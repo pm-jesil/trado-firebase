@@ -1,0 +1,625 @@
+/**
+ * Domain Models for Phase 1 Firestore Collections
+ * 
+ * Strict architectural rule:
+ * - Direct foreign relationships are modeled as Reference IDs, not embedded documents.
+ * - Snapshots are permitted only when explicitly named *Snapshot and justified.
+ */
+
+import {
+  BusinessType,
+  BusinessCategory,
+  EntityStatus,
+  IdempotencyStatus,
+  OutflowKind,
+  OutflowStatus,
+  PaymentStatus,
+  StockMovementType,
+  DeliveryStatus,
+  DeliveryPartner,
+  ReturnType,
+  ReturnDisposition,
+  PaymentMethod,
+  PaymentDirection,
+  PartyType,
+  UnitGroup,
+  SalesMode,
+  DocumentType,
+  BillStatus,
+} from "../constants/enums.js";
+
+/**
+ * 1. users/{uid}
+ * Document ID = Firebase Auth UID
+ */
+export interface UserDoc {
+  name: string;
+  email: string;
+  phone?: string | null;
+  accountType: "standard" | "admin" | "system";
+  isActive: boolean;
+  createdAt: string; // ISO 8601
+  createdBy?: string;
+  updatedAt?: string;
+}
+
+/**
+ * 2. memberships/{membershipId}
+ * Document ID = `${userId}_${organizationId}`
+ * User <-> Organization join record
+ */
+export interface MembershipDoc {
+  userId: string; // Reference to users/{uid}
+  organizationId: string; // Reference to organizations/{organizationId}
+  roleId: string; // Reference to roles/{roleId}
+  departmentId?: string | null; // Reference to departments/{departmentId}
+  jobRoleIds: string[]; // References to jobRoles/{jobRoleId}
+  teamId?: string | null; // Reference to teams/{teamId}
+  reportingToIds: string[]; // References to memberships/{membershipId} (multi-manager graph)
+  permissions: Record<string, boolean>; // Explicit user-level override grants/denies
+  status: EntityStatus;
+  isPrimary: boolean;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * 3. organizations/{organizationId}
+ */
+export interface OrganizationDoc {
+  name: string;
+  businessType: BusinessType;
+  businessCategory: BusinessCategory;
+  country: string; // ISO 3166-1 alpha-2
+  currency: string; // ISO 4217 code
+  taxRegimeCode: string; // Reference to taxRegimes/{taxRegimeCode}
+  status: EntityStatus;
+  planId: string; // Reference to subscriptionPlans/{planId}
+  moduleToggles: Record<string, boolean>; // Per-tenant feature switches
+  logoUrl?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * 4. roles/{roleId}
+ */
+export interface RoleDoc {
+  organizationId: string | null; // Null for system/platform roles
+  name: string;
+  code: string;
+  permissions: string[]; // Canonical permission catalog codes
+  isSystem: boolean;
+  description: string;
+  createdAt?: string;
+  createdBy?: string;
+  updatedAt?: string;
+}
+
+/**
+ * 5. departments/{departmentId}
+ */
+export interface DepartmentDoc {
+  organizationId: string | null; // Null for system catalog
+  name: string;
+  headMembershipIds?: string[]; // References to memberships/{membershipId}
+  isSystem: boolean;
+  createdAt?: string;
+  createdBy?: string;
+  updatedAt?: string;
+}
+
+/**
+ * 6. jobRoles/{jobRoleId}
+ */
+export interface JobRoleDoc {
+  organizationId: string | null; // Null for system catalog
+  name: string;
+  isSystem: boolean;
+  createdAt?: string;
+  createdBy?: string;
+  updatedAt?: string;
+}
+
+/**
+ * 7. teams/{teamId}
+ * Note: Teams NEVER embed members. Membership is queried via memberships.teamId == teamId.
+ */
+export interface TeamDoc {
+  organizationId: string; // Reference to organizations/{organizationId}
+  name: string;
+  createdAt?: string;
+  createdBy?: string;
+  updatedAt?: string;
+}
+
+/**
+ * 8. subscriptionPlans/{planId}
+ */
+export interface SubscriptionPlanDoc {
+  name: string;
+  price: number;
+  currency: string;
+  storageLimitMb: number;
+  monthlyDocumentVolumeLimit: number;
+  seatLimits: {
+    admin: number;
+    staff: number;
+  };
+  moduleFlags: Record<string, boolean>;
+  isActive: boolean;
+  createdAt?: string;
+  createdBy?: string;
+  updatedAt?: string;
+}
+
+/**
+ * 9. permissionCatalog/{permissionCode}
+ */
+export interface PermissionCatalogDoc {
+  code: string;
+  description: string;
+  module: string;
+  isSystem: boolean;
+}
+
+/**
+ * 10. modules/{moduleCode}
+ */
+export interface ModuleDoc {
+  code: string;
+  name: string;
+  description: string;
+}
+
+/**
+ * 11. taxRegimes/{taxRegimeCode}
+ */
+export interface TaxRegimeDoc {
+  code: string;
+  country: string;
+  name: string;
+  description: string;
+  isDefault: boolean;
+}
+
+/**
+ * 12. idempotencyRecords/{recordId}
+ */
+export interface IdempotencyRecordDoc {
+  operationId: string;
+  requestHash: string;
+  status: IdempotencyStatus;
+  result?: Record<string, unknown>;
+  error?: {
+    code: string;
+    message: string;
+  };
+  createdAt: string;
+  processingExpiresAt?: string; // ISO 8601 lease timeout for PROCESSING status
+  expiresAt: string; // ISO 8601
+}
+
+/**
+ * 13. auditLogs/{logId}
+ */
+export interface AuditLogDoc {
+  organizationId?: string | null; // Tenant ID or "platform"
+  actorUid: string;
+  actorMembershipId?: string | null;
+  action: string;
+  entityType: string;
+  entityId: string;
+  timestamp: string;
+  requestId?: string;
+  details?: Record<string, unknown>;
+}
+
+/**
+ * 14. users/{uid}/devices/{deviceId}
+ */
+export interface DeviceDoc {
+  deviceId: string;
+  fcmToken: string;
+  platform: "android" | "ios" | "web";
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * 15. notificationOutbox/{outboxId}
+ */
+export interface NotificationOutboxDoc {
+  userId: string;
+  type: "welcome" | "system";
+  payload: {
+    title: string;
+    body: string;
+    data?: Record<string, string>;
+  };
+  status: "pending" | "dispatched" | "failed";
+  retryCount: number;
+  createdAt: string;
+  dispatchedAt?: string;
+}
+
+/**
+ * -------------------------------------------------------------
+ * Phase 2 Collections & Subdocuments
+ * -------------------------------------------------------------
+ */
+
+/**
+ * Shared Tax Snapshot (frozen at document creation)
+ */
+export interface TaxSnapshot {
+  regime: string;
+  country: string;
+  taxRatePercent: number;
+  taxAmount: number;
+  taxType: string;
+  isRegistered: boolean;
+  registrationNumber?: string;
+  labels?: {
+    taxName: string;
+    registrationLabel: string;
+    invoiceTitle: string;
+  };
+}
+
+/**
+ * 16. products/{productId}
+ */
+export interface ProductDoc {
+  organizationId: string; // Tenant reference
+  name: string;
+  nameKey: string; // Lower-case trimmed for uniqueness search
+  description?: string;
+  categoryId?: string | null; // Reference to categories/{categoryId}
+  baseUnit: string; // Code e.g. "piece", "kg", "box"
+  sellingPrice: number;
+  costPrice: number;
+  mrp?: number | null;
+  wholesalePrice?: number | null;
+  taxInclusive: boolean;
+  taxRatePercent?: number; // e.g. 5, 12, 18
+  taxCode?: string; // HSN/SAC code
+  barcode?: string | null;
+  sku?: string | null;
+  hasExpiry: boolean; // Confirmed canonical name
+  trackStock: boolean;
+  currentStock: number; // Maintained stock total (Stock read strategy option a)
+  lowStockThreshold: number;
+  trackBatch?: boolean;
+  trackSerial?: boolean;
+  hasVariants?: boolean;
+  isPurchaseOnly?: boolean;
+  isExpenseOnly?: boolean;
+  isSaleOnly?: boolean;
+  isActive: boolean;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * 17. categories/{categoryId}
+ */
+export interface CategoryDoc {
+  organizationId: string | null; // Null for global/system categories
+  name: string;
+  nameKey: string;
+  parentId?: string | null; // Parent category ID for hierarchical structure
+  nature?: string; // "operational", "administrative", "cogs", etc.
+  isActive: boolean;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * 18. units/{unitId}
+ */
+export interface UnitDoc {
+  organizationId: string | null; // Null for system units
+  name: string; // e.g. "Kilogram", "Piece", "Liter"
+  code: string; // e.g. "kg", "pcs", "ltr"
+  group: UnitGroup; // count, weight, volume, length, area, time
+  precision: number; // 0-4
+  baseUnit?: string | null; // Reference code if derived
+  conversionFactor?: number; // Relative to baseUnit
+  isActive: boolean;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * 19. customers/{customerId}
+ */
+export interface CustomerDoc {
+  organizationId: string;
+  customerCode: string; // e.g. "CUST-000001"
+  name: string;
+  mobile?: string | null;
+  email?: string | null;
+  taxNumber?: string | null; // GSTIN / VAT registration
+  billingAddress?: string | null;
+  shippingAddress?: string | null;
+  priceGroup?: string; // "retail", "wholesale", "distributor"
+  creditLimit: number;
+  creditPeriodDays: number;
+  outstandingBalance: number; // Udhaar amount customer owes
+  totalSpend: number;
+  isDefault: boolean;
+  isActive: boolean;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * 20. vendors/{vendorId}
+ */
+export interface VendorDoc {
+  organizationId: string;
+  vendorCode: string; // e.g. "VEND-000001"
+  name: string;
+  mobile?: string | null;
+  email?: string | null;
+  taxNumber?: string | null; // GSTIN / TRN
+  address?: string | null;
+  contactPerson?: string | null;
+  paymentTermsDays?: number;
+  creditLimit?: number;
+  outstandingPayable: number; // Amount owed to vendor
+  totalPurchase: number;
+  isDefault: boolean;
+  isActive: boolean;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * Line item in Outflow (Purchase/Expense)
+ */
+export interface OutflowLine {
+  productId?: string | null; // Reference to products/{productId}
+  itemName: string;
+  sku?: string | null;
+  categoryId?: string | null; // Reference to categories/{categoryId}
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+  grossAmount: number;
+  discountAmount: number;
+  taxAmount: number;
+  lineTotal: number;
+  addToStock: boolean;
+  batch?: string | null;
+  expiryDate?: string | null;
+  returnedQty?: number;
+}
+
+/**
+ * 21. outflows/{outflowId}
+ * Unified Outflow collection for both purchases and expenses
+ */
+export interface OutflowDoc {
+  organizationId: string;
+  outflowNumber: string; // e.g. "PUR-2026-000001" or "EXP-2026-000001"
+  kind: OutflowKind; // purchase or expense
+  status: OutflowStatus; // draft, confirmed, voided
+  docDate: string; // ISO 8601
+  vendorId?: string | null; // Reference to vendors/{vendorId}
+  vendorName?: string;
+  payee?: string;
+  invoiceNumber?: string; // External vendor invoice #
+  dueDate?: string | null;
+  lines: OutflowLine[];
+  subTotal: number;
+  discountTotal: number;
+  taxTotal: number;
+  totalAmount: number;
+  paidAmount: number;
+  balanceAmount: number;
+  paymentStatus: PaymentStatus; // paid, pending, partial
+  taxSnapshot?: TaxSnapshot | null;
+  notes?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * Line item in Bill (POS / B2B)
+ */
+export interface BillItem {
+  productId: string; // Reference to products/{productId}
+  nameSnapshot: string; // Product name at sale time
+  priceSnapshot: number; // Selling price at sale time
+  costSnapshot: number; // Cost price at sale time
+  taxCodeSnapshot?: string; // HSN/SAC snapshot
+  quantity: number;
+  unit: string;
+  subtotal: number;
+  discountValue: number;
+  taxAmount: number;
+  lineTotal: number;
+  returnedQty?: number;
+}
+
+/**
+ * Customer Snapshot on Bill
+ */
+export interface BillCustomerSnapshot {
+  name: string;
+  mobile?: string;
+  email?: string;
+  taxNumber?: string;
+  billingAddress?: string;
+  shippingAddress?: string;
+}
+
+/**
+ * 22. bills/{billId}
+ * Shared Sales & Billing engine (POS & B2B)
+ */
+export interface BillDoc {
+  organizationId: string;
+  billNumber: string; // e.g. "INV-2026-000001", "POS-2026-000001", "QTN-2026-000001"
+  salesMode: SalesMode; // pos or b2b
+  documentType?: DocumentType; // invoice, quotation, sales_order, proforma
+  salespersonMembershipId?: string | null;
+  customerId?: string | null; // Reference to customers/{customerId}
+  customerSnapshot?: BillCustomerSnapshot | null;
+  items: BillItem[];
+  subTotal: number;
+  discountTotal: number;
+  taxTotal: number;
+  roundOff: number;
+  totalAmount: number;
+  paidAmount: number;
+  balanceAmount: number;
+  paymentStatus: PaymentStatus;
+  status: BillStatus | "draft" | "active" | "voided" | "cancelled" | "refunded";
+  taxSnapshot?: TaxSnapshot | null;
+  notes?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * 23. stockMovements/{movementId}
+ */
+export interface StockMovementDoc {
+  organizationId: string;
+  productId: string; // Reference to products/{productId}
+  type: StockMovementType;
+  quantity: number; // Signed change (+ addition, - reduction)
+  balanceAfter: number; // Maintained product stock after this movement
+  unit: string;
+  referenceId: string; // ID reference to bill, outflow, return, or adjustment
+  referenceModel: "bill" | "outflow" | "return" | "manual_adjustment";
+  reason?: string | null;
+  createdAt: string;
+  createdBy: string;
+}
+
+/**
+ * Destination Delivery Address
+ */
+export interface DeliveryAddress {
+  line1: string;
+  line2?: string;
+  landmark?: string;
+  city: string;
+  pincode: string;
+}
+
+/**
+ * Delivery Cash on Delivery (COD) Info
+ */
+export interface DeliveryCod {
+  isCod: boolean;
+  amount: number;
+  isCollected: boolean;
+  collectedAt?: string | null;
+}
+
+/**
+ * 24. deliveries/{deliveryId}
+ * Anti-embedding rule: references billId by ID only! Never embeds bill document.
+ */
+export interface DeliveryDoc {
+  organizationId: string;
+  billId: string; // ID reference ONLY! No embedded bill object.
+  customerId?: string | null;
+  customerName: string;
+  customerPhone: string;
+  address: DeliveryAddress; // Destination delivery address
+  riderMembershipId?: string | null;
+  riderName?: string;
+  partner: DeliveryPartner; // internal, swiggy, zomato, dunzo, other
+  deliveryFee: number;
+  status: DeliveryStatus;
+  cod?: DeliveryCod;
+  notes?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * Return Line Item
+ */
+export interface ReturnItem {
+  productId: string; // Reference to products/{productId}
+  nameSnapshot: string;
+  quantity: number;
+  unit?: string;
+  priceSnapshot: number;
+  refundAmount: number;
+  reason: string;
+  disposition: ReturnDisposition; // restocked_to_inventory | wasted_discarded
+}
+
+/**
+ * 25. returns/{returnId}
+ */
+export interface ReturnDoc {
+  organizationId: string;
+  returnNumber: string; // e.g. "RET-2026-000001"
+  returnType: ReturnType; // sales_return or purchase_return
+  referenceId: string; // billId or outflowId (ID reference only!)
+  referenceNumber: string;
+  partyId?: string | null; // customerId or vendorId
+  partyName?: string;
+  items: ReturnItem[];
+  totalRefundAmount: number;
+  refundMethod: string; // cash, credit_note, original_payment
+  status: "completed" | "voided";
+  notes?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * 26. payments/{paymentId}
+ * Payment ledger record
+ */
+export interface PaymentDoc {
+  organizationId: string;
+  paymentNumber: string; // e.g. "PAY-2026-000001"
+  direction: PaymentDirection; // in (collection from customer) or out (payment to vendor)
+  partyType: PartyType; // customer or vendor
+  partyId?: string | null; // ID reference to customer or vendor
+  partyName: string;
+  amount: number;
+  method: PaymentMethod;
+  referenceId?: string | null; // billId or outflowId (ID reference only!)
+  referenceModel?: "bill" | "outflow" | null;
+  referenceNumber?: string | null;
+  notes?: string;
+  status: "completed" | "voided";
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * 27. documentCounters/{counterId}
+ * Document ID format: `${organizationId}_${type}_${year}` e.g. "org123_INV_2026"
+ */
+export interface DocumentCounterDoc {
+  organizationId: string;
+  type: string; // "INV", "POS", "PUR", "EXP", "PAY", "RET", "DEL"
+  year: number;
+  currentSequence: number;
+  updatedAt: string;
+}

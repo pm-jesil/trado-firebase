@@ -1,0 +1,46 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isSuperAdmin() {
+      return isAuthenticated() && ('isSuperAdmin' in request.auth.token) && request.auth.token.isSuperAdmin == true;
+    }
+    
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+    
+    function isValidImage() {
+      return request.resource.size < 5 * 1024 * 1024
+        && (request.resource.contentType.matches('image/png')
+            || request.resource.contentType.matches('image/jpeg')
+            || request.resource.contentType.matches('image/webp')
+            || request.resource.contentType.matches('image/svg\\+xml'));
+    }
+    
+    // User avatars: users/{uid}/avatar/{filename}
+    match /users/{uid}/avatar/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if (isOwner(uid) || isSuperAdmin()) && isValidImage();
+    }
+    
+    // Organization logos: organizations/{organizationId}/logo/{fileName}
+    match /organizations/{organizationId}/logo/{fileName} {
+      // Readable by authenticated users
+      allow read: if isAuthenticated();
+      // Logo uploads restricted to super admin or authorized organization admins via server/admin
+      // In Phase 1 direct upload is permitted only if user has super_admin claim or owner
+      allow write: if isSuperAdmin() && isValidImage();
+    }
+    
+    // Deny all other storage paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
