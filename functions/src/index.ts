@@ -1,5 +1,5 @@
 /**
- * Trado Firebase Cloud Functions - Phase 1 Entry Point
+ * Trado Firebase Cloud Functions Backend
  * 
  * Target Runtime: Node.js 22 (Cloud Functions Gen 2)
  * Primary Region: asia-south1 (Mumbai)
@@ -24,6 +24,17 @@ export {
   organizationsDeactivate,
   organizationsList,
 } from "./callables/organizations.js";
+
+// Branches & Multi-Branch Context
+export {
+  branchesGetDefault,
+  branchesList,
+  branchesCreate,
+  branchesUpdate,
+  branchesDeactivate,
+  branchContextSwitch,
+  sharingPoliciesUpdate,
+} from "./callables/branches.js";
 
 // Employees & Memberships
 export {
@@ -81,7 +92,7 @@ export {
 } from "./callables/notifications.js";
 
 // ============================================================
-// Phase 2 Operational Core Callables
+// Operational Business Layer Callables
 // ============================================================
 
 // Products
@@ -167,4 +178,62 @@ export {
 export {
   reconcileStockBalances,
   reconcilePartyLedgers,
+  reconcileBranchCounts,
 } from "./callables/reconciliation.js";
+
+// ============================================================
+// Operations, Intelligence & Usage Callables & Triggers
+// ============================================================
+
+// Reporting & Analytics
+export {
+  reportsGetRevenue,
+  reportsGetProfitLoss,
+  reportsGetStockValuation,
+  reportsGetTopEntities,
+  reportsGetStaffActivity,
+  reportsGetPlatformOverview,
+  reportsExportCsv,
+} from "./callables/reports.js";
+
+// Tasks
+export {
+  tasksCreate,
+  tasksUpdate,
+  tasksAssign,
+  tasksUpdateStatus,
+  tasksList,
+  tasksDelete,
+} from "./callables/tasks.js";
+
+// Live Location Tracking
+export {
+  locationsRecordPing,
+  locationsGetLatest,
+  locationsGetHistory,
+} from "./callables/locations.js";
+
+// In-App Notifications
+export {
+  notificationsList,
+  notificationsMarkRead,
+} from "./callables/notifications.js";
+
+// Super Admin Usage Metering & Platform Consumption
+export {
+  usageGetPlatformSummary,
+  usageGetOrganizations,
+  usageGetBranches,
+  usageGetDetail,
+  usageCalculateDryRunStatement,
+  usageRecordClientMetric,
+} from "./callables/usage.js";
+
+// Event-Driven Firestore Triggers
+export {
+  onBillWritten,
+  onOutflowWritten,
+  onPaymentWritten,
+  onDeliveryWritten,
+} from "./triggers/eventTriggers.js";
+

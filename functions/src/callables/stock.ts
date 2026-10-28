@@ -67,10 +67,12 @@ export const stockAdjust = onCall({ region: "asia-south1" }, async (request) => 
 
     const movType = input.quantity >= 0 ? StockMovementType.ADJUSTMENT_IN : StockMovementType.ADJUSTMENT_OUT;
     const callerUid = request.auth.uid;
+    const branchId = input.branchId || (request.auth.token.primaryBranchId as string) || "main-branch";
 
     const results = await db.runTransaction(async (txn) => {
       return await applyStockChangesInTxn(txn, {
         organizationId: input.organizationId,
+        branchId,
         actorUid: callerUid,
         items: [
           {
@@ -153,6 +155,9 @@ export const stockMovementsList = onCall({ region: "asia-south1" }, async (reque
   }
   if (input.type) {
     query = query.where("type", "==", input.type);
+  }
+  if (input.branchId) {
+    query = query.where("branchId", "==", input.branchId);
   }
 
   const snapshot = await query.get();

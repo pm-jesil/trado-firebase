@@ -54,3 +54,73 @@ export const notificationsRegisterFcmToken = onCall({ region: "asia-south1" }, a
     message: "FCM token registered successfully.",
   };
 });
+
+/**
+ * notificationsList
+ * Retrieves in-app notification history for the authenticated user.
+ */
+export const notificationsList = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required to view notifications.");
+  }
+
+  const uid = request.auth.uid;
+  const unreadOnly = request.data?.unreadOnly === true;
+  const limit = Math.min(Number(request.data?.limit) || 50, 100);
+
+  let query = db.collection("notifications").where("userId", "==", uid);
+  if (unreadOnly) {
+    query = query.where("isRead", "==", false);
+  }
+
+  const snap = await query.limit(limit).get();
+  const notifications = snap.docs.map((d) => ({
+    notificationId: d.id,
+    ...d.data(),
+  }));
+
+  // Sort descending by creation date
+  notifications.sort((a: any, b: any) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+
+  return {
+    items: notifications,
+    count: notifications.length,
+  };
+});
+
+/**
+ * notificationsMarkRead
+ * Marks a notification as read.
+ */
+export const notificationsMarkRead = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const notificationId = request.data?.notificationId;
+  if (!notificationId) {
+    throw new HttpsError("invalid-argument", "notificationId is required.");
+  }
+
+  const notifRef = db.collection("notifications").doc(notificationId);
+  const snap = await notifRef.get();
+  if (!snap.exists) {
+    throw new HttpsError("not-found", `Notification "${notificationId}" not found.`);
+  }
+
+  const data = snap.data()!;
+  if (data.userId !== request.auth.uid) {
+    throw new HttpsError("permission-denied", "Cannot mark another user's notification as read.");
+  }
+
+  await notifRef.update({
+    isRead: true,
+    readAt: new Date().toISOString(),
+  });
+
+  return {
+    notificationId,
+    isRead: true,
+  };
+});
+

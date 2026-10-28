@@ -194,7 +194,7 @@ async function runSeed() {
   await auth.setCustomUserClaims(ownerUid, { primaryOrganizationId: sampleOrgId });
   console.log(`   Sample organization "${sampleOrgId}", Owner membership, and primaryOrganizationId claim provisioned.`);
 
-  // 8. Seed Sample Phase 2 Operational Core Records
+  // 8. Seed Sample Operational Business Records
   console.log("\n8. Seeding Sample Operational Records (Category, Unit, Product, Customer, Vendor)...");
   const now = new Date().toISOString();
 

@@ -1,0 +1,546 @@
+### ==============================================================================
+### TRADO FIREBASE BACKEND — LOCAL REST CLIENT / POSTMAN API COLLECTION
+### 
+### Requirements:
+### 1. Firebase Emulators running: firebase emulators:start --only auth,functions,firestore
+### 2. VS Code Extension: "REST Client" (humao.rest-client) or import into Postman
+### 3. Local Emulator Ports:
+###    - Auth: 9099
+###    - Cloud Functions: 5001
+###    - Cloud Firestore: 8080
+### ==============================================================================
+
+@authHost = http://127.0.0.1:9099
+@functionsHost = http://127.0.0.1:5001/trado-x/asia-south1
+@projectId = trado-x
+
+### ------------------------------------------------------------------------------
+### 1. SYSTEM & DIAGNOSTICS
+### ------------------------------------------------------------------------------
+
+### 1.1 Health Check (Public, No Auth Required)
+POST {{functionsHost}}/healthCheck
+Content-Type: application/json
+
+{
+  "data": {}
+}
+
+### ------------------------------------------------------------------------------
+### 2. AUTHENTICATION (LOCAL EMULATOR ID TOKEN EXCHANGE)
+### ------------------------------------------------------------------------------
+
+### 2.1 Sign in as Super Admin (Local Emulator Token)
+# @name adminSignIn
+POST {{authHost}}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=fake-key
+Content-Type: application/json
+
+{
+  "email": "superadmin@trado.local",
+  "password": "Password123!",
+  "returnSecureToken": true
+}
+
+### Save Admin Token
+@adminToken = {{adminSignIn.response.body.idToken}}
+
+### 2.2 Sign in as Tenant Owner
+# @name ownerSignIn
+POST {{authHost}}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=fake-key
+Content-Type: application/json
+
+{
+  "email": "owner@acme.local",
+  "password": "Password123!",
+  "returnSecureToken": true
+}
+
+### Save Owner Token
+@ownerToken = {{ownerSignIn.response.body.idToken}}
+
+### ------------------------------------------------------------------------------
+### 3. SESSION BOOTSTRAP & CAPABILITIES
+### ------------------------------------------------------------------------------
+
+### 3.1 authMe - Bootstrap User Profile, Active Memberships & Resolved Permissions
+POST {{functionsHost}}/authMe
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {}
+}
+
+### ------------------------------------------------------------------------------
+### 4. CATALOGS & REFERENCE DATA
+### ------------------------------------------------------------------------------
+
+### 4.1 Permission Catalog List
+POST {{functionsHost}}/permissionCatalogList
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {}
+}
+
+### 4.2 Platform Modules List
+POST {{functionsHost}}/modulesList
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {}
+}
+
+### 4.3 Tax Regimes List
+POST {{functionsHost}}/taxRegimesList
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {}
+}
+
+### 4.4 Subscription Plans List
+POST {{functionsHost}}/plansList
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {}
+}
+
+### ------------------------------------------------------------------------------
+### 5. ORGANIZATIONS
+### ------------------------------------------------------------------------------
+
+### 5.1 Create Organization (Super Admin Only)
+POST {{functionsHost}}/organizationsCreate
+Content-Type: application/json
+Authorization: Bearer {{adminToken}}
+
+{
+  "data": {
+    "name": "Acme Retail Ltd",
+    "businessType": "retail_only",
+    "businessCategory": "grocery_fmcg",
+    "country": "IN",
+    "currency": "INR",
+    "taxRegimeCode": "INDIA_GST",
+    "ownerEmail": "owner@acme.local",
+    "ownerPassword": "Password123!",
+    "ownerName": "John Doe",
+    "planId": "plan_growth",
+    "idempotencyKey": "req_org_create_001"
+  }
+}
+
+### 5.2 List Organizations
+POST {{functionsHost}}/organizationsList
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "pageSize": 10
+  }
+}
+
+### ------------------------------------------------------------------------------
+### 6. EMPLOYEES & STAFF
+### ------------------------------------------------------------------------------
+
+### 6.1 Create Employee (Owner / Admin)
+POST {{functionsHost}}/employeesCreate
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "email": "cashier@acme.local",
+    "password": "Password123!",
+    "name": "Jane Cashier",
+    "roleId": "role_employee",
+    "idempotencyKey": "req_emp_create_001"
+  }
+}
+
+### 6.2 List Employees
+POST {{functionsHost}}/employeesList
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "pageSize": 20
+  }
+}
+
+### ------------------------------------------------------------------------------
+### 7. MASTER CATALOG: CATEGORIES & UNITS
+### ------------------------------------------------------------------------------
+
+### 7.1 Create Category
+POST {{functionsHost}}/categoriesCreate
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "name": "Beverages",
+    "idempotencyKey": "cat_bev_001"
+  }
+}
+
+### 7.2 List Categories
+POST {{functionsHost}}/categoriesList
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123"
+  }
+}
+
+### 7.3 Create Unit
+POST {{functionsHost}}/unitsCreate
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "name": "Bottle",
+    "code": "btl",
+    "group": "count",
+    "precision": 0,
+    "idempotencyKey": "unit_btl_001"
+  }
+}
+
+### 7.4 List Units
+POST {{functionsHost}}/unitsList
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123"
+  }
+}
+
+### ------------------------------------------------------------------------------
+### 8. PRODUCTS & INVENTORY
+### ------------------------------------------------------------------------------
+
+### 8.1 Create Product
+POST {{functionsHost}}/productsCreate
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "name": "Mineral Water 1L",
+    "baseUnit": "btl",
+    "sellingPrice": 20.00,
+    "costPrice": 12.00,
+    "taxInclusive": true,
+    "taxRatePercent": 18,
+    "barcode": "8901234567890",
+    "trackStock": true,
+    "initialStock": 50,
+    "lowStockThreshold": 10,
+    "hasExpiry": true,
+    "idempotencyKey": "prod_create_water_001"
+  }
+}
+
+### 8.2 List Products
+POST {{functionsHost}}/productsList
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "pageSize": 20
+  }
+}
+
+### 8.3 Adjust Stock Manually
+POST {{functionsHost}}/stockAdjust
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "productId": "PROD_ID_HERE",
+    "adjustmentType": "adjustment_in",
+    "quantity": 10,
+    "reason": "Found surplus stock during count",
+    "idempotencyKey": "adj_stock_001"
+  }
+}
+
+### ------------------------------------------------------------------------------
+### 9. CUSTOMERS & VENDORS
+### ------------------------------------------------------------------------------
+
+### 9.1 Create Customer
+POST {{functionsHost}}/customersCreate
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "name": "Acme Hotels",
+    "mobile": "+919876543210",
+    "taxNumber": "27AAACA1234A1Z5",
+    "creditLimit": 50000,
+    "creditPeriodDays": 30,
+    "idempotencyKey": "cust_hotel_001"
+  }
+}
+
+### 9.2 Create Vendor
+POST {{functionsHost}}/vendorsCreate
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "name": "Beverage Distributors Inc",
+    "mobile": "+919123456780",
+    "taxNumber": "27BBBCA5678B1Z2",
+    "idempotencyKey": "vend_bev_001"
+  }
+}
+
+### ------------------------------------------------------------------------------
+### 10. PURCHASES & EXPENSES (OUTFLOWS)
+### ------------------------------------------------------------------------------
+
+### 10.1 Create Purchase Outflow (Inward Stock Intake)
+POST {{functionsHost}}/outflowsCreate
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "kind": "purchase",
+    "status": "confirmed",
+    "docDate": "2026-10-28T00:00:00.000Z",
+    "vendorId": "VENDOR_ID_HERE",
+    "lines": [
+      {
+        "productId": "PROD_ID_HERE",
+        "itemName": "Mineral Water 1L",
+        "quantity": 100,
+        "unit": "btl",
+        "unitPrice": 12.00,
+        "grossAmount": 1200.00,
+        "discountAmount": 0,
+        "taxAmount": 216.00,
+        "lineTotal": 1416.00,
+        "addToStock": true
+      }
+    ],
+    "subTotal": 1200.00,
+    "discountTotal": 0,
+    "taxTotal": 216.00,
+    "totalAmount": 1416.00,
+    "paidAmount": 0,
+    "balanceAmount": 1416.00,
+    "paymentStatus": "pending",
+    "idempotencyKey": "outflow_pur_001"
+  }
+}
+
+### ------------------------------------------------------------------------------
+### 11. SALES & BILLS (POS & B2B)
+### ------------------------------------------------------------------------------
+
+### 11.1 Create POS Bill (Active Tax Invoice)
+POST {{functionsHost}}/billsCreate
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "salesMode": "pos",
+    "documentType": "invoice",
+    "status": "active",
+    "items": [
+      {
+        "productId": "PROD_ID_HERE",
+        "nameSnapshot": "Mineral Water 1L",
+        "priceSnapshot": 20.00,
+        "costSnapshot": 12.00,
+        "quantity": 2,
+        "unit": "btl",
+        "subtotal": 40.00,
+        "discountValue": 0,
+        "taxAmount": 6.10,
+        "lineTotal": 40.00
+      }
+    ],
+    "subTotal": 33.90,
+    "discountTotal": 0,
+    "taxTotal": 6.10,
+    "roundOff": 0,
+    "totalAmount": 40.00,
+    "paidAmount": 40.00,
+    "balanceAmount": 0,
+    "paymentStatus": "paid",
+    "idempotencyKey": "bill_pos_001"
+  }
+}
+
+### 11.2 Create B2B Quotation (Draft, Does Not Decrement Stock)
+POST {{functionsHost}}/billsCreate
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "salesMode": "b2b",
+    "documentType": "quotation",
+    "status": "draft",
+    "customerId": "CUSTOMER_ID_HERE",
+    "items": [
+      {
+        "productId": "PROD_ID_HERE",
+        "nameSnapshot": "Mineral Water 1L",
+        "priceSnapshot": 20.00,
+        "costSnapshot": 12.00,
+        "quantity": 20,
+        "unit": "btl",
+        "subtotal": 400.00,
+        "discountValue": 0,
+        "taxAmount": 61.02,
+        "lineTotal": 400.00
+      }
+    ],
+    "subTotal": 338.98,
+    "discountTotal": 0,
+    "taxTotal": 61.02,
+    "roundOff": 0,
+    "totalAmount": 400.00,
+    "paidAmount": 0,
+    "balanceAmount": 400.00,
+    "paymentStatus": "pending",
+    "idempotencyKey": "qtn_b2b_001"
+  }
+}
+
+### 11.3 Finalize Quotation into Invoice (Assigns INV- number & Decrements Stock)
+POST {{functionsHost}}/billsFinalize
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "billId": "BILL_ID_HERE",
+    "idempotencyKey": "fin_bill_001"
+  }
+}
+
+### ------------------------------------------------------------------------------
+### 12. PAYMENTS LEDGER
+### ------------------------------------------------------------------------------
+
+### 12.1 Inbound Customer Receipt
+POST {{functionsHost}}/paymentsCreate
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "direction": "in",
+    "partyType": "customer",
+    "partyId": "CUSTOMER_ID_HERE",
+    "partyName": "Acme Hotels",
+    "amount": 400.00,
+    "method": "upi",
+    "referenceId": "BILL_ID_HERE",
+    "referenceModel": "bill",
+    "idempotencyKey": "pay_cust_001"
+  }
+}
+
+### ------------------------------------------------------------------------------
+### 13. RETURNS & CREDIT NOTES
+### ------------------------------------------------------------------------------
+
+### 13.1 Sales Return (Restocks Inventory & Credits Customer)
+POST {{functionsHost}}/returnsCreate
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "returnType": "sales_return",
+    "referenceId": "BILL_ID_HERE",
+    "partyId": "CUSTOMER_ID_HERE",
+    "partyName": "Acme Hotels",
+    "refundMethod": "credit_note",
+    "items": [
+      {
+        "productId": "PROD_ID_HERE",
+        "nameSnapshot": "Mineral Water 1L",
+        "quantity": 2,
+        "unit": "btl",
+        "priceSnapshot": 20.00,
+        "refundAmount": 40.00,
+        "reason": "Customer ordered excess",
+        "disposition": "restocked_to_inventory"
+      }
+    ],
+    "idempotencyKey": "ret_sale_001"
+  }
+}
+
+### ------------------------------------------------------------------------------
+### 14. ADMINISTRATIVE RECONCILIATION
+### ------------------------------------------------------------------------------
+
+### 14.1 Reconcile Stock Balances
+POST {{functionsHost}}/reconcileStockBalances
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "autoFix": false
+  }
+}
+
+### 14.2 Reconcile Party Ledgers
+POST {{functionsHost}}/reconcilePartyLedgers
+Content-Type: application/json
+Authorization: Bearer {{ownerToken}}
+
+{
+  "data": {
+    "organizationId": "org_test_123",
+    "partyType": "customer",
+    "autoFix": false
+  }
+}
+

@@ -18,8 +18,10 @@ export interface PermissionResolutionContext {
   roleCode?: string;
   rolePermissions: string[];
   membershipOverrides: Record<string, boolean>; // explicit true (grant) or false (deny)
+  branchMembershipOverrides?: Record<string, boolean>; // branch-level overrides
   planModuleFlags: Record<string, boolean>;
   orgModuleToggles: Record<string, boolean>;
+  branchModuleOverrides?: Record<string, boolean>; // branch-level module restrictions
 }
 
 /**
@@ -73,6 +75,7 @@ export function getModuleForPermission(permissionCode: string): string {
     case "team":
     case "audit":
     case "org":
+    case "branch":
       return "staff";
     default:
       return "system";
@@ -80,12 +83,13 @@ export function getModuleForPermission(permissionCode: string): string {
 }
 
 /**
- * Checks if a module is active across Layer 1 (Plan) and Layer 2 (Organization).
+ * Checks if a module is active across Layer 1 (Plan), Layer 2 (Organization), and Branch overrides.
  */
 export function isModuleActive(
   moduleCode: string,
   planFlags: Record<string, boolean>,
-  orgToggles: Record<string, boolean>
+  orgToggles: Record<string, boolean>,
+  branchOverrides?: Record<string, boolean>
 ): boolean {
   if (moduleCode === "platform" || moduleCode === "system") {
     return true;
@@ -100,6 +104,11 @@ export function isModuleActive(
   // Layer 2: Organization must not have disabled the module
   // If orgToggles has the key and it is false, module is disabled
   if (orgToggles[moduleCode] === false) {
+    return false;
+  }
+
+  // Branch Overrides: can only further restrict capabilities enabled by Plan & Org
+  if (branchOverrides && branchOverrides[moduleCode] === false) {
     return false;
   }
 
@@ -123,9 +132,14 @@ export function resolvePermission(
     return false;
   }
 
-  // Check Module Activation (Layers 1 & 2)
+  // Check Module Activation (Layers 1 & 2 + Branch Overrides)
   const moduleCode = getModuleForPermission(requiredPermission);
-  if (!isModuleActive(moduleCode, context.planModuleFlags, context.orgModuleToggles)) {
+  if (!isModuleActive(moduleCode, context.planModuleFlags, context.orgModuleToggles, context.branchModuleOverrides)) {
+    return false;
+  }
+
+  // Check branch-specific membership overrides (strict deny takes precedence)
+  if (context.branchMembershipOverrides && context.branchMembershipOverrides[requiredPermission] === false) {
     return false;
   }
 
@@ -138,9 +152,17 @@ export function resolvePermission(
   const parts = requiredPermission.split(":");
   for (let i = 1; i < parts.length; i++) {
     const prefixWildcard = `${parts.slice(0, i).join(":")}:*`;
+    if (context.branchMembershipOverrides && context.branchMembershipOverrides[prefixWildcard] === false) {
+      return false;
+    }
     if (context.membershipOverrides[prefixWildcard] === false) {
       return false;
     }
+  }
+
+  // If explicitly granted in Branch Membership Overrides:
+  if (context.branchMembershipOverrides && context.branchMembershipOverrides[requiredPermission] === true) {
+    return true;
   }
 
   // If explicitly granted in Layer 4 overrides:

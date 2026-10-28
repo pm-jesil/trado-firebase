@@ -10,7 +10,7 @@
 import { Transaction } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 import { db } from "./firebase.js";
-import { StockMovementDoc, ProductDoc } from "../types/models.js";
+import { StockMovementDoc, ProductDoc, StockBalanceDoc } from "../types/models.js";
 import { StockMovementType } from "../constants/enums.js";
 import { roundQty } from "./money.js";
 
@@ -41,6 +41,7 @@ export interface StockChangeItem {
 
 export interface ApplyStockChangesParams {
   organizationId: string;
+  branchId?: string; // Branch context (defaults to "main-branch")
   actorUid: string;
   items: StockChangeItem[];
   allowNegativeStock?: boolean;
@@ -50,15 +51,20 @@ export interface StockChangeResult {
   productId: string;
   previousStock: number;
   newStock: number;
+  branchStock: number;
   movementId: string;
 }
 
 export interface PreparedStockOperation {
   docRef: FirebaseFirestore.DocumentReference;
+  stockBalanceRef: FirebaseFirestore.DocumentReference;
+  stockBalanceDoc: StockBalanceDoc;
   item: StockChangeItem;
   trackStock: boolean;
   previousStock: number;
   newStock: number;
+  previousBranchStock: number;
+  newBranchStock: number;
   movementRef: FirebaseFirestore.DocumentReference;
   movementDoc: StockMovementDoc;
   result: StockChangeResult;
@@ -70,7 +76,7 @@ export interface PreparedStockChanges {
 }
 
 /**
- * Reads all product documents, validates tenant isolation and stock availability,
+ * Reads all product and branch stock balance documents, validates tenant isolation and stock availability,
  * and precomputes stock movements.
  * MUST be executed during the transaction read phase (before any writes).
  */
@@ -81,13 +87,24 @@ export async function prepareStockChangesInTxn(
   const operations: PreparedStockOperation[] = [];
   const results: StockChangeResult[] = [];
   const now = new Date().toISOString();
+  const branchId = params.branchId || "main-branch";
 
-  // 1. Read all product documents first (Firestore rule: all reads before writes)
-  const productReads: Array<{ item: StockChangeItem; docSnap: FirebaseFirestore.DocumentSnapshot }> = [];
+  // 1. Read all product documents and branch balance documents first (Firestore rule: all reads before writes)
+  const productReads: Array<{
+    item: StockChangeItem;
+    docSnap: FirebaseFirestore.DocumentSnapshot;
+    balanceSnap: FirebaseFirestore.DocumentSnapshot;
+  }> = [];
 
   for (const item of params.items) {
     const productRef = db.collection("products").doc(item.productId);
-    const docSnap = await txn.get(productRef);
+    const balanceRef = db.collection("stockBalances").doc(`${params.organizationId}_${branchId}_${item.productId}`);
+
+    const [docSnap, balanceSnap] = await Promise.all([
+      txn.get(productRef),
+      txn.get(balanceRef),
+    ]);
+
     if (!docSnap.exists) {
       throw new HttpsError("not-found", `Product with ID "${item.productId}" not found.`);
     }
@@ -97,11 +114,11 @@ export async function prepareStockChangesInTxn(
       throw new HttpsError("permission-denied", `Cross-tenant product access rejected for "${item.productId}".`);
     }
 
-    productReads.push({ item, docSnap });
+    productReads.push({ item, docSnap, balanceSnap });
   }
 
   // 2. Perform calculations and precompute updates + movements
-  for (const { item, docSnap } of productReads) {
+  for (const { item, docSnap, balanceSnap } of productReads) {
     // Validate movement directional sign matches type
     if (INWARD_MOVEMENT_TYPES.has(item.type) && item.quantity <= 0) {
       throw new HttpsError(
@@ -117,26 +134,35 @@ export async function prepareStockChangesInTxn(
     }
 
     const prodData = docSnap.data() as ProductDoc;
+    const balanceData = balanceSnap.exists ? (balanceSnap.data() as StockBalanceDoc) : null;
+
+    // Previous branch stock: if stockBalance exists, use it; otherwise fallback to product currentStock for main-branch, or 0
+    const previousBranchStock = balanceData
+      ? (balanceData.currentStock || 0)
+      : (branchId === "main-branch" ? (prodData.currentStock || 0) : 0);
     const previousStock = prodData.currentStock || 0;
     const roundedQuantity = roundQty(item.quantity, 4);
+
+    const newBranchStock = roundQty(previousBranchStock + roundedQuantity, 4);
     const newStock = roundQty(previousStock + roundedQuantity, 4);
 
     // Check negative stock prohibition if tracking is enabled
-    if (prodData.trackStock && newStock < 0 && !params.allowNegativeStock) {
+    if (prodData.trackStock && newBranchStock < 0 && !params.allowNegativeStock) {
       throw new HttpsError(
         "failed-precondition",
-        `Insufficient stock for "${prodData.name}". Available: ${previousStock}, Requested: ${Math.abs(item.quantity)}.`
+        `Insufficient branch stock for "${prodData.name}". Available at branch: ${previousBranchStock}, Requested: ${Math.abs(item.quantity)}.`
       );
     }
 
-    // Create immutable stock movement record
+    // Create immutable stock movement record with branchId
     const movementRef = db.collection("stockMovements").doc();
     const movementDoc: StockMovementDoc = {
       organizationId: params.organizationId,
+      branchId,
       productId: item.productId,
       type: item.type,
       quantity: item.quantity,
-      balanceAfter: prodData.trackStock ? newStock : previousStock,
+      balanceAfter: prodData.trackStock ? newBranchStock : previousBranchStock,
       unit: item.unit || prodData.baseUnit || "piece",
       referenceId: item.referenceId,
       referenceModel: item.referenceModel,
@@ -145,19 +171,35 @@ export async function prepareStockChangesInTxn(
       createdBy: params.actorUid,
     };
 
+    const stockBalanceRef = balanceSnap.ref;
+    const stockBalanceDoc: StockBalanceDoc = {
+      organizationId: params.organizationId,
+      branchId,
+      productId: item.productId,
+      currentStock: prodData.trackStock ? newBranchStock : previousBranchStock,
+      lowStockThreshold: prodData.lowStockThreshold || 5,
+      updatedAt: now,
+      updatedBy: params.actorUid,
+    };
+
     const result: StockChangeResult = {
       productId: item.productId,
       previousStock,
       newStock: prodData.trackStock ? newStock : previousStock,
+      branchStock: prodData.trackStock ? newBranchStock : previousBranchStock,
       movementId: movementRef.id,
     };
 
     operations.push({
       docRef: docSnap.ref,
+      stockBalanceRef,
+      stockBalanceDoc,
       item,
       trackStock: Boolean(prodData.trackStock),
       previousStock,
       newStock,
+      previousBranchStock,
+      newBranchStock,
       movementRef,
       movementDoc,
       result,
@@ -179,11 +221,17 @@ export function commitStockChangesInTxn(
   const now = new Date().toISOString();
   for (const op of prepared.operations) {
     if (op.trackStock) {
+      // 1. Maintain global aggregate mirror on product document
       txn.update(op.docRef, {
         currentStock: op.newStock,
         updatedAt: now,
       });
+
+      // 2. Maintain physical inventory balance on stockBalances document
+      txn.set(op.stockBalanceRef, op.stockBalanceDoc, { merge: true });
     }
+
+    // 3. Write immutable stock movement record
     txn.set(op.movementRef, op.movementDoc);
   }
   return prepared.results;

@@ -71,9 +71,11 @@ export const deliveriesCreate = onCall({ region: "asia-south1" }, async (request
     const deliveryRef = db.collection("deliveries").doc();
     const deliveryId = deliveryRef.id;
     const now = new Date().toISOString();
+    const branchId = input.branchId || billData.branchId || (request.auth.token.primaryBranchId as string) || "main-branch";
 
     const deliveryDoc: DeliveryDoc = {
       organizationId: input.organizationId,
+      branchId,
       billId: input.billId, // ID reference ONLY!
       customerId: input.customerId || null,
       customerName: input.customerName.trim(),
@@ -214,6 +216,9 @@ export const deliveriesList = onCall({ region: "asia-south1" }, async (request) 
 
   if (input.status) {
     query = query.where("status", "==", input.status);
+  }
+  if (input.branchId) {
+    query = query.where("branchId", "==", input.branchId);
   }
 
   const snapshot = await query.get();

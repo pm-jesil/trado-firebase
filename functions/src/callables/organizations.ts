@@ -17,11 +17,19 @@ import {
 import {
   CreateOrganizationResponse,
 } from "../types/api.js";
-import { OrganizationDoc, UserDoc, MembershipDoc } from "../types/models.js";
+import {
+  OrganizationDoc,
+  UserDoc,
+  MembershipDoc,
+  BranchDoc,
+  BranchCodeLockDoc,
+  MembershipBranchDoc,
+  OrganizationSharingPolicies,
+} from "../types/models.js";
 import { EntityStatus, IdempotencyStatus } from "../constants/enums.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { compensateAuthUser } from "../services/compensation.js";
-import { setPrimaryOrganizationClaim } from "../services/claims.js";
+import { setPrimaryOrganizationClaim, setPrimaryBranchClaim } from "../services/claims.js";
 import { createAuditLog } from "../services/audit.js";
 import { queueWelcomeNotification } from "../services/notificationSender.js";
 
@@ -103,14 +111,28 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
     const orgRef = db.collection("organizations").doc();
     const orgId = orgRef.id;
 
-    // Set custom claim primaryOrganizationId on newly created Owner
+    // Set custom claims primaryOrganizationId and primaryBranchId on newly created Owner
     await setPrimaryOrganizationClaim(createdAuthUid, orgId);
+    await setPrimaryBranchClaim(createdAuthUid, "main-branch");
 
     const userRef = db.collection("users").doc(createdAuthUid);
     const membershipId = `${createdAuthUid}_${orgId}`;
     const membershipRef = db.collection("memberships").doc(membershipId);
 
     const now = new Date().toISOString();
+    const branchCode = (input.defaultBranchCode || "MAIN").toUpperCase().trim();
+
+    const defaultSharingPolicies: OrganizationSharingPolicies = {
+      products: "organization_shared",
+      categories: "organization_shared",
+      customers: "organization_shared",
+      vendors: "organization_shared",
+      sales: "branch_scoped",
+      purchases: "organization_shared",
+      expenses: "organization_shared",
+      stock: "branch_scoped",
+      deliveries: "organization_shared",
+    };
 
     const orgDocData: OrganizationDoc = {
       name: input.name,
@@ -122,6 +144,9 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
       status: EntityStatus.ACTIVE,
       planId: input.planId,
       moduleToggles: {},
+      defaultBranchId: "main-branch",
+      branchCount: 1,
+      sharingPolicies: defaultSharingPolicies,
       createdAt: now,
       createdBy: request.auth.uid,
     };
@@ -145,8 +170,47 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
       permissions: {},
       status: EntityStatus.ACTIVE,
       isPrimary: true,
+      primaryBranchId: "main-branch",
+      assignedBranchIds: ["main-branch"],
       createdAt: now,
       createdBy: request.auth.uid,
+    };
+
+    // Branch-readiness: Provision default branch 'main-branch' under organizations/{orgId}/branches
+    const branchRef = orgRef.collection("branches").doc("main-branch");
+    const defaultBranchDoc: BranchDoc = {
+      organizationId: orgId,
+      name: input.defaultBranchName?.trim() || "Main Branch",
+      code: branchCode,
+      isDefault: true,
+      isActive: true,
+      createdAt: now,
+      createdBy: request.auth.uid,
+      updatedAt: now,
+    };
+
+    // Code lock for default branch
+    const lockRef = db.collection("branchCodeLocks").doc(`${orgId}_${branchCode}`);
+    const lockDoc: BranchCodeLockDoc = {
+      organizationId: orgId,
+      branchCode,
+      branchId: "main-branch",
+      createdAt: now,
+    };
+
+    // Join record mapping Owner membership to main-branch
+    const membershipBranchRef = db.collection("membershipBranches").doc(`${membershipId}_main-branch`);
+    const membershipBranchDoc: MembershipBranchDoc = {
+      organizationId: orgId,
+      branchId: "main-branch",
+      membershipId,
+      userId: createdAuthUid,
+      status: EntityStatus.ACTIVE,
+      isDefaultForMembership: true,
+      permissions: {},
+      createdAt: now,
+      createdBy: request.auth.uid,
+      updatedAt: now,
     };
 
     const response: CreateOrganizationResponse = {
@@ -157,11 +221,14 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
       message: "Organization and owner provisioned successfully.",
     };
 
-    // Coordinated atomic batch: Org + User + Membership + Audit + Idempotency
+    // Coordinated atomic batch: Org + User + Membership + Branch + CodeLock + MembershipBranch + Audit + Idempotency
     const batch = db.batch();
     batch.set(orgRef, orgDocData);
     batch.set(userRef, userDocData);
     batch.set(membershipRef, membershipDocData);
+    batch.set(branchRef, defaultBranchDoc);
+    batch.set(lockRef, lockDoc);
+    batch.set(membershipBranchRef, membershipBranchDoc);
 
     const auditRef = db.collection("auditLogs").doc();
     batch.set(auditRef, {

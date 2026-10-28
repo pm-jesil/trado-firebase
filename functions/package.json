@@ -12,6 +12,7 @@
     "test": "npm run build && node --test lib/test/unit/**/*.test.js",
     "test:unit": "npm run build && node --test lib/test/unit/**/*.test.js",
     "test:rules": "npm run build && node --test lib/test/rules/**/*.test.js",
+    "test:api": "node scripts/test-api-workbench.js",
     "check:embedding": "node ../scripts/check-duplicate-embedding.js"
   },
   "engines": {

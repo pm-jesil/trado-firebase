@@ -12,6 +12,7 @@ import { AuditLogDoc } from "../types/models.js";
 
 export interface LogAuditParams {
   organizationId?: string | null;
+  branchId?: string | null;
   actorUid: string;
   actorMembershipId?: string | null;
   action: string;
@@ -52,6 +53,7 @@ export function sanitizeAuditDetails(details?: Record<string, unknown>): Record<
 export async function createAuditLog(params: LogAuditParams, targetDb: Firestore = db): Promise<string> {
   const logDoc: AuditLogDoc = {
     organizationId: params.organizationId ?? "platform",
+    branchId: params.branchId ?? null,
     actorUid: params.actorUid,
     actorMembershipId: params.actorMembershipId ?? null,
     action: params.action,
@@ -73,6 +75,7 @@ export function addAuditLogToTransaction(txn: Transaction, params: LogAuditParam
   const ref = db.collection("auditLogs").doc();
   const logDoc: AuditLogDoc = {
     organizationId: params.organizationId ?? "platform",
+    branchId: params.branchId ?? null,
     actorUid: params.actorUid,
     actorMembershipId: params.actorMembershipId ?? null,
     action: params.action,
@@ -92,6 +95,7 @@ export function addAuditLogToBatch(batch: WriteBatch, params: LogAuditParams): v
   const ref = db.collection("auditLogs").doc();
   const logDoc: AuditLogDoc = {
     organizationId: params.organizationId ?? "platform",
+    branchId: params.branchId ?? null,
     actorUid: params.actorUid,
     actorMembershipId: params.actorMembershipId ?? null,
     action: params.action,

@@ -23,6 +23,7 @@ import {
   OrganizationDoc,
   MembershipDoc,
   PaymentDoc,
+  CustomerDoc,
 } from "../types/models.js";
 import {
   SalesMode,
@@ -93,6 +94,7 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
     }
     const orgData = orgDoc.data() as OrganizationDoc;
 
+    const branchId = input.branchId || (request.auth.token.primaryBranchId as string) || orgData.defaultBranchId || "main-branch";
     const billRef = db.collection("bills").doc();
     const billId = billRef.id;
     const now = new Date().toISOString();
@@ -206,7 +208,7 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
 
     // Execute atomic transaction for bill creation, document numbering, stock deduction, and payments
     const finalResult = await db.runTransaction(async (txn) => {
-      // === PHASE 1: ALL READS FIRST (Firestore requirement) ===
+      // === STEP 1: ALL TRANSACTIONAL READS FIRST (Firestore requirement) ===
       const billReservation = await readNextDocumentNumberInTxn(txn, {
         organizationId: input.organizationId,
         type: prefix,
@@ -224,17 +226,26 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
       if (stockChangeItems.length > 0) {
         preparedStock = await prepareStockChangesInTxn(txn, {
           organizationId: input.organizationId,
+          branchId,
           actorUid: callerUid,
           items: stockChangeItems,
         });
       }
 
-      // === PHASE 2: ALL WRITES AFTER ALL READS ===
+      let customerRef: FirebaseFirestore.DocumentReference | null = null;
+      let customerSnap: FirebaseFirestore.DocumentSnapshot | null = null;
+      if (!isQuotationOrDraft && input.customerId) {
+        customerRef = db.collection("customers").doc(input.customerId);
+        customerSnap = await txn.get(customerRef);
+      }
+
+      // === STEP 2: ALL TRANSACTIONAL WRITES ===
       commitDocumentNumberInTxn(txn, billReservation);
       const billNumber = billReservation.formattedNumber;
 
       const billDoc: BillDoc = {
         organizationId: input.organizationId,
+        branchId,
         billNumber,
         salesMode: input.salesMode || SalesMode.POS,
         documentType: docType,
@@ -263,6 +274,18 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
         commitStockChangesInTxn(txn, preparedStock);
       }
 
+      // Update customer ledger if active bill (not quotation/draft)
+      if (customerRef && customerSnap && customerSnap.exists) {
+        const custData = customerSnap.data() as CustomerDoc;
+        const newSpend = Money.amount((custData.totalSpend || 0) + totalAmount);
+        const newBal = Money.amount((custData.outstandingBalance || 0) + balanceAmount);
+        txn.update(customerRef, {
+          totalSpend: newSpend,
+          outstandingBalance: newBal,
+          updatedAt: now,
+        });
+      }
+
       // If paid amount > 0, record payment entry
       let paymentId: string | null = null;
       if (paidAmount > 0 && paymentReservation) {
@@ -272,6 +295,7 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
 
         const paymentDoc: PaymentDoc = {
           organizationId: input.organizationId,
+          branchId,
           paymentNumber: paymentReservation.formattedNumber,
           direction: PaymentDirection.IN,
           partyType: PartyType.CUSTOMER,
@@ -364,6 +388,9 @@ export const billsList = onCall({ region: "asia-south1" }, async (request) => {
   if (input.customerId) {
     query = query.where("customerId", "==", input.customerId);
   }
+  if (input.branchId) {
+    query = query.where("branchId", "==", input.branchId);
+  }
 
   const snapshot = await query.get();
   const items = snapshot.docs.map((doc) => ({
@@ -413,78 +440,153 @@ export const billsFinalize = onCall({ region: "asia-south1" }, async (request) =
 
   await verifyTenantAccess(request.auth, input.organizationId);
 
-  const billRef = db.collection("bills").doc(input.billId);
-  const billSnap = await billRef.get();
-  if (!billSnap.exists) {
-    throw new HttpsError("not-found", "Bill not found.");
-  }
-  const billData = billSnap.data() as BillDoc;
-  if (billData.organizationId !== input.organizationId) {
-    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
-  }
+  const idempotency = await reserveIdempotency({
+    scope: input.organizationId,
+    actorUid: request.auth.uid,
+    operation: "bills.finalize",
+    clientKey: input.idempotencyKey,
+    payload: input as unknown as Record<string, unknown>,
+  });
 
-  if (billData.status !== "draft") {
-    throw new HttpsError(
-      "failed-precondition",
-      `Only draft / quotation bills can be finalized. Current status: "${billData.status}".`
-    );
+  if (idempotency.isDuplicate) {
+    if (idempotency.isProcessing) {
+      throw new HttpsError("already-exists", "Operation in progress. Please retry shortly.");
+    }
+    return idempotency.cachedResult;
   }
 
-  const callerUid = request.auth.uid;
-  const now = new Date().toISOString();
+  try {
+    const callerUid = request.auth.uid;
+    const now = new Date().toISOString();
+    const billRef = db.collection("bills").doc(input.billId);
 
-  // Prepare stock deduction items for the finalized bill
-  const stockChangeItems: StockChangeItem[] = [];
-  for (const item of billData.items) {
-    stockChangeItems.push({
-      productId: item.productId,
-      quantity: -Math.abs(item.quantity),
-      type: StockMovementType.SALE_OUT,
-      unit: item.unit,
-      referenceId: input.billId,
-      referenceModel: "bill",
-      reason: `Finalized Bill ${billData.billNumber}`,
-    });
-  }
+    const finalResult = await db.runTransaction(async (txn) => {
+      // === STEP 1: ALL TRANSACTIONAL READS FIRST (Strict Firestore rule) ===
+      const billSnap = await txn.get(billRef);
+      if (!billSnap.exists) {
+        throw new HttpsError("not-found", "Bill not found.");
+      }
+      const billData = billSnap.data() as BillDoc;
+      if (billData.organizationId !== input.organizationId) {
+        throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+      }
 
-  await db.runTransaction(async (txn) => {
-    // 1. Transaction Read phase: Validate stock availability
-    let preparedStock = null;
-    if (stockChangeItems.length > 0) {
-      preparedStock = await prepareStockChangesInTxn(txn, {
+      if (billData.status !== "draft") {
+        throw new HttpsError(
+          "failed-precondition",
+          `Only draft / quotation bills can be finalized. Current status: "${billData.status}".`
+        );
+      }
+
+      // 1. Reserve official invoice number
+      const invReservation = await readNextDocumentNumberInTxn(txn, {
         organizationId: input.organizationId,
-        actorUid: callerUid,
-        items: stockChangeItems,
+        type: "INV",
+      });
+
+      // 2. Prepare stock changes
+      const stockChangeItems: StockChangeItem[] = [];
+      for (const item of billData.items) {
+        stockChangeItems.push({
+          productId: item.productId,
+          quantity: -Math.abs(item.quantity),
+          type: StockMovementType.SALE_OUT,
+          unit: item.unit,
+          referenceId: input.billId,
+          referenceModel: "bill",
+          reason: `Finalized Bill ${invReservation.formattedNumber} (ex-${billData.billNumber})`,
+        });
+      }
+
+      let preparedStock = null;
+      if (stockChangeItems.length > 0) {
+        preparedStock = await prepareStockChangesInTxn(txn, {
+          organizationId: input.organizationId,
+          branchId: billData.branchId || "main-branch",
+          actorUid: callerUid,
+          items: stockChangeItems,
+        });
+      }
+
+      // 3. Read customer profile if B2B account
+      let custSnap = null;
+      let custRef = null;
+      if (billData.customerId) {
+        custRef = db.collection("customers").doc(billData.customerId);
+        custSnap = await txn.get(custRef);
+      }
+
+      // === STEP 2: ALL TRANSACTIONAL WRITES ===
+      commitDocumentNumberInTxn(txn, invReservation);
+
+      if (preparedStock) {
+        commitStockChangesInTxn(txn, preparedStock);
+      }
+
+      const originalNumber = billData.billNumber;
+      const invoiceNumber = invReservation.formattedNumber;
+
+      txn.update(billRef, {
+        status: "active",
+        documentType: DocumentType.INVOICE,
+        billNumber: invoiceNumber,
+        originalQuotationNumber: originalNumber,
+        finalizedAt: now,
+        finalizedBy: callerUid,
+        updatedAt: now,
+      });
+
+      if (custRef && custSnap && custSnap.exists) {
+        const custData = custSnap.data() as any;
+        const newSpend = Money.amount((custData.totalSpend || 0) + billData.totalAmount);
+        const newBal = Money.amount((custData.outstandingBalance || 0) + billData.balanceAmount);
+        txn.update(custRef, {
+          totalSpend: newSpend,
+          outstandingBalance: newBal,
+          updatedAt: now,
+        });
+      }
+
+      return {
+        billId: input.billId,
+        status: "active",
+        billNumber: invoiceNumber,
+        originalQuotationNumber: originalNumber,
+        totalAmount: billData.totalAmount,
+        paidAmount: billData.paidAmount,
+        balanceAmount: billData.balanceAmount,
+        message: `Quotation ${originalNumber} finalized into Invoice ${invoiceNumber}. Inventory stock decremented.`,
+      };
+    });
+
+    if (idempotency.recordId) {
+      const idempRef = db.collection("idempotencyRecords").doc(idempotency.recordId);
+      await idempRef.update({
+        status: "succeeded",
+        result: finalResult,
+        updatedAt: now,
       });
     }
 
-    // 2. Transaction Write phase: Decrement stock & update status
-    if (preparedStock) {
-      commitStockChangesInTxn(txn, preparedStock);
-    }
-
-    txn.update(billRef, {
-      status: "active",
-      documentType: DocumentType.INVOICE,
-      updatedAt: now,
+    await createAuditLog({
+      organizationId: input.organizationId,
+      actorUid: callerUid,
+      action: "BILL_FINALIZED",
+      entityType: "bill",
+      entityId: input.billId,
+      details: {
+        billNumber: finalResult.billNumber,
+        originalQuotationNumber: finalResult.originalQuotationNumber,
+        totalAmount: finalResult.totalAmount,
+      },
     });
-  });
 
-  await createAuditLog({
-    organizationId: input.organizationId,
-    actorUid: callerUid,
-    action: "BILL_FINALIZED",
-    entityType: "bill",
-    entityId: input.billId,
-    details: {
-      billNumber: billData.billNumber,
-      totalAmount: billData.totalAmount,
-    },
-  });
-
-  return {
-    billId: input.billId,
-    status: "active",
-    message: "Bill finalized successfully. Inventory stock decremented.",
-  };
+    return finalResult;
+  } catch (error) {
+    if (idempotency.recordId) {
+      await finalizeIdempotencyFailure(idempotency.recordId, "FINALIZE_BILL_FAILED", (error as Error).message);
+    }
+    if (error instanceof HttpsError) throw error;
+    throw new HttpsError("internal", `Failed to finalize bill: ${(error as Error).message}`);
+  }
 });

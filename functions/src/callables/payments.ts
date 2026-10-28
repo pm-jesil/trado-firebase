@@ -13,9 +13,13 @@ import {
   CreatePaymentSchema,
   ListPaymentsSchema,
 } from "../validation/schemas.js";
-import { PaymentDoc, MembershipDoc } from "../types/models.js";
+import { PaymentDoc, MembershipDoc, BillDoc, OutflowDoc, CustomerDoc, VendorDoc } from "../types/models.js";
+import { Money } from "../services/money.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
-import { getNextDocumentNumberInTxn } from "../services/documentCounter.js";
+import {
+  readNextDocumentNumberInTxn,
+  commitDocumentNumberInTxn,
+} from "../services/documentCounter.js";
 import { createAuditLog } from "../services/audit.js";
 
 async function verifyTenantAccess(auth: any, organizationId: string): Promise<void> {
@@ -61,15 +65,50 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
     const paymentId = paymentRef.id;
     const now = new Date().toISOString();
     const callerUid = request.auth.uid;
+    const branchId = input.branchId || (request.auth.token.primaryBranchId as string) || "main-branch";
 
     const finalResult = await db.runTransaction(async (txn) => {
-      const paymentNumber = await getNextDocumentNumberInTxn(txn, {
+      // === STEP 1: ALL TRANSACTIONAL READS FIRST ===
+      const paymentReservation = await readNextDocumentNumberInTxn(txn, {
         organizationId: input.organizationId,
         type: "PAY",
       });
 
+      let billRef = null;
+      let billSnap = null;
+      if (input.referenceModel === "bill" && input.referenceId) {
+        billRef = db.collection("bills").doc(input.referenceId);
+        billSnap = await txn.get(billRef);
+      }
+
+      let outflowRef = null;
+      let outflowSnap = null;
+      if (input.referenceModel === "outflow" && input.referenceId) {
+        outflowRef = db.collection("outflows").doc(input.referenceId);
+        outflowSnap = await txn.get(outflowRef);
+      }
+
+      let custRef = null;
+      let custSnap = null;
+      if (input.partyType === "customer" && input.partyId) {
+        custRef = db.collection("customers").doc(input.partyId);
+        custSnap = await txn.get(custRef);
+      }
+
+      let vendRef = null;
+      let vendSnap = null;
+      if (input.partyType === "vendor" && input.partyId) {
+        vendRef = db.collection("vendors").doc(input.partyId);
+        vendSnap = await txn.get(vendRef);
+      }
+
+      // === STEP 2: ALL TRANSACTIONAL WRITES ===
+      commitDocumentNumberInTxn(txn, paymentReservation);
+      const paymentNumber = paymentReservation.formattedNumber;
+
       const paymentDoc: PaymentDoc = {
         organizationId: input.organizationId,
+        branchId,
         paymentNumber,
         direction: input.direction,
         partyType: input.partyType,
@@ -86,6 +125,56 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
       };
 
       txn.set(paymentRef, paymentDoc);
+
+      // Settle linked Bill if applicable
+      if (billRef && billSnap && billSnap.exists) {
+        const bData = billSnap.data() as BillDoc;
+        const newPaid = Money.amount((bData.paidAmount || 0) + input.amount);
+        const newBal = Money.amount(Math.max(0, bData.totalAmount - newPaid));
+        const newStatus = newBal <= 0 ? "paid" : "partial";
+        txn.update(billRef, {
+          paidAmount: newPaid,
+          balanceAmount: newBal,
+          paymentStatus: newStatus,
+          updatedAt: now,
+        });
+      }
+
+      // Settle linked Outflow if applicable
+      if (outflowRef && outflowSnap && outflowSnap.exists) {
+        const oData = outflowSnap.data() as OutflowDoc;
+        const newPaid = Money.amount((oData.paidAmount || 0) + input.amount);
+        const newBal = Money.amount(Math.max(0, oData.totalAmount - newPaid));
+        const newStatus = newBal <= 0 ? "paid" : "partial";
+        txn.update(outflowRef, {
+          paidAmount: newPaid,
+          balanceAmount: newBal,
+          paymentStatus: newStatus,
+          updatedAt: now,
+        });
+      }
+
+      // Recalculate customer receivable balance
+      if (custRef && custSnap && custSnap.exists) {
+        const cData = custSnap.data() as CustomerDoc;
+        const currentBal = cData.outstandingBalance || 0;
+        const newBal = Money.amount(Math.max(0, currentBal - input.amount));
+        txn.update(custRef, {
+          outstandingBalance: newBal,
+          updatedAt: now,
+        });
+      }
+
+      // Recalculate vendor payable balance
+      if (vendRef && vendSnap && vendSnap.exists) {
+        const vData = vendSnap.data() as VendorDoc;
+        const currentPayable = vData.outstandingPayable || 0;
+        const newPayable = Money.amount(Math.max(0, currentPayable - input.amount));
+        txn.update(vendRef, {
+          outstandingPayable: newPayable,
+          updatedAt: now,
+        });
+      }
 
       return {
         paymentId,
@@ -155,6 +244,9 @@ export const paymentsList = onCall({ region: "asia-south1" }, async (request) =>
   }
   if (input.referenceId) {
     query = query.where("referenceId", "==", input.referenceId);
+  }
+  if (input.branchId) {
+    query = query.where("branchId", "==", input.branchId);
   }
 
   const snapshot = await query.get();

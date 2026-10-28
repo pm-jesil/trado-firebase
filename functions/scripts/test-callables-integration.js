@@ -75,20 +75,20 @@ async function invokeCallable(functionName, payload, idToken = null) {
 
 async function runIntegrationSuite() {
   console.log("==========================================================");
-  console.log("   TRADO FIREBASE BACKEND — PHASE 1 INTEGRATION SUITE    ");
+  console.log("   TRADO FIREBASE BACKEND — CALLABLES INTEGRATION SUITE   ");
   console.log("==========================================================\n");
 
   let passed = 0;
   let failed = 0;
 
   async function test(name, fn) {
-    process.stdout.write(`• Testing: ${name}... `);
+    process.stdout.write(`â€¢ Testing: ${name}... `);
     try {
       await fn();
-      console.log("PASSED ✓");
+      console.log("PASSED âœ“");
       passed++;
     } catch (err) {
-      console.log(`FAILED ✗\n  ${err.message}`);
+      console.log(`FAILED âœ—\n  ${err.message}`);
       if (err.stack) console.log(`  ${err.stack.split("\n").slice(1, 3).join("\n")}`);
       failed++;
     }
@@ -499,9 +499,9 @@ async function runIntegrationSuite() {
   });
 
   // ============================================================
-  // Phase 2 Operational Core Integration Tests
+  // Operational Business Layer Integration Tests
   // ============================================================
-  console.log("\n--- Phase 2 Operational Core Integration Tests ---");
+  console.log("\n--- Operational Business Layer Integration Tests ---");
 
   // 11. Part 0: employeesCreate default role assignment (role_employee)
   let employeeDefaultRoleUserId = null;
@@ -982,6 +982,392 @@ async function runIntegrationSuite() {
 
     assert.equal(vendRes.ok, true);
     assert.equal(vendRes.data.discrepancyCount, 0, "Must have 0 vendor ledger discrepancies");
+  });
+
+  // 27. Section 5: Sequential duplicate finalization of already-finalized bill rejects
+  await test("Section 5: sequential duplicate finalization of already-finalized bill rejects with FAILED_PRECONDITION", async () => {
+    // quotationBillId was already finalized in test 25
+    const res = await invokeCallable("billsFinalize", {
+      organizationId: createdOrgId,
+      billId: quotationBillId,
+    }, createdOwnerToken);
+
+    assert.equal(res.status, 400);
+    assert.equal(res.error?.status, "FAILED_PRECONDITION");
+    assert.match(res.error?.message, /Only draft \/ quotation bills can be finalized/);
+  });
+
+  // 28. Section 5: Concurrent Promise.all finalization requests for same draft
+  await test("Section 5: concurrent Promise.all finalization of same draft allows exactly 1 winner and 1 stock decrement", async () => {
+    // 1. Create a draft quotation with 5 units
+    const draftRes = await invokeCallable("billsCreate", {
+      organizationId: createdOrgId,
+      salesMode: "b2b",
+      documentType: "quotation",
+      items: [{ productId: createdProductId, quantity: 5 }],
+      idempotencyKey: `concurrent_qtn_${Date.now()}`,
+    }, createdOwnerToken);
+    assert.equal(draftRes.ok, true);
+    const draftId = draftRes.data.billId;
+
+    const stockBeforeRace = (await db.collection("products").doc(createdProductId).get()).data()?.currentStock;
+
+    // 2. Fire two simultaneous finalize requests with DIFFERENT idempotency keys
+    const [resA, resB] = await Promise.all([
+      invokeCallable("billsFinalize", {
+        organizationId: createdOrgId,
+        billId: draftId,
+        idempotencyKey: `fin_race_a_${Date.now()}`,
+      }, createdOwnerToken),
+      invokeCallable("billsFinalize", {
+        organizationId: createdOrgId,
+        billId: draftId,
+        idempotencyKey: `fin_race_b_${Date.now()}`,
+      }, createdOwnerToken),
+    ]);
+
+    // Exactly one must succeed (200 OK) and the other must fail (400 FAILED_PRECONDITION)
+    const successCount = (resA.ok ? 1 : 0) + (resB.ok ? 1 : 0);
+    assert.equal(successCount, 1, "Exactly one concurrent finalization must succeed");
+
+    const failedRes = resA.ok ? resB : resA;
+    assert.equal(failedRes.status, 400);
+    assert.equal(failedRes.error?.status, "FAILED_PRECONDITION");
+
+    // Stock must be decremented by exactly 5 (NOT 10!)
+    const stockAfterRace = (await db.collection("products").doc(createdProductId).get()).data()?.currentStock;
+    assert.equal(stockAfterRace, stockBeforeRace - 5, "Stock must be decremented exactly once under concurrent finalization");
+  });
+
+  // 29. Section 5: Duplicate finalization with identical idempotencyKey returns cached result
+  await test("Section 5: duplicate finalization with identical idempotencyKey returns cached result", async () => {
+    // 1. Create another draft quotation
+    const draftRes = await invokeCallable("billsCreate", {
+      organizationId: createdOrgId,
+      salesMode: "b2b",
+      documentType: "quotation",
+      items: [{ productId: createdProductId, quantity: 2 }],
+      idempotencyKey: `idemp_qtn_${Date.now()}`,
+    }, createdOwnerToken);
+    assert.equal(draftRes.ok, true);
+    const draftId = draftRes.data.billId;
+
+    const idempKey = `finalize_cache_${Date.now()}`;
+    const fin1 = await invokeCallable("billsFinalize", {
+      organizationId: createdOrgId,
+      billId: draftId,
+      idempotencyKey: idempKey,
+    }, createdOwnerToken);
+    assert.equal(fin1.ok, true);
+    const assignedInvoiceNumber = fin1.data.billNumber;
+    assert.match(assignedInvoiceNumber, /^INV-\d{4}-\d{6}$/);
+
+    const stockAfterFin1 = (await db.collection("products").doc(createdProductId).get()).data()?.currentStock;
+
+    // 2. Replay with identical idempotency key
+    const fin2 = await invokeCallable("billsFinalize", {
+      organizationId: createdOrgId,
+      billId: draftId,
+      idempotencyKey: idempKey,
+    }, createdOwnerToken);
+    assert.equal(fin2.ok, true);
+    assert.equal(fin2.data.billNumber, assignedInvoiceNumber, "Must return identical cached invoice number");
+
+    // Stock must NOT be decremented again
+    const stockAfterFin2 = (await db.collection("products").doc(createdProductId).get()).data()?.currentStock;
+    assert.equal(stockAfterFin2, stockAfterFin1, "Stock must NOT be decremented again on idempotent replay");
+  });
+
+  // 30. Section 5: Cross-tenant finalization rejection
+  await test("Section 5: cross-tenant bill finalization is rejected with PERMISSION_DENIED", async () => {
+    // Create draft in createdOrgId, try to finalize via second org context or non-member
+    const draftRes = await invokeCallable("billsCreate", {
+      organizationId: createdOrgId,
+      salesMode: "b2b",
+      documentType: "quotation",
+      items: [{ productId: createdProductId, quantity: 1 }],
+      idempotencyKey: `cross_qtn_${Date.now()}`,
+    }, createdOwnerToken);
+    assert.equal(draftRes.ok, true);
+
+    const crossRes = await invokeCallable("billsFinalize", {
+      organizationId: createdOrgId,
+      billId: draftRes.data.billId,
+    }, regularUserToken);
+
+    assert.equal(crossRes.status, 403);
+    assert.equal(crossRes.error?.status, "PERMISSION_DENIED");
+  });
+
+  // 31. Section 7: Returns over-return rejection
+  let finalizedSaleBillId = null;
+  await test("Section 7: returnsCreate rejects return quantity exceeding remaining billed quantity", async () => {
+    // Create and finalize a sale with quantity = 5
+    const billRes = await invokeCallable("billsCreate", {
+      organizationId: createdOrgId,
+      salesMode: "pos",
+      items: [{ productId: createdProductId, quantity: 5 }],
+      idempotencyKey: `ret_test_bill_${Date.now()}`,
+    }, createdOwnerToken);
+    assert.equal(billRes.ok, true);
+    finalizedSaleBillId = billRes.data.billId;
+
+    // Try to return 10 (exceeds 5)
+    const overRetRes = await invokeCallable("returnsCreate", {
+      organizationId: createdOrgId,
+      returnType: "sales_return",
+      referenceId: finalizedSaleBillId,
+      items: [
+        {
+          productId: createdProductId,
+          quantity: 10,
+          refundAmount: 1000,
+          reason: "customer_refused",
+          disposition: "restocked_to_inventory",
+        },
+      ],
+      refundMethod: "cash",
+      idempotencyKey: `over_ret_${Date.now()}`,
+    }, createdOwnerToken);
+
+    assert.equal(overRetRes.status, 400);
+    assert.equal(overRetRes.error?.status, "INVALID_ARGUMENT");
+    assert.match(overRetRes.error?.message, /remain returnable/);
+  });
+
+  // 32. Section 7: Valid return restores stock and updates line returnedQty
+  await test("Section 7: valid return restores stock and records stock movement", async () => {
+    const stockBeforeReturn = (await db.collection("products").doc(createdProductId).get()).data()?.currentStock;
+
+    const validRetRes = await invokeCallable("returnsCreate", {
+      organizationId: createdOrgId,
+      returnType: "sales_return",
+      referenceId: finalizedSaleBillId,
+      items: [
+        {
+          productId: createdProductId,
+          quantity: 2,
+          refundAmount: 200,
+          reason: "customer_refused",
+          disposition: "restocked_to_inventory",
+        },
+      ],
+      refundMethod: "cash",
+      idempotencyKey: `valid_ret_${Date.now()}`,
+    }, createdOwnerToken);
+
+    assert.equal(validRetRes.ok, true, `valid return failed: ${JSON.stringify(validRetRes.error)}`);
+    assert.match(validRetRes.data.returnNumber, /^RET-\d{4}-\d{6}$/);
+
+    // Stock must be restored by 2
+    const stockAfterReturn = (await db.collection("products").doc(createdProductId).get()).data()?.currentStock;
+    assert.equal(stockAfterReturn, stockBeforeReturn + 2, "Stock must be restored on restocked return");
+
+    // Parent bill line returnedQty must be 2
+    const updatedBill = (await db.collection("bills").doc(finalizedSaleBillId).get()).data();
+    assert.equal(updatedBill.items[0].returnedQty, 2, "Bill line returnedQty must be 2");
+  });
+
+  // ============================================================
+  // PART 17: Branch-Ready Multi-Branch Lifecycle & Plan Enforcement
+  // ============================================================
+  console.log("\n--- PART 17: Branch-Ready Multi-Branch Lifecycle & Plan Enforcement ---");
+
+  let createdSecondaryBranchId = "";
+
+  await test("branchesGetDefault returns main-branch configuration", async () => {
+    const res = await invokeCallable("branchesGetDefault", {}, createdOwnerToken);
+    assert.equal(res.ok, true, `branchesGetDefault failed: ${JSON.stringify(res.error)}`);
+    assert.equal(res.data.branchId, "main-branch");
+    assert.equal(res.data.branch.code, "MAIN");
+    assert.equal(res.data.branch.isDefault, true);
+    assert.equal(res.data.branch.isActive, true);
+  });
+
+  await test("branchesCreate enforces subscription plan branchLimit (1 branch limit)", async () => {
+    // Current org has default plan with branchLimit: 1
+    const res = await invokeCallable("branchesCreate", {
+      name: "Second Branch",
+      code: "SEC1",
+    }, createdOwnerToken);
+
+    assert.equal(res.ok, false, "Should fail when branch limit is exceeded");
+    assert.equal(res.status, 400, "Should return failed-precondition (HTTP 400)");
+    assert.match(res.error.message, /Branch limit reached/);
+  });
+
+  await test("branchesCreate succeeds when plan branchLimit allows multi-branch", async () => {
+    // Elevate organization's plan branchLimit to 2 for isolated emulator testing
+    const orgDocRef = db.collection("organizations").doc(createdOrgId);
+    const orgSnap = await orgDocRef.get();
+    const planId = orgSnap.data().planId;
+    await db.collection("subscriptionPlans").doc(planId).update({ branchLimit: 2 });
+
+    const res = await invokeCallable("branchesCreate", {
+      name: "Downtown Store",
+      code: "DOWN",
+      address: {
+        line1: "123 South Road",
+        city: "Mumbai",
+        state: "Maharashtra",
+        postalCode: "400001",
+        country: "IN",
+      },
+    }, createdOwnerToken);
+
+    assert.equal(res.ok, true, `branchesCreate failed: ${JSON.stringify(res.error)}`);
+    createdSecondaryBranchId = res.data.branchId;
+    assert.equal(res.data.branch.code, "DOWN");
+    assert.equal(res.data.branch.isDefault, false);
+    assert.equal(res.data.branch.isActive, true);
+
+    // Concurrency lock document must exist
+    const lockSnap = await db.collection("branchCodeLocks").doc(`${createdOrgId}_DOWN`).get();
+    assert.equal(lockSnap.exists, true, "branchCodeLocks document must exist");
+  });
+
+  await test("branchesCreate rejects duplicate branch code via concurrency lock", async () => {
+    // Elevate branchLimit to 10 so plan limit does not pre-empt the unique code check
+    const orgDocRef = db.collection("organizations").doc(createdOrgId);
+    const orgSnap = await orgDocRef.get();
+    const planId = orgSnap.data().planId;
+    await db.collection("subscriptionPlans").doc(planId).update({ branchLimit: 10 });
+
+    const res = await invokeCallable("branchesCreate", {
+      name: "Duplicate Downtown",
+      code: "DOWN", // Same code
+    }, createdOwnerToken);
+
+    assert.equal(res.ok, false, "Duplicate branch code must be rejected");
+    assert.match(res.error.message, /already exists/);
+  });
+
+  await test("branchContextSwitch validates assignment and updates primaryBranchId claim", async () => {
+    const res = await invokeCallable("branchContextSwitch", {
+      targetBranchId: createdSecondaryBranchId,
+    }, createdOwnerToken);
+
+    assert.equal(res.ok, true, `branchContextSwitch failed: ${JSON.stringify(res.error)}`);
+    assert.equal(res.data.primaryBranchId, createdSecondaryBranchId);
+
+    // Verify claim directly on Auth user
+    const claims = (await auth.getUser(createdOwnerUid)).customClaims;
+    assert.equal(claims.primaryBranchId, createdSecondaryBranchId);
+  });
+
+  await test("branchesDeactivate protects default branch and deactivates secondary branch", async () => {
+    // 1. Prohibit deactivating main-branch
+    const mainDeactRes = await invokeCallable("branchesDeactivate", {
+      branchId: "main-branch",
+    }, createdOwnerToken);
+    assert.equal(mainDeactRes.ok, false, "main-branch deactivation must be rejected");
+    assert.match(mainDeactRes.error.message, /Cannot deactivate the default branch/);
+
+    // 2. Deactivate secondary branch
+    const secDeactRes = await invokeCallable("branchesDeactivate", {
+      branchId: createdSecondaryBranchId,
+      reason: "Closing location",
+    }, createdOwnerToken);
+    assert.equal(secDeactRes.ok, true, `secondary branch deactivation failed: ${JSON.stringify(secDeactRes.error)}`);
+
+    const branchDoc = (await db.collection("organizations").doc(createdOrgId).collection("branches").doc(createdSecondaryBranchId).get()).data();
+    assert.equal(branchDoc.isActive, false, "Branch isActive should be false");
+  });
+
+  await test("sharingPoliciesUpdate updates tenant sharing policies with strict stock constraint", async () => {
+    const res = await invokeCallable("sharingPoliciesUpdate", {
+      policies: {
+        products: "organization_shared",
+        customers: "organization_shared",
+        sales: "branch_scoped",
+      },
+    }, createdOwnerToken);
+
+    assert.equal(res.ok, true, `sharingPoliciesUpdate failed: ${JSON.stringify(res.error)}`);
+    assert.equal(res.data.sharingPolicies.stock, "branch_scoped", "Stock policy must strictly remain branch_scoped");
+  });
+
+  await test("authMe returns enriched branch context including primaryBranchId and active branches", async () => {
+    const res = await invokeCallable("authMe", {}, createdOwnerToken);
+    assert.equal(res.ok, true, `authMe failed: ${JSON.stringify(res.error)}`);
+    assert.ok(res.data.activeContext, "activeContext must exist");
+    assert.ok(res.data.activeContext.branchId, "activeContext.branchId must exist");
+    assert.ok(res.data.activeContext.primaryBranchId, "activeContext.primaryBranchId must exist");
+    assert.ok(Array.isArray(res.data.activeContext.assignedBranchIds), "assignedBranchIds must be an array");
+    assert.ok(Array.isArray(res.data.activeContext.branches), "activeContext.branches must be an array");
+    const mainBranchEntry = res.data.activeContext.branches.find((b) => b.branchId === "main-branch");
+    assert.ok(mainBranchEntry, "branches array must contain main-branch");
+    assert.equal(mainBranchEntry.code, "MAIN");
+  });
+
+  let branchScopedCustId = null;
+  await test("customersCreate supports branch-scoping and visibilityScope validation", async () => {
+    // 1. Create customer with branch_only scope
+    const res = await invokeCallable("customersCreate", {
+      organizationId: createdOrgId,
+      branchId: "main-branch",
+      name: "Main Branch Walkin Customer",
+      visibilityScope: "branch_only",
+      idempotencyKey: `cust_scope_${Date.now()}`,
+    }, createdOwnerToken);
+
+    assert.equal(res.ok, true, `customersCreate failed: ${JSON.stringify(res.error)}`);
+    assert.ok(res.data.customerId);
+    branchScopedCustId = res.data.customerId;
+
+    // Verify persisted customer fields in Firestore
+    const custDoc = (await db.collection("customers").doc(branchScopedCustId).get()).data();
+    assert.equal(custDoc.visibilityScope, "branch_only");
+    assert.deepEqual(custDoc.sharedForBranchIds, ["main-branch"]);
+  });
+
+  await test("customersUpdate modifies visibilityScope and enforces branch existence validation", async () => {
+    // 1. Reject update with invalid/nonexistent branch ID
+    const badRes = await invokeCallable("customersUpdate", {
+      organizationId: createdOrgId,
+      customerId: branchScopedCustId,
+      visibilityScope: "selected_branches",
+      sharedForBranchIds: ["non-existent-branch-999"],
+    }, createdOwnerToken);
+
+    assert.equal(badRes.ok, false, "Must reject non-existent branch ID in sharedForBranchIds");
+
+    // 2. Accept update with valid branch
+    const goodRes = await invokeCallable("customersUpdate", {
+      organizationId: createdOrgId,
+      customerId: branchScopedCustId,
+      visibilityScope: "all_branches",
+      sharedForBranchIds: ["main-branch"],
+    }, createdOwnerToken);
+
+    assert.equal(goodRes.ok, true, `customersUpdate failed: ${JSON.stringify(goodRes.error)}`);
+    const updatedDoc = (await db.collection("customers").doc(branchScopedCustId).get()).data();
+    assert.equal(updatedDoc.visibilityScope, "all_branches");
+  });
+
+  await test("vendorsCreate and vendorsUpdate support branch attribution and visibility", async () => {
+    const res = await invokeCallable("vendorsCreate", {
+      organizationId: createdOrgId,
+      branchId: "main-branch",
+      name: "Local Produce Vendor",
+      visibilityScope: "branch_only",
+      idempotencyKey: `vend_scope_${Date.now()}`,
+    }, createdOwnerToken);
+
+    assert.equal(res.ok, true, `vendorsCreate failed: ${JSON.stringify(res.error)}`);
+    const vendId = res.data.vendorId;
+
+    const vendDoc = (await db.collection("vendors").doc(vendId).get()).data();
+    assert.equal(vendDoc.visibilityScope, "branch_only");
+    assert.deepEqual(vendDoc.sharedForBranchIds, ["main-branch"]);
+
+    // Update to all_branches
+    const updateRes = await invokeCallable("vendorsUpdate", {
+      organizationId: createdOrgId,
+      vendorId: vendId,
+      visibilityScope: "all_branches",
+    }, createdOwnerToken);
+    assert.equal(updateRes.ok, true);
   });
 
   console.log("\n==========================================================");

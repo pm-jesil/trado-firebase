@@ -88,7 +88,7 @@ describe("Firestore Security Rules Matrix", () => {
       setDoc(doc(userDb, "roles", "role_super"), { name: "Hacked Super Role" })
     );
 
-    // Direct write to Phase 2 operational collections
+    // Direct write to operational business collections
     await assertFails(
       setDoc(doc(userDb, "products", "prod_1"), { name: "Hacked Product", organizationId: "org_1" })
     );
@@ -250,7 +250,7 @@ describe("Firestore Security Rules Matrix", () => {
     await assertSucceeds(getDoc(doc(userDb, "taxRegimes", "IN_GST")));
   });
 
-  // --- 7. Phase 2 Operational Core Tenant Isolation ---
+  // --- 7. Operational Business Collections Tenant Isolation ---
   it("allows tenant member to read products, bills, outflows, payments of own org, denies cross-tenant reads", async () => {
     await testEnv.withSecurityRulesDisabled(async (adminContext) => {
       // Organization Alpha membership for Alice
@@ -291,5 +291,147 @@ describe("Firestore Security Rules Matrix", () => {
     // Alice CANNOT read Beta product or bill (cross-tenant rejected!)
     await assertFails(getDoc(doc(aliceDb, "products", "prod_beta")));
     await assertFails(getDoc(doc(aliceDb, "bills", "bill_beta")));
+  });
+
+  // --- 8. Branch-Ready Foundation Security Rules ---
+  it("protects branches, membershipBranches, and stockBalances: allows tenant reads, denies cross-tenant reads and direct writes", async () => {
+    await testEnv.withSecurityRulesDisabled(async (adminContext) => {
+      // Organization Alpha membership for Alice
+      await setDoc(doc(adminContext.firestore(), "memberships", "user_alice_org_alpha"), {
+        userId: "user_alice",
+        organizationId: "org_alpha",
+        roleId: "role_employee",
+        status: "active",
+      });
+
+      // Branch under org_alpha
+      await setDoc(doc(adminContext.firestore(), "organizations", "org_alpha", "branches", "main-branch"), {
+        organizationId: "org_alpha",
+        name: "Main Branch",
+        code: "MAIN",
+        isDefault: true,
+        isActive: true,
+      });
+
+      // Branch under org_beta
+      await setDoc(doc(adminContext.firestore(), "organizations", "org_beta", "branches", "main-branch"), {
+        organizationId: "org_beta",
+        name: "Main Branch",
+        code: "MAIN",
+        isDefault: true,
+        isActive: true,
+      });
+
+      // membershipBranches for Alice
+      await setDoc(doc(adminContext.firestore(), "membershipBranches", "user_alice_org_alpha_main-branch"), {
+        organizationId: "org_alpha",
+        branchId: "main-branch",
+        membershipId: "user_alice_org_alpha",
+        userId: "user_alice",
+        status: "active",
+      });
+
+      // StockBalance in Alpha and Beta
+      await setDoc(doc(adminContext.firestore(), "stockBalances", "org_alpha_main-branch_prod_1"), {
+        organizationId: "org_alpha",
+        branchId: "main-branch",
+        productId: "prod_1",
+        currentStock: 100,
+      });
+      await setDoc(doc(adminContext.firestore(), "stockBalances", "org_beta_main-branch_prod_2"), {
+        organizationId: "org_beta",
+        branchId: "main-branch",
+        productId: "prod_2",
+        currentStock: 50,
+      });
+    });
+
+    const aliceDb = testEnv.authenticatedContext("user_alice").firestore();
+
+    // Direct client writes denied
+    await assertFails(
+      setDoc(doc(aliceDb, "organizations", "org_alpha", "branches", "new-branch"), { name: "Direct Client Branch" })
+    );
+    await assertFails(
+      setDoc(doc(aliceDb, "membershipBranches", "hack_join"), { status: "active" })
+    );
+    await assertFails(
+      setDoc(doc(aliceDb, "stockBalances", "hack_balance"), { currentStock: 9999 })
+    );
+    await assertFails(
+      setDoc(doc(aliceDb, "branchCodeLocks", "org_alpha_MAIN"), { branchCode: "MAIN" })
+    );
+
+    // Reads in own org succeed
+    await assertSucceeds(getDoc(doc(aliceDb, "organizations", "org_alpha", "branches", "main-branch")));
+    await assertSucceeds(getDoc(doc(aliceDb, "membershipBranches", "user_alice_org_alpha_main-branch")));
+    await assertSucceeds(getDoc(doc(aliceDb, "stockBalances", "org_alpha_main-branch_prod_1")));
+
+    // Reads in other org fail
+    await assertFails(getDoc(doc(aliceDb, "organizations", "org_beta", "branches", "main-branch")));
+    await assertFails(getDoc(doc(aliceDb, "stockBalances", "org_beta_main-branch_prod_2")));
+
+    // Branch code locks completely denied to client reads
+    await assertFails(getDoc(doc(aliceDb, "branchCodeLocks", "org_alpha_MAIN")));
+  });
+
+  it("Operations collections: client read isolation and direct write denial", async () => {
+    await testEnv.withSecurityRulesDisabled(async (adminContext) => {
+      // Setup Alice in org_alpha
+      await setDoc(doc(adminContext.firestore(), "memberships", "user_alice_org_alpha"), {
+        userId: "user_alice",
+        organizationId: "org_alpha",
+        status: "active",
+      });
+
+      // Tasks
+      await setDoc(doc(adminContext.firestore(), "tasks", "task_alpha_1"), {
+        organizationId: "org_alpha",
+        title: "Alpha Task",
+      });
+      await setDoc(doc(adminContext.firestore(), "tasks", "task_beta_1"), {
+        organizationId: "org_beta",
+        title: "Beta Task",
+      });
+
+      // Daily Summaries
+      await setDoc(doc(adminContext.firestore(), "dailySummaries", "org_alpha_2026-10-28"), {
+        organizationId: "org_alpha",
+        totalRevenue: 5000,
+      });
+      await setDoc(doc(adminContext.firestore(), "dailySummaries", "org_beta_2026-10-28"), {
+        organizationId: "org_beta",
+        totalRevenue: 10000,
+      });
+
+      // Notifications
+      await setDoc(doc(adminContext.firestore(), "notifications", "notif_alice_1"), {
+        userId: "user_alice",
+        title: "Alice Notif",
+      });
+      await setDoc(doc(adminContext.firestore(), "notifications", "notif_bob_1"), {
+        userId: "user_bob",
+        title: "Bob Notif",
+      });
+    });
+
+    const aliceDb = testEnv.authenticatedContext("user_alice").firestore();
+
+    // 1. Direct writes denied
+    await assertFails(setDoc(doc(aliceDb, "tasks", "hack_task"), { title: "Hack" }));
+    await assertFails(setDoc(doc(aliceDb, "dailySummaries", "hack_summary"), { totalRevenue: 0 }));
+    await assertFails(setDoc(doc(aliceDb, "notifications", "hack_notif"), { title: "Hack" }));
+
+    // 2. Org-scoped read success for own tenant
+    await assertSucceeds(getDoc(doc(aliceDb, "tasks", "task_alpha_1")));
+    await assertSucceeds(getDoc(doc(aliceDb, "dailySummaries", "org_alpha_2026-10-28")));
+
+    // 3. Cross-tenant read denied
+    await assertFails(getDoc(doc(aliceDb, "tasks", "task_beta_1")));
+    await assertFails(getDoc(doc(aliceDb, "dailySummaries", "org_beta_2026-10-28")));
+
+    // 4. User-scoped notification read: Alice can read own, denied Bob's
+    await assertSucceeds(getDoc(doc(aliceDb, "notifications", "notif_alice_1")));
+    await assertFails(getDoc(doc(aliceDb, "notifications", "notif_bob_1")));
   });
 });

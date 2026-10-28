@@ -55,6 +55,28 @@ service cloud.firestore {
     match /organizations/{organizationId} {
       allow read: if isSuperAdmin() || isOrgMember(organizationId);
       allow write: if writesDenied();
+
+      // Subcollection for branches
+      match /branches/{branchId} {
+        allow read: if isSuperAdmin() || isOrgMember(organizationId);
+        allow write: if writesDenied();
+      }
+    }
+
+    // --- Membership Branches Collection (Join Table) ---
+    // membershipBranches/{membershipId_branchId}
+    match /membershipBranches/{membershipBranchId} {
+      allow read: if isSuperAdmin()
+        || (isAuthenticated() && resource.data.userId == request.auth.uid)
+        || (isAuthenticated() && isOrgMember(resource.data.organizationId));
+      allow write: if writesDenied();
+    }
+
+    // --- Stock Balances Collection ---
+    // stockBalances/{organizationId_branchId_productId}
+    match /stockBalances/{stockBalanceId} {
+      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
+      allow write: if writesDenied();
     }
 
     // --- 4. Roles Collection ---
@@ -201,15 +223,86 @@ service cloud.firestore {
       allow write: if writesDenied();
     }
 
-    // 26. Document Counters Collection
+    // --- Phase 3 Collections ---
+
+    // 26. Tasks Collection
+    match /tasks/{taskId} {
+      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
+      allow write: if writesDenied();
+    }
+
+    // 27. Daily Summaries Collection
+    match /dailySummaries/{summaryId} {
+      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
+      allow write: if writesDenied();
+    }
+
+    // 28. Monthly Summaries Collection
+    match /monthlySummaries/{summaryId} {
+      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
+      allow write: if writesDenied();
+    }
+
+    // 29. Latest Locations Collection
+    match /latestLocations/{locationId} {
+      allow read: if isSuperAdmin() || (isAuthenticated() && (resource.data.userId == request.auth.uid || isOrgMember(resource.data.organizationId)));
+      allow write: if writesDenied();
+    }
+
+    // 30. Location Pings Collection
+    match /locationPings/{pingId} {
+      allow read: if isSuperAdmin() || (isAuthenticated() && (resource.data.userId == request.auth.uid || isOrgMember(resource.data.organizationId)));
+      allow write: if writesDenied();
+    }
+
+    // 31. In-App Notifications Collection
+    match /notifications/{notificationId} {
+      allow read: if isSuperAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow write: if writesDenied();
+    }
+
+    // 32. Document Counters Collection
     // Internal server sequence generator - completely denied to client SDKs
     match /documentCounters/{counterId} {
       allow read, write: if false;
     }
 
+    // 33. Super Admin Usage Collections
+    // Completely denied to client writes; readable ONLY by platform Super Admin
+    match /organizationUsageDaily/{docId} {
+      allow read: if isSuperAdmin();
+      allow write: if writesDenied();
+    }
+
+    match /branchUsageDaily/{docId} {
+      allow read: if isSuperAdmin();
+      allow write: if writesDenied();
+    }
+
+    match /platformUsageSnapshots/{docId} {
+      allow read: if isSuperAdmin();
+      allow write: if writesDenied();
+    }
+
+    match /usageRateCards/{docId} {
+      allow read: if isSuperAdmin();
+      allow write: if writesDenied();
+    }
+
+    match /usageAllocationRuns/{docId} {
+      allow read: if isSuperAdmin();
+      allow write: if writesDenied();
+    }
+
     // 27. Barcode Locks Collection
     // Internal server concurrency lock - completely denied to client SDKs
     match /barcodeLocks/{lockId} {
+      allow read, write: if false;
+    }
+
+    // 28. Branch Code Locks Collection
+    // Internal server concurrency lock - completely denied to client SDKs
+    match /branchCodeLocks/{lockId} {
       allow read, write: if false;
     }
 

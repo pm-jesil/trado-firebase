@@ -28,6 +28,14 @@ export const AppPermissions = {
   ORG_MODULES: "org:modules",
   ORG_DELETE: "org:delete",
 
+  // Branch Management
+  BRANCH_CREATE: "branch:create",
+  BRANCH_VIEW: "branch:view",
+  BRANCH_UPDATE: "branch:update",
+  BRANCH_DEACTIVATE: "branch:deactivate",
+  BRANCH_MANAGE: "branch:manage",
+  BRANCH_ASSIGN: "branch:assign",
+
   // Staff, Employees & Roles
   EMPLOYEE_VIEW: "employee:view",
   EMPLOYEE_CREATE: "employee:create",
@@ -126,6 +134,22 @@ export const AppPermissions = {
   REPORT_VIEW: "report:view",
   REPORT_PROFIT: "report:profit",
   REPORT_EXPORT: "report:export",
+
+  // Tasks
+  TASK_CREATE: "task:create",
+  TASK_VIEW: "task:view",
+  TASK_UPDATE: "task:update",
+  TASK_DELETE: "task:delete",
+  TASK_ASSIGN: "task:assign",
+
+  // Live Location Tracking
+  LOCATION_PING: "location:ping",
+  LOCATION_VIEW_OWN: "location:view_own",
+  LOCATION_VIEW_ALL: "location:view_all",
+  LOCATION_MANAGE: "location:manage",
+
+  // Notifications
+  NOTIFICATION_VIEW: "notification:view",
 } as const;
 
 export type PermissionCode = typeof AppPermissions[keyof typeof AppPermissions] | string;

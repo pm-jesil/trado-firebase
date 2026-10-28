@@ -20,6 +20,7 @@ import {
   OrganizationDoc,
   MembershipDoc,
   PaymentDoc,
+  VendorDoc,
 } from "../types/models.js";
 import {
   OutflowKind,
@@ -30,6 +31,7 @@ import {
   PartyType,
   PaymentMethod,
 } from "../constants/enums.js";
+import { Money } from "../services/money.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import {
   readNextDocumentNumberInTxn,
@@ -42,7 +44,6 @@ import {
   StockChangeItem,
 } from "../services/stockEngine.js";
 import { createAuditLog } from "../services/audit.js";
-import { Money } from "../services/money.js";
 
 async function verifyTenantAccess(auth: any, organizationId: string): Promise<void> {
   if (auth.token.isSuperAdmin === true) return;
@@ -88,6 +89,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
       throw new HttpsError("not-found", "Organization not found.");
     }
     const orgData = orgDoc.data() as OrganizationDoc;
+    const branchId = input.branchId || (request.auth.token.primaryBranchId as string) || orgData.defaultBranchId || "main-branch";
 
     const outflowRef = db.collection("outflows").doc();
     const outflowId = outflowRef.id;
@@ -171,7 +173,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
 
     // Execute atomic transaction for sequential numbering, stock, and payment creation
     const finalResult = await db.runTransaction(async (txn) => {
-      // === PHASE 1: ALL READS FIRST (Firestore requirement) ===
+      // === STEP 1: ALL TRANSACTIONAL READS FIRST (Firestore requirement) ===
       const outflowReservation = await readNextDocumentNumberInTxn(txn, {
         organizationId: input.organizationId,
         type: prefix,
@@ -189,17 +191,26 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
       if (stockChangeItems.length > 0) {
         preparedStock = await prepareStockChangesInTxn(txn, {
           organizationId: input.organizationId,
+          branchId,
           actorUid: callerUid,
           items: stockChangeItems,
         });
       }
 
-      // === PHASE 2: ALL WRITES AFTER ALL READS ===
+      let vendorRef: FirebaseFirestore.DocumentReference | null = null;
+      let vendorSnap: FirebaseFirestore.DocumentSnapshot | null = null;
+      if (input.kind === OutflowKind.PURCHASE && input.vendorId) {
+        vendorRef = db.collection("vendors").doc(input.vendorId);
+        vendorSnap = await txn.get(vendorRef);
+      }
+
+      // === STEP 2: ALL TRANSACTIONAL WRITES ===
       commitDocumentNumberInTxn(txn, outflowReservation);
       const outflowNumber = outflowReservation.formattedNumber;
 
       const outflowDoc: OutflowDoc = {
         organizationId: input.organizationId,
+        branchId,
         outflowNumber,
         kind: input.kind,
         status: OutflowStatus.CONFIRMED,
@@ -230,6 +241,18 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
         commitStockChangesInTxn(txn, preparedStock);
       }
 
+      // Update vendor running balances (totalPurchase & outstandingPayable)
+      if (vendorRef && vendorSnap && vendorSnap.exists) {
+        const vendData = vendorSnap.data() as VendorDoc;
+        const newPurchases = Money.amount((vendData.totalPurchase || 0) + totalAmount);
+        const newPayable = Money.amount((vendData.outstandingPayable || 0) + balanceAmount);
+        txn.update(vendorRef, {
+          totalPurchase: newPurchases,
+          outstandingPayable: newPayable,
+          updatedAt: now,
+        });
+      }
+
       // If paid amount > 0, create payment voucher ledger record
       let paymentId: string | null = null;
       if (paidAmount > 0 && paymentReservation) {
@@ -239,6 +262,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
 
         const paymentDoc: PaymentDoc = {
           organizationId: input.organizationId,
+          branchId,
           paymentNumber: paymentReservation.formattedNumber,
           direction: PaymentDirection.OUT,
           partyType: PartyType.VENDOR,
@@ -327,6 +351,9 @@ export const outflowsList = onCall({ region: "asia-south1" }, async (request) =>
   }
   if (input.vendorId) {
     query = query.where("vendorId", "==", input.vendorId);
+  }
+  if (input.branchId) {
+    query = query.where("branchId", "==", input.branchId);
   }
 
   const snapshot = await query.get();

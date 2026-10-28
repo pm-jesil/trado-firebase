@@ -30,6 +30,7 @@ export const plansCreate = onCall({ region: "asia-south1" }, async (request) => 
     storageLimitMb: input.storageLimitMb,
     monthlyDocumentVolumeLimit: input.monthlyDocumentVolumeLimit,
     seatLimits: input.seatLimits,
+    branchLimit: input.branchLimit ?? 1,
     moduleFlags: input.moduleFlags,
     isActive: input.isActive ?? true,
     createdAt: new Date().toISOString(),
@@ -73,6 +74,7 @@ export const plansUpdate = onCall({ region: "asia-south1" }, async (request) => 
 
   if (input.name) updates.name = input.name;
   if (input.price !== undefined) updates.price = input.price;
+  if (input.branchLimit !== undefined) updates.branchLimit = input.branchLimit;
   if (input.moduleFlags) updates.moduleFlags = input.moduleFlags;
   if (input.isActive !== undefined) updates.isActive = input.isActive;
 

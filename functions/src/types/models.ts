@@ -1,5 +1,5 @@
 /**
- * Domain Models for Phase 1 Firestore Collections
+ * Domain Models for Firestore Collections
  * 
  * Strict architectural rule:
  * - Direct foreign relationships are modeled as Reference IDs, not embedded documents.
@@ -59,6 +59,9 @@ export interface MembershipDoc {
   permissions: Record<string, boolean>; // Explicit user-level override grants/denies
   status: EntityStatus;
   isPrimary: boolean;
+  primaryBranchId?: string; // Canonical default active operating branch for this membership
+  assignedBranchIds?: string[]; // Materialized projection of active membershipBranches IDs
+  locationTrackingEnabled?: boolean; // Explicit consent flag for employee live-location tracking
   createdAt: string;
   createdBy: string;
   updatedAt?: string;
@@ -78,6 +81,9 @@ export interface OrganizationDoc {
   planId: string; // Reference to subscriptionPlans/{planId}
   moduleToggles: Record<string, boolean>; // Per-tenant feature switches
   logoUrl?: string;
+  defaultBranchId?: string;
+  branchCount?: number;
+  sharingPolicies?: OrganizationSharingPolicies;
   createdAt: string;
   createdBy: string;
   updatedAt?: string;
@@ -149,6 +155,7 @@ export interface SubscriptionPlanDoc {
     staff: number;
   };
   moduleFlags: Record<string, boolean>;
+  branchLimit?: number;
   isActive: boolean;
   createdAt?: string;
   createdBy?: string;
@@ -207,6 +214,7 @@ export interface IdempotencyRecordDoc {
  */
 export interface AuditLogDoc {
   organizationId?: string | null; // Tenant ID or "platform"
+  branchId?: string | null;
   actorUid: string;
   actorMembershipId?: string | null;
   action: string;
@@ -247,7 +255,7 @@ export interface NotificationOutboxDoc {
 
 /**
  * -------------------------------------------------------------
- * Phase 2 Collections & Subdocuments
+ * Operational Business Collections & Subdocuments
  * -------------------------------------------------------------
  */
 
@@ -281,6 +289,7 @@ export interface ProductDoc {
   baseUnit: string; // Code e.g. "piece", "kg", "box"
   sellingPrice: number;
   costPrice: number;
+  weightedAverageCost?: number; // Maintained weighted-average cost for valuation & COGS
   mrp?: number | null;
   wholesalePrice?: number | null;
   taxInclusive: boolean;
@@ -290,7 +299,7 @@ export interface ProductDoc {
   sku?: string | null;
   hasExpiry: boolean; // Confirmed canonical name
   trackStock: boolean;
-  currentStock: number; // Maintained stock total (Stock read strategy option a)
+  currentStock: number; // Maintained aggregate stock total
   lowStockThreshold: number;
   trackBatch?: boolean;
   trackSerial?: boolean;
@@ -353,6 +362,8 @@ export interface CustomerDoc {
   creditPeriodDays: number;
   outstandingBalance: number; // Udhaar amount customer owes
   totalSpend: number;
+  visibilityScope?: "all_branches" | "selected_branches" | "branch_only"; // Branch visibility scope (default: all_branches)
+  sharedForBranchIds?: string[]; // Branch IDs allowed to access this customer record
   isDefault: boolean;
   isActive: boolean;
   createdAt: string;
@@ -376,6 +387,8 @@ export interface VendorDoc {
   creditLimit?: number;
   outstandingPayable: number; // Amount owed to vendor
   totalPurchase: number;
+  visibilityScope?: "all_branches" | "selected_branches" | "branch_only"; // Branch visibility scope (default: all_branches)
+  sharedForBranchIds?: string[]; // Branch IDs allowed to access this vendor record
   isDefault: boolean;
   isActive: boolean;
   createdAt: string;
@@ -410,6 +423,7 @@ export interface OutflowLine {
  */
 export interface OutflowDoc {
   organizationId: string;
+  branchId?: string;
   outflowNumber: string; // e.g. "PUR-2026-000001" or "EXP-2026-000001"
   kind: OutflowKind; // purchase or expense
   status: OutflowStatus; // draft, confirmed, voided
@@ -470,6 +484,7 @@ export interface BillCustomerSnapshot {
  */
 export interface BillDoc {
   organizationId: string;
+  branchId?: string;
   billNumber: string; // e.g. "INV-2026-000001", "POS-2026-000001", "QTN-2026-000001"
   salesMode: SalesMode; // pos or b2b
   documentType?: DocumentType; // invoice, quotation, sales_order, proforma
@@ -498,6 +513,7 @@ export interface BillDoc {
  */
 export interface StockMovementDoc {
   organizationId: string;
+  branchId?: string;
   productId: string; // Reference to products/{productId}
   type: StockMovementType;
   quantity: number; // Signed change (+ addition, - reduction)
@@ -537,6 +553,7 @@ export interface DeliveryCod {
  */
 export interface DeliveryDoc {
   organizationId: string;
+  branchId?: string;
   billId: string; // ID reference ONLY! No embedded bill object.
   customerId?: string | null;
   customerName: string;
@@ -573,6 +590,7 @@ export interface ReturnItem {
  */
 export interface ReturnDoc {
   organizationId: string;
+  branchId?: string;
   returnNumber: string; // e.g. "RET-2026-000001"
   returnType: ReturnType; // sales_return or purchase_return
   referenceId: string; // billId or outflowId (ID reference only!)
@@ -595,6 +613,7 @@ export interface ReturnDoc {
  */
 export interface PaymentDoc {
   organizationId: string;
+  branchId?: string;
   paymentNumber: string; // e.g. "PAY-2026-000001"
   direction: PaymentDirection; // in (collection from customer) or out (payment to vendor)
   partyType: PartyType; // customer or vendor
@@ -623,3 +642,336 @@ export interface DocumentCounterDoc {
   currentSequence: number;
   updatedAt: string;
 }
+
+/**
+ * -------------------------------------------------------------
+ * Operations & Intelligence Collections & Subdocuments
+ * -------------------------------------------------------------
+ */
+
+export type TaskStatus = "pending" | "in_progress" | "completed" | "cancelled";
+export type TaskPriority = "low" | "medium" | "high" | "urgent";
+export type TaskRelatedEntityType = "bill" | "outflow" | "delivery" | "customer" | "vendor" | "product";
+
+/**
+ * 28. tasks/{taskId}
+ */
+export interface TaskDoc {
+  organizationId: string; // Tenant reference
+  title: string;
+  description?: string;
+  assignedToMembershipId: string; // Reference to memberships/{uid}_{orgId}
+  assignedByMembershipId: string; // Reference to memberships/{uid}_{orgId}
+  status: TaskStatus;
+  priority: TaskPriority;
+  dueAt?: string; // ISO 8601 string
+  relatedEntityType?: TaskRelatedEntityType | null;
+  relatedEntityId?: string | null; // ID-only reference
+  completedAt?: string | null;
+  completedByMembershipId?: string | null;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+/**
+ * 29. dailySummaries/{organizationId}_{date}
+ */
+export interface DailySummaryDoc {
+  organizationId: string;
+  date: string; // YYYY-MM-DD
+  totalRevenue: number; // Gross bill total amount
+  totalExpenses: number; // Outflow expenses total amount
+  cogs: number; // Cost of goods sold (WAC * sold quantity)
+  grossProfit: number; // totalRevenue - cogs
+  netProfit: number; // grossProfit - totalExpenses
+  billCount: number;
+  outflowCount: number;
+  paymentBreakdown: {
+    cash: number;
+    upi: number;
+    card: number;
+    bank_transfer: number;
+    credit: number;
+    other: number;
+  };
+  topProducts?: Array<{
+    productId: string;
+    nameSnapshot: string;
+    quantity: number;
+    revenue: number;
+  }>;
+  updatedAt: string;
+}
+
+/**
+ * 30. monthlySummaries/{organizationId}_{yearMonth}
+ */
+export interface MonthlySummaryDoc {
+  organizationId: string;
+  yearMonth: string; // YYYY-MM
+  totalRevenue: number;
+  totalExpenses: number;
+  cogs: number;
+  grossProfit: number;
+  netProfit: number;
+  billCount: number;
+  outflowCount: number;
+  daysRecorded: number;
+  updatedAt: string;
+}
+
+/**
+ * 31. latestLocations/{organizationId}_{membershipId}
+ */
+export interface LatestLocationDoc {
+  organizationId: string;
+  membershipId: string; // Reference to memberships/{uid}_{orgId}
+  userId: string;
+  latitude: number;
+  longitude: number;
+  accuracy?: number; // Accuracy in meters
+  speed?: number; // Speed in m/s
+  heading?: number; // Heading in degrees
+  source: "foreground" | "background";
+  recordedAt: string; // ISO 8601 string
+  updatedAt: string;
+}
+
+/**
+ * 32. locationPings/{organizationId}_{membershipId}_{timestamp}
+ */
+export interface LocationPingDoc {
+  organizationId: string;
+  membershipId: string;
+  userId: string;
+  latitude: number;
+  longitude: number;
+  accuracy?: number;
+  speed?: number;
+  heading?: number;
+  source: "foreground" | "background";
+  recordedAt: string;
+  createdAt: string;
+}
+
+export type NotificationType =
+  | "task_assigned"
+  | "task_due"
+  | "delivery_assigned"
+  | "payment_received"
+  | "low_stock"
+  | "bill_created"
+  | "outflow_recorded"
+  | "account_updated";
+
+/**
+ * 33. notifications/{notificationId}
+ */
+export interface NotificationDoc {
+  organizationId: string;
+  userId: string; // Recipient user ID
+  membershipId: string; // Recipient membership ID
+  type: NotificationType;
+  title: string;
+  body: string;
+  relatedEntityType?: string | null;
+  relatedEntityId?: string | null;
+  data?: Record<string, string>;
+  isRead: boolean;
+  readAt?: string | null;
+  createdAt: string;
+}
+
+/**
+ * -------------------------------------------------------------
+ * Branch Architecture Models
+ * -------------------------------------------------------------
+ */
+
+export interface BranchAddress {
+  line1?: string;
+  line2?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  country?: string;
+}
+
+export interface BranchContact {
+  phone?: string | null;
+  email?: string | null;
+  managerName?: string | null;
+  contactPerson?: string | null;
+}
+
+export interface BranchSettings {
+  allowNegativeStock?: boolean;
+  autoFulfillDeliveries?: boolean;
+  receiptPrefix?: string;
+  taxInclusivePrices?: boolean;
+  moduleOverrides?: Record<string, boolean>;
+}
+
+export interface BranchDoc {
+  organizationId: string;
+  name: string;
+  code: string;
+  isDefault: boolean;
+  isActive: boolean;
+  status?: EntityStatus;
+  gstin?: string;
+  address?: BranchAddress;
+  contact?: BranchContact;
+  settings?: BranchSettings;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+export interface BranchCodeLockDoc {
+  organizationId: string;
+  code?: string;
+  branchId: string;
+  branchCode?: string;
+  createdAt: string;
+}
+
+export interface MembershipBranchDoc {
+  membershipId: string;
+  userId: string;
+  organizationId: string;
+  branchId: string;
+  status: EntityStatus;
+  isDefaultForMembership: boolean;
+  permissions?: Record<string, boolean>;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+}
+
+export interface StockBalanceDoc {
+  organizationId: string;
+  branchId: string;
+  productId: string;
+  currentStock: number;
+  allocatedStock?: number;
+  availableStock?: number;
+  reorderPoint?: number;
+  lowStockThreshold?: number;
+  lastMovementId?: string;
+  updatedAt: string;
+  updatedBy?: string;
+}
+
+export interface OrganizationSharingPolicies {
+  products?: "organization_shared" | "branch_scoped";
+  categories?: "organization_shared" | "branch_scoped";
+  customers?: "organization_shared" | "branch_scoped";
+  vendors?: "organization_shared" | "branch_scoped";
+  sales?: "organization_shared" | "branch_scoped";
+  purchases?: "organization_shared" | "branch_scoped";
+  expenses?: "organization_shared" | "branch_scoped";
+  stock?: "branch_scoped";
+  deliveries?: "organization_shared" | "branch_scoped";
+}
+
+// ============================================================
+// Super Admin Usage Metering & Platform Consumption Models
+// ============================================================
+
+export type MeasurementClass =
+  | "platform_actual" // Provider metrics from Cloud Monitoring / Billing Export
+  | "app_attributed" // Server-instrumented operations attributed to Org/Branch
+  | "client_estimate" // Direct client activity estimates
+  | "allocated_cost"; // Calculated cost share using rate-card formula
+
+export type ServiceType =
+  | "firestore"
+  | "functions"
+  | "storage"
+  | "auth"
+  | "fcm"
+  | "location";
+
+export interface ServiceUsageCounts {
+  firestoreReads: number;
+  firestoreWrites: number;
+  firestoreDeletes: number;
+  functionsInvocations: number;
+  functionsErrors: number;
+  functionsExecutionMs: number;
+  storageUploadBytes: number;
+  storageDownloadBytes: number;
+  storageOperations: number;
+  authOperations: number;
+  fcmDispatches: number;
+  locationPings: number;
+}
+
+export interface OrganizationUsageDailyDoc {
+  organizationId: string;
+  date: string; // YYYY-MM-DD
+  counts: ServiceUsageCounts;
+  estimatedCost: number;
+  currency: string;
+  rateCardVersion: string;
+  completenessPercent: number; // Indicates confidence/coverage (e.g., 90)
+  measurementClass: MeasurementClass;
+  updatedAt: string;
+}
+
+export interface BranchUsageDailyDoc {
+  organizationId: string;
+  branchId: string;
+  date: string; // YYYY-MM-DD
+  counts: ServiceUsageCounts;
+  estimatedCost: number;
+  currency: string;
+  rateCardVersion: string;
+  completenessPercent: number;
+  measurementClass: MeasurementClass;
+  updatedAt: string;
+}
+
+export interface PlatformUsageSnapshotDoc {
+  date: string; // YYYY-MM-DD
+  source: "cloud_monitoring" | "emulator_mock" | "app_aggregation";
+  platformTotals: ServiceUsageCounts;
+  platformActualCost?: number;
+  currency: string;
+  asOf: string;
+}
+
+export interface UsageRateCardDoc {
+  version: string;
+  effectiveDate: string;
+  currency: string;
+  rates: {
+    firestoreReadPer100k: number;
+    firestoreWritePer100k: number;
+    firestoreDeletePer100k: number;
+    functionsInvocationPerMillion: number;
+    functionsComputeGbSecond: number;
+    storageGbMonth: number;
+    fcmPerThousand: number;
+    locationPingPer100k: number;
+  };
+  status: "active" | "draft" | "deprecated";
+  createdAt: string;
+  createdBy: string;
+}
+
+export interface UsageAllocationRunDoc {
+  runId: string;
+  billingPeriod: string; // YYYY-MM
+  rateCardVersion: string;
+  totalPlatformCost: number;
+  allocatedTenantCost: number;
+  unallocatedPlatformOverhead: number;
+  currency: string;
+  status: "draft_estimate" | "audited";
+  createdAt: string;
+  createdBy: string;
+}
+

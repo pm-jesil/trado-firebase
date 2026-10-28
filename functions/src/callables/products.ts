@@ -145,9 +145,11 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
       }
 
       if (input.trackStock && initialStock > 0) {
+        const targetBranchId = input.branchId || (request.auth?.token?.primaryBranchId as string | undefined) || "main-branch";
         const movementRef = db.collection("stockMovements").doc();
         const movementDoc: StockMovementDoc = {
           organizationId: input.organizationId,
+          branchId: targetBranchId,
           productId,
           type: StockMovementType.ADJUSTMENT_IN,
           quantity: initialStock,
@@ -160,6 +162,17 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
           createdBy: callerUid,
         };
         txn.set(movementRef, movementDoc);
+
+        const stockBalanceRef = db.collection("stockBalances").doc(`${input.organizationId}_${targetBranchId}_${productId}`);
+        txn.set(stockBalanceRef, {
+          organizationId: input.organizationId,
+          branchId: targetBranchId,
+          productId,
+          currentStock: initialStock,
+          lowStockThreshold: input.lowStockThreshold || 5,
+          updatedAt: now,
+          updatedBy: callerUid,
+        });
       }
 
       if (idempotency.recordId) {

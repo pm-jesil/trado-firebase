@@ -219,4 +219,38 @@ describe("Four-Layer Permission Resolver", () => {
     assert.equal(grantedPlatform, true, "Super Admin should have platform access.");
     assert.equal(grantedTenant, true, "Super Admin should have tenant access.");
   });
+
+  it("Branch module overrides can restrict capabilities enabled by Plan and Org", () => {
+    // Normal user with billing permission in a branch where billing is overridden to false
+    const granted = resolvePermission("bill:create", {
+      isSuperAdmin: false,
+      roleCode: "cashier",
+      rolePermissions: ["bill:create"],
+      membershipOverrides: {},
+      planModuleFlags: baseActivePlan,
+      orgModuleToggles: baseActiveOrgToggles,
+      branchModuleOverrides: { billing: false },
+    });
+
+    assert.equal(granted, false, "Branch module override false must disable the module even if plan/org permit it.");
+  });
+
+  it("Branch membership overrides can deny permission specifically for that branch", () => {
+    const granted = resolvePermission("bill:create", {
+      isSuperAdmin: false,
+      roleCode: "cashier",
+      rolePermissions: ["bill:create"],
+      membershipOverrides: {},
+      branchMembershipOverrides: { "bill:create": false },
+      planModuleFlags: baseActivePlan,
+      orgModuleToggles: baseActiveOrgToggles,
+    });
+
+    assert.equal(granted, false, "Branch membership override deny must block permission.");
+  });
+
+  it("Branch permissions map to staff module", () => {
+    assert.equal(getModuleForPermission("branch:create"), "staff");
+    assert.equal(getModuleForPermission("branch:view"), "staff");
+  });
 });

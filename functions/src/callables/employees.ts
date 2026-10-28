@@ -15,11 +15,11 @@ import {
   ListEmployeesSchema,
 } from "../validation/schemas.js";
 import { CreateEmployeeResponse } from "../types/api.js";
-import { UserDoc, MembershipDoc, RoleDoc, OrganizationDoc, SubscriptionPlanDoc } from "../types/models.js";
+import { UserDoc, MembershipDoc, RoleDoc, OrganizationDoc, SubscriptionPlanDoc, MembershipBranchDoc } from "../types/models.js";
 import { EntityStatus, IdempotencyStatus } from "../constants/enums.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { compensateAuthUser } from "../services/compensation.js";
-import { getUserCustomClaims, setPrimaryOrganizationClaim } from "../services/claims.js";
+import { getUserCustomClaims, setPrimaryOrganizationClaim, setPrimaryBranchClaim } from "../services/claims.js";
 import { createAuditLog } from "../services/audit.js";
 import { queueWelcomeNotification } from "../services/notificationSender.js";
 
@@ -157,10 +157,19 @@ export const employeesCreate = onCall({ region: "asia-south1" }, async (request)
       throw new HttpsError("already-exists", "User is already an active member of this organization.");
     }
 
-    // Ensure user has primaryOrganizationId claim if not already set
+    // Determine initial branch assignments (defaults to org defaultBranchId or "main-branch")
+    const assignedBranchIds = (input.branchIds && input.branchIds.length > 0)
+      ? input.branchIds
+      : [orgData.defaultBranchId || "main-branch"];
+    const employeeDefaultBranch = input.defaultBranchId || assignedBranchIds[0];
+
+    // Ensure user has primaryOrganizationId and primaryBranchId claims if not already set
     const userClaims = await getUserCustomClaims(targetUid);
     if (!userClaims.primaryOrganizationId) {
       await setPrimaryOrganizationClaim(targetUid, input.organizationId);
+    }
+    if (!userClaims.primaryBranchId) {
+      await setPrimaryBranchClaim(targetUid, employeeDefaultBranch);
     }
 
     const userRef = db.collection("users").doc(targetUid);
@@ -177,6 +186,8 @@ export const employeesCreate = onCall({ region: "asia-south1" }, async (request)
       permissions: input.permissionOverrides || {},
       status: EntityStatus.ACTIVE,
       isPrimary: !userClaims.primaryOrganizationId,
+      primaryBranchId: employeeDefaultBranch,
+      assignedBranchIds,
       createdAt: now,
       createdBy: request.auth.uid,
     };
@@ -209,6 +220,24 @@ export const employeesCreate = onCall({ region: "asia-south1" }, async (request)
     }
 
     batch.set(membershipRef, membershipDocData);
+
+    // Create membershipBranches join records for assigned branches
+    for (const bId of assignedBranchIds) {
+      const mbRef = db.collection("membershipBranches").doc(`${membershipId}_${bId}`);
+      const mbDoc: MembershipBranchDoc = {
+        organizationId: input.organizationId,
+        branchId: bId,
+        membershipId,
+        userId: targetUid,
+        status: EntityStatus.ACTIVE,
+        isDefaultForMembership: bId === employeeDefaultBranch,
+        permissions: {},
+        createdAt: now,
+        createdBy: request.auth.uid,
+        updatedAt: now,
+      };
+      batch.set(mbRef, mbDoc);
+    }
 
     const auditRef = db.collection("auditLogs").doc();
     batch.set(auditRef, {

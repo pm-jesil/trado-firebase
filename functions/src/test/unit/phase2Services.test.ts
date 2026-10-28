@@ -1,5 +1,5 @@
 /**
- * Unit Tests for Phase 2 Core Services
+ * Unit Tests for Business Core Services
  * - Tax Calculation Service (IN_GST, AE_VAT, US_SALES_TAX, NONE)
  * - Sequential Document Counter formatting
  * - Stock Engine calculations & negative stock guards
@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 import { calculateTax } from "../../services/taxCalculation.js";
 import { Money } from "../../services/money.js";
 
-describe("Phase 2 Core Services - Tax Calculation", () => {
+describe("Business Core Services - Tax Calculation", () => {
   it("calculates standard India GST (18%) split into CGST (9%) and SGST (9%) for intra-state sales", () => {
     const result = calculateTax({
       taxRegimeCode: "IN_GST",
@@ -104,7 +104,7 @@ describe("Phase 2 Core Services - Tax Calculation", () => {
   });
 });
 
-describe("Phase 2 Core Services - Sequential Number Formatting", () => {
+describe("Business Core Services - Sequential Number Formatting", () => {
   it("formats standard sequential document numbers with zero padding", () => {
     const prefix = "INV";
     const year = 2026;
@@ -120,7 +120,7 @@ describe("Phase 2 Core Services - Sequential Number Formatting", () => {
   });
 });
 
-describe("Phase 2 Core Services - Stock Balance Arithmetic", () => {
+describe("Business Core Services - Stock Balance Arithmetic", () => {
   it("computes correct running stock totals on inward intake and outward sales", () => {
     const initialStock = 100;
     const purchaseIn = 50;
@@ -146,7 +146,7 @@ describe("Phase 2 Core Services - Stock Balance Arithmetic", () => {
   });
 });
 
-describe("Phase 2 Core Services - Decimal-Safe Money & Precision Utility", () => {
+describe("Business Core Services - Decimal-Safe Money & Precision Utility", () => {
   it("handles 2-decimal currencies (INR, USD, EUR) with commercial rounding", () => {
     assert.equal(Money.getDecimals("INR"), 2);
     assert.equal(Money.getDecimals("USD"), 2);

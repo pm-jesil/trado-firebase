@@ -27,6 +27,15 @@ async function verifyTenantAccess(auth: any, organizationId: string): Promise<vo
   }
 }
 
+async function validateBranchIds(organizationId: string, branchIds: string[]): Promise<void> {
+  for (const bId of branchIds) {
+    const bSnap = await db.collection("organizations").doc(organizationId).collection("branches").doc(bId).get();
+    if (!bSnap.exists || !bSnap.data()?.isActive) {
+      throw new HttpsError("invalid-argument", `Branch '${bId}' does not exist or is inactive in organization.`);
+    }
+  }
+}
+
 export const customersCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Authentication required.");
@@ -67,6 +76,29 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
       .get();
     const customerCode = `CUST-${String(existingCount.data().count + 1).padStart(6, "0")}`;
 
+    // Resolve branch and visibility scope
+    const callerBranchId = input.branchId || (request.auth.token?.primaryBranchId as string | undefined) || "main-branch";
+    const visibilityScope = input.visibilityScope || "all_branches";
+    let sharedForBranchIds: string[] = [];
+
+    if (visibilityScope === "branch_only") {
+      sharedForBranchIds = [callerBranchId];
+    } else if (visibilityScope === "selected_branches") {
+      if (!input.sharedForBranchIds || input.sharedForBranchIds.length === 0) {
+        throw new HttpsError("invalid-argument", "sharedForBranchIds must be non-empty when visibilityScope is selected_branches.");
+      }
+      await validateBranchIds(input.organizationId, input.sharedForBranchIds);
+      sharedForBranchIds = Array.from(new Set(input.sharedForBranchIds));
+    } else {
+      // all_branches
+      if (input.sharedForBranchIds && input.sharedForBranchIds.length > 0) {
+        await validateBranchIds(input.organizationId, input.sharedForBranchIds);
+        sharedForBranchIds = Array.from(new Set(input.sharedForBranchIds));
+      } else {
+        sharedForBranchIds = [callerBranchId];
+      }
+    }
+
     const customerDoc: CustomerDoc = {
       organizationId: input.organizationId,
       customerCode,
@@ -81,6 +113,8 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
       creditPeriodDays: input.creditPeriodDays || 30,
       outstandingBalance: 0,
       totalSpend: 0,
+      visibilityScope,
+      sharedForBranchIds,
       isDefault: input.isDefault || false,
       isActive: true,
       createdAt: now,
@@ -164,6 +198,15 @@ export const customersUpdate = onCall({ region: "asia-south1" }, async (request)
   if (input.creditLimit !== undefined) updates.creditLimit = input.creditLimit;
   if (input.creditPeriodDays !== undefined) updates.creditPeriodDays = input.creditPeriodDays;
   if (input.isActive !== undefined) updates.isActive = input.isActive;
+  if (input.visibilityScope !== undefined) updates.visibilityScope = input.visibilityScope;
+  if (input.sharedForBranchIds !== undefined) {
+    if (input.sharedForBranchIds.length > 0) {
+      await validateBranchIds(input.organizationId, input.sharedForBranchIds);
+      updates.sharedForBranchIds = Array.from(new Set(input.sharedForBranchIds));
+    } else {
+      updates.sharedForBranchIds = [];
+    }
+  }
 
   await customerRef.update(updates);
 
@@ -197,10 +240,22 @@ export const customersList = onCall({ region: "asia-south1" }, async (request) =
     .limit(input.limit || 50);
 
   const snapshot = await query.get();
-  const items = snapshot.docs.map((doc) => ({
+  let items = snapshot.docs.map((doc) => ({
     customerId: doc.id,
     ...(doc.data() as CustomerDoc),
   }));
+
+  // Enforce branch-level visibility in query scope
+  const targetBranchId = input.branchId || (request.auth.token?.primaryBranchId as string | undefined);
+  if (targetBranchId && request.auth.token?.isSuperAdmin !== true) {
+    items = items.filter((c) => {
+      if (!c.visibilityScope || c.visibilityScope === "all_branches") return true;
+      if (c.visibilityScope === "branch_only" || c.visibilityScope === "selected_branches") {
+        return Array.isArray(c.sharedForBranchIds) && c.sharedForBranchIds.includes(targetBranchId);
+      }
+      return true;
+    });
+  }
 
   return { items, count: items.length };
 });
@@ -226,6 +281,16 @@ export const customersGet = onCall({ region: "asia-south1" }, async (request) =>
   const data = docSnap.data() as CustomerDoc;
   if (data.organizationId !== organizationId) {
     throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
+
+  // Branch visibility validation
+  const callerBranchId = request.data?.branchId || (request.auth.token?.primaryBranchId as string | undefined);
+  if (callerBranchId && request.auth.token?.isSuperAdmin !== true) {
+    if (data.visibilityScope === "branch_only" || data.visibilityScope === "selected_branches") {
+      if (!Array.isArray(data.sharedForBranchIds) || !data.sharedForBranchIds.includes(callerBranchId)) {
+        throw new HttpsError("permission-denied", "Customer record is not shared with caller's branch.");
+      }
+    }
   }
 
   return { customerId: docSnap.id, ...data };

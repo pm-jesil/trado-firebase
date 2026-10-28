@@ -11,6 +11,7 @@ import { auth } from "./firebase.js";
 export interface TradoCustomClaims {
   isSuperAdmin?: boolean;
   primaryOrganizationId?: string;
+  primaryBranchId?: string;
   [key: string]: unknown;
 }
 
@@ -43,6 +44,13 @@ export async function setCustomClaims(
  */
 export async function setPrimaryOrganizationClaim(uid: string, organizationId: string): Promise<void> {
   await setCustomClaims(uid, { primaryOrganizationId: organizationId }, true);
+}
+
+/**
+ * Sets the primary branch ID claim for a user.
+ */
+export async function setPrimaryBranchClaim(uid: string, branchId: string): Promise<void> {
+  await setCustomClaims(uid, { primaryBranchId: branchId }, true);
 }
 
 /**

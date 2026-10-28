@@ -116,6 +116,129 @@ const COLLECTION_MANIFEST = {
     referenceFields: ['organizationId', 'vendorId'],
     forbiddenEmbeds: ['vendor', 'payments'],
   },
+  branches: {
+    canonicalFields: [
+      'organizationId', 'name', 'code', 'isDefault', 'isActive',
+      'address', 'contact', 'settings', 'createdAt', 'createdBy', 'updatedAt'
+    ],
+    referenceFields: ['organizationId'],
+    forbiddenEmbeds: ['employees', 'staff', 'adminMemberships', 'users', 'products'],
+  },
+  membershipBranches: {
+    canonicalFields: [
+      'organizationId', 'branchId', 'membershipId', 'userId', 'status',
+      'isDefaultForMembership', 'branchRoleId', 'permissions',
+      'createdAt', 'createdBy', 'updatedAt'
+    ],
+    referenceFields: ['organizationId', 'branchId', 'membershipId', 'userId', 'branchRoleId'],
+    forbiddenEmbeds: ['user', 'membership', 'branch', 'organization'],
+  },
+  stockBalances: {
+    canonicalFields: [
+      'organizationId', 'branchId', 'productId', 'currentStock',
+      'lowStockThreshold', 'updatedAt', 'updatedBy'
+    ],
+    referenceFields: ['organizationId', 'branchId', 'productId'],
+    forbiddenEmbeds: ['product', 'branch', 'movements'],
+  },
+  branchCodeLocks: {
+    canonicalFields: ['organizationId', 'branchCode', 'branchId', 'createdAt'],
+    referenceFields: ['organizationId', 'branchId'],
+    forbiddenEmbeds: ['branch', 'organization'],
+  },
+  tasks: {
+    canonicalFields: [
+      'organizationId', 'title', 'description', 'assignedToMembershipId',
+      'assignedByMembershipId', 'status', 'priority', 'dueAt',
+      'relatedEntityType', 'relatedEntityId', 'completedAt',
+      'completedByMembershipId', 'createdAt', 'createdBy', 'updatedAt'
+    ],
+    referenceFields: ['organizationId', 'assignedToMembershipId', 'assignedByMembershipId', 'relatedEntityId'],
+    forbiddenEmbeds: ['assignee', 'user', 'member', 'bill', 'delivery', 'customer', 'vendor'],
+  },
+  latestLocations: {
+    canonicalFields: [
+      'organizationId', 'membershipId', 'userId', 'latitude', 'longitude',
+      'accuracy', 'speed', 'heading', 'source', 'recordedAt', 'updatedAt'
+    ],
+    referenceFields: ['organizationId', 'membershipId', 'userId'],
+    forbiddenEmbeds: ['user', 'membership', 'profile'],
+  },
+  locationPings: {
+    canonicalFields: [
+      'organizationId', 'membershipId', 'userId', 'latitude', 'longitude',
+      'accuracy', 'speed', 'heading', 'source', 'recordedAt', 'createdAt'
+    ],
+    referenceFields: ['organizationId', 'membershipId', 'userId'],
+    forbiddenEmbeds: ['user', 'membership', 'profile'],
+  },
+  notifications: {
+    canonicalFields: [
+      'organizationId', 'userId', 'membershipId', 'type', 'title', 'body',
+      'relatedEntityType', 'relatedEntityId', 'data', 'isRead', 'readAt', 'createdAt'
+    ],
+    referenceFields: ['organizationId', 'userId', 'membershipId', 'relatedEntityId'],
+    forbiddenEmbeds: ['user', 'membership', 'devices'],
+  },
+  dailySummaries: {
+    canonicalFields: [
+      'organizationId', 'date', 'totalRevenue', 'totalExpenses', 'cogs',
+      'grossProfit', 'netProfit', 'billCount', 'outflowCount',
+      'paymentBreakdown', 'topProducts', 'updatedAt'
+    ],
+    referenceFields: ['organizationId'],
+    forbiddenEmbeds: ['bills', 'outflows', 'payments'],
+  },
+  monthlySummaries: {
+    canonicalFields: [
+      'organizationId', 'yearMonth', 'totalRevenue', 'totalExpenses', 'cogs',
+      'grossProfit', 'netProfit', 'billCount', 'outflowCount',
+      'daysRecorded', 'updatedAt'
+    ],
+    referenceFields: ['organizationId'],
+    forbiddenEmbeds: ['bills', 'outflows', 'payments'],
+  },
+  organizationUsageDaily: {
+    canonicalFields: [
+      'organizationId', 'date', 'counts', 'rateCardVersion', 'currency',
+      'measurementClass', 'completenessPercent', 'updatedAt'
+    ],
+    referenceFields: ['organizationId'],
+    forbiddenEmbeds: ['organization', 'invoices', 'billing'],
+  },
+  branchUsageDaily: {
+    canonicalFields: [
+      'organizationId', 'branchId', 'date', 'counts', 'rateCardVersion',
+      'currency', 'measurementClass', 'completenessPercent', 'updatedAt'
+    ],
+    referenceFields: ['organizationId', 'branchId'],
+    forbiddenEmbeds: ['organization', 'branch', 'invoices'],
+  },
+  platformUsageSnapshots: {
+    canonicalFields: [
+      'date', 'serviceTotals', 'source', 'measurementClass',
+      'completenessPercent', 'fetchedAt', 'rawSourceRef'
+    ],
+    referenceFields: [],
+    forbiddenEmbeds: ['organizations', 'branches'],
+  },
+  usageRateCards: {
+    canonicalFields: [
+      'version', 'effectiveDate', 'currency', 'rates', 'status',
+      'createdAt', 'createdBy'
+    ],
+    referenceFields: [],
+    forbiddenEmbeds: ['tenants', 'organizations'],
+  },
+  usageAllocationRuns: {
+    canonicalFields: [
+      'runId', 'billingPeriod', 'rateCardVersion', 'totalPlatformCost',
+      'allocatedTenantCost', 'unallocatedPlatformOverhead', 'currency',
+      'status', 'createdAt', 'createdBy'
+    ],
+    referenceFields: [],
+    forbiddenEmbeds: ['organizations', 'tenants'],
+  },
 };
 
 /**
@@ -180,6 +303,19 @@ function analyzeSourceText(content, filePath) {
           file: filePath,
         });
       }
+    }
+  }
+
+  // Rule 5: Check for embedded 'employees' or 'staff' in Branch writes or models
+  if (content.includes('branch') || content.includes('Branch')) {
+    const isBranchEmployeesArray = /(?:BranchDoc|branchDoc|branches\.doc)[^;]*(?:employees|staff|adminMemberships)\s*:\s*\[/is.test(content);
+    if (isBranchEmployeesArray) {
+      findings.push({
+        rule: 'NO_BRANCH_EMPLOYEES_ARRAY',
+        severity: 'HIGH',
+        message: 'Suspicious employee array found in Branch context. Staff branch access must be derived via membershipBranches.',
+        file: filePath,
+      });
     }
   }
 
@@ -277,6 +413,79 @@ function runSelfTest() {
   console.log('\n[PASS] Self-test succeeded with verified detection evidence!\n');
 }
 
+/**
+ * Structural AST/Interface Validator for functions/src/types/models.ts
+ */
+function checkStructuralModels(modelsFilePath) {
+  if (!fs.existsSync(modelsFilePath)) return [];
+  const content = fs.readFileSync(modelsFilePath, 'utf8');
+  const lines = content.split('\n');
+  const docInterfaces = [];
+  let currentDoc = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const m = line.match(/export interface\s+([A-Za-z0-9_]+Doc)\s*\{/);
+    if (m) {
+      currentDoc = { name: m[1], fields: [] };
+      docInterfaces.push(currentDoc);
+      continue;
+    }
+    if (currentDoc) {
+      if (line.trim().startsWith('}')) {
+        currentDoc = null;
+        continue;
+      }
+      const fm = line.match(/^\s*([A-Za-z0-9_]+)\??\s*:\s*([^;]+);/);
+      if (fm) {
+        currentDoc.fields.push({ name: fm[1], type: fm[2].trim() });
+      }
+    }
+  }
+
+  const foreignEntities = [
+    'user', 'membership', 'organization', 'branch', 'role', 'team',
+    'department', 'jobrole', 'bill', 'outflow', 'customer', 'vendor',
+    'product', 'delivery', 'payment', 'plan', 'subscriptionplan'
+  ];
+
+  const structuralFindings = [];
+
+  docInterfaces.forEach(doc => {
+    doc.fields.forEach(f => {
+      const fn = f.name;
+      const ft = f.type;
+
+      if (fn.endsWith('Id') || fn.endsWith('Ids')) return;
+      if (fn.endsWith('Snapshot') || fn.includes('Snapshot')) return;
+      if (['isActive', 'isPrimary', 'isDefault', 'status'].includes(fn)) return;
+
+      // Direct foreign entity name embedding
+      if (foreignEntities.includes(fn.toLowerCase())) {
+        structuralFindings.push({
+          rule: 'STRUCTURAL_NO_FOREIGN_ENTITY_EMBEDDING',
+          severity: 'HIGH',
+          message: `In ${doc.name}: field '${fn}' directly embeds foreign entity name instead of reference-by-ID (${fn}Id)`,
+          file: modelsFilePath,
+        });
+      }
+
+      // Embedding another Doc interface: matches exactly e.g. UserDoc, BranchDoc (not DocumentType)
+      const docMatch = ft.match(/\b([A-Z][a-zA-Z0-9]*Doc)\b/);
+      if (docMatch && docMatch[1] !== doc.name) {
+        structuralFindings.push({
+          rule: 'STRUCTURAL_NO_EMBEDDED_DOC_INTERFACE',
+          severity: 'HIGH',
+          message: `In ${doc.name}: field '${fn}' embeds foreign document type '${docMatch[1]}'`,
+          file: modelsFilePath,
+        });
+      }
+    });
+  });
+
+  return { docCount: docInterfaces.length, findings: structuralFindings };
+}
+
 // Main execution
 const isSelfTest = process.argv.includes('--test');
 
@@ -285,9 +494,13 @@ if (isSelfTest) {
 } else {
   console.log('Scanning Phase 1 codebase for duplicate embedding violations...');
   const targetDir = path.join(__dirname, '..', 'functions', 'src');
+  const modelsPath = path.join(targetDir, 'types', 'models.ts');
+  const structuralResult = checkStructuralModels(modelsPath);
   const findings = scanDirectory(targetDir);
+  findings.push(...structuralResult.findings);
 
   console.log(`Scanned: ${targetDir}`);
+  console.log(`Structural Model Check: Verified ${structuralResult.docCount} Doc interfaces in models.ts`);
   console.log(`Total suspicious findings: ${findings.length}`);
 
   if (findings.length > 0) {

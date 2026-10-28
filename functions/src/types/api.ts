@@ -23,14 +23,20 @@ export interface AuthMeResponse {
     roleName?: string;
     status: string;
     isPrimary: boolean;
+    primaryBranchId?: string;
+    assignedBranchIds?: string[];
   }>;
   activeContext?: {
     organizationId: string;
+    branchId?: string;
+    primaryBranchId?: string;
+    assignedBranchIds?: string[];
     roleId: string;
     roleCode: string;
     isOrgOwner: boolean;
     effectivePermissions: string[];
     moduleToggles: Record<string, boolean>;
+    branches?: Array<{ branchId: string; name: string; code: string; isDefault: boolean }>;
   };
 }
 
@@ -233,7 +239,7 @@ export interface RegisterFcmTokenRequest {
 }
 
 // ============================================================
-// Phase 2 DTOs
+// Operational Business Layer API Interfaces
 // ============================================================
 
 // Products
@@ -339,6 +345,7 @@ export interface ListUnitsRequest {
 export interface CreateCustomerRequest {
   idempotencyKey?: string;
   organizationId: string;
+  branchId?: string;
   name: string;
   mobile?: string;
   email?: string;
@@ -348,6 +355,8 @@ export interface CreateCustomerRequest {
   priceGroup?: string;
   creditLimit?: number;
   creditPeriodDays?: number;
+  visibilityScope?: "all_branches" | "selected_branches" | "branch_only";
+  sharedForBranchIds?: string[];
   isDefault?: boolean;
 }
 
@@ -363,11 +372,14 @@ export interface UpdateCustomerRequest {
   priceGroup?: string;
   creditLimit?: number;
   creditPeriodDays?: number;
+  visibilityScope?: "all_branches" | "selected_branches" | "branch_only";
+  sharedForBranchIds?: string[];
   isActive?: boolean;
 }
 
 export interface ListCustomersRequest {
   organizationId: string;
+  branchId?: string;
   search?: string;
   limit?: number;
   startAfterId?: string;
@@ -377,6 +389,7 @@ export interface ListCustomersRequest {
 export interface CreateVendorRequest {
   idempotencyKey?: string;
   organizationId: string;
+  branchId?: string;
   name: string;
   mobile?: string;
   email?: string;
@@ -385,6 +398,8 @@ export interface CreateVendorRequest {
   contactPerson?: string;
   paymentTermsDays?: number;
   creditLimit?: number;
+  visibilityScope?: "all_branches" | "selected_branches" | "branch_only";
+  sharedForBranchIds?: string[];
   isDefault?: boolean;
 }
 
@@ -399,11 +414,14 @@ export interface UpdateVendorRequest {
   contactPerson?: string;
   paymentTermsDays?: number;
   creditLimit?: number;
+  visibilityScope?: "all_branches" | "selected_branches" | "branch_only";
+  sharedForBranchIds?: string[];
   isActive?: boolean;
 }
 
 export interface ListVendorsRequest {
   organizationId: string;
+  branchId?: string;
   search?: string;
   limit?: number;
   startAfterId?: string;
@@ -592,3 +610,356 @@ export interface ListStockMovementsRequest {
   limit?: number;
   startAfterId?: string;
 }
+
+// ==========================================
+// Operations & Intelligence API Interfaces
+// ==========================================
+
+// Reporting
+export interface GetRevenueReportRequest {
+  organizationId: string;
+  branchId?: string;
+  from?: string; // ISO date YYYY-MM-DD
+  to?: string;
+  groupBy?: "day" | "month" | "year";
+}
+
+export interface GetRevenueReportResponse {
+  totalRevenue: number;
+  billCount: number;
+  averageBillValue: number;
+  breakdown: Array<{
+    period: string;
+    revenue: number;
+    count: number;
+  }>;
+}
+
+export interface GetProfitLossReportRequest {
+  organizationId: string;
+  branchId?: string;
+  from?: string;
+  to?: string;
+}
+
+export interface GetProfitLossReportResponse {
+  totalRevenue: number;
+  cogs: number;
+  grossProfit: number;
+  grossMarginPercent: number;
+  totalExpenses: number;
+  netProfit: number;
+  netMarginPercent: number;
+  billCount: number;
+  outflowCount: number;
+  costingMethod: "weighted_average" | "direct_expense";
+}
+
+export interface GetStockValuationReportRequest {
+  organizationId: string;
+  branchId?: string;
+  categoryId?: string;
+}
+
+export interface GetStockValuationReportResponse {
+  totalStockValuation: number;
+  totalItemsCount: number;
+  items: Array<{
+    productId: string;
+    name: string;
+    currentStock: number;
+    costPrice: number;
+    weightedAverageCost: number;
+    valuation: number;
+  }>;
+}
+
+export interface GetTopEntitiesReportRequest {
+  organizationId: string;
+  branchId?: string;
+  entityType: "products" | "customers" | "vendors";
+  limit?: number;
+  from?: string;
+  to?: string;
+}
+
+export interface GetStaffReportRequest {
+  organizationId: string;
+  branchId?: string;
+  staffMembershipId?: string;
+  from?: string;
+  to?: string;
+}
+
+export interface GetPlatformOverviewReportRequest {
+  from?: string;
+  to?: string;
+}
+
+export interface ExportReportRequest {
+  organizationId: string;
+  branchId?: string;
+  reportType: "revenue" | "profit_loss" | "stock_valuation" | "top_products" | "staff_sales";
+  from?: string;
+  to?: string;
+}
+
+// Tasks
+export interface CreateTaskRequest {
+  idempotencyKey?: string;
+  organizationId: string;
+  title: string;
+  description?: string;
+  assignedToMembershipId: string;
+  priority?: "low" | "medium" | "high" | "urgent";
+  dueAt?: string;
+  relatedEntityType?: "bill" | "outflow" | "delivery" | "customer" | "vendor" | "product" | null;
+  relatedEntityId?: string | null;
+}
+
+export interface UpdateTaskRequest {
+  taskId: string;
+  title?: string;
+  description?: string;
+  assignedToMembershipId?: string;
+  priority?: "low" | "medium" | "high" | "urgent";
+  dueAt?: string | null;
+  status?: "pending" | "in_progress" | "completed" | "cancelled";
+}
+
+export interface AssignTaskRequest {
+  taskId: string;
+  assignedToMembershipId: string;
+}
+
+export interface UpdateTaskStatusRequest {
+  taskId: string;
+  status: "pending" | "in_progress" | "completed" | "cancelled";
+}
+
+export interface ListTasksRequest {
+  organizationId: string;
+  assignedToMembershipId?: string;
+  status?: "pending" | "in_progress" | "completed" | "cancelled";
+  priority?: "low" | "medium" | "high" | "urgent";
+  limit?: number;
+  startAfterId?: string;
+}
+
+export interface DeleteTaskRequest {
+  taskId: string;
+}
+
+// Live Location
+export interface RecordLocationPingRequest {
+  organizationId: string;
+  latitude: number;
+  longitude: number;
+  accuracy?: number;
+  speed?: number;
+  heading?: number;
+  source?: "foreground" | "background";
+}
+
+export interface GetLatestLocationsRequest {
+  organizationId: string;
+  membershipIds?: string[];
+}
+
+export interface GetLocationHistoryRequest {
+  organizationId: string;
+  membershipId: string;
+  from?: string;
+  to?: string;
+  limit?: number;
+}
+
+// In-app Notifications
+export interface ListNotificationsRequest {
+  limit?: number;
+  unreadOnly?: boolean;
+}
+
+export interface MarkNotificationReadRequest {
+  notificationId: string;
+}
+
+// ============================================================
+// Super Admin Usage Metering & Platform Consumption API Types
+// ============================================================
+
+export interface GetPlatformUsageSummaryRequest {
+  startDate?: string; // YYYY-MM-DD
+  endDate?: string; // YYYY-MM-DD
+}
+
+export interface GetPlatformUsageSummaryResponse {
+  timeframe: { startDate: string; endDate: string };
+  platformActualTotals?: {
+    firestoreReads: number;
+    firestoreWrites: number;
+    firestoreDeletes: number;
+    functionsInvocations: number;
+    functionsErrors: number;
+    storageOperations: number;
+  };
+  applicationAttributedTotals: {
+    firestoreReads: number;
+    firestoreWrites: number;
+    firestoreDeletes: number;
+    functionsInvocations: number;
+    functionsErrors: number;
+    functionsExecutionMs: number;
+    storageUploadBytes: number;
+    storageDownloadBytes: number;
+    storageOperations: number;
+    authOperations: number;
+    fcmDispatches: number;
+    locationPings: number;
+  };
+  estimatedTotalPlatformCost: number;
+  allocatedTenantCostSum: number;
+  unallocatedPlatformOverhead: number;
+  currency: string;
+  activeRateCardVersion: string;
+  dataCompletenessNotes: string[];
+}
+
+export interface GetOrganizationsUsageRequest {
+  startDate?: string;
+  endDate?: string;
+  sortBy?: "activity" | "cost" | "name";
+  limit?: number;
+  startAfterOrgId?: string;
+}
+
+export interface OrganizationUsageSummaryItem {
+  organizationId: string;
+  name: string;
+  planId: string;
+  branchCount: number;
+  totalOperations: number;
+  estimatedCost: number;
+  currency: string;
+  completenessPercent: number;
+  breakdown: {
+    firestoreReads: number;
+    firestoreWrites: number;
+    firestoreDeletes: number;
+    functionsInvocations: number;
+    locationPings: number;
+    fcmDispatches: number;
+  };
+}
+
+export interface GetOrganizationsUsageResponse {
+  timeframe: { startDate: string; endDate: string };
+  count: number;
+  items: OrganizationUsageSummaryItem[];
+}
+
+export interface GetBranchesUsageRequest {
+  organizationId: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface BranchUsageSummaryItem {
+  branchId: string;
+  name: string;
+  code: string;
+  isActive: boolean;
+  isDefault: boolean;
+  totalOperations: number;
+  estimatedCost: number;
+  currency: string;
+  dataFreshness: string;
+  completenessPercent: number;
+  counts: {
+    firestoreReads: number;
+    firestoreWrites: number;
+    firestoreDeletes: number;
+    functionsInvocations: number;
+    locationPings: number;
+  };
+}
+
+export interface GetBranchesUsageResponse {
+  organizationId: string;
+  organizationName: string;
+  timeframe: { startDate: string; endDate: string };
+  branches: BranchUsageSummaryItem[];
+}
+
+export interface GetUsageDetailRequest {
+  organizationId?: string;
+  branchId?: string;
+  service?: "firestore" | "functions" | "storage" | "auth" | "fcm" | "location";
+  startDate?: string;
+  endDate?: string;
+  granularity?: "daily" | "monthly";
+}
+
+export interface UsageDetailItem {
+  date: string;
+  organizationId: string;
+  branchId?: string;
+  counts: Record<string, number>;
+  estimatedCost: number;
+  currency: string;
+  measurementClass: string;
+}
+
+export interface GetUsageDetailResponse {
+  filters: GetUsageDetailRequest;
+  items: UsageDetailItem[];
+}
+
+export interface CalculateDryRunStatementRequest {
+  organizationId: string;
+  billingPeriod: string; // YYYY-MM
+  rateCardVersion?: string;
+}
+
+export interface DryRunStatementLineItem {
+  service: string;
+  metric: string;
+  quantity: number;
+  unit: string;
+  unitRate: number;
+  amount: number;
+}
+
+export interface CalculateDryRunStatementResponse {
+  organizationId: string;
+  organizationName: string;
+  billingPeriod: string;
+  status: "draft_estimate";
+  legalDisclaimer: string;
+  rateCardVersion: string;
+  currency: string;
+  lineItems: DryRunStatementLineItem[];
+  subtotal: number;
+  sharedOverheadAllocation: number;
+  totalEstimatedCharge: number;
+  generatedAt: string;
+}
+
+// Branch Reconciliation Types
+export interface ReconcileBranchCountsRequest {
+  organizationId: string;
+  repair?: boolean;
+}
+
+export interface ReconcileBranchCountsResponse {
+  organizationId: string;
+  recordedBranchCount: number;
+  actualActiveBranches: number;
+  difference: number;
+  isDiscrepancy: boolean;
+  repaired: boolean;
+  activeBranchIds: string[];
+  timestamp: string;
+}
+
+

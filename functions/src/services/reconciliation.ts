@@ -8,7 +8,7 @@
  */
 
 import { db } from "./firebase.js";
-import { ProductDoc, StockMovementDoc, CustomerDoc, VendorDoc, BillDoc, OutflowDoc, PaymentDoc } from "../types/models.js";
+import { ProductDoc, StockMovementDoc, CustomerDoc, VendorDoc, BillDoc, OutflowDoc, PaymentDoc, ReturnDoc, OrganizationDoc } from "../types/models.js";
 import { Money } from "./money.js";
 import { PaymentDirection, PartyType } from "../constants/enums.js";
 
@@ -57,7 +57,8 @@ export interface PartyReconciliationReport {
 export async function reconcileStock(
   organizationId: string,
   productId?: string,
-  repair: boolean = false
+  repair: boolean = false,
+  branchId?: string
 ): Promise<StockReconciliationReport> {
   const now = new Date().toISOString();
   let productDocs: FirebaseFirestore.QueryDocumentSnapshot[] = [];
@@ -81,11 +82,16 @@ export async function reconcileStock(
     const pData = doc.data() as ProductDoc;
     const prodId = doc.id;
 
-    // Aggregate movements for this product
-    const movSnap = await db.collection("stockMovements")
+    // Aggregate movements for this product (optionally scoped to branch)
+    let movQuery: FirebaseFirestore.Query = db.collection("stockMovements")
       .where("organizationId", "==", organizationId)
-      .where("productId", "==", prodId)
-      .get();
+      .where("productId", "==", prodId);
+
+    if (branchId) {
+      movQuery = movQuery.where("branchId", "==", branchId);
+    }
+
+    const movSnap = await movQuery.get();
 
     let sum = 0;
     for (const mDoc of movSnap.docs) {
@@ -93,7 +99,14 @@ export async function reconcileStock(
       sum += (m.quantity || 0);
     }
 
-    const currentStock = pData.currentStock || 0;
+    let currentStock = pData.currentStock || 0;
+    if (branchId) {
+      const balanceSnap = await db.collection("stockBalances").doc(`${organizationId}_${branchId}_${prodId}`).get();
+      if (balanceSnap.exists) {
+        currentStock = (balanceSnap.data() as any).currentStock || 0;
+      }
+    }
+
     const roundedSum = Money.qty(sum, 4);
     const difference = Money.qty(currentStock - roundedSum, 4);
     const isDiscrepancy = Math.abs(difference) > 0.0001;
@@ -105,6 +118,17 @@ export async function reconcileStock(
           currentStock: roundedSum,
           updatedAt: now,
         });
+        if (branchId) {
+          const balanceRef = db.collection("stockBalances").doc(`${organizationId}_${branchId}_${prodId}`);
+          await balanceRef.set({
+            organizationId,
+            branchId,
+            productId: prodId,
+            currentStock: roundedSum,
+            updatedAt: now,
+            updatedBy: "reconciliation_repair",
+          }, { merge: true });
+        }
       }
     }
 
@@ -190,7 +214,23 @@ export async function reconcilePartyBalances(
         }
       }
 
-      const calculatedBalance = Money.amount(totalBilled - totalBillPaid);
+      // 3. Fetch credit note returns for this customer
+      const returnsSnap = await db.collection("returns")
+        .where("organizationId", "==", organizationId)
+        .where("partyId", "==", pId)
+        .where("returnType", "==", "sales_return")
+        .where("status", "==", "completed")
+        .get();
+
+      let totalCreditNotes = 0;
+      for (const r of returnsSnap.docs) {
+        const rData = r.data() as ReturnDoc;
+        if (rData.refundMethod === "credit_note") {
+          totalCreditNotes += (rData.totalRefundAmount || 0);
+        }
+      }
+
+      const calculatedBalance = Money.amount(Math.max(0, totalBilled - totalBillPaid - totalCreditNotes));
       const recordedBalance = Money.amount(cust.outstandingBalance || 0);
       const balanceDifference = Money.amount(recordedBalance - calculatedBalance);
       const recordedVolume = Money.amount(cust.totalSpend || 0);
@@ -247,7 +287,21 @@ export async function reconcilePartyBalances(
         }
       }
 
-      const calculatedBalance = Money.amount(totalPurchased - totalOutflowPaid);
+      // 3. Fetch debit note / credit reduction returns for this vendor
+      const returnsSnap = await db.collection("returns")
+        .where("organizationId", "==", organizationId)
+        .where("partyId", "==", pId)
+        .where("returnType", "==", "purchase_return")
+        .where("status", "==", "completed")
+        .get();
+
+      let totalDebitNotes = 0;
+      for (const r of returnsSnap.docs) {
+        const rData = r.data() as ReturnDoc;
+        totalDebitNotes += (rData.totalRefundAmount || 0);
+      }
+
+      const calculatedBalance = Money.amount(Math.max(0, totalPurchased - totalOutflowPaid - totalDebitNotes));
       const recordedBalance = Money.amount(vend.outstandingPayable || 0);
       const balanceDifference = Money.amount(recordedBalance - calculatedBalance);
       const recordedVolume = Money.amount(vend.totalPurchase || 0);
@@ -282,4 +336,60 @@ export async function reconcilePartyBalances(
     timestamp: now,
   };
 }
+
+export interface BranchCountReconciliationReport {
+  organizationId: string;
+  recordedBranchCount: number;
+  actualActiveBranches: number;
+  difference: number;
+  isDiscrepancy: boolean;
+  repaired: boolean;
+  activeBranchIds: string[];
+  timestamp: string;
+}
+
+/**
+ * Reconciles organization.branchCount against active branches in organizations/{orgId}/branches
+ */
+export async function reconcileBranchCounts(
+  organizationId: string,
+  repair: boolean = false
+): Promise<BranchCountReconciliationReport> {
+  const now = new Date().toISOString();
+  const orgRef = db.collection("organizations").doc(organizationId);
+  const orgSnap = await orgRef.get();
+  if (!orgSnap.exists) {
+    throw new Error(`Organization "${organizationId}" not found.`);
+  }
+
+  const orgData = orgSnap.data() as OrganizationDoc;
+  const recordedBranchCount = typeof orgData.branchCount === "number" ? orgData.branchCount : 1;
+
+  const branchesSnap = await orgRef.collection("branches").where("isActive", "==", true).get();
+  const actualActiveBranches = branchesSnap.size;
+  const activeBranchIds = branchesSnap.docs.map((d) => d.id);
+  const difference = recordedBranchCount - actualActiveBranches;
+  const isDiscrepancy = difference !== 0;
+
+  let repaired = false;
+  if (isDiscrepancy && repair) {
+    await orgRef.update({
+      branchCount: actualActiveBranches,
+      updatedAt: now,
+    });
+    repaired = true;
+  }
+
+  return {
+    organizationId,
+    recordedBranchCount,
+    actualActiveBranches,
+    difference,
+    isDiscrepancy,
+    repaired,
+    activeBranchIds,
+    timestamp: now,
+  };
+}
+
 
