@@ -16,7 +16,6 @@ import {
 import {
   ReturnDoc,
   ReturnItem,
-  MembershipDoc,
   BillDoc,
   OutflowDoc,
   CustomerDoc,
@@ -38,16 +37,7 @@ import {
   StockChangeItem,
 } from "../services/stockEngine.js";
 import { createAuditLog } from "../services/audit.js";
-
-async function verifyTenantAccess(auth: any, organizationId: string): Promise<void> {
-  if (auth.token.isSuperAdmin === true) return;
-
-  const memRef = db.collection("memberships").doc(`${auth.uid}_${organizationId}`);
-  const memDoc = await memRef.get();
-  if (!memDoc.exists || (memDoc.data() as MembershipDoc).status !== "active") {
-    throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-  }
-}
+import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
 
 export const returnsCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
@@ -60,10 +50,10 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   const idempotency = await reserveIdempotency({
-    scope: input.organizationId,
+    scope: orgId,
     actorUid: request.auth.uid,
     operation: "returns.create",
     clientKey: input.idempotencyKey,
@@ -86,7 +76,7 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
     const finalResult = await db.runTransaction(async (txn) => {
       // === STEP 1: ALL TRANSACTIONAL READS FIRST (Firestore transactional rule) ===
       const returnReservation = await readNextDocumentNumberInTxn(txn, {
-        organizationId: input.organizationId,
+        organizationId: orgId,
         type: "RET",
       });
 
@@ -107,7 +97,7 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
           throw new HttpsError("not-found", `Referenced Bill "${input.referenceId}" not found.`);
         }
         billData = parentBillDoc.data() as BillDoc;
-        if (billData.organizationId !== input.organizationId) {
+        if (billData.organizationId !== orgId) {
           throw new HttpsError("permission-denied", "Cross-tenant reference rejected.");
         }
         if (billData.status === "voided") {
@@ -130,7 +120,7 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
           throw new HttpsError("not-found", `Referenced Outflow "${input.referenceId}" not found.`);
         }
         outflowData = parentOutflowDoc.data() as OutflowDoc;
-        if (outflowData.organizationId !== input.organizationId) {
+        if (outflowData.organizationId !== orgId) {
           throw new HttpsError("permission-denied", "Cross-tenant reference rejected.");
         }
         if (outflowData.status === "voided") {
@@ -153,6 +143,7 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
       for (const item of input.items) {
         let nameSnapshot = "";
         let priceSnapshot = 0;
+        let costSnapshot = 0;
         let baseUnit = "piece";
 
         if (input.returnType === ReturnType.SALES_RETURN && billData) {
@@ -170,6 +161,7 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
           }
           nameSnapshot = originalLine.nameSnapshot;
           priceSnapshot = originalLine.priceSnapshot;
+          costSnapshot = originalLine.costSnapshot !== undefined ? originalLine.costSnapshot : 0;
           baseUnit = originalLine.unit || "piece";
           originalLine.returnedQty = alreadyReturned + item.quantity;
         } else if (input.returnType === ReturnType.PURCHASE_RETURN && outflowData) {
@@ -187,6 +179,7 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
           }
           nameSnapshot = originalLine.itemName;
           priceSnapshot = originalLine.unitPrice;
+          costSnapshot = originalLine.unitPrice;
           baseUnit = originalLine.unit || "piece";
           originalLine.returnedQty = alreadyReturned + item.quantity;
         }
@@ -199,6 +192,7 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
           quantity: item.quantity,
           unit: baseUnit,
           priceSnapshot,
+          costSnapshot,
           refundAmount: item.refundAmount,
           reason: item.reason,
           disposition: item.disposition,
@@ -225,11 +219,15 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
       }
 
       let preparedStock = null;
-      const branchId = input.branchId || billData?.branchId || outflowData?.branchId || (request.auth?.token?.primaryBranchId as string) || "main-branch";
+      const branchId = await resolveBranchContext(
+        request.auth!,
+        orgId,
+        input.branchId || billData?.branchId || outflowData?.branchId
+      );
 
       if (stockChangeItems.length > 0) {
         preparedStock = await prepareStockChangesInTxn(txn, {
-          organizationId: input.organizationId,
+          organizationId: orgId,
           branchId,
           actorUid: callerUid,
           items: stockChangeItems,
@@ -241,7 +239,7 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
       const returnNumber = returnReservation.formattedNumber;
 
       const returnDoc: ReturnDoc = {
-        organizationId: input.organizationId,
+        organizationId: orgId,
         branchId,
         returnNumber,
         returnType: input.returnType,
@@ -298,7 +296,7 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
 
       return {
         returnId,
-        organizationId: input.organizationId,
+        organizationId: orgId,
         returnNumber,
         totalRefundAmount,
         status: "completed",
@@ -316,7 +314,7 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
     }
 
     await createAuditLog({
-      organizationId: input.organizationId,
+      organizationId: orgId,
       actorUid: request.auth.uid,
       action: "RETURN_PROCESSED",
       entityType: "return",
@@ -349,10 +347,10 @@ export const returnsList = onCall({ region: "asia-south1" }, async (request) => 
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   let query = db.collection("returns")
-    .where("organizationId", "==", input.organizationId)
+    .where("organizationId", "==", orgId)
     .limit(input.limit || 50);
 
   if (input.returnType) {

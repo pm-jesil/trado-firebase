@@ -122,9 +122,9 @@ export function resolvePermission(
   requiredPermission: string,
   context: PermissionResolutionContext
 ): boolean {
-  // 1. Super Admin bypass
+  // 1. Super Admin platform isolation: bypasses platform:* capabilities only
   if (context.isSuperAdmin) {
-    return true;
+    return requiredPermission.startsWith("platform:");
   }
 
   // Deny platform permissions to non-super-admins
@@ -203,7 +203,7 @@ export function resolveAllEffectivePermissions(
   context: PermissionResolutionContext
 ): string[] {
   if (context.isSuperAdmin) {
-    return [AppPermissions.ALL, AppPermissions.PLATFORM_ALL, ...allCatalogCodes];
+    return allCatalogCodes.filter((c) => c.startsWith("platform:"));
   }
 
   const effective: string[] = [];

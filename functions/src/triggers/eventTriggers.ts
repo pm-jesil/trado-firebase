@@ -28,11 +28,12 @@ export const onBillWritten = onDocumentWritten(
     const bill = after.data() as BillDoc;
 
     const isNew = !before || !before.exists;
-    const justFinalized = before && before.data()?.documentType === DocumentType.QUOTATION && bill.documentType !== DocumentType.QUOTATION;
+    const wasDraft = before && before.exists && (before.data()?.status === "draft" || before.data()?.documentType === DocumentType.QUOTATION || before.data()?.documentType === DocumentType.PROFORMA);
+    const isNowActive = bill.status === BillStatus.ACTIVE;
+    const justFinalized = wasDraft && isNowActive;
 
-    if (isNew || justFinalized) {
-      if (bill.status === BillStatus.ACTIVE) {
-        await recordBillSummary(bill);
+    if ((isNew && isNowActive) || justFinalized) {
+      await recordBillSummary(bill);
 
         // Check low-stock threshold for items
         if (Array.isArray(bill.items)) {
@@ -99,7 +100,6 @@ export const onBillWritten = onDocumentWritten(
         }
       }
     }
-  }
 );
 
 /**
@@ -154,19 +154,24 @@ export const onOutflowWritten = onDocumentWritten(
             const prodSnap = await prodRef.get();
             if (prodSnap.exists) {
               const prod = prodSnap.data() as ProductDoc;
-              const currentStock = prod.currentStock || 0;
-              const currentWac = prod.weightedAverageCost ?? prod.costPrice ?? 0;
-              const newWac = calculateNewWeightedAverageCost(
-                currentStock,
-                currentWac,
-                line.quantity,
-                line.unitPrice
-              );
+              // Authoritative WAC is already committed atomically during outflowsCreate transaction.
+              // As an idempotent safety fallback, only recalculate if product has no existing WAC recorded.
+              if (prod.weightedAverageCost === undefined || prod.weightedAverageCost === null) {
+                const currentStock = prod.currentStock || 0;
+                const previousStock = Math.max(0, currentStock - line.quantity);
+                const currentWac = prod.costPrice ?? 0;
+                const newWac = calculateNewWeightedAverageCost(
+                  previousStock,
+                  currentWac,
+                  line.quantity,
+                  line.unitPrice
+                );
 
-              await prodRef.update({
-                weightedAverageCost: newWac,
-                updatedAt: new Date().toISOString(),
-              });
+                await prodRef.update({
+                  weightedAverageCost: newWac,
+                  updatedAt: new Date().toISOString(),
+                });
+              }
             }
           } catch {
             // Non-blocking

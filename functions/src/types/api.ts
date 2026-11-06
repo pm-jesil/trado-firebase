@@ -4,40 +4,125 @@
 
 import { BusinessType, BusinessCategory, EntityStatus } from "../constants/enums.js";
 
-// Session Bootstrap (/auth/me equivalent)
-export interface AuthMeResponse {
-  user: {
-    uid: string;
-    email: string;
-    name: string;
-    phone?: string;
-    accountType: string;
-    isActive: boolean;
-  };
+// Canonical Session Context DTOs
+export type AuthContextStatus =
+  | "ready"
+  | "platform"
+  | "organization_selection_required"
+  | "branch_selection_required"
+  | "no_active_membership";
+
+export interface AuthUserContext {
+  uid: string;
+  email: string;
+  name: string;
+  phone: string | null;
+  avatarUrl: string | null;
+  accountType: string;
+  isActive: boolean;
   isSuperAdmin: boolean;
-  memberships: Array<{
-    membershipId: string;
-    organizationId: string;
-    organizationName?: string;
-    roleId: string;
-    roleName?: string;
-    status: string;
-    isPrimary: boolean;
-    primaryBranchId?: string;
-    assignedBranchIds?: string[];
-  }>;
-  activeContext?: {
-    organizationId: string;
-    branchId?: string;
-    primaryBranchId?: string;
-    assignedBranchIds?: string[];
-    roleId: string;
-    roleCode: string;
-    isOrgOwner: boolean;
-    effectivePermissions: string[];
-    moduleToggles: Record<string, boolean>;
-    branches?: Array<{ branchId: string; name: string; code: string; isDefault: boolean }>;
+}
+
+export interface AuthRoleContext {
+  scope: "platform" | "organization";
+  roleId: string | null;
+  roleName: string | null;
+  roleCode: string | null;
+}
+
+export interface AuthJobRoleContext {
+  jobRoleId: string;
+  name: string;
+  code: string;
+}
+
+export interface AuthOrganizationContext {
+  organizationId: string;
+  name?: string;
+  roleId?: string;
+  roleName?: string;
+  isPrimary?: boolean;
+}
+
+export interface AuthPrimaryOrganizationContext {
+  organizationId: string;
+  name?: string;
+}
+
+export interface AuthBranchContext {
+  branchId: string;
+  name: string;
+  code: string;
+  isDefault: boolean;
+}
+
+export interface AuthPrimaryBranchContext {
+  branchId: string;
+  name: string;
+  code: string;
+}
+
+export interface AuthDeviceContext {
+  deviceId: string;
+  recognized: boolean;
+}
+
+export interface AuthSessionContext {
+  user: AuthUserContext;
+  role: AuthRoleContext | null;
+  jobRoles: AuthJobRoleContext[];
+  permissions: string[];
+  platformPermissions: string[];
+  organizations: AuthOrganizationContext[];
+  primaryOrganization: AuthPrimaryOrganizationContext | null;
+  branches: AuthBranchContext[];
+  primaryBranch: AuthPrimaryBranchContext | null;
+  device: AuthDeviceContext | null;
+  contextStatus: AuthContextStatus;
+}
+
+// Authentication Login DTOs (Emulator Adapter)
+export interface AuthLoginRequest {
+  email: string;
+  password: string;
+  deviceId?: string;
+}
+
+export interface AuthLoginResponse {
+  context: AuthSessionContext;
+  credentials: {
+    idToken: string;
+    expiresInSeconds: number;
+    accessToken?: string;
+    refreshToken?: string;
   };
+  idToken?: string;
+  accessToken?: string;
+  refreshToken?: string | null;
+  user?: AuthUserContext;
+  profile?: AuthUserContext;
+  role?: AuthRoleContext | null;
+  jobRoles?: AuthJobRoleContext[];
+  permissions?: string[];
+  platformPermissions?: string[];
+  organizations?: AuthOrganizationContext[];
+  primaryOrganization?: AuthPrimaryOrganizationContext | null;
+  branches?: AuthBranchContext[];
+  primaryBranch?: AuthPrimaryBranchContext | null;
+  device?: AuthDeviceContext | null;
+  contextStatus?: AuthContextStatus;
+}
+
+// Session Bootstrap (/auth/me equivalent)
+export interface AuthMeRequest {
+  deviceId?: string;
+  organizationId?: string;
+  branchId?: string;
+}
+
+export interface AuthMeResponse {
+  context: AuthSessionContext;
+  credentials: null;
 }
 
 // Organizations

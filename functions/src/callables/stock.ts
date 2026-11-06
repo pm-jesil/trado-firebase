@@ -10,21 +10,12 @@ import {
   StockAdjustSchema,
   ListStockMovementsSchema,
 } from "../validation/schemas.js";
-import { StockMovementDoc, ProductDoc, MembershipDoc } from "../types/models.js";
+import { StockMovementDoc, ProductDoc } from "../types/models.js";
 import { StockMovementType } from "../constants/enums.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { applyStockChangesInTxn } from "../services/stockEngine.js";
 import { createAuditLog } from "../services/audit.js";
-
-async function verifyTenantAccess(auth: any, organizationId: string): Promise<void> {
-  if (auth.token.isSuperAdmin === true) return;
-
-  const memRef = db.collection("memberships").doc(`${auth.uid}_${organizationId}`);
-  const memDoc = await memRef.get();
-  if (!memDoc.exists || (memDoc.data() as MembershipDoc).status !== "active") {
-    throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-  }
-}
+import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
 
 export const stockAdjust = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
@@ -37,10 +28,10 @@ export const stockAdjust = onCall({ region: "asia-south1" }, async (request) => 
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   const idempotency = await reserveIdempotency({
-    scope: input.organizationId,
+    scope: orgId,
     actorUid: request.auth.uid,
     operation: "stock.adjust",
     clientKey: input.idempotencyKey,
@@ -61,17 +52,17 @@ export const stockAdjust = onCall({ region: "asia-south1" }, async (request) => 
     }
 
     const prodData = prodDoc.data() as ProductDoc;
-    if (prodData.organizationId !== input.organizationId) {
+    if (prodData.organizationId !== orgId) {
       throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
     }
 
     const movType = input.quantity >= 0 ? StockMovementType.ADJUSTMENT_IN : StockMovementType.ADJUSTMENT_OUT;
     const callerUid = request.auth.uid;
-    const branchId = input.branchId || (request.auth.token.primaryBranchId as string) || "main-branch";
+    const branchId = await resolveBranchContext(request.auth, orgId, input.branchId);
 
     const results = await db.runTransaction(async (txn) => {
       return await applyStockChangesInTxn(txn, {
-        organizationId: input.organizationId,
+        organizationId: orgId,
         branchId,
         actorUid: callerUid,
         items: [
@@ -91,7 +82,7 @@ export const stockAdjust = onCall({ region: "asia-south1" }, async (request) => 
     const changeResult = results[0];
     const response = {
       productId: input.productId,
-      organizationId: input.organizationId,
+      organizationId: orgId,
       previousStock: changeResult.previousStock,
       newStock: changeResult.newStock,
       quantityAdjusted: input.quantity,
@@ -110,7 +101,7 @@ export const stockAdjust = onCall({ region: "asia-south1" }, async (request) => 
     }
 
     await createAuditLog({
-      organizationId: input.organizationId,
+      organizationId: orgId,
       actorUid: request.auth.uid,
       action: "STOCK_ADJUSTED",
       entityType: "product",
@@ -144,10 +135,10 @@ export const stockMovementsList = onCall({ region: "asia-south1" }, async (reque
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   let query = db.collection("stockMovements")
-    .where("organizationId", "==", input.organizationId)
+    .where("organizationId", "==", orgId)
     .limit(input.limit || 50);
 
   if (input.productId) {

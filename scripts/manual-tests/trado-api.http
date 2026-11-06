@@ -1,13 +1,24 @@
 ### ==============================================================================
 ### TRADO FIREBASE BACKEND — LOCAL REST CLIENT / POSTMAN API COLLECTION
 ### 
-### Requirements:
-### 1. Firebase Emulators running: firebase emulators:start --only auth,functions,firestore
-### 2. VS Code Extension: "REST Client" (humao.rest-client) or import into Postman
-### 3. Local Emulator Ports:
-###    - Auth: 9099
-###    - Cloud Functions: 5001
-###    - Cloud Firestore: 8080
+### Tool Role:
+### - Ideal for VS Code inline execution using the "REST Client" extension (humao.rest-client)
+###   or for direct import into Postman/Insomnia for scriptable HTTP sweeps.
+### - Relationship to API Explorer:
+###   * API Explorer (http://127.0.0.1:3939) provides a full visual Swagger UI with
+###     interactive schema hints, auto-login persona selectors, and one-click execution.
+###   * This .http collection provides a code-adjacent, version-controlled developer scratchpad
+###     for rapid request editing, variable chaining, and headless reproduction.
+###
+### Prerequisites:
+### 1. Firebase Emulators running:
+###    firebase emulators:start --only auth,functions,firestore
+### 2. Emulators seeded with demo data:
+###    npm --prefix functions run build; node functions/lib/scripts/seed-emulator.js --profile api-explorer-demo
+### 3. Local Ports:
+###    - Auth Emulator: 127.0.0.1:9099
+###    - Cloud Functions: 127.0.0.1:5001 (Project: trado-x, Region: asia-south1)
+###    - Cloud Firestore: 127.0.0.1:8080
 ### ==============================================================================
 
 @authHost = http://127.0.0.1:9099
@@ -30,33 +41,47 @@ Content-Type: application/json
 ### 2. AUTHENTICATION (LOCAL EMULATOR ID TOKEN EXCHANGE)
 ### ------------------------------------------------------------------------------
 
-### 2.1 Sign in as Super Admin (Local Emulator Token)
+### 2.1 Sign in as Super Admin (Platform Persona)
 # @name adminSignIn
 POST {{authHost}}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=fake-key
 Content-Type: application/json
 
 {
   "email": "superadmin@trado.local",
-  "password": "Password123!",
+  "password": "TestPassword123!",
   "returnSecureToken": true
 }
 
 ### Save Admin Token
 @adminToken = {{adminSignIn.response.body.idToken}}
 
-### 2.2 Sign in as Tenant Owner
+### 2.2 Sign in as Retail Demo Owner (Organization A: Apex Wholesale Sample)
 # @name ownerSignIn
 POST {{authHost}}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=fake-key
 Content-Type: application/json
 
 {
-  "email": "owner@acme.local",
-  "password": "Password123!",
+  "email": "owner@apexwholesale.local",
+  "password": "TestPassword123!",
   "returnSecureToken": true
 }
 
-### Save Owner Token
+### Save Retail Owner Token
 @ownerToken = {{ownerSignIn.response.body.idToken}}
+
+### 2.3 Sign in as Wholesale Demo Owner (Organization B: Wholesale Hub Sample)
+# @name wholesaleOwnerSignIn
+POST {{authHost}}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=fake-key
+Content-Type: application/json
+
+{
+  "email": "owner@wholesale.trado.local",
+  "password": "TestPassword123!",
+  "returnSecureToken": true
+}
+
+### Save Wholesale Owner Token
+@wholesaleOwnerToken = {{wholesaleOwnerSignIn.response.body.idToken}}
 
 ### ------------------------------------------------------------------------------
 ### 3. SESSION BOOTSTRAP & CAPABILITIES

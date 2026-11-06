@@ -21,7 +21,6 @@ import {
   BillItem,
   ProductDoc,
   OrganizationDoc,
-  MembershipDoc,
   PaymentDoc,
   CustomerDoc,
 } from "../types/models.js";
@@ -48,16 +47,7 @@ import {
   StockChangeItem,
 } from "../services/stockEngine.js";
 import { createAuditLog } from "../services/audit.js";
-
-async function verifyTenantAccess(auth: any, organizationId: string): Promise<void> {
-  if (auth.token.isSuperAdmin === true) return;
-
-  const memRef = db.collection("memberships").doc(`${auth.uid}_${organizationId}`);
-  const memDoc = await memRef.get();
-  if (!memDoc.exists || (memDoc.data() as MembershipDoc).status !== "active") {
-    throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-  }
-}
+import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
 
 export const billsCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
@@ -70,10 +60,11 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const branchId = await resolveBranchContext(request.auth, orgId, input.branchId);
 
   const idempotency = await reserveIdempotency({
-    scope: input.organizationId,
+    scope: orgId,
     actorUid: request.auth.uid,
     operation: "bills.create",
     clientKey: input.idempotencyKey,
@@ -88,13 +79,11 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
   }
 
   try {
-    const orgDoc = await db.collection("organizations").doc(input.organizationId).get();
+    const orgDoc = await db.collection("organizations").doc(orgId).get();
     if (!orgDoc.exists) {
       throw new HttpsError("not-found", "Organization not found.");
     }
     const orgData = orgDoc.data() as OrganizationDoc;
-
-    const branchId = input.branchId || (request.auth.token.primaryBranchId as string) || orgData.defaultBranchId || "main-branch";
     const billRef = db.collection("bills").doc();
     const billId = billRef.id;
     const now = new Date().toISOString();
@@ -152,7 +141,9 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
         productId: rawItem.productId,
         nameSnapshot: prodData.name,
         priceSnapshot: price,
-        costSnapshot: prodData.costPrice || 0,
+        costSnapshot: prodData.weightedAverageCost && prodData.weightedAverageCost > 0
+          ? prodData.weightedAverageCost
+          : (prodData.costPrice || 0),
         taxCodeSnapshot: prodData.taxCode || "",
         quantity: Money.qty(rawItem.quantity),
         unit: rawItem.unit || prodData.baseUnit || "piece",
@@ -210,14 +201,14 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
     const finalResult = await db.runTransaction(async (txn) => {
       // === STEP 1: ALL TRANSACTIONAL READS FIRST (Firestore requirement) ===
       const billReservation = await readNextDocumentNumberInTxn(txn, {
-        organizationId: input.organizationId,
+        organizationId: orgId,
         type: prefix,
       });
 
       let paymentReservation = null;
       if (paidAmount > 0) {
         paymentReservation = await readNextDocumentNumberInTxn(txn, {
-          organizationId: input.organizationId,
+          organizationId: orgId,
           type: "PAY",
         });
       }
@@ -225,7 +216,7 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
       let preparedStock = null;
       if (stockChangeItems.length > 0) {
         preparedStock = await prepareStockChangesInTxn(txn, {
-          organizationId: input.organizationId,
+          organizationId: orgId,
           branchId,
           actorUid: callerUid,
           items: stockChangeItems,
@@ -244,7 +235,7 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
       const billNumber = billReservation.formattedNumber;
 
       const billDoc: BillDoc = {
-        organizationId: input.organizationId,
+        organizationId: orgId,
         branchId,
         billNumber,
         salesMode: input.salesMode || SalesMode.POS,
@@ -294,7 +285,7 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
         paymentId = paymentRef.id;
 
         const paymentDoc: PaymentDoc = {
-          organizationId: input.organizationId,
+          organizationId: orgId,
           branchId,
           paymentNumber: paymentReservation.formattedNumber,
           direction: PaymentDirection.IN,
@@ -316,7 +307,7 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
 
       return {
         billId,
-        organizationId: input.organizationId,
+        organizationId: orgId,
         billNumber,
         salesMode: billDoc.salesMode,
         documentType: docType,
@@ -342,7 +333,7 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
     }
 
     await createAuditLog({
-      organizationId: input.organizationId,
+      organizationId: orgId,
       actorUid: request.auth.uid,
       action: "BILL_CREATED",
       entityType: "bill",
@@ -376,10 +367,10 @@ export const billsList = onCall({ region: "asia-south1" }, async (request) => {
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   let query = db.collection("bills")
-    .where("organizationId", "==", input.organizationId)
+    .where("organizationId", "==", orgId)
     .limit(input.limit || 50);
 
   if (input.salesMode) {
@@ -407,12 +398,11 @@ export const billsGet = onCall({ region: "asia-south1" }, async (request) => {
   }
 
   const billId = request.data?.billId;
-  const organizationId = request.data?.organizationId;
-  if (!billId || !organizationId) {
-    throw new HttpsError("invalid-argument", "billId and organizationId required.");
+  if (!billId) {
+    throw new HttpsError("invalid-argument", "billId is required.");
   }
 
-  await verifyTenantAccess(request.auth, organizationId);
+  const orgId = await verifyTenantAccess(request.auth, request.data?.organizationId);
 
   const docSnap = await db.collection("bills").doc(billId).get();
   if (!docSnap.exists) {
@@ -420,7 +410,7 @@ export const billsGet = onCall({ region: "asia-south1" }, async (request) => {
   }
 
   const data = docSnap.data() as BillDoc;
-  if (data.organizationId !== organizationId) {
+  if (data.organizationId !== orgId) {
     throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
   }
 
@@ -438,10 +428,10 @@ export const billsFinalize = onCall({ region: "asia-south1" }, async (request) =
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   const idempotency = await reserveIdempotency({
-    scope: input.organizationId,
+    scope: orgId,
     actorUid: request.auth.uid,
     operation: "bills.finalize",
     clientKey: input.idempotencyKey,
@@ -467,7 +457,7 @@ export const billsFinalize = onCall({ region: "asia-south1" }, async (request) =
         throw new HttpsError("not-found", "Bill not found.");
       }
       const billData = billSnap.data() as BillDoc;
-      if (billData.organizationId !== input.organizationId) {
+      if (billData.organizationId !== orgId) {
         throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
       }
 
@@ -480,7 +470,7 @@ export const billsFinalize = onCall({ region: "asia-south1" }, async (request) =
 
       // 1. Reserve official invoice number
       const invReservation = await readNextDocumentNumberInTxn(txn, {
-        organizationId: input.organizationId,
+        organizationId: orgId,
         type: "INV",
       });
 
@@ -501,7 +491,7 @@ export const billsFinalize = onCall({ region: "asia-south1" }, async (request) =
       let preparedStock = null;
       if (stockChangeItems.length > 0) {
         preparedStock = await prepareStockChangesInTxn(txn, {
-          organizationId: input.organizationId,
+          organizationId: orgId,
           branchId: billData.branchId || "main-branch",
           actorUid: callerUid,
           items: stockChangeItems,
@@ -514,6 +504,19 @@ export const billsFinalize = onCall({ region: "asia-south1" }, async (request) =
       if (billData.customerId) {
         custRef = db.collection("customers").doc(billData.customerId);
         custSnap = await txn.get(custRef);
+      }
+
+      // 4. Read products to lock authoritative cost snapshot at the exact moment of finalization
+      const finalizedItems = [...billData.items];
+      for (const item of finalizedItems) {
+        const pSnap = await txn.get(db.collection("products").doc(item.productId));
+        if (pSnap.exists) {
+          const pData = pSnap.data() as ProductDoc;
+          const authoritativeCost = (pData.weightedAverageCost !== undefined && pData.weightedAverageCost !== null)
+            ? pData.weightedAverageCost
+            : (pData.costPrice ?? 0);
+          item.costSnapshot = authoritativeCost;
+        }
       }
 
       // === STEP 2: ALL TRANSACTIONAL WRITES ===
@@ -531,6 +534,7 @@ export const billsFinalize = onCall({ region: "asia-south1" }, async (request) =
         documentType: DocumentType.INVOICE,
         billNumber: invoiceNumber,
         originalQuotationNumber: originalNumber,
+        items: finalizedItems,
         finalizedAt: now,
         finalizedBy: callerUid,
         updatedAt: now,
@@ -569,7 +573,7 @@ export const billsFinalize = onCall({ region: "asia-south1" }, async (request) =
     }
 
     await createAuditLog({
-      organizationId: input.organizationId,
+      organizationId: orgId,
       actorUid: callerUid,
       action: "BILL_FINALIZED",
       entityType: "bill",

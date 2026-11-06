@@ -1,5 +1,7 @@
 # Trado Security, Rules & Permissions Model
 
+> **Canonical Companion**: For the complete role hierarchy, four-layer resolution engine, and privilege matrix, see [Permissions & Roles](permissions-and-roles.md).
+
 This document specifies the complete security architecture for Trado, including Cloud Firestore Security Rules, Cloud Storage Security Rules, the 4-layer dynamic RBAC permission evaluation engine, and the 105-code canonical permission catalog.
 
 ---

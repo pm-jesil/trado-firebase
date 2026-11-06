@@ -13,7 +13,7 @@ import {
   CreatePaymentSchema,
   ListPaymentsSchema,
 } from "../validation/schemas.js";
-import { PaymentDoc, MembershipDoc, BillDoc, OutflowDoc, CustomerDoc, VendorDoc } from "../types/models.js";
+import { PaymentDoc, BillDoc, OutflowDoc, CustomerDoc, VendorDoc } from "../types/models.js";
 import { Money } from "../services/money.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import {
@@ -21,16 +21,7 @@ import {
   commitDocumentNumberInTxn,
 } from "../services/documentCounter.js";
 import { createAuditLog } from "../services/audit.js";
-
-async function verifyTenantAccess(auth: any, organizationId: string): Promise<void> {
-  if (auth.token.isSuperAdmin === true) return;
-
-  const memRef = db.collection("memberships").doc(`${auth.uid}_${organizationId}`);
-  const memDoc = await memRef.get();
-  if (!memDoc.exists || (memDoc.data() as MembershipDoc).status !== "active") {
-    throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-  }
-}
+import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
 
 export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
@@ -43,10 +34,11 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const branchId = await resolveBranchContext(request.auth, orgId, input.branchId);
 
   const idempotency = await reserveIdempotency({
-    scope: input.organizationId,
+    scope: orgId,
     actorUid: request.auth.uid,
     operation: "payments.create",
     clientKey: input.idempotencyKey,
@@ -65,12 +57,11 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
     const paymentId = paymentRef.id;
     const now = new Date().toISOString();
     const callerUid = request.auth.uid;
-    const branchId = input.branchId || (request.auth.token.primaryBranchId as string) || "main-branch";
 
     const finalResult = await db.runTransaction(async (txn) => {
       // === STEP 1: ALL TRANSACTIONAL READS FIRST ===
       const paymentReservation = await readNextDocumentNumberInTxn(txn, {
-        organizationId: input.organizationId,
+        organizationId: orgId,
         type: "PAY",
       });
 
@@ -107,7 +98,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
       const paymentNumber = paymentReservation.formattedNumber;
 
       const paymentDoc: PaymentDoc = {
-        organizationId: input.organizationId,
+        organizationId: orgId,
         branchId,
         paymentNumber,
         direction: input.direction,
@@ -178,7 +169,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
 
       return {
         paymentId,
-        organizationId: input.organizationId,
+        organizationId: orgId,
         paymentNumber,
         amount: input.amount,
         direction: input.direction,
@@ -197,7 +188,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
     }
 
     await createAuditLog({
-      organizationId: input.organizationId,
+      organizationId: orgId,
       actorUid: request.auth.uid,
       action: "PAYMENT_RECORDED",
       entityType: "payment",
@@ -230,10 +221,10 @@ export const paymentsList = onCall({ region: "asia-south1" }, async (request) =>
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   let query = db.collection("payments")
-    .where("organizationId", "==", input.organizationId)
+    .where("organizationId", "==", orgId)
     .limit(input.limit || 50);
 
   if (input.direction) {

@@ -67,3 +67,11 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+# Scratch files
+scratch/
+
+# Local emulator credentials and developer overrides
+.local/
+
+

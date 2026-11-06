@@ -8,6 +8,7 @@
  */
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { Timestamp } from "firebase-admin/firestore";
 import { db } from "../services/firebase.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { AppPermissions } from "../constants/permissions.js";
@@ -19,6 +20,15 @@ import {
 import { LatestLocationDoc, LocationPingDoc, MembershipDoc } from "../types/models.js";
 
 const MIN_PING_INTERVAL_MS = 5000;
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Production Expiry Helper for Location Pings
+ * Computes native Firestore Timestamp for Cloud Firestore TTL exactly 7 days after server ingestion.
+ */
+export function computeLocationPingExpiry(serverCreatedAt: Date): Timestamp {
+  return Timestamp.fromDate(new Date(serverCreatedAt.getTime() + SEVEN_DAYS_MS));
+}
 
 /**
  * 1. locationsRecordPing
@@ -49,6 +59,10 @@ export const locationsRecordPing = onCall({ region: "asia-south1" }, async (requ
   }
 
   const memberData = memberSnap.data() as MembershipDoc;
+  if (memberData.status === "inactive" || (memberData as any).isActive === false) {
+    throw new HttpsError("failed-precondition", "Employee membership is inactive or deactivated.");
+  }
+
   const isOwnerOrAdmin = memberData.isPrimary || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
   if (!memberData.locationTrackingEnabled && !isOwnerOrAdmin) {
     throw new HttpsError(
@@ -59,6 +73,20 @@ export const locationsRecordPing = onCall({ region: "asia-south1" }, async (requ
 
   const now = new Date();
   const nowIso = now.toISOString();
+
+  // Sanitize recordedAt device timestamp: keep client timestamp if within +/- 5 minutes, else fallback to server now
+  let clientRecordedAt = nowIso;
+  if (validated.recordedAt) {
+    const recordedTime = new Date(validated.recordedAt).getTime();
+    const isFuture = recordedTime > now.getTime() + 5 * 60 * 1000;
+    const isTooOld = recordedTime < now.getTime() - SEVEN_DAYS_MS;
+    if (!isNaN(recordedTime) && !isFuture && !isTooOld) {
+      clientRecordedAt = validated.recordedAt;
+    }
+  }
+
+  // Ephemeral location pings expire exactly 7 days after trusted server creation for Cloud Firestore TTL
+  const expiresAtTimestamp = computeLocationPingExpiry(now);
   const latestDocId = `${orgId}_${callerMembershipId}`;
   const latestRef = db.collection("latestLocations").doc(latestDocId);
 
@@ -86,12 +114,13 @@ export const locationsRecordPing = onCall({ region: "asia-south1" }, async (requ
     speed: validated.speed,
     heading: validated.heading,
     source: validated.source || "foreground",
-    recordedAt: nowIso,
+    recordedAt: clientRecordedAt,
     updatedAt: nowIso,
   };
 
   const pingDoc: LocationPingDoc = {
     organizationId: orgId,
+    branchId: validated.branchId || context.branchId || "main-branch",
     membershipId: callerMembershipId,
     userId: context.callerUid,
     latitude: validated.latitude,
@@ -100,8 +129,9 @@ export const locationsRecordPing = onCall({ region: "asia-south1" }, async (requ
     speed: validated.speed,
     heading: validated.heading,
     source: validated.source || "foreground",
-    recordedAt: nowIso,
+    recordedAt: clientRecordedAt,
     createdAt: nowIso,
+    expiresAt: expiresAtTimestamp,
   };
 
   const pingDocId = `${orgId}_${callerMembershipId}_${now.getTime()}`;
@@ -114,7 +144,7 @@ export const locationsRecordPing = onCall({ region: "asia-south1" }, async (requ
   return {
     success: true,
     rateLimited: false,
-    recordedAt: nowIso,
+    recordedAt: clientRecordedAt,
     latitude: validated.latitude,
     longitude: validated.longitude,
   };
@@ -215,8 +245,19 @@ export const locationsGetHistory = onCall({ region: "asia-south1" }, async (requ
   const limit = validated.limit || 50;
   const snap = await query.limit(limit).get();
 
-  const pings = snap.docs.map((d) => d.data() as LocationPingDoc);
-  pings.sort((a, b) => a.recordedAt.localeCompare(b.recordedAt));
+  const pings = snap.docs.map((d) => {
+    const data = d.data() as LocationPingDoc;
+    let expiresAtVal: any = data.expiresAt;
+    // Format native Timestamp to ISO 8601 string for wire transport compatibility
+    if (expiresAtVal && typeof expiresAtVal.toDate === "function") {
+      expiresAtVal = expiresAtVal.toDate().toISOString();
+    }
+    return {
+      ...data,
+      expiresAt: expiresAtVal,
+    };
+  });
+  pings.sort((a, b) => (a.recordedAt || "").localeCompare(b.recordedAt || ""));
 
   return {
     organizationId: orgId,

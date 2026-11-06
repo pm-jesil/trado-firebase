@@ -8,6 +8,15 @@
 
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+
+// Route Auth Admin SDK to local emulator during unit tests to avoid 19-second GCP metadata server discovery timeout
+if (!process.env.FIREBASE_AUTH_EMULATOR_HOST) {
+  process.env.FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099";
+}
+if (!process.env.GCLOUD_PROJECT) {
+  process.env.GCLOUD_PROJECT = "trado-x";
+}
+
 import { compensateAuthUser } from "../../services/compensation.js";
 
 describe("Provisioning Compensation Service", () => {

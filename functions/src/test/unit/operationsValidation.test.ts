@@ -3,12 +3,13 @@
  * 
  * Verifies:
  * 1. Task creation and status update schemas
- * 2. Location ping constraints and rate-limit parameters
- * 3. Reporting query schemas (date formats, ranges)
+ * 2. Location ping constraints and coordinate boundaries
+ * 3. Reporting query schemas (date formats, ranges, CSV exports)
  */
 
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { Timestamp } from "firebase-admin/firestore";
 import {
   CreateTaskSchema,
   UpdateTaskStatusSchema,
@@ -17,6 +18,7 @@ import {
   GetProfitLossReportSchema,
   ExportReportSchema,
 } from "../../validation/schemas.js";
+import { computeLocationPingExpiry } from "../../callables/locations.js";
 
 describe("Operations Schema Validation — Tasks", () => {
   it("validates valid task creation payload", () => {
@@ -98,6 +100,42 @@ describe("Operations Schema Validation — Live Location & Reports", () => {
     });
   });
 
+  it("calculates locationPing expiresAt with exactly 7-day offset for Cloud Firestore TTL as native Timestamp", () => {
+    const now = new Date("2026-10-30T10:00:00.000Z");
+    const expiresAt = computeLocationPingExpiry(now);
+
+    assert.ok(expiresAt instanceof Timestamp, "expiresAt must be a native Firestore Timestamp instance");
+    const deltaMs = expiresAt.toMillis() - now.getTime();
+    assert.strictEqual(deltaMs, 7 * 24 * 60 * 60 * 1000); // Exactly 604,800,000 ms
+    assert.strictEqual(expiresAt.toDate().toISOString(), "2026-11-06T10:00:00.000Z");
+  });
+
+  it("handles legacy, missing, and nullable location ping expiry values safely", () => {
+    // Legacy document with ISO string expiresAt
+    const legacyDoc = {
+      expiresAt: "2026-11-06T10:00:00.000Z",
+    };
+    const legacySerialized = typeof legacyDoc.expiresAt === "string"
+      ? legacyDoc.expiresAt
+      : (legacyDoc.expiresAt as any).toDate().toISOString();
+    assert.strictEqual(legacySerialized, "2026-11-06T10:00:00.000Z");
+
+    // Native Timestamp doc
+    const now = new Date("2026-10-30T10:00:00.000Z");
+    const tsDoc = {
+      expiresAt: computeLocationPingExpiry(now),
+    };
+    const tsSerialized = typeof (tsDoc.expiresAt as any).toDate === "function"
+      ? tsDoc.expiresAt.toDate().toISOString()
+      : tsDoc.expiresAt;
+    assert.strictEqual(tsSerialized, "2026-11-06T10:00:00.000Z");
+
+    // Null/undefined safety
+    const nullDoc = { expiresAt: null };
+    const nullSerialized = nullDoc.expiresAt ? (nullDoc.expiresAt as any).toDate?.() : null;
+    assert.strictEqual(nullSerialized, null);
+  });
+
   it("validates revenue and P&L report date filters", () => {
     const validReport = GetRevenueReportSchema.parse({
       organizationId: "org-test",
@@ -147,4 +185,3 @@ describe("Operations Schema Validation — Live Location & Reports", () => {
     });
   });
 });
-

@@ -13,6 +13,7 @@ import { db } from "./firebase.js";
 import { StockMovementDoc, ProductDoc, StockBalanceDoc } from "../types/models.js";
 import { StockMovementType } from "../constants/enums.js";
 import { roundQty } from "./money.js";
+import { calculateNewWeightedAverageCost } from "./costingEngine.js";
 
 const INWARD_MOVEMENT_TYPES = new Set<StockMovementType>([
   StockMovementType.PURCHASE_IN,
@@ -32,6 +33,7 @@ const OUTWARD_MOVEMENT_TYPES = new Set<StockMovementType>([
 export interface StockChangeItem {
   productId: string;
   quantity: number; // Signed: positive for inward, negative for outward
+  costPrice?: number; // Inward unit purchase price for transactional WAC calculation
   type: StockMovementType;
   unit: string;
   referenceId: string;
@@ -63,6 +65,7 @@ export interface PreparedStockOperation {
   trackStock: boolean;
   previousStock: number;
   newStock: number;
+  newWac?: number; // Transactionally computed Weighted-Average Cost for inward purchases
   previousBranchStock: number;
   newBranchStock: number;
   movementRef: FirebaseFirestore.DocumentReference;
@@ -190,6 +193,18 @@ export async function prepareStockChangesInTxn(
       movementId: movementRef.id,
     };
 
+    // Calculate new Weighted-Average Cost atomically for inward purchases
+    let newWac: number | undefined;
+    if (item.type === StockMovementType.PURCHASE_IN && item.costPrice !== undefined && item.costPrice !== null) {
+      const currentWac = prodData.weightedAverageCost ?? prodData.costPrice ?? 0;
+      newWac = calculateNewWeightedAverageCost(
+        previousStock,
+        currentWac,
+        item.quantity,
+        item.costPrice
+      );
+    }
+
     operations.push({
       docRef: docSnap.ref,
       stockBalanceRef,
@@ -198,6 +213,7 @@ export async function prepareStockChangesInTxn(
       trackStock: Boolean(prodData.trackStock),
       previousStock,
       newStock,
+      newWac,
       previousBranchStock,
       newBranchStock,
       movementRef,
@@ -221,11 +237,15 @@ export function commitStockChangesInTxn(
   const now = new Date().toISOString();
   for (const op of prepared.operations) {
     if (op.trackStock) {
-      // 1. Maintain global aggregate mirror on product document
-      txn.update(op.docRef, {
+      // 1. Maintain global aggregate mirror on product document (and WAC if purchase inward)
+      const updatePayload: Record<string, any> = {
         currentStock: op.newStock,
         updatedAt: now,
-      });
+      };
+      if (op.newWac !== undefined) {
+        updatePayload.weightedAverageCost = op.newWac;
+      }
+      txn.update(op.docRef, updatePayload);
 
       // 2. Maintain physical inventory balance on stockBalances document
       txn.set(op.stockBalanceRef, op.stockBalanceDoc, { merge: true });

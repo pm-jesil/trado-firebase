@@ -21,6 +21,8 @@ import {
   GetBranchesUsageSchema,
   GetUsageDetailSchema,
   CalculateDryRunStatementSchema,
+  GetUsageLimitsSchema,
+  UpdateUsageLimitsSchema,
 } from "../validation/schemas.js";
 import {
   createEmptyServiceCounts,
@@ -28,12 +30,15 @@ import {
   getActiveRateCard,
   generateDryRunUsageStatement,
   recordUsageMetrics,
+  getEffectiveUsageLimits,
+  updateOrganizationUsageLimits,
 } from "../services/usageMetering.js";
 import {
   OrganizationDoc,
   BranchDoc,
   OrganizationUsageDailyDoc,
   BranchUsageDailyDoc,
+  UsageLimitsConfig,
 } from "../types/models.js";
 import { createAuditLog } from "../services/audit.js";
 
@@ -419,4 +424,81 @@ export const usageRecordClientMetric = onCall({ region: "asia-south1" }, async (
   });
 
   return { success: true };
+});
+
+/**
+ * 7. usageGetLimits
+ * Retrieves effective usage limits, active period consumption, and threshold warning status.
+ * Accessible by: Super Admin (any tenant) or Tenant Owner / Admin (own tenant only).
+ */
+export const usageGetLimits = onCall({ region: "asia-south1" }, async (request) => {
+  const context = await resolveRequestContext(request, {
+    allowPlatformSuperAdmin: true,
+  });
+
+  const parsed = GetUsageLimitsSchema.safeParse(request.data);
+  if (!parsed.success) {
+    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
+  }
+
+  const targetOrgId = context.isSuperAdmin
+    ? (parsed.data.organizationId || context.organizationId)
+    : context.organizationId;
+
+  if (!targetOrgId) {
+    throw new HttpsError("invalid-argument", "organizationId is required.");
+  }
+
+  // Cross-tenant security check for non-Super Admin
+  if (!context.isSuperAdmin && parsed.data.organizationId && parsed.data.organizationId !== context.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-organization access rejected.");
+  }
+
+  // Privilege check: must be Super Admin, Owner, or Admin
+  const isOwnerOrAdmin = context.isSuperAdmin || context.membership?.isPrimary || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
+  if (!isOwnerOrAdmin) {
+    throw new HttpsError("permission-denied", "Tenant Owner or Administrator role required to view usage limits.");
+  }
+
+  const limitsInfo = await getEffectiveUsageLimits(targetOrgId);
+  return limitsInfo;
+});
+
+/**
+ * 8. usageUpdateLimits
+ * Configures organization-level usage limit overrides.
+ * Strictly Super Admin only!
+ */
+export const usageUpdateLimits = onCall({ region: "asia-south1" }, async (request) => {
+  const context = await resolveRequestContext(request, {
+    allowPlatformSuperAdmin: true,
+  });
+
+  if (!context.isSuperAdmin) {
+    throw new HttpsError("permission-denied", "Super Admin platform authorization required.");
+  }
+
+  const parsed = UpdateUsageLimitsSchema.safeParse(request.data);
+  if (!parsed.success) {
+    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
+  }
+
+  const { organizationId, limits } = parsed.data;
+
+  await updateOrganizationUsageLimits(organizationId, limits as UsageLimitsConfig);
+
+  await createAuditLog({
+    organizationId,
+    actorUid: context.callerUid,
+    action: "USAGE_LIMITS_OVERRIDE_UPDATED",
+    entityType: "organization",
+    entityId: organizationId,
+    details: { limits },
+  });
+
+  return {
+    success: true,
+    organizationId,
+    message: "Organization usage limits override successfully updated.",
+  };
 });

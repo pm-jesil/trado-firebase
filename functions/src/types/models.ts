@@ -6,6 +6,7 @@
  * - Snapshots are permitted only when explicitly named *Snapshot and justified.
  */
 
+import type { Timestamp } from "firebase-admin/firestore";
 import {
   BusinessType,
   BusinessCategory,
@@ -84,6 +85,7 @@ export interface OrganizationDoc {
   defaultBranchId?: string;
   branchCount?: number;
   sharingPolicies?: OrganizationSharingPolicies;
+  usageLimitOverrides?: UsageLimitsConfig; // Super Admin per-tenant usage limit overrides
   createdAt: string;
   createdBy: string;
   updatedAt?: string;
@@ -156,6 +158,7 @@ export interface SubscriptionPlanDoc {
   };
   moduleFlags: Record<string, boolean>;
   branchLimit?: number;
+  usageLimits?: UsageLimitsConfig; // Plan baseline usage thresholds & limits
   isActive: boolean;
   createdAt?: string;
   createdBy?: string;
@@ -240,8 +243,9 @@ export interface DeviceDoc {
  * 15. notificationOutbox/{outboxId}
  */
 export interface NotificationOutboxDoc {
-  userId: string;
-  type: "welcome" | "system";
+  organizationId?: string;
+  userId?: string;
+  type: "welcome" | "system" | "usage_warning";
   payload: {
     title: string;
     body: string;
@@ -580,6 +584,7 @@ export interface ReturnItem {
   quantity: number;
   unit?: string;
   priceSnapshot: number;
+  costSnapshot?: number; // Preserved unit cost basis from original bill line item for restocked items
   refundAmount: number;
   reason: string;
   disposition: ReturnDisposition; // restocked_to_inventory | wasted_discarded
@@ -743,6 +748,7 @@ export interface LatestLocationDoc {
  */
 export interface LocationPingDoc {
   organizationId: string;
+  branchId?: string;
   membershipId: string;
   userId: string;
   latitude: number;
@@ -751,8 +757,9 @@ export interface LocationPingDoc {
   speed?: number;
   heading?: number;
   source: "foreground" | "background";
-  recordedAt: string;
-  createdAt: string;
+  recordedAt: string; // ISO 8601 string from device
+  createdAt: string; // ISO 8601 string of server ingestion time
+  expiresAt: Timestamp; // Native Firestore Timestamp for Cloud Firestore TTL
 }
 
 export type NotificationType =
@@ -763,7 +770,8 @@ export type NotificationType =
   | "low_stock"
   | "bill_created"
   | "outflow_recorded"
-  | "account_updated";
+  | "account_updated"
+  | "usage_warning";
 
 /**
  * 33. notifications/{notificationId}
@@ -921,6 +929,18 @@ export interface OrganizationUsageDailyDoc {
   updatedAt: string;
 }
 
+export interface OrganizationUsageMonthlyDoc {
+  organizationId: string;
+  month: string; // YYYY-MM
+  counts: ServiceUsageCounts;
+  estimatedCost: number;
+  currency: string;
+  rateCardVersion: string;
+  completenessPercent: number;
+  measurementClass: MeasurementClass;
+  updatedAt: string;
+}
+
 export interface BranchUsageDailyDoc {
   organizationId: string;
   branchId: string;
@@ -933,6 +953,32 @@ export interface BranchUsageDailyDoc {
   measurementClass: MeasurementClass;
   updatedAt: string;
 }
+
+export interface BranchUsageMonthlyDoc {
+  organizationId: string;
+  branchId: string;
+  month: string; // YYYY-MM
+  counts: ServiceUsageCounts;
+  estimatedCost: number;
+  currency: string;
+  rateCardVersion: string;
+  completenessPercent: number;
+  measurementClass: MeasurementClass;
+  updatedAt: string;
+}
+
+export type EnforcementMode = "warn_only" | "soft_throttle" | "hard_block";
+
+export interface MetricLimitConfig {
+  dailyLimit?: number; // Maximum allowed operations per day (undefined/0 = disabled)
+  monthlyLimit?: number; // Maximum allowed operations per month
+  warningThresholdPercent: number; // e.g. 80 (80%)
+  hardThresholdPercent: number; // e.g. 100 (100%)
+  enforcementMode: EnforcementMode; // "warn_only" default
+  enabled: boolean;
+}
+
+export type UsageLimitsConfig = Partial<Record<keyof ServiceUsageCounts, MetricLimitConfig>>;
 
 export interface PlatformUsageSnapshotDoc {
   date: string; // YYYY-MM-DD

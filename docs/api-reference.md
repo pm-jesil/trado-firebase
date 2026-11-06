@@ -1,6 +1,6 @@
 # Trado API Reference
 
-This document is the single, authoritative reference for all **102 exported Cloud Functions** (98 HTTPS Callables + 4 Firestore Event Triggers) in the Trado backend. All HTTPS Callables are deployed to region `asia-south1` (Mumbai) using Cloud Functions Gen 2 on Node.js 22.
+This document is the single, authoritative reference for all **105 exported Cloud Functions** (101 HTTPS Callables + 4 Firestore Event Triggers) in the Trado backend. All HTTPS Callables are deployed to region `asia-south1` (Mumbai) using Cloud Functions Gen 2 on Node.js 22.
 
 ## Global Calling Convention
 
@@ -9,12 +9,13 @@ This document is the single, authoritative reference for all **102 exported Clou
 - **Branch Scoping**: When operating in multi-branch mode, requests accept `branchId`. If omitted, standard staff operate in their assigned `primaryBranchId`, and owners default to `main-branch`.
 - **Idempotency**: State-mutating writes accept an optional or mandatory `idempotencyKey` UUID to guarantee zero-risk network retries.
 
-## Function Catalog (102 Exports)
+## Function Catalog (105 Exports)
 
 | # | Export Name | Type | Domain | Required Permission |
 |---|---|---|---|---|
-| 1 | `healthCheck` | Callable | General | `Authenticated` |
-| 2 | `authMe` | Callable | General | `Authenticated` |
+| 1 | `healthCheck` | Callable | General | `Public` |
+| 2 | `authLogin` | Callable | General | `Public` |
+| 3 | `authMe` | Callable | General | `Authenticated` |
 | 3 | `organizationsCreate` | Callable | Tenancy | `Platform Super Admin` |
 | 4 | `organizationsUpdate` | Callable | Tenancy | `org:manage / org:view` |
 | 5 | `organizationsDeactivate` | Callable | Tenancy | `org:manage / org:view` |
@@ -111,10 +112,12 @@ This document is the single, authoritative reference for all **102 exported Clou
 | 96 | `usageGetDetail` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
 | 97 | `usageCalculateDryRunStatement` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
 | 98 | `usageRecordClientMetric` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
-| 99 | `onBillWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
-| 100 | `onOutflowWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
-| 101 | `onPaymentWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
-| 102 | `onDeliveryWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 99 | `usageGetLimits` | Callable | Usage Metering & Quotas | `Platform Super Admin / Tenant Owner` |
+| 100 | `usageUpdateLimits` | Callable | Usage Metering & Quotas | `Platform Super Admin Only` |
+| 101 | `onBillWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 102 | `onOutflowWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 103 | `onPaymentWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 104 | `onDeliveryWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
 
 ---
 
@@ -129,6 +132,17 @@ This document is the single, authoritative reference for all **102 exported Clou
 - **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/healthCheck` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/healthCheck` (Emulator)
 - **Summary**: Cloud function handling `healthCheck` business workflow with transactional integrity and anti-embedding validation.
 
+### Module: `./callables/authLogin.js` (AuthLogin)
+
+#### `authLogin`
+
+- **Function Export**: `authLogin`
+- **Source File**: `functions/src/callables/authLogin.ts`
+- **Calling Path**: `http://127.0.0.1:5001/trado-x/asia-south1/authLogin` (Emulator Only — strictly fails closed outside local emulator)
+- **Input Schema**: `AuthLoginSchema` (`email`, `password`, `deviceId`)
+- **Output Schema**: `AuthLoginResponse` (`context: AuthSessionContext`, `credentials: { idToken, expiresInSeconds }`)
+- **Summary**: Local emulator testing adapter for Swagger UI / REST Client / curl. Authenticates credentials against local Auth Emulator, registers device ID, and returns canonical `AuthSessionContext` plus transport credentials (`idToken`, `expiresInSeconds`). Fails closed outside local emulator.
+
 ### Module: `./callables/authMe.js` (AuthMe)
 
 #### `authMe`
@@ -136,7 +150,9 @@ This document is the single, authoritative reference for all **102 exported Clou
 - **Function Export**: `authMe`
 - **Source File**: `functions/src/callables/authMe.ts`
 - **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/authMe` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/authMe` (Emulator)
-- **Summary**: Cloud function handling `authMe` business workflow with transactional integrity and anti-embedding validation.
+- **Input Schema**: `AuthMeSchema` (`deviceId`, `organizationId`, `branchId`)
+- **Output Schema**: `AuthMeResponse` (`context: AuthSessionContext`, `credentials: null`)
+- **Summary**: Canonical session bootstrap endpoint for Flutter Web / Mobile and web clients. Verifies caller token, registers installation device ID, and returns authoritative `AuthSessionContext` with user profile, active memberships, role, job roles, branches, 4-layer permissions, and context status. Transport credentials are null.
 
 ### Module: `./callables/organizations.js` (Organizations)
 
@@ -864,6 +880,20 @@ This document is the single, authoritative reference for all **102 exported Clou
 - **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/usageRecordClientMetric` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/usageRecordClientMetric` (Emulator)
 - **Summary**: Cloud function handling `usageRecordClientMetric` business workflow with transactional integrity and anti-embedding validation.
 
+#### `usageGetLimits`
+
+- **Function Export**: `usageGetLimits`
+- **Source File**: `functions/src/callables/usage.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/usageGetLimits` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/usageGetLimits` (Emulator)
+- **Summary**: Retrieves effective daily and monthly usage limits, current consumption, and threshold warning status for an organization. Accessible by Super Admin or Tenant Owner/Admin.
+
+#### `usageUpdateLimits`
+
+- **Function Export**: `usageUpdateLimits`
+- **Source File**: `functions/src/callables/usage.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/usageUpdateLimits` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/usageUpdateLimits` (Emulator)
+- **Summary**: Configures organization-specific usage limit overrides (thresholds, daily/monthly allowances, enforcement mode). Strictly Super Admin only; audited to auditLogs.
+
 ### Module: `./triggers/eventTriggers.js` (EventTriggers)
 
 #### `onBillWritten`
@@ -893,4 +923,35 @@ This document is the single, authoritative reference for all **102 exported Clou
 - **Source File**: `functions/src/callables/eventTriggers.ts`
 - **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/onDeliveryWritten` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/onDeliveryWritten` (Emulator)
 - **Summary**: Cloud function handling `onDeliveryWritten` business workflow with transactional integrity and anti-embedding validation.
+
+---
+
+## Interactive API Explorer & OpenAPI Contract
+
+The Trado backend includes a **generated OpenAPI 3.0.3 specification** ([`docs/openapi.json`](openapi.json)) covering all 100 HTTPS callables with typed request schemas derived from Zod validation.
+
+### Quick Start
+
+```powershell
+# Generate/regenerate the OpenAPI spec
+node scripts/generate-openapi.js
+
+# Start the local Swagger UI explorer (requires emulators running)
+node tools/api-explorer/server.js
+# → http://127.0.0.1:3939
+```
+
+### Related Resources
+
+| Resource | Path | Purpose |
+|----------|------|---------|
+| OpenAPI Spec | [`docs/openapi.json`](openapi.json) | Machine-readable 100-callable contract |
+| Flutter Client Guide | [`docs/flutter-client-integration.md`](flutter-client-integration.md) | Canonical Flutter Web integration & DTO guide |
+| API Explorer | [`tools/api-explorer/server.js`](../tools/api-explorer/server.js) | Local Swagger UI with persona login |
+| Manual Testing Guide | [`docs/manual-api-testing-guide.md`](manual-api-testing-guide.md) | Step-by-step beginner walkthrough |
+| .http Collection | [`scripts/manual-tests/trado-api.http`](../scripts/manual-tests/trado-api.http) | VS Code REST Client requests |
+| CLI Workbench | [`functions/scripts/test-api-workbench.js`](../functions/scripts/test-api-workbench.js) | Terminal-based callable testing |
+
+> [!NOTE]
+> The API Explorer is a **local-only developer tool** — it binds exclusively to `127.0.0.1` and rejects any production target configuration.
 

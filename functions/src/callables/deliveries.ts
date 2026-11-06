@@ -14,20 +14,11 @@ import {
   UpdateDeliveryStatusSchema,
   ListDeliveriesSchema,
 } from "../validation/schemas.js";
-import { DeliveryDoc, MembershipDoc, BillDoc } from "../types/models.js";
+import { DeliveryDoc, BillDoc } from "../types/models.js";
 import { DeliveryStatus, DeliveryPartner } from "../constants/enums.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { createAuditLog } from "../services/audit.js";
-
-async function verifyTenantAccess(auth: any, organizationId: string): Promise<void> {
-  if (auth.token.isSuperAdmin === true) return;
-
-  const memRef = db.collection("memberships").doc(`${auth.uid}_${organizationId}`);
-  const memDoc = await memRef.get();
-  if (!memDoc.exists || (memDoc.data() as MembershipDoc).status !== "active") {
-    throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-  }
-}
+import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
 
 export const deliveriesCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
@@ -40,7 +31,7 @@ export const deliveriesCreate = onCall({ region: "asia-south1" }, async (request
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   // Verify the referenced bill exists and belongs to this organization
   const billDoc = await db.collection("bills").doc(input.billId).get();
@@ -48,12 +39,14 @@ export const deliveriesCreate = onCall({ region: "asia-south1" }, async (request
     throw new HttpsError("not-found", `Referenced Bill "${input.billId}" not found.`);
   }
   const billData = billDoc.data() as BillDoc;
-  if (billData.organizationId !== input.organizationId) {
+  if (billData.organizationId !== orgId) {
     throw new HttpsError("permission-denied", "Cross-tenant bill reference rejected.");
   }
 
+  const branchId = await resolveBranchContext(request.auth, orgId, input.branchId || billData.branchId);
+
   const idempotency = await reserveIdempotency({
-    scope: input.organizationId,
+    scope: orgId,
     actorUid: request.auth.uid,
     operation: "deliveries.create",
     clientKey: input.idempotencyKey,
@@ -71,10 +64,9 @@ export const deliveriesCreate = onCall({ region: "asia-south1" }, async (request
     const deliveryRef = db.collection("deliveries").doc();
     const deliveryId = deliveryRef.id;
     const now = new Date().toISOString();
-    const branchId = input.branchId || billData.branchId || (request.auth.token.primaryBranchId as string) || "main-branch";
 
     const deliveryDoc: DeliveryDoc = {
-      organizationId: input.organizationId,
+      organizationId: orgId,
       branchId,
       billId: input.billId, // ID reference ONLY!
       customerId: input.customerId || null,
@@ -123,7 +115,7 @@ export const deliveriesCreate = onCall({ region: "asia-south1" }, async (request
     }
 
     await createAuditLog({
-      organizationId: input.organizationId,
+      organizationId: orgId,
       actorUid: request.auth.uid,
       action: "DELIVERY_CREATED",
       entityType: "delivery",
@@ -152,7 +144,7 @@ export const deliveriesUpdateStatus = onCall({ region: "asia-south1" }, async (r
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   const deliveryRef = db.collection("deliveries").doc(input.deliveryId);
   const docSnap = await deliveryRef.get();
@@ -161,7 +153,7 @@ export const deliveriesUpdateStatus = onCall({ region: "asia-south1" }, async (r
   }
 
   const existing = docSnap.data() as DeliveryDoc;
-  if (existing.organizationId !== input.organizationId) {
+  if (existing.organizationId !== orgId) {
     throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
   }
 
@@ -186,7 +178,7 @@ export const deliveriesUpdateStatus = onCall({ region: "asia-south1" }, async (r
   await deliveryRef.update(updates);
 
   await createAuditLog({
-    organizationId: input.organizationId,
+    organizationId: orgId,
     actorUid: request.auth.uid,
     action: "DELIVERY_STATUS_UPDATED",
     entityType: "delivery",
@@ -208,10 +200,10 @@ export const deliveriesList = onCall({ region: "asia-south1" }, async (request) 
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   let query = db.collection("deliveries")
-    .where("organizationId", "==", input.organizationId)
+    .where("organizationId", "==", orgId)
     .limit(input.limit || 50);
 
   if (input.status) {
@@ -236,12 +228,11 @@ export const deliveriesGet = onCall({ region: "asia-south1" }, async (request) =
   }
 
   const deliveryId = request.data?.deliveryId;
-  const organizationId = request.data?.organizationId;
-  if (!deliveryId || !organizationId) {
-    throw new HttpsError("invalid-argument", "deliveryId and organizationId required.");
+  if (!deliveryId) {
+    throw new HttpsError("invalid-argument", "deliveryId is required.");
   }
 
-  await verifyTenantAccess(request.auth, organizationId);
+  const orgId = await verifyTenantAccess(request.auth, request.data?.organizationId);
 
   const docSnap = await db.collection("deliveries").doc(deliveryId).get();
   if (!docSnap.exists) {
@@ -249,7 +240,7 @@ export const deliveriesGet = onCall({ region: "asia-south1" }, async (request) =
   }
 
   const data = docSnap.data() as DeliveryDoc;
-  if (data.organizationId !== organizationId) {
+  if (data.organizationId !== orgId) {
     throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
   }
 

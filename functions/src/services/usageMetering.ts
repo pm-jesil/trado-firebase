@@ -17,6 +17,11 @@ import {
   ServiceUsageCounts,
   OrganizationUsageDailyDoc,
   UsageRateCardDoc,
+  OrganizationDoc,
+  SubscriptionPlanDoc,
+  UsageLimitsConfig,
+  MetricLimitConfig,
+  NotificationOutboxDoc,
 } from "../types/models.js";
 
 /**
@@ -93,8 +98,14 @@ export function calculateEstimatedCost(
 }
 
 /**
- * Records application-attributed operations into daily buckets.
+ * Records application-attributed operations into daily and monthly buckets.
  * Uses atomic FieldValue.increment to eliminate read-before-write overhead.
+ * Atomically updates:
+ * 1. organizationUsageDaily
+ * 2. organizationUsageMonthly
+ * 3. branchUsageDaily (if branchId present)
+ * 4. branchUsageMonthly (if branchId present)
+ * Then triggers idempotent threshold evaluation.
  */
 export async function recordUsageMetrics(params: {
   organizationId: string;
@@ -106,10 +117,13 @@ export async function recordUsageMetrics(params: {
   if (!organizationId) return;
 
   const dateStr = params.date || new Date().toISOString().slice(0, 10);
+  const monthStr = dateStr.slice(0, 7);
   const orgDailyId = `${organizationId}_${dateStr}`;
+  const orgMonthlyId = `${organizationId}_${monthStr}`;
   const now = new Date().toISOString();
 
   const orgDocRef = db.collection("organizationUsageDaily").doc(orgDailyId);
+  const orgMonthlyDocRef = db.collection("organizationUsageMonthly").doc(orgMonthlyId);
 
   const incrementFields: Record<string, any> = {
     organizationId,
@@ -121,27 +135,296 @@ export async function recordUsageMetrics(params: {
     updatedAt: now,
   };
 
+  const monthlyIncrementFields: Record<string, any> = {
+    organizationId,
+    month: monthStr,
+    rateCardVersion: DEFAULT_RATE_CARD_V1.version,
+    currency: DEFAULT_RATE_CARD_V1.currency,
+    measurementClass: "app_attributed",
+    completenessPercent: 90,
+    updatedAt: now,
+  };
+
   for (const [key, val] of Object.entries(metrics)) {
     if (typeof val === "number" && val !== 0) {
       incrementFields[`counts.${key}`] = FieldValue.increment(val);
+      monthlyIncrementFields[`counts.${key}`] = FieldValue.increment(val);
     }
   }
 
-  // Update organization daily bucket
-  await orgDocRef.set(incrementFields, { merge: true });
+  // Update organization daily & monthly buckets
+  const writes: Promise<any>[] = [
+    orgDocRef.set(incrementFields, { merge: true }),
+    orgMonthlyDocRef.set(monthlyIncrementFields, { merge: true }),
+  ];
 
-  // Update branch daily bucket if branch context is present
+  // Update branch daily & monthly buckets if branch context is present
   if (branchId) {
     const branchDailyId = `${organizationId}_${branchId}_${dateStr}`;
+    const branchMonthlyId = `${organizationId}_${branchId}_${monthStr}`;
+
     const branchDocRef = db.collection("branchUsageDaily").doc(branchDailyId);
+    const branchMonthlyDocRef = db.collection("branchUsageMonthly").doc(branchMonthlyId);
 
     const branchIncrementFields = {
       ...incrementFields,
       branchId,
     };
 
-    await branchDocRef.set(branchIncrementFields, { merge: true });
+    const branchMonthlyIncrementFields = {
+      ...monthlyIncrementFields,
+      branchId,
+    };
+
+    writes.push(branchDocRef.set(branchIncrementFields, { merge: true }));
+    writes.push(branchMonthlyDocRef.set(branchMonthlyIncrementFields, { merge: true }));
   }
+
+  await Promise.all(writes);
+
+  // Evaluate usage threshold limits idempotently
+  await evaluateUsageThresholds(organizationId, dateStr);
+}
+
+interface WarningCheckParams {
+  organizationId: string;
+  metric: keyof ServiceUsageCounts;
+  period: string; // YYYY-MM-DD or YYYY-MM
+  periodType: "daily" | "monthly";
+  currentUsage: number;
+  limit: number;
+  percentage: number;
+  config: MetricLimitConfig;
+}
+
+/**
+ * Idempotently evaluates threshold crossing and writes an outbox warning record.
+ */
+async function checkAndEmitWarning(params: WarningCheckParams): Promise<void> {
+  const { organizationId, metric, period, periodType, currentUsage, limit, percentage, config } = params;
+
+  let severity: "warning" | "hard" | null = null;
+  if (percentage >= config.hardThresholdPercent) {
+    severity = "hard";
+  } else if (percentage >= config.warningThresholdPercent) {
+    severity = "warning";
+  }
+
+  if (!severity) return;
+
+  // Deterministic outbox doc ID: guarantees exactly-once warning creation per org, metric, period, severity
+  const outboxDocId = `outbox_usage_${organizationId}_${metric}_${period}_${severity}`;
+  const outboxRef = db.collection("notificationOutbox").doc(outboxDocId);
+
+  const existingSnap = await outboxRef.get();
+  if (existingSnap.exists) {
+    return; // Already emitted for this threshold crossing in this period
+  }
+
+  const title = `Usage Alert: ${metric} at ${Math.round(percentage)}% of ${periodType} limit`;
+  const body = `Organization has consumed ${currentUsage.toLocaleString()} / ${limit.toLocaleString()} ${metric} in ${periodType} window (${period}). Enforcement mode: ${config.enforcementMode}.`;
+
+  const now = new Date().toISOString();
+  const outboxDoc: NotificationOutboxDoc = {
+    organizationId,
+    type: "usage_warning",
+    payload: {
+      title,
+      body,
+      data: {
+        organizationId,
+        metric,
+        period,
+        periodType,
+        currentUsage: String(currentUsage),
+        limit: String(limit),
+        percentage: String(Math.round(percentage)),
+        severity,
+        enforcementMode: config.enforcementMode,
+      },
+    },
+    status: "dispatched",
+    retryCount: 0,
+    createdAt: now,
+    dispatchedAt: now,
+  };
+
+  await outboxRef.set(outboxDoc);
+
+  // Deliver in-app notification to Organization Owner
+  try {
+    const ownerSnap = await db
+      .collection("memberships")
+      .where("organizationId", "==", organizationId)
+      .where("isPrimary", "==", true)
+      .limit(1)
+      .get();
+
+    if (!ownerSnap.empty) {
+      const ownerData = ownerSnap.docs[0].data();
+      await db.collection("notifications").add({
+        organizationId,
+        userId: ownerData.userId,
+        membershipId: ownerSnap.docs[0].id,
+        type: "usage_warning",
+        title,
+        body,
+        relatedEntityType: "organization",
+        relatedEntityId: organizationId,
+        data: outboxDoc.payload.data,
+        isRead: false,
+        readAt: null,
+        createdAt: now,
+      });
+    }
+  } catch {
+    // Non-blocking in-app notification
+  }
+}
+
+/**
+ * Evaluates current consumption against configured plan defaults and tenant overrides.
+ */
+export async function evaluateUsageThresholds(organizationId: string, dateStr: string): Promise<void> {
+  try {
+    const orgDoc = await db.collection("organizations").doc(organizationId).get();
+    if (!orgDoc.exists) return;
+    const orgData = orgDoc.data() as OrganizationDoc;
+
+    let planUsageLimits: UsageLimitsConfig = {};
+    if (orgData.planId) {
+      const planDoc = await db.collection("subscriptionPlans").doc(orgData.planId).get();
+      if (planDoc.exists) {
+        const planData = planDoc.data() as SubscriptionPlanDoc;
+        planUsageLimits = planData.usageLimits || {};
+      }
+    }
+
+    // Merge effective limits: organization-level override strictly takes precedence
+    const effectiveLimits: UsageLimitsConfig = {
+      ...planUsageLimits,
+      ...(orgData.usageLimitOverrides || {}),
+    };
+
+    if (Object.keys(effectiveLimits).length === 0) return;
+
+    const monthStr = dateStr.slice(0, 7);
+    const orgDailySnap = await db.collection("organizationUsageDaily").doc(`${organizationId}_${dateStr}`).get();
+    const orgMonthlySnap = await db.collection("organizationUsageMonthly").doc(`${organizationId}_${monthStr}`).get();
+
+    const dailyCounts: ServiceUsageCounts = (orgDailySnap.data()?.counts as ServiceUsageCounts) || createEmptyServiceCounts();
+    const monthlyCounts: ServiceUsageCounts = (orgMonthlySnap.data()?.counts as ServiceUsageCounts) || createEmptyServiceCounts();
+
+    for (const [metricKey, config] of Object.entries(effectiveLimits)) {
+      if (!config || !config.enabled) continue;
+      const key = metricKey as keyof ServiceUsageCounts;
+      const dailyVal = dailyCounts[key] || 0;
+      const monthlyVal = monthlyCounts[key] || 0;
+
+      if (config.dailyLimit && config.dailyLimit > 0) {
+        const dailyPct = (dailyVal / config.dailyLimit) * 100;
+        await checkAndEmitWarning({
+          organizationId,
+          metric: key,
+          period: dateStr,
+          periodType: "daily",
+          currentUsage: dailyVal,
+          limit: config.dailyLimit,
+          percentage: dailyPct,
+          config,
+        });
+      }
+
+      if (config.monthlyLimit && config.monthlyLimit > 0) {
+        const monthlyPct = (monthlyVal / config.monthlyLimit) * 100;
+        await checkAndEmitWarning({
+          organizationId,
+          metric: key,
+          period: monthStr,
+          periodType: "monthly",
+          currentUsage: monthlyVal,
+          limit: config.monthlyLimit,
+          percentage: monthlyPct,
+          config,
+        });
+      }
+    }
+  } catch {
+    // Non-blocking
+  }
+}
+
+/**
+ * Retrieves effective usage limits, current consumption, and threshold statuses for an organization.
+ */
+export async function getEffectiveUsageLimits(organizationId: string): Promise<{
+  organizationId: string;
+  planId: string;
+  effectiveLimits: UsageLimitsConfig;
+  dailyUsage: ServiceUsageCounts;
+  monthlyUsage: ServiceUsageCounts;
+  currentDate: string;
+  currentMonth: string;
+}> {
+  const orgDoc = await db.collection("organizations").doc(organizationId).get();
+  if (!orgDoc.exists) {
+    throw new Error(`Organization "${organizationId}" not found`);
+  }
+  const orgData = orgDoc.data() as OrganizationDoc;
+
+  let planLimits: UsageLimitsConfig = {};
+  if (orgData.planId) {
+    const planDoc = await db.collection("subscriptionPlans").doc(orgData.planId).get();
+    if (planDoc.exists) {
+      const planData = planDoc.data() as SubscriptionPlanDoc;
+      planLimits = planData.usageLimits || {};
+    }
+  }
+
+  const effectiveLimits: UsageLimitsConfig = {
+    ...planLimits,
+    ...(orgData.usageLimitOverrides || {}),
+  };
+
+  const today = new Date().toISOString().slice(0, 10);
+  const currentMonth = today.slice(0, 7);
+
+  const [dailySnap, monthlySnap] = await Promise.all([
+    db.collection("organizationUsageDaily").doc(`${organizationId}_${today}`).get(),
+    db.collection("organizationUsageMonthly").doc(`${organizationId}_${currentMonth}`).get(),
+  ]);
+
+  const dailyUsage = (dailySnap.data()?.counts as ServiceUsageCounts) || createEmptyServiceCounts();
+  const monthlyUsage = (monthlySnap.data()?.counts as ServiceUsageCounts) || createEmptyServiceCounts();
+
+  return {
+    organizationId,
+    planId: orgData.planId,
+    effectiveLimits,
+    dailyUsage,
+    monthlyUsage,
+    currentDate: today,
+    currentMonth,
+  };
+}
+
+/**
+ * Updates organization-level usage limit overrides (Super Admin only).
+ */
+export async function updateOrganizationUsageLimits(
+  organizationId: string,
+  overrides: UsageLimitsConfig
+): Promise<void> {
+  const orgRef = db.collection("organizations").doc(organizationId);
+  const orgSnap = await orgRef.get();
+  if (!orgSnap.exists) {
+    throw new Error(`Organization "${organizationId}" not found`);
+  }
+
+  await orgRef.update({
+    usageLimitOverrides: overrides,
+    updatedAt: new Date().toISOString(),
+  });
 }
 
 /**

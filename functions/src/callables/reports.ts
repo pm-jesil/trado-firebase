@@ -26,7 +26,8 @@ import {
 } from "../validation/schemas.js";
 import { calculateStockValuation } from "../services/costingEngine.js";
 import { round2 } from "../services/money.js";
-import { ProductDoc, BillDoc, OutflowDoc, DailySummaryDoc } from "../types/models.js";
+import { ProductDoc, BillDoc, OutflowDoc, DailySummaryDoc, ReturnDoc } from "../types/models.js";
+import { ReturnType, ReturnDisposition } from "../constants/enums.js";
 
 /**
  * Helper to convert array of flat objects to CSV format.
@@ -194,10 +195,11 @@ export const reportsGetProfitLoss = onCall({ region: "asia-south1" }, async (req
     outflowsQuery = outflowsQuery.where("createdAt", "<=", `${validated.to}T23:59:59.999Z`);
   }
 
-  const [billsSnap, outflowsSnap, productsSnap] = await Promise.all([
+  const [billsSnap, outflowsSnap, productsSnap, returnsSnap] = await Promise.all([
     billsQuery.get(),
     outflowsQuery.get(),
     db.collection("products").where("organizationId", "==", orgId).get(),
+    db.collection("returns").where("organizationId", "==", orgId).get(),
   ]);
 
   const productCostMap = new Map<string, number>();
@@ -209,22 +211,62 @@ export const reportsGetProfitLoss = onCall({ region: "asia-south1" }, async (req
     productCostMap.set(doc.id, effectiveCost);
   });
 
-  let totalRevenue = 0;
-  let totalCogs = 0;
+  let grossRevenue = 0;
+  let grossCogs = 0;
   let billCount = 0;
 
   billsSnap.docs.forEach((doc) => {
     const bill = doc.data() as BillDoc;
-    totalRevenue += bill.totalAmount || 0;
+    grossRevenue += bill.totalAmount || 0;
     billCount++;
 
     if (Array.isArray(bill.items)) {
       bill.items.forEach((item) => {
-        const unitCost = productCostMap.get(item.productId) || 0;
-        totalCogs += (item.quantity || 0) * unitCost;
+        // Authoritative Historical COGS: Use the immutable costSnapshot recorded at sale/invoice time.
+        // Zero cost is valid (samples, free tiers). Falls back to product catalog cost only for legacy records.
+        const unitCost = (item.costSnapshot !== undefined && item.costSnapshot !== null)
+          ? item.costSnapshot
+          : (productCostMap.get(item.productId) ?? 0);
+        grossCogs += (item.quantity || 0) * unitCost;
       });
     }
   });
+
+  let salesReturns = 0;
+  let cogsReversals = 0;
+  let returnCount = 0;
+
+  returnsSnap.docs.forEach((doc) => {
+    const ret = doc.data() as ReturnDoc;
+    if (ret.returnType !== ReturnType.SALES_RETURN || ret.status === "voided") return;
+    if (targetBranchId && ret.branchId && ret.branchId !== targetBranchId) return;
+    if (validated.from && ret.createdAt < validated.from) return;
+    if (validated.to && ret.createdAt > `${validated.to}T23:59:59.999Z`) return;
+
+    salesReturns += ret.totalRefundAmount || 0;
+    returnCount++;
+
+    if (Array.isArray(ret.items)) {
+      ret.items.forEach((item) => {
+        if (item.disposition === ReturnDisposition.RESTOCKED_TO_INVENTORY) {
+          // Authoritative Return COGS Reversal: Use the immutable cost basis of the original sale line.
+          // Zero cost is valid. Falls back to product catalog cost only for legacy records.
+          const unitCost = (item.costSnapshot !== undefined && item.costSnapshot !== null)
+            ? item.costSnapshot
+            : (productCostMap.get(item.productId) ?? 0);
+          cogsReversals += (item.quantity || 0) * unitCost;
+        }
+      });
+    }
+  });
+
+  grossRevenue = round2(grossRevenue);
+  salesReturns = round2(salesReturns);
+  const netRevenue = round2(Math.max(0, grossRevenue - salesReturns));
+
+  grossCogs = round2(grossCogs);
+  cogsReversals = round2(cogsReversals);
+  const netCogs = round2(Math.max(0, grossCogs - cogsReversals));
 
   let totalExpenses = 0;
   let outflowCount = 0;
@@ -239,24 +281,37 @@ export const reportsGetProfitLoss = onCall({ region: "asia-south1" }, async (req
     }
   });
 
-  totalRevenue = round2(totalRevenue);
-  totalCogs = round2(totalCogs);
   totalExpenses = round2(totalExpenses);
 
-  const grossProfit = round2(totalRevenue - totalCogs);
-  const grossMarginPercent = totalRevenue > 0 ? round2((grossProfit / totalRevenue) * 100) : 0;
+  const grossProfit = round2(netRevenue - netCogs);
+  const grossMarginPercent = netRevenue > 0 ? round2((grossProfit / netRevenue) * 100) : 0;
   const netProfit = round2(grossProfit - totalExpenses);
-  const netMarginPercent = totalRevenue > 0 ? round2((netProfit / totalRevenue) * 100) : 0;
+  const netMarginPercent = netRevenue > 0 ? round2((netProfit / netRevenue) * 100) : 0;
 
   return {
-    totalRevenue,
-    cogs: totalCogs,
+    organizationId: orgId,
+    branchId: targetBranchId || null,
+    from: validated.from || null,
+    to: validated.to || null,
+    // GAAP / IFRS Revenue Breakdown
+    grossRevenue,
+    salesReturns,
+    netRevenue,
+    totalRevenue: netRevenue,
+    // COGS Breakdown
+    grossCogs,
+    cogsReversals,
+    netCogs,
+    cogs: netCogs,
+    // Profit Metrics
     grossProfit,
     grossMarginPercent,
+    operatingExpenses: totalExpenses,
     totalExpenses,
     netProfit,
     netMarginPercent,
     billCount,
+    returnCount,
     outflowCount,
     costingMethod: "weighted_average",
   };
@@ -643,7 +698,9 @@ export const reportsExportCsv = onCall({ region: "asia-south1" }, async (request
       totalRevenue += bill.totalAmount || 0;
       if (Array.isArray(bill.items)) {
         bill.items.forEach((item) => {
-          const unitCost = productCostMap.get(item.productId) || 0;
+          const unitCost = (item.costSnapshot !== undefined && item.costSnapshot !== null)
+            ? item.costSnapshot
+            : (productCostMap.get(item.productId) ?? 0);
           totalCogs += (item.quantity || 0) * unitCost;
         });
       }

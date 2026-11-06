@@ -100,3 +100,57 @@ This document records the foundational product and technical architecture decisi
 - **Decision**: Usage metering (`usageRecordMetric`, `usageCalculateDryRunStatement`) is strictly an internal diagnostic telemetry system for Super Admins to monitor tenant resource consumption.
 - **Legal Guarantee**: Generated dry-run usage statements are non-binding diagnostic estimates of infrastructure utilization. Every generated statement includes an explicit legal disclaimer confirming it is NOT an invoice and no automated charge has occurred.
 
+---
+
+## Decision 11: Canonical Authentication Flow for Flutter Clients vs. Local Testing Adapter
+
+- **Date**: 2026-11-05
+- **Context**: Mobile/web clients (Flutter) and developer testing tools (API Explorer, Swagger UI, curl, Postman) interact with Firebase backend services differently. Flutter clients integrate the official Firebase Auth and Cloud Functions client SDKs natively, while REST-based tools cannot execute the client SDK protocol.
+- **Decision**: 
+  - **Canonical Production Flow (Flutter Web / Mobile)**: The client authenticates directly using the official Firebase Authentication client SDK (`FirebaseAuth.instance.signInWithEmailAndPassword(email, password)`). Firebase Auth securely manages cryptographic session tokens, secure storage, and automatic ID token refreshing. The Firebase Functions callable SDK (`FirebaseFunctions.instance.httpsCallable(...)`) automatically attaches the caller's active Firebase ID token in the `Authorization: Bearer <idToken>` request header on every callable request. The client does NOT pass tokens in JSON request bodies. Upon successful sign-in, the Flutter client calls `authMe` to fetch the authoritative profile, organizations, active memberships, assigned branches, job roles, and permissions.
+  - **Testing & Tooling Adapter (`authLogin` HTTPS Callable)**: The `authLogin` HTTPS callable is maintained strictly as an adapter for manual developer testing, Swagger UI, curl, and `.http` workbench scripts that run outside the Firebase client SDK ecosystem. It validates credentials against the Firebase Auth REST API (or emulator) and returns `idToken`, `accessToken`, `refreshToken`, `expiresInSeconds`, `profile`, `user`, `organizations`, `branches`, `jobRoles`, and `permissions`.
+- **Security Hardening**:
+  - `authLogin` emits generic authentication error messages (`"Invalid email or password."`) on any authentication failure, preventing email enumeration.
+  - Password and refresh tokens are never written to audit logs or system logs.
+  - Public login supports an optional `deviceId` for session audit logging without conflating device sessions with push notification FCM tokens (which are registered separately via `authUpdateProfile`).
+
+---
+
+## Decision 12: Server-Derived Tenant Context and Super Admin Platform Isolation
+
+- **Date**: 2026-11-05
+- **Context**: Relying on client-supplied `organizationId` and `branchId` in JSON request bodies creates severe security vulnerabilities, including tenant spoofing, cross-tenant data leaks, and unauthorized cross-branch stock modifications. Furthermore, Super Admins need platform management capabilities without possessing fake memberships in tenant organizations.
+- **Decision**:
+  - **Server-Derived Context (`services/tenantContext.ts`)**: For all operational tenant callables (`bills`, `products`, `customers`, `vendors`, `outflows`, `deliveries`, `returns`, `payments`, `stock`), `organizationId` and `branchId` are derived server-side from the verified caller's Firebase Auth token (`request.auth.token.primaryOrganizationId`) or active Firestore `memberships` records.
+  - **Client Omission & Forgery Prevention**: Flutter clients do not need to send `organizationId` or `branchId` in request bodies. If a client does provide an `organizationId`, it is strictly verified against the caller's active membership; mismatches are rejected immediately with `permission-denied`.
+  - **Super Admin Platform Isolation**: Super Admin (`isSuperAdmin: true`) is strictly platform-scoped. Super Admin possesses no tenant organization, no branch, and no tenant memberships. Their context returns:
+    * `organizations: []`
+    * `primaryOrganization: null`
+    * `branches: []`
+    * `primaryBranch: null`
+    * `jobRoles: []`
+    * `permissions: []` (zero tenant permissions!)
+    * `platformPermissions: ["platform:*"]`
+    * `contextStatus: "platform"`
+    When a Super Admin performs a platform management operation on a specific organization (such as `organizationsDeactivate`), they must pass the target `organizationId` explicitly. Normal operational callables reject execution without an explicit or derived tenant context.
+
+---
+
+## Decision 13: Canonical AuthSessionContext Builder, Clean Response Envelope & Strict Fail-Closed Emulator Login Adapter
+
+- **Date**: 2026-11-05
+- **Context**: Authentication responses suffered from duplicate user/profile representations, legacy aliases (`accessToken` alongside `idToken`), browser-exposed refresh tokens, and divergent responses between `authMe` and `authLogin`.
+- **Decision**:
+  - **Unified Canonical Resolver (`services/sessionContext.ts`)**: `buildAuthSessionContext` is the single source of truth for constructing `AuthSessionContext` across both `authMe` and `authLogin`.
+  - **Clean Response Envelopes**:
+    * `authMe` returns `{ context: AuthSessionContext, credentials: null }`.
+    * `authLogin` returns `{ context: AuthSessionContext, credentials: { idToken, expiresInSeconds } }`.
+    * Eliminated duplicate `user`/`profile` copies, eliminated redundant top-level `name`/`email`, eliminated refresh token from browser callable responses, and eliminated the `accessToken` alias.
+  - **Fail-Closed Local Emulator Guard for `authLogin`**:
+    * Rejects execution immediately with `failed-precondition` unless `FUNCTIONS_EMULATOR === "true"`, `GCLOUD_PROJECT === "trado-x"`, and `FIREBASE_AUTH_EMULATOR_HOST` matches `127.0.0.1:9099` or `localhost:9099`.
+    * Never falls back to production `identitytoolkit.googleapis.com`.
+  - **Truthful Device Tracking**:
+    * `deviceId` is an installation identifier upserted to `users/{uid}/devices/{deviceId}` with `{ deviceId, lastLoginAt, updatedAt }`.
+    * FCM token registration remains strictly canonical in `notificationsRegisterFcmToken`.
+
+

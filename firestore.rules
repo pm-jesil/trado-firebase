@@ -279,6 +279,11 @@ service cloud.firestore {
       allow write: if writesDenied();
     }
 
+    match /branchUsageMonthly/{docId} {
+      allow read: if isSuperAdmin();
+      allow write: if writesDenied();
+    }
+
     match /platformUsageSnapshots/{docId} {
       allow read: if isSuperAdmin();
       allow write: if writesDenied();

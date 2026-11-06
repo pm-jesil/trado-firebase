@@ -44,6 +44,7 @@ export interface SubscriptionPlanDefinition {
   currency: string;
   storageLimitMb: number;
   monthlyDocumentVolumeLimit: number;
+  branchLimit: number;
   seatLimits: {
     admin: number;
     staff: number;
@@ -60,6 +61,7 @@ export const DEFAULT_SUBSCRIPTION_PLANS: SubscriptionPlanDefinition[] = [
     currency: "INR",
     storageLimitMb: 500,
     monthlyDocumentVolumeLimit: 1000,
+    branchLimit: 1,
     seatLimits: { admin: 1, staff: 4 },
     moduleFlags: {
       billing: true,
@@ -80,6 +82,7 @@ export const DEFAULT_SUBSCRIPTION_PLANS: SubscriptionPlanDefinition[] = [
     currency: "INR",
     storageLimitMb: 5000,
     monthlyDocumentVolumeLimit: 10000,
+    branchLimit: 3,
     seatLimits: { admin: 3, staff: 20 },
     moduleFlags: {
       billing: true,
@@ -100,6 +103,7 @@ export const DEFAULT_SUBSCRIPTION_PLANS: SubscriptionPlanDefinition[] = [
     currency: "INR",
     storageLimitMb: 50000,
     monthlyDocumentVolumeLimit: 100000,
+    branchLimit: 10,
     seatLimits: { admin: 10, staff: 100 },
     moduleFlags: {
       billing: true,

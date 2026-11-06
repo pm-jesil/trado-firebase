@@ -21,6 +21,18 @@ import {
   DocumentType,
 } from "../constants/enums.js";
 
+export const AuthLoginSchema = z.object({
+  email: z.string().trim().email().toLowerCase(),
+  password: z.string().min(1, "Password is required").max(512),
+  deviceId: z.string().trim().min(4).max(128).optional(),
+}).strict();
+export type AuthLoginInput = z.infer<typeof AuthLoginSchema>;
+
+export const AuthMeSchema = z.object({
+  deviceId: z.string().trim().min(4).max(128).optional(),
+}).strict();
+export type AuthMeInput = z.infer<typeof AuthMeSchema>;
+
 export const CreateOrganizationSchema = z.object({
   idempotencyKey: z.string().min(8).max(128).optional(),
   name: z.string().trim().min(2).max(100),
@@ -191,8 +203,8 @@ export const RegisterFcmTokenSchema = z.object({
 // 1. Products
 export const CreateProductSchema = z.object({
   idempotencyKey: z.string().min(8).max(128).optional(),
-  organizationId: z.string().trim().min(2),
-  branchId: z.string().trim().optional(),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
+  branchId: z.string().trim().optional(), // Derived server-side from active context
   name: z.string().trim().min(1).max(150),
   description: z.string().trim().max(1000).optional(),
   categoryId: z.string().trim().nullable().optional(),
@@ -219,7 +231,7 @@ export const CreateProductSchema = z.object({
 });
 
 export const UpdateProductSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   productId: z.string().trim().min(2),
   name: z.string().trim().min(1).max(150).optional(),
   description: z.string().trim().max(1000).optional(),
@@ -241,7 +253,7 @@ export const UpdateProductSchema = z.object({
 });
 
 export const ListProductsSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   categoryId: z.string().trim().optional(),
   isActive: z.boolean().optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
@@ -297,8 +309,8 @@ export const ListUnitsSchema = z.object({
 // 4. Customers
 export const CreateCustomerSchema = z.object({
   idempotencyKey: z.string().min(8).max(128).optional(),
-  organizationId: z.string().trim().min(2),
-  branchId: z.string().trim().optional(),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
+  branchId: z.string().trim().optional(), // Derived server-side from active context
   name: z.string().trim().min(1).max(100),
   mobile: z.string().trim().optional(),
   email: z.string().trim().email().toLowerCase().optional(),
@@ -314,7 +326,7 @@ export const CreateCustomerSchema = z.object({
 });
 
 export const UpdateCustomerSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   customerId: z.string().trim().min(2),
   name: z.string().trim().min(1).max(100).optional(),
   mobile: z.string().trim().optional(),
@@ -331,7 +343,7 @@ export const UpdateCustomerSchema = z.object({
 });
 
 export const ListCustomersSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   search: z.string().trim().optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
@@ -341,8 +353,8 @@ export const ListCustomersSchema = z.object({
 // 5. Vendors
 export const CreateVendorSchema = z.object({
   idempotencyKey: z.string().min(8).max(128).optional(),
-  organizationId: z.string().trim().min(2),
-  branchId: z.string().trim().optional(),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
+  branchId: z.string().trim().optional(), // Derived server-side from active context
   name: z.string().trim().min(1).max(100),
   mobile: z.string().trim().optional(),
   email: z.string().trim().email().toLowerCase().optional(),
@@ -357,7 +369,7 @@ export const CreateVendorSchema = z.object({
 });
 
 export const UpdateVendorSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   vendorId: z.string().trim().min(2),
   name: z.string().trim().min(1).max(100).optional(),
   mobile: z.string().trim().optional(),
@@ -373,7 +385,7 @@ export const UpdateVendorSchema = z.object({
 });
 
 export const ListVendorsSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   search: z.string().trim().optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
@@ -398,8 +410,8 @@ export const OutflowLineSchema = z.object({
 
 export const CreateOutflowSchema = z.object({
   idempotencyKey: z.string().min(8).max(128).optional(),
-  organizationId: z.string().trim().min(2),
-  branchId: z.string().trim().optional(),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
+  branchId: z.string().trim().optional(), // Derived server-side from active context
   kind: z.nativeEnum(OutflowKind),
   docDate: z.string().trim().optional(), // ISO string, defaults to now
   vendorId: z.string().trim().nullable().optional(),
@@ -414,7 +426,7 @@ export const CreateOutflowSchema = z.object({
 });
 
 export const ListOutflowsSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   kind: z.nativeEnum(OutflowKind).optional(),
   vendorId: z.string().trim().optional(),
@@ -433,8 +445,8 @@ export const BillItemSchema = z.object({
 
 export const CreateBillSchema = z.object({
   idempotencyKey: z.string().min(8).max(128).optional(),
-  organizationId: z.string().trim().min(2),
-  branchId: z.string().trim().optional(),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
+  branchId: z.string().trim().optional(), // Derived server-side from active context
   salesMode: z.nativeEnum(SalesMode).default(SalesMode.POS),
   documentType: z.nativeEnum(DocumentType).default(DocumentType.INVOICE).optional(),
   status: z.enum(["draft", "active"]).default("active").optional(),
@@ -455,13 +467,13 @@ export const CreateBillSchema = z.object({
 });
 
 export const FinalizeBillSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   billId: z.string().trim().min(2),
   idempotencyKey: z.string().min(8).max(128).optional(),
 });
 
 export const ListBillsSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   salesMode: z.nativeEnum(SalesMode).optional(),
   customerId: z.string().trim().optional(),
@@ -472,8 +484,8 @@ export const ListBillsSchema = z.object({
 // 8. Deliveries
 export const CreateDeliverySchema = z.object({
   idempotencyKey: z.string().min(8).max(128).optional(),
-  organizationId: z.string().trim().min(2),
-  branchId: z.string().trim().optional(),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
+  branchId: z.string().trim().optional(), // Derived server-side from active context
   billId: z.string().trim().min(2), // ID reference ONLY!
   customerId: z.string().trim().nullable().optional(),
   customerName: z.string().trim().min(1).max(100),
@@ -497,7 +509,7 @@ export const CreateDeliverySchema = z.object({
 });
 
 export const UpdateDeliveryStatusSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   deliveryId: z.string().trim().min(2),
   status: z.nativeEnum(DeliveryStatus),
   riderMembershipId: z.string().trim().optional(),
@@ -507,7 +519,7 @@ export const UpdateDeliveryStatusSchema = z.object({
 });
 
 export const ListDeliveriesSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   status: z.nativeEnum(DeliveryStatus).optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
@@ -525,8 +537,8 @@ export const ReturnItemSchema = z.object({
 
 export const CreateReturnSchema = z.object({
   idempotencyKey: z.string().min(8).max(128).optional(),
-  organizationId: z.string().trim().min(2),
-  branchId: z.string().trim().optional(),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
+  branchId: z.string().trim().optional(), // Derived server-side from active context
   returnType: z.nativeEnum(ReturnType),
   referenceId: z.string().trim().min(2), // billId or outflowId
   partyId: z.string().trim().nullable().optional(),
@@ -537,7 +549,7 @@ export const CreateReturnSchema = z.object({
 });
 
 export const ListReturnsSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   returnType: z.nativeEnum(ReturnType).optional(),
   referenceId: z.string().trim().optional(),
@@ -548,8 +560,8 @@ export const ListReturnsSchema = z.object({
 // 10. Payments Ledger
 export const CreatePaymentSchema = z.object({
   idempotencyKey: z.string().min(8).max(128).optional(),
-  organizationId: z.string().trim().min(2),
-  branchId: z.string().trim().optional(),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
+  branchId: z.string().trim().optional(), // Derived server-side from active context
   direction: z.nativeEnum(PaymentDirection),
   partyType: z.nativeEnum(PartyType),
   partyId: z.string().trim().nullable().optional(),
@@ -562,7 +574,7 @@ export const CreatePaymentSchema = z.object({
 });
 
 export const ListPaymentsSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   direction: z.nativeEnum(PaymentDirection).optional(),
   partyId: z.string().trim().optional(),
@@ -574,15 +586,15 @@ export const ListPaymentsSchema = z.object({
 // 11. Stock Movements / Adjustments
 export const StockAdjustSchema = z.object({
   idempotencyKey: z.string().min(8).max(128).optional(),
-  organizationId: z.string().trim().min(2),
-  branchId: z.string().trim().optional(),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
+  branchId: z.string().trim().optional(), // Derived server-side from active context
   productId: z.string().trim().min(2),
   quantity: z.number(), // Positive to add, negative to deduct
   reason: z.string().trim().min(2).max(500),
 });
 
 export const ListStockMovementsSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   productId: z.string().trim().optional(),
   type: z.nativeEnum(StockMovementType).optional(),
@@ -784,12 +796,14 @@ export const DeleteTaskSchema = z.object({
 // Live Location Tracking
 export const RecordLocationPingSchema = z.object({
   organizationId: z.string().trim().optional(),
+  branchId: z.string().trim().optional(),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   accuracy: z.number().nonnegative().optional(),
   speed: z.number().nonnegative().optional(),
   heading: z.number().min(0).max(360).optional(),
   source: z.enum(["foreground", "background"]).default("foreground").optional(),
+  recordedAt: z.string().trim().optional(),
 });
 
 export const GetLatestLocationsSchema = z.object({
@@ -817,7 +831,7 @@ export const MarkNotificationReadSchema = z.object({
 
 // Branch Reconciliation
 export const ReconcileBranchCountsSchema = z.object({
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   repair: z.boolean().default(false).optional(),
 });
 
@@ -854,6 +868,24 @@ export const CalculateDryRunStatementSchema = z.object({
   organizationId: z.string().trim().min(2),
   billingPeriod: z.string().trim().regex(/^\d{4}-\d{2}$/, "Format must be YYYY-MM"),
   rateCardVersion: z.string().trim().optional(),
+});
+
+export const GetUsageLimitsSchema = z.object({
+  organizationId: z.string().trim().optional(),
+});
+
+export const MetricLimitConfigSchema = z.object({
+  dailyLimit: z.number().int().nonnegative().optional(),
+  monthlyLimit: z.number().int().nonnegative().optional(),
+  warningThresholdPercent: z.number().min(0).max(100).default(80),
+  hardThresholdPercent: z.number().min(0).max(100).default(100),
+  enforcementMode: z.enum(["warn_only", "soft_throttle", "hard_block"]).default("warn_only"),
+  enabled: z.boolean().default(true),
+});
+
+export const UpdateUsageLimitsSchema = z.object({
+  organizationId: z.string().trim().min(2, "organizationId is required"),
+  limits: z.record(z.string(), MetricLimitConfigSchema),
 });
 
 

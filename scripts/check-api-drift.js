@@ -42,6 +42,95 @@ function extractDocumentedCallables(content) {
   return documented;
 }
 
+function evaluateDrift(exportsSet, documentedSet, expectedCount = 102) {
+  const missingFromDocs = [];
+  for (const exp of exportsSet) {
+    if (!documentedSet.has(exp)) {
+      missingFromDocs.push(exp);
+    }
+  }
+
+  const extraInDocs = [];
+  for (const doc of documentedSet) {
+    if (!exportsSet.has(doc)) {
+      extraInDocs.push(doc);
+    }
+  }
+
+  const countMatches = expectedCount === null || exportsSet.size === expectedCount;
+
+  return {
+    exportsCount: exportsSet.size,
+    missingFromDocs,
+    extraInDocs,
+    countMatches,
+    isValid: missingFromDocs.length === 0 && countMatches,
+  };
+}
+
+function runSelfTest() {
+  console.log("=== Running API Drift Checker Self-Test ===");
+  let passed = true;
+
+  // Test 1: Compliant matching fixture
+  const sampleIndexValid = `
+    export { authMe, organizationsCreate, billsCreate } from './callables/index.js';
+  `;
+  const sampleDocValid = `
+    | \`authMe\` | Authentication verification |
+    | \`organizationsCreate\` | Create organization |
+    | \`billsCreate\` | Create bill |
+  `;
+
+  const validExports = extractExportsFromIndex(sampleIndexValid);
+  const validDocs = extractDocumentedCallables(sampleDocValid);
+  const validResult = evaluateDrift(validExports, validDocs, 3);
+
+  if (!validResult.isValid || validResult.missingFromDocs.length !== 0) {
+    console.error("FAIL: Valid sample fixture falsely failed drift check!");
+    passed = false;
+  } else {
+    console.log("✓ Test 1: Clean matching fixture passed validation.");
+  }
+
+  // Test 2: Missing export in docs fixture
+  const sampleIndexMissing = `
+    export { authMe, organizationsCreate, billsCreate, secretUnlistedCallable } from './callables/index.js';
+  `;
+  const sampleDocMissing = `
+    | \`authMe\` | Authentication verification |
+    | \`organizationsCreate\` | Create organization |
+    | \`billsCreate\` | Create bill |
+  `;
+
+  const missingExports = extractExportsFromIndex(sampleIndexMissing);
+  const missingDocs = extractDocumentedCallables(sampleDocMissing);
+  const missingResult = evaluateDrift(missingExports, missingDocs, 4);
+
+  if (missingResult.isValid || !missingResult.missingFromDocs.includes("secretUnlistedCallable")) {
+    console.error("FAIL: Missing export fixture failed to detect unlisted callable!");
+    passed = false;
+  } else {
+    console.log("✓ Test 2: Successfully detected undocumented callable: 'secretUnlistedCallable'.");
+  }
+
+  // Test 3: Count mismatch fixture
+  const countResult = evaluateDrift(missingExports, missingDocs, 102);
+  if (countResult.countMatches) {
+    console.error("FAIL: Count mismatch was not detected!");
+    passed = false;
+  } else {
+    console.log("✓ Test 3: Successfully caught expected vs actual export count mismatch.");
+  }
+
+  if (!passed) {
+    console.error("\n[FAIL] API Drift Checker Self-Test Failed!\n");
+    process.exit(1);
+  }
+
+  console.log("\n[PASS] All API Drift Checker self-tests completed successfully.\n");
+}
+
 function runCheck() {
   console.log("Checking Cloud Functions exports against API documentation...\n");
 
@@ -67,29 +156,24 @@ function runCheck() {
 
   console.log(`Total exports discovered in functions/src/index.ts: ${exports.size}`);
 
-  const missingFromDocs = [];
-  for (const exp of exports) {
-    if (!combinedDoc.has(exp)) {
-      missingFromDocs.push(exp);
-    }
-  }
+  const driftResult = evaluateDrift(exports, combinedDoc, 105);
 
   let hasError = false;
 
-  if (missingFromDocs.length > 0) {
-    console.error(`\n[FAIL] Exported callables missing from API documentation (${missingFromDocs.length}):`);
-    for (const m of missingFromDocs) {
+  if (driftResult.missingFromDocs.length > 0) {
+    console.error(`\n[FAIL] Exported callables missing from API documentation (${driftResult.missingFromDocs.length}):`);
+    for (const m of driftResult.missingFromDocs) {
       console.error(`  - ${m}`);
     }
     hasError = true;
   } else {
-    console.log(`✓ All ${exports.size} exports are fully documented in phase1-api.md, phase2-api.md, branch-readiness-api.md, and phase3-api.md.`);
+    console.log(`✓ All ${exports.size} exports are fully documented in docs/api-reference.md.`);
   }
 
-  if (exports.size !== 102) {
-    console.warn(`\n[WARN] Expected 102 exports, found ${exports.size}.`);
+  if (!driftResult.countMatches) {
+    console.warn(`\n[WARN] Expected 105 exports, found ${exports.size}.`);
   } else {
-    console.log(`✓ Exact count confirmed: 102/102 Cloud Function exports.`);
+    console.log(`✓ Exact count confirmed: ${exports.size}/${exports.size} Cloud Function exports.`);
   }
 
   if (hasError) {
@@ -99,5 +183,9 @@ function runCheck() {
   }
 }
 
-runCheck();
+if (process.argv.includes('--test')) {
+  runSelfTest();
+} else {
+  runCheck();
+}
 

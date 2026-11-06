@@ -230,7 +230,7 @@ describe("Firestore Security Rules Matrix", () => {
   });
 
   // --- 6. Platform Catalogs Read Access ---
-  it("allows authenticated users to read platform catalogs (plans, modules, taxRegimes)", async () => {
+  it("allows authenticated users to read platform catalogs (plans, modules, taxRegimes, permissionCatalog)", async () => {
     await testEnv.withSecurityRulesDisabled(async (adminContext) => {
       await setDoc(doc(adminContext.firestore(), "subscriptionPlans", "plan_starter"), {
         name: "Starter",
@@ -241,6 +241,10 @@ describe("Firestore Security Rules Matrix", () => {
       await setDoc(doc(adminContext.firestore(), "taxRegimes", "IN_GST"), {
         name: "India GST",
       });
+      await setDoc(doc(adminContext.firestore(), "permissionCatalog", "perm_sales_create"), {
+        name: "Create Sales",
+        code: "sales.create",
+      });
     });
 
     const userDb = testEnv.authenticatedContext("user_alice").firestore();
@@ -248,6 +252,7 @@ describe("Firestore Security Rules Matrix", () => {
     await assertSucceeds(getDoc(doc(userDb, "subscriptionPlans", "plan_starter")));
     await assertSucceeds(getDoc(doc(userDb, "modules", "billing")));
     await assertSucceeds(getDoc(doc(userDb, "taxRegimes", "IN_GST")));
+    await assertSucceeds(getDoc(doc(userDb, "permissionCatalog", "perm_sales_create")));
   });
 
   // --- 7. Operational Business Collections Tenant Isolation ---
@@ -433,5 +438,138 @@ describe("Firestore Security Rules Matrix", () => {
     // 4. User-scoped notification read: Alice can read own, denied Bob's
     await assertSucceeds(getDoc(doc(aliceDb, "notifications", "notif_alice_1")));
     await assertFails(getDoc(doc(aliceDb, "notifications", "notif_bob_1")));
+  });
+
+  it("Organization structure and master catalogs: client read isolation and direct write denial", async () => {
+    await testEnv.withSecurityRulesDisabled(async (adminContext) => {
+      const db = adminContext.firestore();
+      // Setup Alice in org_alpha
+      await setDoc(doc(db, "memberships", "user_alice_org_alpha"), {
+        userId: "user_alice",
+        organizationId: "org_alpha",
+        status: "active",
+      });
+
+      // Org alpha master data
+      await setDoc(doc(db, "departments", "dept_alpha_1"), { organizationId: "org_alpha", name: "Alpha Sales" });
+      await setDoc(doc(db, "jobRoles", "job_alpha_1"), { organizationId: "org_alpha", name: "Alpha Cashier" });
+      await setDoc(doc(db, "teams", "team_alpha_1"), { organizationId: "org_alpha", name: "Alpha Counter A" });
+      await setDoc(doc(db, "categories", "cat_alpha_1"), { organizationId: "org_alpha", name: "Beverages" });
+      await setDoc(doc(db, "units", "unit_alpha_1"), { organizationId: "org_alpha", name: "Bottle" });
+      await setDoc(doc(db, "customers", "cust_alpha_1"), { organizationId: "org_alpha", name: "Alpha Customer" });
+      await setDoc(doc(db, "vendors", "vend_alpha_1"), { organizationId: "org_alpha", name: "Alpha Vendor" });
+
+      // Org beta master data
+      await setDoc(doc(db, "departments", "dept_beta_1"), { organizationId: "org_beta", name: "Beta Sales" });
+      await setDoc(doc(db, "categories", "cat_beta_1"), { organizationId: "org_beta", name: "Snacks" });
+      await setDoc(doc(db, "customers", "cust_beta_1"), { organizationId: "org_beta", name: "Beta Customer" });
+      await setDoc(doc(db, "vendors", "vend_beta_1"), { organizationId: "org_beta", name: "Beta Vendor" });
+    });
+
+    const aliceDb = testEnv.authenticatedContext("user_alice").firestore();
+
+    // 1. Direct writes denied
+    await assertFails(setDoc(doc(aliceDb, "departments", "hack_dept"), { name: "Hack Dept" }));
+    await assertFails(setDoc(doc(aliceDb, "jobRoles", "hack_job"), { name: "Hack Job" }));
+    await assertFails(setDoc(doc(aliceDb, "teams", "hack_team"), { name: "Hack Team" }));
+    await assertFails(setDoc(doc(aliceDb, "categories", "hack_cat"), { name: "Hack Cat" }));
+    await assertFails(setDoc(doc(aliceDb, "units", "hack_unit"), { name: "Hack Unit" }));
+    await assertFails(setDoc(doc(aliceDb, "customers", "hack_cust"), { name: "Hack Cust" }));
+    await assertFails(setDoc(doc(aliceDb, "vendors", "hack_vend"), { name: "Hack Vend" }));
+
+    // 2. Read own org data succeeds
+    await assertSucceeds(getDoc(doc(aliceDb, "departments", "dept_alpha_1")));
+    await assertSucceeds(getDoc(doc(aliceDb, "jobRoles", "job_alpha_1")));
+    await assertSucceeds(getDoc(doc(aliceDb, "teams", "team_alpha_1")));
+    await assertSucceeds(getDoc(doc(aliceDb, "categories", "cat_alpha_1")));
+    await assertSucceeds(getDoc(doc(aliceDb, "units", "unit_alpha_1")));
+    await assertSucceeds(getDoc(doc(aliceDb, "customers", "cust_alpha_1")));
+    await assertSucceeds(getDoc(doc(aliceDb, "vendors", "vend_alpha_1")));
+
+    // 3. Cross-tenant reads denied
+    await assertFails(getDoc(doc(aliceDb, "departments", "dept_beta_1")));
+    await assertFails(getDoc(doc(aliceDb, "categories", "cat_beta_1")));
+    await assertFails(getDoc(doc(aliceDb, "customers", "cust_beta_1")));
+    await assertFails(getDoc(doc(aliceDb, "vendors", "vend_beta_1")));
+  });
+
+  it("Telemetry, Usage Metering, Devices, and Concurrency Locks security rules", async () => {
+    await testEnv.withSecurityRulesDisabled(async (adminContext) => {
+      const db = adminContext.firestore();
+      // Setup Alice in org_alpha
+      await setDoc(doc(db, "memberships", "user_alice_org_alpha"), {
+        userId: "user_alice",
+        organizationId: "org_alpha",
+        status: "active",
+      });
+
+      // Devices
+      await setDoc(doc(db, "users", "user_alice", "devices", "dev_alice_1"), { fcmToken: "token_alice" });
+      await setDoc(doc(db, "users", "user_bob", "devices", "dev_bob_1"), { fcmToken: "token_bob" });
+
+      // Monthly Summaries & Locations
+      await setDoc(doc(db, "monthlySummaries", "org_alpha_2026-10"), { organizationId: "org_alpha", totalRevenue: 50000 });
+      await setDoc(doc(db, "monthlySummaries", "org_beta_2026-10"), { organizationId: "org_beta", totalRevenue: 100000 });
+      await setDoc(doc(db, "latestLocations", "loc_alpha_alice"), { organizationId: "org_alpha", userId: "user_alice", lat: 12.97 });
+      await setDoc(doc(db, "locationPings", "ping_alpha_1"), { organizationId: "org_alpha", userId: "user_alice", lat: 12.97 });
+
+      // Locks & Outbox
+      await setDoc(doc(db, "barcodeLocks", "org_alpha_8901234567890"), { barcode: "8901234567890" });
+      await setDoc(doc(db, "notificationOutbox", "outbox_1"), { type: "push", recipient: "token_xyz" });
+
+      // Super Admin usage metering data
+      await setDoc(doc(db, "organizationUsageDaily", "org_alpha_2026-10-28"), { organizationId: "org_alpha", apiCalls: 150 });
+      await setDoc(doc(db, "branchUsageDaily", "org_alpha_branch1_2026-10-28"), { organizationId: "org_alpha", apiCalls: 50 });
+      await setDoc(doc(db, "branchUsageMonthly", "org_alpha_branch1_2026-10"), { organizationId: "org_alpha", apiCalls: 50 });
+      await setDoc(doc(db, "platformUsageSnapshots", "snap_2026-10-28"), { totalOrgs: 10 });
+      await setDoc(doc(db, "usageRateCards", "v1"), { apiCallRate: 0.001 });
+      await setDoc(doc(db, "usageAllocationRuns", "run_2026-10"), { status: "completed" });
+    });
+
+    const aliceDb = testEnv.authenticatedContext("user_alice").firestore();
+    const superAdminDb = testEnv.authenticatedContext("superadmin_user", { isSuperAdmin: true }).firestore();
+
+    // 1. Direct writes denied to all these collections
+    await assertFails(setDoc(doc(aliceDb, "users", "user_alice", "devices", "dev_hack"), { token: "hack" }));
+    await assertFails(setDoc(doc(aliceDb, "monthlySummaries", "hack_monthly"), { revenue: 0 }));
+    await assertFails(setDoc(doc(aliceDb, "latestLocations", "hack_loc"), { lat: 0 }));
+    await assertFails(setDoc(doc(aliceDb, "locationPings", "hack_ping"), { lat: 0 }));
+    await assertFails(setDoc(doc(aliceDb, "barcodeLocks", "hack_lock"), { barcode: "hack" }));
+    await assertFails(setDoc(doc(aliceDb, "notificationOutbox", "hack_outbox"), { type: "hack" }));
+    await assertFails(setDoc(doc(aliceDb, "organizationUsageDaily", "hack_usage"), { apiCalls: 0 }));
+    await assertFails(setDoc(doc(aliceDb, "branchUsageDaily", "hack_b_usage"), { apiCalls: 0 }));
+    await assertFails(setDoc(doc(aliceDb, "branchUsageMonthly", "hack_bm_usage"), { apiCalls: 0 }));
+    await assertFails(setDoc(doc(aliceDb, "platformUsageSnapshots", "hack_snap"), { totalOrgs: 0 }));
+    await assertFails(setDoc(doc(aliceDb, "usageRateCards", "hack_rate"), { rate: 0 }));
+    await assertFails(setDoc(doc(aliceDb, "usageAllocationRuns", "hack_run"), { status: "hack" }));
+
+    // 2. User device subcollection isolation: Alice reads own device, denied reading Bob's device
+    await assertSucceeds(getDoc(doc(aliceDb, "users", "user_alice", "devices", "dev_alice_1")));
+    await assertFails(getDoc(doc(aliceDb, "users", "user_bob", "devices", "dev_bob_1")));
+
+    // 3. Monthly summaries and location tracking tenant isolation
+    await assertSucceeds(getDoc(doc(aliceDb, "monthlySummaries", "org_alpha_2026-10")));
+    await assertFails(getDoc(doc(aliceDb, "monthlySummaries", "org_beta_2026-10")));
+    await assertSucceeds(getDoc(doc(aliceDb, "latestLocations", "loc_alpha_alice")));
+    await assertSucceeds(getDoc(doc(aliceDb, "locationPings", "ping_alpha_1")));
+
+    // 4. Server-only collections completely denied to client reads
+    await assertFails(getDoc(doc(aliceDb, "barcodeLocks", "org_alpha_8901234567890")));
+    await assertFails(getDoc(doc(aliceDb, "notificationOutbox", "outbox_1")));
+
+    // 5. Usage metering collections: denied to tenant member Alice, accessible to Super Admin
+    await assertFails(getDoc(doc(aliceDb, "organizationUsageDaily", "org_alpha_2026-10-28")));
+    await assertFails(getDoc(doc(aliceDb, "branchUsageDaily", "org_alpha_branch1_2026-10-28")));
+    await assertFails(getDoc(doc(aliceDb, "branchUsageMonthly", "org_alpha_branch1_2026-10")));
+    await assertFails(getDoc(doc(aliceDb, "platformUsageSnapshots", "snap_2026-10-28")));
+    await assertFails(getDoc(doc(aliceDb, "usageRateCards", "v1")));
+    await assertFails(getDoc(doc(aliceDb, "usageAllocationRuns", "run_2026-10")));
+
+    await assertSucceeds(getDoc(doc(superAdminDb, "organizationUsageDaily", "org_alpha_2026-10-28")));
+    await assertSucceeds(getDoc(doc(superAdminDb, "branchUsageDaily", "org_alpha_branch1_2026-10-28")));
+    await assertSucceeds(getDoc(doc(superAdminDb, "branchUsageMonthly", "org_alpha_branch1_2026-10")));
+    await assertSucceeds(getDoc(doc(superAdminDb, "platformUsageSnapshots", "snap_2026-10-28")));
+    await assertSucceeds(getDoc(doc(superAdminDb, "usageRateCards", "v1")));
+    await assertSucceeds(getDoc(doc(superAdminDb, "usageAllocationRuns", "run_2026-10")));
   });
 });

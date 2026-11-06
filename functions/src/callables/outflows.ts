@@ -18,7 +18,6 @@ import {
   OutflowDoc,
   OutflowLine,
   OrganizationDoc,
-  MembershipDoc,
   PaymentDoc,
   VendorDoc,
 } from "../types/models.js";
@@ -44,16 +43,7 @@ import {
   StockChangeItem,
 } from "../services/stockEngine.js";
 import { createAuditLog } from "../services/audit.js";
-
-async function verifyTenantAccess(auth: any, organizationId: string): Promise<void> {
-  if (auth.token.isSuperAdmin === true) return;
-
-  const memRef = db.collection("memberships").doc(`${auth.uid}_${organizationId}`);
-  const memDoc = await memRef.get();
-  if (!memDoc.exists || (memDoc.data() as MembershipDoc).status !== "active") {
-    throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-  }
-}
+import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
 
 export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
@@ -66,10 +56,11 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const branchId = await resolveBranchContext(request.auth, orgId, input.branchId);
 
   const idempotency = await reserveIdempotency({
-    scope: input.organizationId,
+    scope: orgId,
     actorUid: request.auth.uid,
     operation: "outflows.create",
     clientKey: input.idempotencyKey,
@@ -84,12 +75,11 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
   }
 
   try {
-    const orgDoc = await db.collection("organizations").doc(input.organizationId).get();
+    const orgDoc = await db.collection("organizations").doc(orgId).get();
     if (!orgDoc.exists) {
       throw new HttpsError("not-found", "Organization not found.");
     }
     const orgData = orgDoc.data() as OrganizationDoc;
-    const branchId = input.branchId || (request.auth.token.primaryBranchId as string) || orgData.defaultBranchId || "main-branch";
 
     const outflowRef = db.collection("outflows").doc();
     const outflowId = outflowRef.id;
@@ -141,6 +131,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
         stockChangeItems.push({
           productId: rawLine.productId,
           quantity, // Positive addition
+          costPrice: rawLine.unitPrice, // Transactional WAC cost basis
           type: StockMovementType.PURCHASE_IN,
           unit: rawLine.unit,
           referenceId: outflowId,
@@ -175,14 +166,14 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
     const finalResult = await db.runTransaction(async (txn) => {
       // === STEP 1: ALL TRANSACTIONAL READS FIRST (Firestore requirement) ===
       const outflowReservation = await readNextDocumentNumberInTxn(txn, {
-        organizationId: input.organizationId,
+        organizationId: orgId,
         type: prefix,
       });
 
       let paymentReservation = null;
       if (paidAmount > 0) {
         paymentReservation = await readNextDocumentNumberInTxn(txn, {
-          organizationId: input.organizationId,
+          organizationId: orgId,
           type: "PAY",
         });
       }
@@ -190,7 +181,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
       let preparedStock = null;
       if (stockChangeItems.length > 0) {
         preparedStock = await prepareStockChangesInTxn(txn, {
-          organizationId: input.organizationId,
+          organizationId: orgId,
           branchId,
           actorUid: callerUid,
           items: stockChangeItems,
@@ -209,7 +200,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
       const outflowNumber = outflowReservation.formattedNumber;
 
       const outflowDoc: OutflowDoc = {
-        organizationId: input.organizationId,
+        organizationId: orgId,
         branchId,
         outflowNumber,
         kind: input.kind,
@@ -261,7 +252,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
         paymentId = paymentRef.id;
 
         const paymentDoc: PaymentDoc = {
-          organizationId: input.organizationId,
+          organizationId: orgId,
           branchId,
           paymentNumber: paymentReservation.formattedNumber,
           direction: PaymentDirection.OUT,
@@ -283,7 +274,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
 
       return {
         outflowId,
-        organizationId: input.organizationId,
+        organizationId: orgId,
         outflowNumber,
         kind: input.kind,
         totalAmount,
@@ -306,7 +297,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
     }
 
     await createAuditLog({
-      organizationId: input.organizationId,
+      organizationId: orgId,
       actorUid: request.auth.uid,
       action: input.kind === OutflowKind.PURCHASE ? "PURCHASE_CREATED" : "EXPENSE_CREATED",
       entityType: "outflow",
@@ -340,10 +331,10 @@ export const outflowsList = onCall({ region: "asia-south1" }, async (request) =>
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   let query = db.collection("outflows")
-    .where("organizationId", "==", input.organizationId)
+    .where("organizationId", "==", orgId)
     .limit(input.limit || 50);
 
   if (input.kind) {
@@ -371,12 +362,11 @@ export const outflowsGet = onCall({ region: "asia-south1" }, async (request) => 
   }
 
   const outflowId = request.data?.outflowId;
-  const organizationId = request.data?.organizationId;
-  if (!outflowId || !organizationId) {
-    throw new HttpsError("invalid-argument", "outflowId and organizationId required.");
+  if (!outflowId) {
+    throw new HttpsError("invalid-argument", "outflowId is required.");
   }
 
-  await verifyTenantAccess(request.auth, organizationId);
+  const orgId = await verifyTenantAccess(request.auth, request.data?.organizationId);
 
   const docSnap = await db.collection("outflows").doc(outflowId).get();
   if (!docSnap.exists) {
@@ -384,7 +374,7 @@ export const outflowsGet = onCall({ region: "asia-south1" }, async (request) => 
   }
 
   const data = docSnap.data() as OutflowDoc;
-  if (data.organizationId !== organizationId) {
+  if (data.organizationId !== orgId) {
     throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
   }
 

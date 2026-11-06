@@ -14,52 +14,55 @@ This document is the authoritative, permanent reference for all Cloud Firestore 
 
 ## Collection Inventory Overview
 
-Total Collections & Subcollections: **42**
+Total Concrete Collections & Subcollections: **44** (42 Root Collections + 2 Subcollections, mapping to 43 TypeScript `Doc` interfaces in `models.ts` + `barcodeLocks` concurrency lock)
 
-| # | Collection Path | Primary Interface | Domain |
-|---|---|---|---|
-| 1 | `user` | `UserDoc` | Tenant & RBAC |
-| 2 | `membership` | `MembershipDoc` | Tenant & RBAC |
-| 3 | `organization` | `OrganizationDoc` | Tenant & RBAC |
-| 4 | `role` | `RoleDoc` | Tenant & RBAC |
-| 5 | `department` | `DepartmentDoc` | Tenant & RBAC |
-| 6 | `jobrole` | `JobRoleDoc` | Tenant & RBAC |
-| 7 | `team` | `TeamDoc` | Tenant & RBAC |
-| 8 | `subscriptionplan` | `SubscriptionPlanDoc` | Tenant & RBAC |
-| 9 | `permissioncatalog` | `PermissionCatalogDoc` | Tenant & RBAC |
-| 10 | `module` | `ModuleDoc` | Tenant & RBAC |
-| 11 | `taxregime` | `TaxRegimeDoc` | Tenant & RBAC |
-| 12 | `idempotencyrecord` | `IdempotencyRecordDoc` | System Infrastructure |
-| 13 | `auditlog` | `AuditLogDoc` | System Infrastructure |
-| 14 | `device` | `DeviceDoc` | System Infrastructure |
-| 15 | `notificationoutbox` | `NotificationOutboxDoc` | Tenant & RBAC |
-| 16 | `product` | `ProductDoc` | Catalog & Inventory |
-| 17 | `category` | `CategoryDoc` | Catalog & Inventory |
-| 18 | `unit` | `UnitDoc` | Catalog & Inventory |
-| 19 | `customer` | `CustomerDoc` | Parties & Ledgers |
-| 20 | `vendor` | `VendorDoc` | Parties & Ledgers |
-| 21 | `outflow` | `OutflowDoc` | Operations & Transactions |
-| 22 | `bill` | `BillDoc` | Operations & Transactions |
-| 23 | `stockmovement` | `StockMovementDoc` | Catalog & Inventory |
-| 24 | `delivery` | `DeliveryDoc` | Operations & Transactions |
-| 25 | `return` | `ReturnDoc` | Operations & Transactions |
-| 26 | `payment` | `PaymentDoc` | Operations & Transactions |
-| 27 | `documentcounter` | `DocumentCounterDoc` | System Infrastructure |
-| 28 | `task` | `TaskDoc` | Tasks, Location & Notifications |
-| 29 | `dailysummary` | `DailySummaryDoc` | Analytics & Usage Metering |
-| 30 | `monthlysummary` | `MonthlySummaryDoc` | Analytics & Usage Metering |
-| 31 | `latestlocation` | `LatestLocationDoc` | Tasks, Location & Notifications |
-| 32 | `locationping` | `LocationPingDoc` | Tasks, Location & Notifications |
-| 33 | `notification` | `NotificationDoc` | Tasks, Location & Notifications |
-| 34 | `branch` | `BranchDoc` | Multi-Branch Architecture |
-| 35 | `branchcodelock` | `BranchCodeLockDoc` | Multi-Branch Architecture |
-| 36 | `membershipbranch` | `MembershipBranchDoc` | Multi-Branch Architecture |
-| 37 | `stockbalance` | `StockBalanceDoc` | Catalog & Inventory |
-| 38 | `organizationusagedaily` | `OrganizationUsageDailyDoc` | Analytics & Usage Metering |
-| 39 | `branchusagedaily` | `BranchUsageDailyDoc` | Analytics & Usage Metering |
-| 40 | `platformusagesnapshot` | `PlatformUsageSnapshotDoc` | Analytics & Usage Metering |
-| 41 | `usageratecard` | `UsageRateCardDoc` | Analytics & Usage Metering |
-| 42 | `usageallocationrun` | `UsageAllocationRunDoc` | Analytics & Usage Metering |
+| # | Collection Path | Primary Interface | Storage Type | Domain |
+|---|---|---|---|---|
+| 1 | `users/{uid}` | `UserDoc` | Root Collection | Tenant & RBAC |
+| 2 | `memberships/{membershipId}` | `MembershipDoc` | Root Collection | Tenant & RBAC |
+| 3 | `organizations/{organizationId}` | `OrganizationDoc` | Root Collection | Tenant & RBAC |
+| 4 | `organizations/{organizationId}/branches/{branchId}` | `BranchDoc` | Subcollection | Multi-Branch Architecture |
+| 5 | `users/{uid}/devices/{deviceId}` | `DeviceDoc` | Subcollection | System Infrastructure |
+| 6 | `roles/{roleId}` | `RoleDoc` | Root Collection | Tenant & RBAC |
+| 7 | `departments/{departmentId}` | `DepartmentDoc` | Root Collection | Tenant & RBAC |
+| 8 | `jobRoles/{jobRoleId}` | `JobRoleDoc` | Root Collection | Tenant & RBAC |
+| 9 | `teams/{teamId}` | `TeamDoc` | Root Collection | Tenant & RBAC |
+| 10 | `subscriptionPlans/{planId}` | `SubscriptionPlanDoc` | Root Collection | Tenant & RBAC |
+| 11 | `permissionCatalog/{permissionCode}` | `PermissionCatalogDoc` | Root Collection | Tenant & RBAC |
+| 12 | `modules/{moduleCode}` | `ModuleDoc` | Root Collection | Tenant & RBAC |
+| 13 | `taxRegimes/{taxRegimeCode}` | `TaxRegimeDoc` | Root Collection | Tenant & RBAC |
+| 14 | `idempotencyRecords/{recordId}` | `IdempotencyRecordDoc` | Root Collection | System Infrastructure |
+| 15 | `auditLogs/{logId}` | `AuditLogDoc` | Root Collection | System Infrastructure |
+| 16 | `notificationOutbox/{outboxId}` | `NotificationOutboxDoc` | Root Collection | Tenant & RBAC |
+| 17 | `products/{productId}` | `ProductDoc` | Root Collection | Catalog & Inventory |
+| 18 | `categories/{categoryId}` | `CategoryDoc` | Root Collection | Catalog & Inventory |
+| 19 | `units/{unitId}` | `UnitDoc` | Root Collection | Catalog & Inventory |
+| 20 | `customers/{customerId}` | `CustomerDoc` | Root Collection | Parties & Ledgers |
+| 21 | `vendors/{vendorId}` | `VendorDoc` | Root Collection | Parties & Ledgers |
+| 22 | `outflows/{outflowId}` | `OutflowDoc` | Root Collection | Operations & Transactions |
+| 23 | `bills/{billId}` | `BillDoc` | Root Collection | Operations & Transactions |
+| 24 | `stockMovements/{movementId}` | `StockMovementDoc` | Root Collection | Catalog & Inventory |
+| 25 | `deliveries/{deliveryId}` | `DeliveryDoc` | Root Collection | Operations & Transactions |
+| 26 | `returns/{returnId}` | `ReturnDoc` | Root Collection | Operations & Transactions |
+| 27 | `payments/{paymentId}` | `PaymentDoc` | Root Collection | Operations & Transactions |
+| 28 | `documentCounters/{counterId}` | `DocumentCounterDoc` | Root Collection | System Infrastructure |
+| 29 | `tasks/{taskId}` | `TaskDoc` | Root Collection | Tasks, Location & Notifications |
+| 30 | `dailySummaries/{summaryId}` | `DailySummaryDoc` | Root Collection | Analytics & Usage Metering |
+| 31 | `monthlySummaries/{summaryId}` | `MonthlySummaryDoc` | Root Collection | Analytics & Usage Metering |
+| 32 | `latestLocations/{locationId}` | `LatestLocationDoc` | Root Collection | Tasks, Location & Notifications |
+| 33 | `locationPings/{pingId}` | `LocationPingDoc` | Root Collection | Tasks, Location & Notifications |
+| 34 | `notifications/{notificationId}` | `NotificationDoc` | Root Collection | Tasks, Location & Notifications |
+| 35 | `branchCodeLocks/{lockId}` | `BranchCodeLockDoc` | Root Collection | Multi-Branch Architecture |
+| 36 | `membershipBranches/{membershipBranchId}` | `MembershipBranchDoc` | Root Collection | Multi-Branch Architecture |
+| 37 | `stockBalances/{stockBalanceId}` | `StockBalanceDoc` | Root Collection | Catalog & Inventory |
+| 38 | `organizationUsageDaily/{docId}` | `OrganizationUsageDailyDoc` | Root Collection | Analytics & Usage Metering |
+| 39 | `organizationUsageMonthly/{docId}` | `OrganizationUsageMonthlyDoc` | Root Collection | Analytics & Usage Metering |
+| 40 | `branchUsageDaily/{docId}` | `BranchUsageDailyDoc` | Root Collection | Analytics & Usage Metering |
+| 41 | `branchUsageMonthly/{docId}` | `BranchUsageMonthlyDoc` | Root Collection | Analytics & Usage Metering |
+| 42 | `platformUsageSnapshots/{docId}` | `PlatformUsageSnapshotDoc` | Root Collection | Analytics & Usage Metering |
+| 43 | `usageRateCards/{docId}` | `UsageRateCardDoc` | Root Collection | Analytics & Usage Metering |
+| 44 | `usageAllocationRuns/{docId}` | `UsageAllocationRunDoc` | Root Collection | Analytics & Usage Metering |
+| * | `barcodeLocks/{lockId}` | Concurrency Lock | Root Collection | Catalog & Inventory |
 
 ---
 
@@ -234,7 +237,7 @@ Total Collections & Subcollections: **42**
 | `requestId` | `string` | Yes | **reference-by-ID** | Foreign key reference by bare ID to related entity |
 | `details` | `Record<string, unknown>` | Yes | **owned attribute/state** | Direct entity state attribute |
 
-### 14. `device` (`DeviceDoc`)
+### 14. `device` (`DeviceDoc` — Subcollection at `users/{uid}/devices/{deviceId}`)
 
 | Field Name | Type | Optional | Classification | Description / Justification |
 |---|---|:---:|---|---|
@@ -596,6 +599,7 @@ Total Collections & Subcollections: **42**
 | Field Name | Type | Optional | Classification | Description / Justification |
 |---|---|:---:|---|---|
 | `organizationId` | `string` | No | **identity** | Primary identity / tenant partition key |
+| `branchId` | `string` | Yes | **reference-by-ID** | Foreign key reference to operating branch |
 | `membershipId` | `string` | No | **reference-by-ID** | Foreign key reference by bare ID to related entity |
 | `userId` | `string` | No | **reference-by-ID** | Foreign key reference by bare ID to related entity |
 | `latitude` | `number` | No | **owned attribute/state** | Direct entity state attribute |
@@ -604,8 +608,9 @@ Total Collections & Subcollections: **42**
 | `speed` | `number` | Yes | **owned attribute/state** | Direct entity state attribute |
 | `heading` | `number` | Yes | **owned attribute/state** | Direct entity state attribute |
 | `source` | `"foreground" \| "background"` | No | **owned attribute/state** | Direct entity state attribute |
-| `recordedAt` | `string` | No | **owned attribute/state** | Direct entity state attribute |
-| `createdAt` | `string` | No | **system-audit metadata** | System lifecycle timestamp or actor metadata |
+| `recordedAt` | `string` | No | **owned attribute/state** | Client device recorded timestamp (sanitized to [-7 days, +5 mins] window) |
+| `createdAt` | `string` | No | **system-audit metadata** | Trusted server ingestion timestamp (ISO 8601) |
+| `expiresAt` | `Timestamp` | No | **owned attribute/state** | Native Firestore Timestamp for Cloud Firestore TTL (precomputed `createdAt + 7 days`) |
 
 ### 33. `notification` (`NotificationDoc`)
 
@@ -754,4 +759,100 @@ Total Collections & Subcollections: **42**
 | `status` | `"draft_estimate" \| "audited"` | No | **owned attribute/state** | Direct entity state attribute |
 | `createdAt` | `string` | No | **system-audit metadata** | System lifecycle timestamp or actor metadata |
 | `createdBy` | `string` | No | **system-audit metadata** | System lifecycle timestamp or actor metadata |
+
+### 43. `branchusagemonthly` (`BranchUsageMonthlyDoc`)
+
+| Field Name | Type | Optional | Classification | Description / Justification |
+|---|---|:---:|---|---|
+| `organizationId` | `string` | No | **identity** | Primary identity / tenant partition key |
+| `branchId` | `string` | No | **reference-by-ID** | Foreign key reference to operating branch |
+| `yearMonth` | `string` | No | **owned attribute/state** | Billing/metering period in YYYY-MM format |
+| `counts` | `ServiceUsageCounts` | No | **derived value** | Aggregated atomic usage counts across all platform services |
+| `updatedAt` | `string` | No | **system-audit metadata** | ISO 8601 timestamp of last usage update |
+
+### 44. `barcodeLocks` (`BarcodeLockDoc`)
+
+| Field Name | Type | Optional | Classification | Description / Justification |
+|---|---|:---:|---|---|
+| `organizationId` | `string` | No | **identity** | Organization owning this barcode allocation |
+| `barcode` | `string` | No | **owned attribute/state** | Scanned or assigned physical barcode string |
+| `lockedAt` | `string` | No | **system-audit metadata** | ISO 8601 acquisition timestamp for transaction lock |
+
+---
+
+## Conditional Data Invariants & Cross-Field Rules
+
+To guarantee strict transactional integrity across financial, inventory, and multi-tenant domain boundaries, the backend enforces the following mandatory conditional invariants:
+
+### 1. Quotation & Draft Lifecycle Invariant (`isQuotationOrDraft`)
+- **Condition**: A bill document where `isQuotationOrDraft == true` (e.g. `docType == "quotation"` or draft invoice).
+- **Rule**:
+  - Does **NOT** deduct physical inventory from `products/{productId}` or `stockBalances/{stockBalanceId}`.
+  - Does **NOT** create `stockMovements` ledger entries.
+  - Does **NOT** increment customer outstanding debt or accounts receivable (`currentBalance`).
+  - Does **NOT** consume sequential fiscal document numbers (`documentCounters`).
+  - Does **NOT** lock authoritative COGS snapshots until finalization.
+- **Finalization**: When `billsFinalize` is invoked:
+  - Validates pre-condition: document must still be in draft/quotation state. Sequential duplicate calls are immediately rejected with `FAILED_PRECONDITION`.
+  - Atomically allocates the next sequential invoice number (e.g. `INV-2026-000001`).
+  - Reads active product records inside the transaction and locks immutable `costSnapshot` (`pData.weightedAverageCost ?? pData.costPrice ?? 0`) on each bill line item. Zero cost ($0.00) is strictly treated as valid and preserved.
+  - Decrements physical stock from `products` and `stockBalances` inside the same Firestore transaction.
+  - Creates the audit `stockMovement` record and mutates customer ledger.
+
+### 2. Weighted Average Costing (WAC) Synchronous Atomic Intake Invariant
+- **Condition**: Purchase intake execution via `outflowsCreate`.
+- **Rule**:
+  - In `outflowsCreate`, WAC recalculation is executed **synchronously inside the atomic transaction** (`prepareStockChangesInTxn` / `commitStockChangesInTxn`), rather than relying asynchronously on `onOutflowWritten`.
+  - Base stock prior to intake is captured from the transactional read:
+    $$\text{previousStock} = \text{productRef.currentStock}$$
+  - The new weighted average cost is computed and written atomically with stock update:
+    $$\text{WAC}_{\text{new}} = \frac{(\text{previousStock} \times \text{WAC}_{\text{old}}) + (\text{intakeQuantity} \times \text{costPrice})}{\text{previousStock} + \text{intakeQuantity}}$$
+  - The `onOutflowWritten` background trigger acts solely as an idempotent safety fallback if uninitialized, completely preventing race conditions between subsequent rapid sales and background triggers.
+
+### 3. Sales Mode & Party Compatibility Invariant
+- **Condition**: Bill generation (`billsCreate`).
+- **Rule**:
+  - The organization/branch `salesMode` (`"pos" | "b2b" | "both"`) governs permissible party and payment configurations.
+  - POS retail transactions require immediate cash/card/UPI tender or an authenticated customer profile.
+  - B2B transactions require a valid `customerId` with `businessType == "business"` and credit limit validation before allowing payment terms.
+
+### 4. Customer & Vendor Visibility Scope Invariant
+- **Condition**: Party lookups, customer selection in POS/B2B, and vendor allocation in purchase outflows.
+- **Rule**:
+  - `visibilityScope == "all_branches"`: Party is visible, selectable, and debt-bearing across all operating branches within the organization.
+  - `visibilityScope == "branch_only"`: Party operations are strictly constrained to branches listed in `restrictedToBranchIds`. Attempting to record a bill or purchase at an unlisted branch is rejected with `INVALID_ARGUMENT`.
+
+### 5. Return Ceiling & COGS Restocking Invariant
+- **Condition**: Customer sales return creation (`returnsCreate`).
+- **Rule**:
+  - For each line item being returned, `returnQuantity` must satisfy:
+    $$\text{returnQuantity} \le \text{originalSoldQuantity} - \text{previouslyReturnedQuantity}$$
+  - Any over-return attempt is rejected with `INVALID_ARGUMENT`.
+  - Valid returns preserve the line item's original `costSnapshot` from the source bill.
+  - When line item disposition is `restocked_to_inventory`, physical stock is replenished and COGS is reversed in P&L reporting. If disposition is `waste_damaged` or `returned_to_vendor`, physical inventory is not restocked into saleable inventory and COGS is retained as recognized loss.
+
+### 6. Branch Limit Quota Invariant
+- **Condition**: Branch creation (`branchesCreate`) and reactivation (`branchesUpdate`).
+- **Rule**:
+  - The count of active branches in `organizations/{orgId}/branches` must be strictly less than `subscriptionPlans/{planId}.branchLimit`.
+  - If $\text{activeBranchCount} \ge \text{branchLimit}$, the operation is rejected with `FAILED_PRECONDITION: Branch limit reached`.
+  - Deactivating a branch decrements the active count, allowing capacity reuse.
+
+### 7. Ephemeral Location Retention & Cloud Firestore TTL Invariant
+- **Condition**: Staff live GPS coordinate logging (`locationsRecordPing`).
+- **Rule**:
+  - Cloud Firestore TTL enforces document deletion based on a native Firestore `Timestamp` pointing to a timestamp in the past.
+  - `LocationPingDoc.expiresAt` is stored as a **native Firestore `Timestamp`** precomputed at trusted server ingestion time:
+    $$\text{expiresAt} = \text{Timestamp.fromDate}(\text{serverCreatedAt} + 7\text{ days})$$
+  - Client device timestamps (`recordedAt`) are strictly validated against a permitted $[-7\text{ days}, +5\text{ mins}]$ clock skew window, falling back to server time if outside boundaries.
+  - Deactivated or inactive employees are strictly rejected (`failed-precondition` / `permission-denied`), ensuring GDPR/privacy compliance.
+
+### 8. Usage Metering, Quota Threshold Warnings & Non-Blocking Resilience
+- **Condition**: Metered operations across Firestore reads/writes, Functions invocations, and telemetry.
+- **Rule**:
+  - Multi-tenant usage aggregates into `organizationUsageDaily`, `organizationUsageMonthly`, `branchUsageDaily`, and `branchUsageMonthly` via `FieldValue.increment`.
+  - Effective limits are evaluated by layering plan defaults (`subscriptionPlans/{planId}.usageLimits`) with Super-Admin organization overrides (`organizations/{orgId}.usageLimitOverrides`).
+  - When usage crosses warning (80%) or hard (100%) thresholds in `warn_only` mode, warnings are dispatched to tenant owners and recorded in `notificationOutbox` with deterministic deduplication keys (`outbox_usage_${organizationId}_${metric}_${period}_${severity}`).
+  - Core business transactions (`billsCreate`, `outflowsCreate`, `paymentsCreate`) remain strictly non-blocking even when warnings trigger.
+
 

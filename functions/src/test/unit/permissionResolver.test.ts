@@ -197,7 +197,7 @@ describe("Four-Layer Permission Resolver", () => {
     assert.equal(granted, false, "Org Owner must NOT have platform admin access.");
   });
 
-  it("Super Admin bypasses all checks with unrestricted platform and tenant access", () => {
+  it("Super Admin bypasses platform checks but is isolated from tenant operations", () => {
     const grantedPlatform = resolvePermission("platform:tenants:manage", {
       isSuperAdmin: true,
       roleCode: "super_admin",
@@ -217,7 +217,7 @@ describe("Four-Layer Permission Resolver", () => {
     });
 
     assert.equal(grantedPlatform, true, "Super Admin should have platform access.");
-    assert.equal(grantedTenant, true, "Super Admin should have tenant access.");
+    assert.equal(grantedTenant, false, "Super Admin must NOT bypass tenant permissions without membership.");
   });
 
   it("Branch module overrides can restrict capabilities enabled by Plan and Org", () => {

@@ -15,6 +15,7 @@ setGlobalOptions({
 
 // Diagnostic & Session
 export { healthCheck } from "./callables/healthCheck.js";
+export { authLogin } from "./callables/authLogin.js";
 export { authMe } from "./callables/authMe.js";
 
 // Organizations
@@ -227,6 +228,8 @@ export {
   usageGetDetail,
   usageCalculateDryRunStatement,
   usageRecordClientMetric,
+  usageGetLimits,
+  usageUpdateLimits,
 } from "./callables/usage.js";
 
 // Event-Driven Firestore Triggers

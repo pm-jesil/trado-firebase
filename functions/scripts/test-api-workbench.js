@@ -1,7 +1,16 @@
 /**
  * Trado Firebase Backend — Local API Test Workbench Runner
  * 
- * Target: Firebase Emulator Suite (Auth 9099, Functions 5001, Firestore 8080)
+ * Tool Role:
+ * - Scriptable CLI runner for automated, headless execution of API callable workflows across domains.
+ * - Complements the Visual Swagger API Explorer (http://127.0.0.1:3939):
+ *   * Explorer is ideal for interactive human discovery, schema inspection, and manual testing.
+ *   * Workbench is ideal for terminal regression testing, single-callable debugging, and batch verification.
+ *   * scripts/manual-tests/trado-api.http is ideal for VS Code REST Client in-editor execution.
+ * 
+ * Target Environment:
+ *   - Local Firebase Emulator Suite (Auth 9099, Functions 5001, Firestore 8080)
+ *   - Project ID: trado-x | Region: asia-south1
  * 
  * Usage:
  *   node functions/scripts/test-api-workbench.js                       # Run all tests

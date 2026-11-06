@@ -13,19 +13,10 @@ import {
   UpdateCustomerSchema,
   ListCustomersSchema,
 } from "../validation/schemas.js";
-import { CustomerDoc, MembershipDoc } from "../types/models.js";
+import { CustomerDoc } from "../types/models.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { createAuditLog } from "../services/audit.js";
-
-async function verifyTenantAccess(auth: any, organizationId: string): Promise<void> {
-  if (auth.token.isSuperAdmin === true) return;
-
-  const memRef = db.collection("memberships").doc(`${auth.uid}_${organizationId}`);
-  const memDoc = await memRef.get();
-  if (!memDoc.exists || (memDoc.data() as MembershipDoc).status !== "active") {
-    throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-  }
-}
+import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
 
 async function validateBranchIds(organizationId: string, branchIds: string[]): Promise<void> {
   for (const bId of branchIds) {
@@ -47,10 +38,11 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const callerBranchId = await resolveBranchContext(request.auth, orgId, input.branchId);
 
   const idempotency = await reserveIdempotency({
-    scope: input.organizationId,
+    scope: orgId,
     actorUid: request.auth.uid,
     operation: "customers.create",
     clientKey: input.idempotencyKey,
@@ -71,13 +63,12 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
 
     // Auto-generate customerCode
     const existingCount = await db.collection("customers")
-      .where("organizationId", "==", input.organizationId)
+      .where("organizationId", "==", orgId)
       .count()
       .get();
     const customerCode = `CUST-${String(existingCount.data().count + 1).padStart(6, "0")}`;
 
-    // Resolve branch and visibility scope
-    const callerBranchId = input.branchId || (request.auth.token?.primaryBranchId as string | undefined) || "main-branch";
+    // Resolve visibility scope
     const visibilityScope = input.visibilityScope || "all_branches";
     let sharedForBranchIds: string[] = [];
 
@@ -87,12 +78,12 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
       if (!input.sharedForBranchIds || input.sharedForBranchIds.length === 0) {
         throw new HttpsError("invalid-argument", "sharedForBranchIds must be non-empty when visibilityScope is selected_branches.");
       }
-      await validateBranchIds(input.organizationId, input.sharedForBranchIds);
+      await validateBranchIds(orgId, input.sharedForBranchIds);
       sharedForBranchIds = Array.from(new Set(input.sharedForBranchIds));
     } else {
       // all_branches
       if (input.sharedForBranchIds && input.sharedForBranchIds.length > 0) {
-        await validateBranchIds(input.organizationId, input.sharedForBranchIds);
+        await validateBranchIds(orgId, input.sharedForBranchIds);
         sharedForBranchIds = Array.from(new Set(input.sharedForBranchIds));
       } else {
         sharedForBranchIds = [callerBranchId];
@@ -100,7 +91,7 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
     }
 
     const customerDoc: CustomerDoc = {
-      organizationId: input.organizationId,
+      organizationId: orgId,
       customerCode,
       name: input.name.trim(),
       mobile: input.mobile?.trim() || null,
@@ -142,7 +133,7 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
     }
 
     await createAuditLog({
-      organizationId: input.organizationId,
+      organizationId: orgId,
       actorUid: request.auth.uid,
       action: "CUSTOMER_CREATED",
       entityType: "customer",
@@ -171,7 +162,7 @@ export const customersUpdate = onCall({ region: "asia-south1" }, async (request)
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   const customerRef = db.collection("customers").doc(input.customerId);
   const docSnap = await customerRef.get();
@@ -180,7 +171,7 @@ export const customersUpdate = onCall({ region: "asia-south1" }, async (request)
   }
 
   const existing = docSnap.data() as CustomerDoc;
-  if (existing.organizationId !== input.organizationId) {
+  if (existing.organizationId !== orgId) {
     throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
   }
 
@@ -201,7 +192,7 @@ export const customersUpdate = onCall({ region: "asia-south1" }, async (request)
   if (input.visibilityScope !== undefined) updates.visibilityScope = input.visibilityScope;
   if (input.sharedForBranchIds !== undefined) {
     if (input.sharedForBranchIds.length > 0) {
-      await validateBranchIds(input.organizationId, input.sharedForBranchIds);
+      await validateBranchIds(orgId, input.sharedForBranchIds);
       updates.sharedForBranchIds = Array.from(new Set(input.sharedForBranchIds));
     } else {
       updates.sharedForBranchIds = [];
@@ -211,7 +202,7 @@ export const customersUpdate = onCall({ region: "asia-south1" }, async (request)
   await customerRef.update(updates);
 
   await createAuditLog({
-    organizationId: input.organizationId,
+    organizationId: orgId,
     actorUid: request.auth.uid,
     action: "CUSTOMER_UPDATED",
     entityType: "customer",
@@ -233,10 +224,10 @@ export const customersList = onCall({ region: "asia-south1" }, async (request) =
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   const query = db.collection("customers")
-    .where("organizationId", "==", input.organizationId)
+    .where("organizationId", "==", orgId)
     .limit(input.limit || 50);
 
   const snapshot = await query.get();
@@ -266,12 +257,11 @@ export const customersGet = onCall({ region: "asia-south1" }, async (request) =>
   }
 
   const customerId = request.data?.customerId;
-  const organizationId = request.data?.organizationId;
-  if (!customerId || !organizationId) {
-    throw new HttpsError("invalid-argument", "customerId and organizationId required.");
+  if (!customerId) {
+    throw new HttpsError("invalid-argument", "customerId is required.");
   }
 
-  await verifyTenantAccess(request.auth, organizationId);
+  const orgId = await verifyTenantAccess(request.auth, request.data?.organizationId);
 
   const docSnap = await db.collection("customers").doc(customerId).get();
   if (!docSnap.exists) {
@@ -279,7 +269,7 @@ export const customersGet = onCall({ region: "asia-south1" }, async (request) =>
   }
 
   const data = docSnap.data() as CustomerDoc;
-  if (data.organizationId !== organizationId) {
+  if (data.organizationId !== orgId) {
     throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
   }
 

@@ -1,8 +1,11 @@
 /**
- * Unit Tests for Business Core Services
+ * Unit Tests for Financial & Business Core Services
+ * 
+ * Verifies:
  * - Tax Calculation Service (IN_GST, AE_VAT, US_SALES_TAX, NONE)
  * - Sequential Document Counter formatting
- * - Stock Engine calculations & negative stock guards
+ * - Stock Balance Arithmetic & negative stock guards
+ * - Decimal-Safe Money & Precision Utility
  */
 
 import { describe, it } from "node:test";
@@ -211,4 +214,3 @@ describe("Business Core Services - Decimal-Safe Money & Precision Utility", () =
     assert.equal(added.gross, 100.01);
   });
 });
-

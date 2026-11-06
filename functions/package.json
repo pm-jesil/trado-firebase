@@ -12,7 +12,20 @@
     "test": "npm run build && node --test lib/test/unit/**/*.test.js",
     "test:unit": "npm run build && node --test lib/test/unit/**/*.test.js",
     "test:rules": "npm run build && node --test lib/test/rules/**/*.test.js",
+    "test:callables": "node scripts/test-tenancy-auth-callables.cjs && node scripts/test-branch-lifecycle-callables.cjs && node scripts/test-catalog-inventory-callables.cjs && node scripts/test-parties-ledgers-callables.cjs && node scripts/test-billing-procurement-callables.cjs && node scripts/test-operations-tasks-callables.cjs && node scripts/test-analytics-platform-callables.cjs",
+    "test:triggers": "node scripts/test-event-triggers.cjs",
+    "test:e2e": "node scripts/test-retail-lifecycle.e2e.js && node scripts/test-multibranch-isolation.e2e.js",
+    "test:completeness": "node ../scripts/check-test-completeness.js",
+    "test:static": "node ../scripts/check-duplicate-embedding.js && node ../scripts/check-schema-duplicates.js && node ../scripts/generate-source-inventory.js && node ../scripts/check-api-drift.js && node ../scripts/check-test-completeness.js && node ../scripts/check-markdown-links.js && node ../scripts/check-openapi-drift.js",
+    "test:simulation": "node scripts/run-two-business-simulation.cjs",
+    "test:all": "npm run test:unit && npm run test:rules && npm run test:callables && npm run test:triggers && npm run test:e2e && npm run test:simulation && npm run test:static",
+    "test:full": "npm run test:all",
     "test:api": "node scripts/test-api-workbench.js",
+    "test:api-explorer": "node ../tools/api-explorer/test-api-explorer.js",
+    "test:api-explorer:acceptance": "firebase emulators:exec --project trado-x --only auth,firestore,functions \"node ../tools/api-explorer/test-runtime-acceptance.js\"",
+    "api:openapi:generate": "node ../scripts/generate-openapi.js",
+    "api:openapi:check": "node ../scripts/check-openapi-drift.js",
+    "api:explorer": "node ../tools/api-explorer/server.js",
     "check:embedding": "node ../scripts/check-duplicate-embedding.js"
   },
   "engines": {
@@ -33,6 +46,7 @@
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.25.4",
     "firebase-functions-test": "^3.4.1",
+    "swagger-ui-dist": "^5.34.1",
     "typescript": "^6.0.0"
   },
   "private": true

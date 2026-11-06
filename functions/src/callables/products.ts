@@ -13,20 +13,11 @@ import {
   UpdateProductSchema,
   ListProductsSchema,
 } from "../validation/schemas.js";
-import { ProductDoc, MembershipDoc, StockMovementDoc } from "../types/models.js";
+import { ProductDoc, StockMovementDoc } from "../types/models.js";
 import { StockMovementType } from "../constants/enums.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { createAuditLog } from "../services/audit.js";
-
-async function verifyTenantAccess(auth: any, organizationId: string): Promise<void> {
-  if (auth.token.isSuperAdmin === true) return;
-
-  const memRef = db.collection("memberships").doc(`${auth.uid}_${organizationId}`);
-  const memDoc = await memRef.get();
-  if (!memDoc.exists || (memDoc.data() as MembershipDoc).status !== "active") {
-    throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-  }
-}
+import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
 
 export const productsCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
@@ -39,19 +30,20 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const branchId = await resolveBranchContext(request.auth, orgId, input.branchId);
 
   const callerUid = request.auth.uid;
 
   const idempotency = await reserveIdempotency({
-    scope: input.organizationId,
+    scope: orgId,
     actorUid: callerUid,
     operation: "products.create",
     clientKey: input.idempotencyKey,
     payload: input as unknown as Record<string, unknown>,
     recoveryChecker: async () => {
       const existing = await db.collection("products")
-        .where("organizationId", "==", input.organizationId)
+        .where("organizationId", "==", orgId)
         .where("nameKey", "==", input.name.trim().toLowerCase())
         .limit(1)
         .get();
@@ -77,11 +69,11 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
     const initialStock = input.initialStock || 0;
     const cleanBarcode = input.barcode?.trim() || null;
     const barcodeLockRef = cleanBarcode
-      ? db.collection("barcodeLocks").doc(`${input.organizationId}_${cleanBarcode.toLowerCase()}`)
+      ? db.collection("barcodeLocks").doc(`${orgId}_${cleanBarcode.toLowerCase()}`)
       : null;
 
     const productDoc: ProductDoc = {
-      organizationId: input.organizationId,
+      organizationId: orgId,
       name: input.name.trim(),
       nameKey: input.name.trim().toLowerCase(),
       description: input.description?.trim() || "",
@@ -113,7 +105,7 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
 
     const response = {
       productId,
-      organizationId: input.organizationId,
+      organizationId: orgId,
       name: productDoc.name,
       currentStock: productDoc.currentStock,
       status: "created",
@@ -137,7 +129,7 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
 
       if (barcodeLockRef) {
         txn.set(barcodeLockRef, {
-          organizationId: input.organizationId,
+          organizationId: orgId,
           productId,
           barcode: cleanBarcode,
           createdAt: now,
@@ -145,11 +137,10 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
       }
 
       if (input.trackStock && initialStock > 0) {
-        const targetBranchId = input.branchId || (request.auth?.token?.primaryBranchId as string | undefined) || "main-branch";
         const movementRef = db.collection("stockMovements").doc();
         const movementDoc: StockMovementDoc = {
-          organizationId: input.organizationId,
-          branchId: targetBranchId,
+          organizationId: orgId,
+          branchId,
           productId,
           type: StockMovementType.ADJUSTMENT_IN,
           quantity: initialStock,
@@ -163,10 +154,10 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
         };
         txn.set(movementRef, movementDoc);
 
-        const stockBalanceRef = db.collection("stockBalances").doc(`${input.organizationId}_${targetBranchId}_${productId}`);
+        const stockBalanceRef = db.collection("stockBalances").doc(`${orgId}_${branchId}_${productId}`);
         txn.set(stockBalanceRef, {
-          organizationId: input.organizationId,
-          branchId: targetBranchId,
+          organizationId: orgId,
+          branchId,
           productId,
           currentStock: initialStock,
           lowStockThreshold: input.lowStockThreshold || 5,
@@ -186,7 +177,7 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
     });
 
     await createAuditLog({
-      organizationId: input.organizationId,
+      organizationId: orgId,
       actorUid: callerUid,
       action: "PRODUCT_CREATED",
       entityType: "product",
@@ -215,7 +206,7 @@ export const productsUpdate = onCall({ region: "asia-south1" }, async (request) 
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   const productRef = db.collection("products").doc(input.productId);
   const docSnap = await productRef.get();
@@ -224,7 +215,7 @@ export const productsUpdate = onCall({ region: "asia-south1" }, async (request) 
   }
 
   const existing = docSnap.data() as ProductDoc;
-  if (existing.organizationId !== input.organizationId) {
+  if (existing.organizationId !== orgId) {
     throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
   }
 
@@ -286,7 +277,7 @@ export const productsUpdate = onCall({ region: "asia-south1" }, async (request) 
       }
       if (newLockRef) {
         txn.set(newLockRef, {
-          organizationId: input.organizationId,
+          organizationId: orgId,
           productId: input.productId,
           barcode: newBarcode,
           createdAt: now,
@@ -298,7 +289,7 @@ export const productsUpdate = onCall({ region: "asia-south1" }, async (request) 
   }
 
   await createAuditLog({
-    organizationId: input.organizationId,
+    organizationId: orgId,
     actorUid: request.auth.uid,
     action: "PRODUCT_UPDATED",
     entityType: "product",
@@ -320,10 +311,10 @@ export const productsList = onCall({ region: "asia-south1" }, async (request) =>
   }
   const input = parsed.data;
 
-  await verifyTenantAccess(request.auth, input.organizationId);
+  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
 
   let query = db.collection("products")
-    .where("organizationId", "==", input.organizationId)
+    .where("organizationId", "==", orgId)
     .limit(input.limit || 50);
 
   if (input.categoryId) {
@@ -348,12 +339,11 @@ export const productsGet = onCall({ region: "asia-south1" }, async (request) => 
   }
 
   const productId = request.data?.productId;
-  const organizationId = request.data?.organizationId;
-  if (!productId || !organizationId) {
-    throw new HttpsError("invalid-argument", "productId and organizationId required.");
+  if (!productId) {
+    throw new HttpsError("invalid-argument", "productId required.");
   }
 
-  await verifyTenantAccess(request.auth, organizationId);
+  const orgId = await verifyTenantAccess(request.auth, request.data?.organizationId);
 
   const docSnap = await db.collection("products").doc(productId).get();
   if (!docSnap.exists) {
@@ -361,7 +351,7 @@ export const productsGet = onCall({ region: "asia-south1" }, async (request) => 
   }
 
   const data = docSnap.data() as ProductDoc;
-  if (data.organizationId !== organizationId) {
+  if (data.organizationId !== orgId) {
     throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
   }
 
