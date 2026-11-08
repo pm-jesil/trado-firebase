@@ -318,7 +318,6 @@ async function runSimulation() {
     lines: [
       {
         productId: prod1Id,
-        itemName: 'Organic Farm Milk 1L',
         quantity: 100,
         unit: 'liter',
         unitPrice: 48,
@@ -383,7 +382,6 @@ async function runSimulation() {
     lines: [
       {
         productId: prod1Id,
-        itemName: 'Organic Farm Milk 1L',
         quantity: 50,
         unit: 'liter',
         unitPrice: 60,
@@ -478,7 +476,6 @@ async function runSimulation() {
     direction: 'in',
     partyType: 'customer',
     partyId: cust1Id,
-    partyName: 'Mrs. Shanti Sharma',
     amount: 400,
     method: 'cash',
     referenceModel: 'bill',
@@ -525,7 +522,6 @@ async function runSimulation() {
     branchId: 'main-branch',
     returnType: 'sales_return',
     referenceId: quoteId,
-    partyId: cust1Id,
     refundMethod: 'credit_note',
     items: [
       {
@@ -548,7 +544,6 @@ async function runSimulation() {
     branchId: 'main-branch',
     returnType: 'sales_return',
     referenceId: quoteId,
-    partyId: cust1Id,
     refundMethod: 'credit_note',
     items: [
       {
@@ -584,7 +579,6 @@ async function runSimulation() {
     direction: 'out',
     partyType: 'vendor',
     partyId: vend1Id,
-    partyName: 'Nandini Dairy Producers Ltd',
     amount: 1000,
     method: 'bank_transfer',
     referenceModel: 'outflow',
@@ -616,7 +610,11 @@ async function runSimulation() {
   console.log(`  COGS:           Actual = Rs ${actualPnl.cogs}, Oracle = Rs ${expectedPnl.cogs}`);
   console.log(`  Gross Profit:   Actual = Rs ${actualPnl.grossProfit}, Oracle = Rs ${expectedPnl.grossProfit}`);
   console.log(`  Expenses:       Actual = Rs ${actualPnl.totalExpenses}, Oracle = Rs ${expectedPnl.totalExpenses}`);
+  console.log(`  Write-offs:     Actual = Rs ${actualPnl.inventoryWriteOff}, Oracle = Rs ${expectedPnl.inventoryWriteOff}`);
   console.log(`  Net Profit:     Actual = Rs ${actualPnl.netProfit}, Oracle = Rs ${expectedPnl.netProfit}`);
+  if (actualPnl.inventoryWriteOff !== expectedPnl.inventoryWriteOff) {
+    throw new Error(`Inventory write-off discrepancy: actual ${actualPnl.inventoryWriteOff} vs expected ${expectedPnl.inventoryWriteOff}`);
+  }
 
   if (actualPnl.totalRevenue !== expectedPnl.totalRevenue) {
     throw new Error(`Revenue discrepancy: actual ${actualPnl.totalRevenue} vs expected ${expectedPnl.totalRevenue}`);
@@ -792,7 +790,6 @@ async function runSimulation() {
     lines: [
       {
         productId: prod2Id,
-        itemName: 'Royal Basmati Rice 25kg',
         quantity: 100,
         unit: 'bag',
         unitPrice: 1500,
@@ -820,7 +817,6 @@ async function runSimulation() {
     lines: [
       {
         productId: prod2Id,
-        itemName: 'Royal Basmati Rice 25kg',
         quantity: 200,
         unit: 'bag',
         unitPrice: 1400,

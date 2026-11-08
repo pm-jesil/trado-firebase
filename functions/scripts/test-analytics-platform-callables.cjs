@@ -121,13 +121,13 @@ async function run() {
 
   const customerRes = await callFunction("customersCreate", buildCustomerPayload(orgId, {
     name: "Analytics Premium Customer",
-    phone: "+919876543299",
+    mobile: "+919876543299",
   }), ownerToken);
   const custId = customerRes.customerId;
 
   const vendorRes = await callFunction("vendorsCreate", buildVendorPayload(orgId, {
     name: "Analytics Prime Supplier",
-    phone: "+919876543288",
+    mobile: "+919876543288",
   }), ownerToken);
   const vendId = vendorRes.vendorId;
 
@@ -233,7 +233,10 @@ async function run() {
   assert.ok(platformOverviewRes.totalOrganizations >= 1);
   assert.ok(platformOverviewRes.activeOrganizations >= 1);
   assert.ok(platformOverviewRes.availablePlansCount >= 1);
-  console.log(`✓ reportsGetPlatformOverview verified: ${platformOverviewRes.totalOrganizations} total orgs, ${platformOverviewRes.activeOrganizations} active`);
+  assert.ok(typeof platformOverviewRes.totalPlatformRevenue === "number", "totalPlatformRevenue must be number");
+  assert.ok(typeof platformOverviewRes.totalPlatformOutflows === "number", "totalPlatformOutflows must be number");
+  assert.ok(platformOverviewRes.platformFinancials !== undefined, "platformFinancials must be present");
+  console.log(`✓ reportsGetPlatformOverview verified: ${platformOverviewRes.totalOrganizations} total orgs, ${platformOverviewRes.activeOrganizations} active, platform revenue ₹${platformOverviewRes.totalPlatformRevenue}`);
 
   // 7. CSV Export
   const csvRes = await callFunction("reportsExportCsv", {

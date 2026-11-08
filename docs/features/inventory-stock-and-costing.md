@@ -2,101 +2,158 @@
 
 ---
 
-## 1. Purpose & Scope
-This module provides real-time physical stock tracking, multi-branch inventory balances, double-entry stock movement ledgers, and inventory costing for Trado:
-- **Authoritative Balance**: Maintained in `stockBalances/{orgId}_{branchId}_{productId}`. Physical inventory is strictly branch-scoped.
-- **Immutable Movement Ledger**: Every addition, deduction, transfer, damage, or adjustment is permanently recorded in `stockMovements/{movementId}`.
-- **Costing Engine**: Weighted Average Cost (WAC) tracking and Cost of Goods Sold (COGS) computation with 4-decimal precision.
-- **Stock Reconciliation**: `reconcileStockBalances` detects and reports discrepancies between the movement ledger, branch balances, and product aggregate mirrors.
+## 1. Module Overview & Stock Architecture
+
+The Inventory Engine provides multi-branch physical stock tracking, serialized inventory lifecycle, double-entry audit ledgers, and real-time inventory valuation for Trado:
+- **Authoritative Physical Balance (`stockBalances/{orgId}_{branchId}_{productId}`)**: The single source of truth for physical inventory at a specific branch location. Stock is never shared across branches without an explicit transfer.
+- **Aggregate Mirror (`products/{productId}.currentStock`)**: Read-optimized cached total representing organization-wide stock across all branches for quick catalog display.
+- **Immutable Stock Movement Ledger (`stockMovements/{movementId}`)**: Every addition, deduction, sale, return, damage, or adjustment creates a permanent, append-only movement entry.
+- **Serialized Asset Tracking (`serialNumbers/{serialId}`)**: Tracks individual items (e.g. bicycle frames, mobile phones, equipment) by serial number/IMEI through their lifecycle (`in_stock`, `sold`, `returned`, `damaged`).
+- **Valuation & Reconciliation Engine**: Weighted Average Cost (WAC) tracking and mathematical balance auditing (`reconcileStockBalances`).
+
+```mermaid
+flowchart TD
+    subgraph Transactions["Operational Inward / Outward Events"]
+        Purchase["Purchase Outflow (purchase_in)"]
+        Sale["Finalized Bill / POS (sale_out)"]
+        Return["Customer Return (sale_return_in)"]
+        VendorReturn["Vendor Return (purchase_return_out)"]
+        Adjust["Manual Stock Adjustment (stockAdjust)"]
+    end
+
+    subgraph InventoryCore["Authoritative Inventory Core"]
+        MovementLedger["stockMovements/{movementId}\n(Append-Only Movement Ledger)"]
+        BranchBalance["stockBalances/{orgId}_{branchId}_{prodId}\n(Authoritative Shelf Stock)"]
+        CatalogMirror["products/{prodId}.currentStock\n(Org-Wide Aggregated Mirror)"]
+        SerialRegistry["serialNumbers/{serialId}\n(Serial / IMEI Life Cycle)"]
+    end
+
+    Transactions --> MovementLedger
+    MovementLedger --> BranchBalance
+    BranchBalance --> CatalogMirror
+    Transactions -.->|If Serial Tracked| SerialRegistry
+```
 
 ---
 
-## 2. Actors & Permissions
-- **Warehouse / Inventory Manager**: Requires `inventory:write` or `stock:adjust`. Can record manual stock adjustments, count verifications, and waste/damage deductions.
-- **Cashier / Sales Staff**: Requires `bill:create`. Finalizing bills triggers automatic stock deductions via the internal stock engine.
-- **Purchasing Staff**: Requires `purchase:create`. Outflows with `kind: "purchase"` trigger inward stock increments.
+## 2. Stock Movement Types & Accounting Directions
+
+| Movement Type | Direction | Sign | Triggering API / Source | P&L / Costing Effect |
+| :--- | :--- | :--- | :--- | :--- |
+| **`purchase_in`** | Inward | `+` | Inward purchase confirmed (`outflowsCreate`) | Capitalized into inventory, updates WAC |
+| **`sale_out`** | Outward | `-` | Bill finalized or POS checkout (`billsCreate`) | Realized as Cost of Goods Sold (COGS) |
+| **`sale_return_in`** | Inward | `+` | Sales return restocked (`returnsCreate`) | Restored at historical cost or current WAC |
+| **`purchase_return_out`** | Outward | `-` | Goods returned to vendor (`returnsCreate`) | Decrements vendor payable balance |
+| **`adjustment_in`** | Inward | `+` | Count verification surplus (`stockAdjust`) | Inventory gain adjustment |
+| **`adjustment_out`**| Outward | `-` | Count verification deficit (`stockAdjust`) | Inventory shrinkage expense |
+| **`damage_out`** | Outward | `-` | Broken / spoiled items written off (`stockAdjust`) | Written off to Loss on Damaged Goods |
+| **`waste_out`** | Outward | `-` | Perishable goods expired (`stockAdjust`) | Written off to Loss on Expired Inventory |
 
 ---
 
-## 3. Stock Architecture & Movement Types
+## 3. End-to-End Sequence Diagrams
 
-### Movement Types & Mathematical Direction
-| Movement Type | Direction | Sign | Triggering API / Source |
-|---|---|---|---|
-| `purchase_in` | Inward | `+` | Purchase Outflow confirmed |
-| `adjustment_in` | Inward | `+` | Initial product stock or manual stock count increase (`stockAdjust`) |
-| `sale_return_in` | Inward | `+` | Sales return restocked to inventory (`returnsCreate`) |
-| `sale_out` | Outward | `-` | Bill finalized (`billsFinalize` or POS `billsCreate`) |
-| `adjustment_out` | Outward | `-` | Manual inventory count reduction (`stockAdjust`) |
-| `damage_out` | Outward | `-` | Damaged stock write-off (`stockAdjust`) |
-| `waste_out` | Outward | `-` | Expired / spoiled perishable inventory write-off (`stockAdjust`) |
-| `purchase_return_out`| Outward | `-` | Stock returned to vendor (`returnsCreate`) |
+### 3.1 Manual Stock Adjustment Workflow (`stockAdjust`)
 
----
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Manager as Store / Inventory Manager
+    participant GW as Cloud Functions (stockAdjust)
+    participant Stock as Stock Engine (stock.ts)
+    participant DB as Cloud Firestore
 
-## 4. Multi-Branch Stock Isolation Invariants
-
-1. **Strict Branch Scoping**: An organization with two branches (`main-branch` and `branch-south`) maintains independent balances:
-   - `stockBalances/{orgId}_main-branch_{productId}`
-   - `stockBalances/{orgId}_branch-south_{productId}`
-2. **Initial Balance Zeroing**: If a product has never been stocked at `branch-south`, querying its balance returns `0` available stock. It never falls back to the organization-wide total.
-3. **No Cross-Branch Depletion**: Selling 10 units at `main-branch` decrements only `main-branch` stock. `branch-south` stock remains completely untouched.
-4. **Aggregate Mirror**: `products/{productId}.currentStock` stores the organization-wide sum across all branches for quick catalog display.
-
----
-
-## 5. Costing Engine & COGS Arithmetic
-
-### Weighted Average Cost (WAC) Formula
-When incoming stock is received at unit rate $P_{\text{in}}$ and quantity $Q_{\text{in}}$:
-$$\text{WAC}_{\text{new}} = \frac{(Q_{\text{current}} \times \text{WAC}_{\text{current}}) + (Q_{\text{in}} \times P_{\text{in}})}{Q_{\text{current}} + Q_{\text{in}}}$$
-
-### Decimal Precision Safeguard
-- Monetary amounts and quantities use `roundMoney` and `round2` from `money.ts`.
-- WAC values are stored with 4 decimal places (e.g. `₹85.4250`) to eliminate rounding drift across fractional quantities (e.g. `0.250 kg`).
-
-### COGS Calculation
-When a bill is finalized, COGS is computed as:
-$$\text{COGS} = \sum_{\text{items}} (\text{item.quantity} \times \text{product.weightedAvgCost})$$
-This value is recorded on the bill and aggregated in `reportsGetProfitLoss`.
+    Manager->>GW: Call stockAdjust(productId, quantity: -5, reasonCode: "damaged", reason: "Water leak in rack")
+    GW->>GW: Verify caller has stock:adjust or inventory:write permission
+    GW->>GW: Validate StockAdjustSchema & check idempotency lease
+    
+    Note over GW,DB: Atomic Multi-Document Firestore Transaction
+    GW->>DB: Read stockBalances/{orgId}_{branchId}_{productId}
+    GW->>GW: If quantity < 0 and allowNegativeStock === false, verify currentStock >= |quantity|
+    
+    GW->>Stock: Compute new balance (currentStock + quantity)
+    GW->>DB: Update stockBalances (currentStock = newBalance)
+    GW->>DB: Update products/{productId}.currentStock aggregate mirror
+    
+    GW->>DB: Append stockMovements (movementType: "damage_out", quantity: -5)
+    
+    alt Product Tracks Serials
+        GW->>DB: Update serialNumbers/{serialId} (status: "damaged")
+    end
+    
+    GW->>DB: Append auditLogs/{auditId}
+    
+    GW-->>Manager: Return StockAdjustResponse (productId, newQuantity, movementId)
+```
 
 ---
 
-## 6. Stock Adjustments & Waste Operations
+## 4. API Reference & Parameter Specifications
 
-### Recording Manual Adjustments or Damage
-1. **User calls `stockAdjust`**:
-   - Payload:
-     ```json
-     {
-       "organizationId": "org_demo",
-       "branchId": "main-branch",
-       "productId": "prod_rice",
-       "quantity": 5,
-       "movementType": "damage_out",
-       "reason": "Water damage in storage rack B"
-     }
-     ```
-2. **Backend Processing**:
-   - Atomically updates `stockBalances/org_demo_main-branch_prod_rice`.
-   - Decrements `products/prod_rice.currentStock` by 5.
-   - Appends audit entry in `stockMovements`.
+### 4.1 `stockAdjust`
+Manually adjusts stock for inventory cycle counts, damaged stock write-offs, or sample allocations.
+
+#### Who Can Call
+- Users with `stock:adjust` or `inventory:write` (e.g. `role_store_manager`, `role_admin`, `role_org_owner`).
+
+#### Request Parameters
+```typescript
+interface StockAdjustRequest {
+  idempotencyKey?: string;           // 8-128 char unique lease key
+  organizationId?: string;           // Optional (derived from token context)
+  branchId?: string;                 // Optional (derived from token context)
+  productId: string;                 // Target product ID
+  quantity: number;                  // Positive to add stock, negative to deduct stock
+  reason: string;                    // 2-500 characters, descriptive reason
+  reasonCode?: StockAdjustmentReason;// "opening_stock" | "count_verification" | "damaged" | "expired" | "lost_theft" | "sample" | "internal_use"
+  serialNumbers?: string[];          // Required if product has trackSerial: true
+}
+```
+
+#### Success Response (200 OK)
+```json
+{
+  "productId": "prod_hero_sprint_26",
+  "branchId": "main-branch",
+  "adjustedQuantity": -2,
+  "newBranchStock": 8,
+  "movementId": "sm_99a8b7c6",
+  "reasonCode": "damaged",
+  "message": "Stock adjusted successfully."
+}
+```
+
+#### Common Error Codes
+- `failed-precondition`: Stock deduction would cause negative inventory when `allowNegativeStock === false`.
+- `invalid-argument`: Product is serial-tracked, but serial numbers are missing or do not match quantity.
+- `not-found`: Product does not exist in caller's organization.
 
 ---
 
-## 7. Stock Reconciliation Engine (`reconcileStockBalances`)
-- Scans `stockMovements` for each product across all branches.
-- Computes mathematical ledger sum: $\sum \text{inward} - \sum \text{outward}$.
-- Compares computed sum against `stockBalances.currentStock`.
+### 4.2 `reconcileStockBalances`
+Audits and reconciles physical stock balances against the immutable movement ledger.
+
+#### Who Can Call
+- **Platform Super Admin** or **Organization Owner** with `inventory:write`.
+
+#### Execution Logic
+- Computes mathematical ledger sum:
+  $$\text{LedgerSum} = \sum \text{inward movements} - \sum \text{outward movements}$$
+- Compares computed `LedgerSum` against `stockBalances.currentStock`.
 - Compares sum of all branch balances against `products.currentStock`.
-- Returns discrepancy report (`discrepanciesCount`, `itemsWithDiscrepancy`).
-- **Policy**: Read-only verification tool. Does not silently overwrite balances unless explicit maintenance mode is engaged.
+- Returns detailed discrepancy audit report without silently mutating records unless maintenance flag is passed.
 
 ---
 
-## 8. Local Testing & Verification
-- **Unit Tests**: `functions/src/test/unit/costingEngine.test.ts` (WAC calculations, fractional quantities, and COGS).
-- **Integration Tests**: `functions/scripts/test-branch-deep-e2e.js`
-  - Scenarios 8–12 verify stock isolation between branch A1 and A2 across purchases, POS sales, and returns.
-  - Step 10 of `functions/scripts/test-e2e-business-flow.js` runs `reconcileStockBalances` and asserts 0 discrepancies.
+## 5. Manual Emulator Testing Commands
 
+```powershell
+# 1. Run Stock Isolation and Branch Scoping Tests
+node functions/scripts/test-e2e-multi-branch-isolation.cjs
+
+# 2. Run Live Stock Movement Trigger tests
+node functions/scripts/test-event-triggers.cjs
+
+# 3. Run Two-Business Simulation (Serial tracking and damaged transit stock)
+node functions/scripts/test-two-business-simulation.cjs
+```

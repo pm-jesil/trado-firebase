@@ -17,6 +17,7 @@ import {
   GetLatestLocationsSchema,
   GetLocationHistorySchema,
 } from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
 import { LatestLocationDoc, LocationPingDoc, MembershipDoc } from "../types/models.js";
 
 const MIN_PING_INTERVAL_MS = 5000;
@@ -35,14 +36,11 @@ export function computeLocationPingExpiry(serverCreatedAt: Date): Timestamp {
  */
 export const locationsRecordPing = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: AppPermissions.LOCATION_PING,
     allowPlatformSuperAdmin: true,
   });
 
-  const parsed = RecordLocationPingSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const validated = parsed.data;
+  const validated = parseInput(RecordLocationPingSchema, request.data);
   const orgId = validated.organizationId || context.organizationId;
 
   if (orgId !== context.organizationId && !context.isSuperAdmin) {
@@ -63,7 +61,7 @@ export const locationsRecordPing = onCall({ region: "asia-south1" }, async (requ
     throw new HttpsError("failed-precondition", "Employee membership is inactive or deactivated.");
   }
 
-  const isOwnerOrAdmin = memberData.isPrimary || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
+  const isOwnerOrAdmin = context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
   if (!memberData.locationTrackingEnabled && !isOwnerOrAdmin) {
     throw new HttpsError(
       "failed-precondition",
@@ -155,14 +153,11 @@ export const locationsRecordPing = onCall({ region: "asia-south1" }, async (requ
  */
 export const locationsGetLatest = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: [AppPermissions.LOCATION_VIEW_OWN, AppPermissions.LOCATION_VIEW_ALL],
     allowPlatformSuperAdmin: true,
   });
 
-  const parsed = GetLatestLocationsSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const validated = parsed.data;
+  const validated = parseInput(GetLatestLocationsSchema, request.data);
   const orgId = validated.organizationId || context.organizationId;
 
   if (orgId !== context.organizationId && !context.isSuperAdmin) {
@@ -170,7 +165,7 @@ export const locationsGetLatest = onCall({ region: "asia-south1" }, async (reque
   }
 
   const callerMembershipId = `${context.callerUid}_${orgId}`;
-  const isOwnerOrAdmin = context.membership?.isPrimary || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
+  const isOwnerOrAdmin = context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
   const canViewAll = isOwnerOrAdmin || context.effectivePermissions.includes(AppPermissions.LOCATION_VIEW_ALL);
 
   if (!canViewAll) {
@@ -205,14 +200,11 @@ export const locationsGetLatest = onCall({ region: "asia-south1" }, async (reque
  */
 export const locationsGetHistory = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: [AppPermissions.LOCATION_VIEW_OWN, AppPermissions.LOCATION_VIEW_ALL],
     allowPlatformSuperAdmin: true,
   });
 
-  const parsed = GetLocationHistorySchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const validated = parsed.data;
+  const validated = parseInput(GetLocationHistorySchema, request.data);
   const orgId = validated.organizationId || context.organizationId;
 
   if (orgId !== context.organizationId && !context.isSuperAdmin) {
@@ -220,7 +212,7 @@ export const locationsGetHistory = onCall({ region: "asia-south1" }, async (requ
   }
 
   const callerMembershipId = `${context.callerUid}_${orgId}`;
-  const isOwnerOrAdmin = context.membership?.isPrimary || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
+  const isOwnerOrAdmin = context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
   const canViewAll = isOwnerOrAdmin || context.effectivePermissions.includes(AppPermissions.LOCATION_VIEW_ALL);
 
   if (!canViewAll && validated.membershipId !== callerMembershipId) {

@@ -209,6 +209,52 @@ Trado cleanly separates **Permission Roles** from **Organizational Job Designati
 
 ---
 
+## 5a. Gate, Data Scope, Approvals & Field Policy (2026-11-07)
+
+### Plan modules gated per permission prefix
+
+`bill`/`pos`/`payment` → billing · `sale`/`order` → sales (order-taking) · `product`/`inventory`/`stock`/`category`/`unit` → inventory · `expense`/`outflow` → expenses · `purchase`/`vendor` → purchases · `customer` → customers · `report` → reports · `delivery` → delivery · `return` → returns · `task` → tasks · `location` → employee_tracking · `employee`/`role`/`team`/`department`/`job_role`/`audit`/`org`/`branch` → staff. A plan flag `false` yields `MODULE_NOT_IN_PLAN`; an organization/branch toggle `false` yields `MODULE_DISABLED`. Plans list every module explicitly.
+
+### Super Admin
+
+Platform operator only: `platform:*` callables plus read-only tenant views when **every** required permission is read-only (`:view`, `:view_all`, `:profit`, `:export`, …). Tenant mutations return `SUPER_ADMIN_TENANT_FORBIDDEN`. Super Admin creates the organization and its Owner (`organizationsCreate`) and manages plans, subscriptions and usage limits; employees are created by the Owner/Admin.
+
+### New permission codes
+
+| Code | Grants |
+|---|---|
+| `product:view_cost` | cost price / WAC / bill line cost in responses; editing `costPrice` |
+| `customer:view_balance`, `vendor:view_balance` | outstanding balances, totals, credit limits; editing `creditLimit`; party statements |
+| `expense:view_sensitive` | employee-linked expenses (salary advance, reimbursement) |
+| `bill:approve`, `stock:approve` | maker–checker approval (with existing `purchase:approve`, `expense:approve`, `return:approve`) |
+| `purchase:void`, `expense:void` | outflow reversal (with existing `bill:void`, `outflow:void`) |
+
+The Admin system role holds all operational codes including these; `role_employee` stays view-only (`org:view`, `employee:view`) — staff duties are granted with custom roles or per-membership `permissionOverrides` (Owner only: `employee:permission_update`). Deny overrides always win.
+
+### Data scope (whose data)
+
+Lists, gets and staff reports resolve a scope per module (`sales`, `purchases`, `expenses`, `deliveries`, `returns`, `payments`, `stock`, `tasks`):
+
+1. `membership.dataScopes[module]` if set (Owner/Admin via `employeesUpdate`),
+2. Owner / Admin → `organization` (optional branch filter),
+3. holder of the module's view-all permission (`bill:view_all`, `outflow:view`, `payment:view`, `delivery:assign`, `return:view`, `stock:view`) → `branch`,
+4. has reportees (`reportingToIds`, recursive, cycle-safe) → `team` (self + reportees),
+5. otherwise → `self` (documents the user created).
+
+Delivery staff without `delivery:assign` see and update only deliveries assigned to them.
+
+### Maker–checker
+
+`organizations.settings.approvals = { enabled, modules{sale,purchase,expense,return,stock_adjustment}, amountThreshold }` (Owner-editable, off by default). A maker without the module's approve permission creates `pending_approval` documents with no stock/ledger/payment effect; approvers decide with `billsApprove` / `outflowsApprove` (never their own). Discounts above `product.maxDiscountPercent` and credit-limit breaches force approval even with the policy off. If no other active Owner/Admin exists, the document auto-approves with an audit note (small-organization mode). Returns and stock adjustments are not yet routed (OPEN).
+
+### Organization field policy
+
+Super Admin: `name`, `businessType`, `businessCategory`, `moduleToggles`, `salesChannels`, `timezone`, plan and subscription (`organizationsSetSubscription`), status. Owner: `displayName`, `logoUrl`, `imageUrls`, `taxNumber`, `website`, `contactEmail`, `contactPhone`, `address`, `bankDetails`, `settings.approvals`. Admin: none. Every change is audited with field, old → new.
+
+### Designations are labels
+
+Departments and job roles (purchase manager, sales manager, cashier, delivery staff, store keeper …) are descriptive only and never grant permissions. "Manager" behaviour comes from reportees (team scope) and team leadership (`teams.leaderMembershipId`: rename own team, add own reportees via `teamsAssignMember`).
+
 ## 6. Local Testing & Verification
 - **Unit Test File**: `functions/src/test/unit/permissionResolver.test.ts` (16 tests verifying all 4 layers, wildcards, and deny precedence).
 - **Integration Test File**: `functions/scripts/test-callables-integration.js` (Verifies unauthenticated 401, non-admin 403, Owner provisioning Admin, escalation rejection, and multi-tenant deactivation safety).

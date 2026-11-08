@@ -1275,6 +1275,16 @@ const OPERATION_EXAMPLES = {
     },
   },
   billsList: { data: { organizationId: "org_apex_sample" } },
+  billsApprove: { data: { organizationId: "org_apex_sample", documentId: "bill_sample_001", decision: "approve", reason: "Approved discount for loyal customer" } },
+  billsVoid: { data: { organizationId: "org_apex_sample", documentId: "bill_sample_001", reason: "Duplicate entry", idempotencyKey: "bill-void-ex-001" } },
+  outflowsApprove: { data: { organizationId: "org_apex_sample", documentId: "outflow_sample_001", decision: "reject", reason: "Wrong vendor" } },
+  outflowsVoid: { data: { organizationId: "org_apex_sample", documentId: "outflow_sample_001", reason: "Entered twice", idempotencyKey: "outflow-void-ex-001" } },
+  organizationsSetSubscription: { data: { organizationId: "org_apex_sample", action: "renew", durationDays: 365, reason: "Annual renewal" } },
+  teamsAssignMember: { data: { organizationId: "org_apex_sample", teamId: "team_sample_001", membershipId: "uid_staff_org_apex_sample", action: "add" } },
+  productsGetPriceHistory: { data: { organizationId: "org_apex_sample", productId: "prod_bread_sample", limit: 20 } },
+  auditGetEntityHistory: { data: { organizationId: "org_apex_sample", entityType: "product", entityId: "prod_bread_sample" } },
+  reportsGetPartyStatement: { data: { organizationId: "org_apex_sample", partyType: "vendor", partyId: "vendor_sample_001", from: "2026-11-01", to: "2026-11-30" } },
+  reportsGetOutflowSummary: { data: { organizationId: "org_apex_sample", from: "2026-11-01", to: "2026-11-30", groupBy: "category" } },
   billsGet: { data: { organizationId: "org_apex_sample", billId: "bill_sample_001" } },
   deliveriesCreate: {
     data: {

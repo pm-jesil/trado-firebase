@@ -6,7 +6,12 @@
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db } from "../services/firebase.js";
-import { RegisterFcmTokenSchema } from "../validation/schemas.js";
+import {
+  RegisterFcmTokenSchema,
+  ListNotificationsSchema,
+  MarkNotificationReadSchema,
+} from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
 import { DeviceDoc } from "../types/models.js";
 import { dispatchPendingWelcomeNotifications } from "../services/notificationSender.js";
 
@@ -15,18 +20,13 @@ export const notificationsRegisterFcmToken = onCall({ region: "asia-south1" }, a
     throw new HttpsError("unauthenticated", "Authentication required to register device token.");
   }
 
-  const parsed = RegisterFcmTokenSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(RegisterFcmTokenSchema, request.data);
 
   const uid = request.auth.uid;
   const deviceRef = db.collection("users").doc(uid).collection("devices").doc(input.deviceId);
 
   const now = new Date().toISOString();
   const deviceDocData: DeviceDoc = {
-    deviceId: input.deviceId,
     fcmToken: input.fcmToken,
     platform: input.platform,
     createdAt: now,
@@ -65,8 +65,7 @@ export const notificationsList = onCall({ region: "asia-south1" }, async (reques
   }
 
   const uid = request.auth.uid;
-  const unreadOnly = request.data?.unreadOnly === true;
-  const limit = Math.min(Number(request.data?.limit) || 50, 100);
+  const { unreadOnly = false, limit = 50 } = parseInput(ListNotificationsSchema, request.data);
 
   let query = db.collection("notifications").where("userId", "==", uid);
   if (unreadOnly) {
@@ -97,10 +96,7 @@ export const notificationsMarkRead = onCall({ region: "asia-south1" }, async (re
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const notificationId = request.data?.notificationId;
-  if (!notificationId) {
-    throw new HttpsError("invalid-argument", "notificationId is required.");
-  }
+  const { notificationId } = parseInput(MarkNotificationReadSchema, request.data);
 
   const notifRef = db.collection("notifications").doc(notificationId);
   const snap = await notifRef.get();

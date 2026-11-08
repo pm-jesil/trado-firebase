@@ -55,7 +55,32 @@ The canonical seed script is located at `functions/src/scripts/seed-emulator.ts`
 
 ## 3. Step-by-Step PowerShell Walkthrough
 
-### Step 1: Start the Local Firebase Emulators
+### 3.1 Standard 5-Step Local Startup & API Explorer Quickstart
+
+For full local development with demo organizations and the Swagger API Explorer:
+
+```powershell
+# 1. Compile backend functions
+npm --prefix functions run build
+
+# 2. Start Firebase Emulators (Terminal 1)
+$env:FUNCTIONS_DISCOVERY_TIMEOUT = "60"
+firebase emulators:start --project trado-x
+
+# 3. Seed demo organizations & personas (Terminal 2)
+node functions/lib/scripts/seed-emulator.js --profile api-explorer-demo
+
+# 4. Generate OpenAPI specification (Terminal 2)
+node scripts/generate-openapi.js
+
+# 5. Launch Local API Explorer (Terminal 2)
+node tools/api-explorer/server.js
+# → Open browser to http://127.0.0.1:3939
+```
+
+### 3.2 Granular CLI Walkthrough
+
+#### Step 1: Start the Local Firebase Emulators
 Open Terminal 1:
 ```powershell
 $env:FUNCTIONS_DISCOVERY_TIMEOUT = "60"
@@ -63,29 +88,22 @@ firebase emulators:start --project trado-x
 ```
 *Wait until the Emulator UI is available at `http://127.0.0.1:4000`.*
 
-### Step 2: Configure Local Emulator Environment Variables
+#### Step 2: Run Seed Pre-Flight Inspection (`--check`)
 Open Terminal 2:
-```powershell
-$env:Path = "C:\Users\jesil.p\node\node-v24.16.0-win-x64;$env:Path"
-$env:FIRESTORE_EMULATOR_HOST = "127.0.0.1:8080"
-$env:FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099"
-```
-
-### Step 3: Run Seed Pre-Flight Inspection (`--check`)
 ```powershell
 node functions/lib/scripts/seed-emulator.js --check
 ```
 *Prints a status report of present vs. missing seed collections.*
 
-### Step 4: Execute Full Seed (`--all`)
+#### Step 3: Execute Full Seed (`--all`) or API Explorer Demo Profile
 ```powershell
-node functions/lib/scripts/seed-emulator.js --all
+node functions/lib/scripts/seed-emulator.js --profile api-explorer-demo
 ```
-*Expected output: Seeds modules, tax regimes, plans, permissions, system roles, Super Admin, sample organization, branches, staff, products, and parties with exit code 0.*
+*Expected output: Seeds modules, tax regimes, plans, permissions, system roles, Super Admin, sample organizations, branches, staff, products, and parties with exit code 0.*
 
-### Step 5: Verify Idempotency (Run Seed Twice)
+#### Step 4: Verify Idempotency (Run Seed Twice)
 ```powershell
-node functions/lib/scripts/seed-emulator.js --all
+node functions/lib/scripts/seed-emulator.js --profile api-explorer-demo
 ```
 *Expected output: Detects existing deterministic fixtures, updates existing records in place, and reports 0 duplicate collections.*
 
@@ -95,6 +113,7 @@ node functions/lib/scripts/seed-emulator.js --all
 
 > [!NOTE]
 > These accounts exist solely within the local Emulator Auth database (port `9099`) and cannot be used against cloud production.
+> For the complete matrix of active, multi-branch, and negative testing personas, see **[Testing Personas & Credentials Directory](testing-personas-and-credentials.md)**.
 
 ### Platform Super Admin (Belongs to NO Organization)
 The Super Admin is a global platform operator with unrestricted privileges across all organizations, rate cards, and system catalogs.
@@ -148,6 +167,16 @@ A wholesale distributor operating under `plan_growth` (hard branch limit = 3). D
 9. **Cross-Tenant Security**: Tenant 1 Admin attempts to read Tenant 2 products or generate bills in Tenant 2 are rejected with `permission-denied`.
 
 ---
+
+### Roles and plans of the demo personas (2026-11-07)
+
+Permissions are enforced on every callable. Demo personas use real system roles seeded by `--seed-reference-data`: `role_admin`, `role_cashier` (billing, customers, payments, returns), `role_rider` (assigned deliveries, location), `role_store_manager` (branch operations and approvals), `role_purchase_staff` (purchases, vendors, stock-in), and the view-only `role_employee`. The single-branch demo organization `org_apex_sample` is on `plan_starter`, which excludes the delivery, tasks and employee-tracking modules: its rider persona demonstrates `MODULE_NOT_IN_PLAN`. Use the multi-branch organization (`plan_growth`) for delivery flows.
+
+Seeded organizations created before subscriptions existed have no subscription fields and run as `legacy_unset` (allowed). Use `organizationsSetSubscription` as Super Admin to test expiry, suspension and renewal.
+
+### Flagship business scenarios
+
+The bicycle wholesale ("Cycle World") and kitchenware wholesale ("Kitchen Mart") businesses are created fresh, with their own Owner credentials, by `node functions/scripts/test-governance-flagship.cjs` (sections 10–11). They are not yet part of a `seed-emulator` profile (open item ISSUE-34/R-16).
 
 ## 5. Seed Reset & Database Cleanup
 

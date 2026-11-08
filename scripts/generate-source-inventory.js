@@ -64,6 +64,7 @@ const CLASSIFICATION_DEFINITIONS = {
       "usageGetOrganizations",
       "usageCalculateDryRunStatement",
       "usageUpdateLimits",
+      "organizationsSetSubscription",
     ],
   },
   REFERENCE_DATA: {
@@ -86,6 +87,7 @@ const CLASSIFICATION_DEFINITIONS = {
         "jobRolesUpdate",
         "teamsCreate",
         "teamsUpdate",
+        "teamsAssignMember",
       ],
       "Catalog & Parties": [
         "productsCreate",
@@ -103,10 +105,17 @@ const CLASSIFICATION_DEFINITIONS = {
         "outflowsCreate",
         "billsCreate",
         "billsFinalize",
+        "billsUpdateDraft",
+        "billsVoid",
+        "outflowsVoid",
+        "documentsDecide",
         "deliveriesCreate",
         "deliveriesUpdateStatus",
         "returnsCreate",
         "paymentsCreate",
+        "paymentsVoid",
+        "recurringExpensesCreate",
+        "recurringExpensesUpdate",
       ],
       "Stock & Reconciliation": [
         "stockAdjust",
@@ -154,6 +163,9 @@ const CLASSIFICATION_DEFINITIONS = {
         "returnsList",
         "paymentsList",
         "stockMovementsList",
+        "productsGetPriceHistory",
+        "auditGetEntityHistory",
+        "recurringExpensesList",
       ],
       "Reports & Telemetry": [
         "reportsGetRevenue",
@@ -162,6 +174,8 @@ const CLASSIFICATION_DEFINITIONS = {
         "reportsGetTopEntities",
         "reportsGetStaffActivity",
         "reportsExportCsv",
+        "reportsGetPartyStatement",
+        "reportsGetOutflowSummary",
         "tasksList",
         "locationsGetLatest",
         "locationsGetHistory",
@@ -222,55 +236,106 @@ const TRIGGER_DEFINITIONS = [
     ],
     idempotency: "Only triggers when rider assignment changes; non-blocking notification dispatch",
   },
+  {
+    name: "onStorageObjectFinalized",
+    documentPath: "(storage: onObjectFinalized)",
+    region: "asia-south1",
+    eventType: "onObjectFinalized",
+    sideEffects: [
+      "Tracks uploaded storage bytes per organization via sharded counters",
+      "Deletes file and refunds counter if organization hard_block storage limit is exceeded",
+    ],
+    idempotency: "Guarded by storage object generation and metadata; safe on retry",
+  },
+  {
+    name: "subscriptionAndUsageSweep",
+    documentPath: "(scheduled: 0 2 * * * Asia/Kolkata)",
+    region: "asia-south1",
+    eventType: "onSchedule",
+    sideEffects: [
+      "Sends 7/3/1-day subscription expiry reminders to organization Owners",
+      "Flips subscriptionStatus to expired after expiry + grace (audited)",
+      "Sends server-observed usage warnings (>= warning threshold) to Owners",
+    ],
+    idempotency: "Every notification guarded by reserveIdempotency (scheduled.notify); safe to re-run",
+  },
 ];
 
-// Concrete Firestore collections
-const CONCRETE_FIRESTORE_COLLECTIONS = [
-  { path: "users/{uid}", type: "root", domain: "Tenant & RBAC" },
-  { path: "memberships/{membershipId}", type: "root", domain: "Tenant & RBAC" },
-  { path: "organizations/{organizationId}", type: "root", domain: "Tenant & RBAC" },
-  { path: "organizations/{organizationId}/branches/{branchId}", type: "subcollection", domain: "Multi-Branch Architecture" },
-  { path: "users/{uid}/devices/{deviceId}", type: "subcollection", domain: "System Infrastructure" },
-  { path: "roles/{roleId}", type: "root", domain: "Tenant & RBAC" },
-  { path: "departments/{departmentId}", type: "root", domain: "Tenant & RBAC" },
-  { path: "jobRoles/{jobRoleId}", type: "root", domain: "Tenant & RBAC" },
-  { path: "teams/{teamId}", type: "root", domain: "Tenant & RBAC" },
-  { path: "subscriptionPlans/{planId}", type: "root", domain: "Tenant & RBAC" },
-  { path: "permissionCatalog/{permissionCode}", type: "root", domain: "Tenant & RBAC" },
-  { path: "modules/{moduleCode}", type: "root", domain: "Tenant & RBAC" },
-  { path: "taxRegimes/{taxRegimeCode}", type: "root", domain: "Tenant & RBAC" },
-  { path: "idempotencyRecords/{recordId}", type: "root", domain: "System Infrastructure" },
-  { path: "auditLogs/{logId}", type: "root", domain: "System Infrastructure" },
-  { path: "notificationOutbox/{outboxId}", type: "root", domain: "Tenant & RBAC" },
-  { path: "products/{productId}", type: "root", domain: "Catalog & Inventory" },
-  { path: "categories/{categoryId}", type: "root", domain: "Catalog & Inventory" },
-  { path: "units/{unitId}", type: "root", domain: "Catalog & Inventory" },
-  { path: "customers/{customerId}", type: "root", domain: "Parties & Ledgers" },
-  { path: "vendors/{vendorId}", type: "root", domain: "Parties & Ledgers" },
-  { path: "outflows/{outflowId}", type: "root", domain: "Operations & Transactions" },
-  { path: "bills/{billId}", type: "root", domain: "Operations & Transactions" },
-  { path: "stockMovements/{movementId}", type: "root", domain: "Catalog & Inventory" },
-  { path: "deliveries/{deliveryId}", type: "root", domain: "Operations & Transactions" },
-  { path: "returns/{returnId}", type: "root", domain: "Operations & Transactions" },
-  { path: "payments/{paymentId}", type: "root", domain: "Operations & Transactions" },
-  { path: "documentCounters/{counterId}", type: "root", domain: "System Infrastructure" },
-  { path: "tasks/{taskId}", type: "root", domain: "Tasks, Location & Notifications" },
-  { path: "dailySummaries/{summaryId}", type: "root", domain: "Analytics & Usage Metering" },
-  { path: "monthlySummaries/{summaryId}", type: "root", domain: "Analytics & Usage Metering" },
-  { path: "latestLocations/{locationId}", type: "root", domain: "Tasks, Location & Notifications" },
-  { path: "locationPings/{pingId}", type: "root", domain: "Tasks, Location & Notifications" },
-  { path: "notifications/{notificationId}", type: "root", domain: "Tasks, Location & Notifications" },
-  { path: "branchCodeLocks/{lockId}", type: "root", domain: "Multi-Branch Architecture" },
-  { path: "membershipBranches/{membershipBranchId}", type: "root", domain: "Multi-Branch Architecture" },
-  { path: "stockBalances/{stockBalanceId}", type: "root", domain: "Catalog & Inventory" },
-  { path: "organizationUsageDaily/{docId}", type: "root", domain: "Analytics & Usage Metering" },
-  { path: "organizationUsageMonthly/{docId}", type: "root", domain: "Analytics & Usage Metering" },
-  { path: "branchUsageDaily/{docId}", type: "root", domain: "Analytics & Usage Metering" },
-  { path: "branchUsageMonthly/{docId}", type: "root", domain: "Analytics & Usage Metering" },
-  { path: "platformUsageSnapshots/{docId}", type: "root", domain: "Analytics & Usage Metering" },
-  { path: "usageRateCards/{docId}", type: "root", domain: "Analytics & Usage Metering" },
-  { path: "usageAllocationRuns/{docId}", type: "root", domain: "Analytics & Usage Metering" },
-];
+// Concrete Firestore collections — DERIVED from the source (every db.collection("…") /
+// subcollection used under functions/src), never hand-listed. Domain labels below are the only
+// hand-kept part; a collection without a label fails the run.
+const COLLECTION_DOMAINS = {
+  "users": "Tenant & RBAC",
+  "memberships": "Tenant & RBAC",
+  "organizations": "Tenant & RBAC",
+  "organizations/branches": "Multi-Branch Architecture",
+  "users/devices": "System Infrastructure",
+  "roles": "Tenant & RBAC",
+  "departments": "Tenant & RBAC",
+  "jobRoles": "Tenant & RBAC",
+  "teams": "Tenant & RBAC",
+  "subscriptionPlans": "Tenant & RBAC",
+  "permissionCatalog": "Tenant & RBAC",
+  "modules": "Tenant & RBAC",
+  "taxRegimes": "Tenant & RBAC",
+  "idempotencyRecords": "System Infrastructure",
+  "auditLogs": "System Infrastructure",
+  "notificationOutbox": "Tenant & RBAC",
+  "products": "Catalog & Inventory",
+  "categories": "Catalog & Inventory",
+  "units": "Catalog & Inventory",
+  "customers": "Parties & Ledgers",
+  "vendors": "Parties & Ledgers",
+  "outflows": "Operations & Transactions",
+  "bills": "Operations & Transactions",
+  "stockMovements": "Catalog & Inventory",
+  "deliveries": "Operations & Transactions",
+  "returns": "Operations & Transactions",
+  "payments": "Operations & Transactions",
+  "documentCounters": "System Infrastructure",
+  "tasks": "Tasks, Location & Notifications",
+  "dailySummaries": "Analytics & Usage Metering",
+  "monthlySummaries": "Analytics & Usage Metering",
+  "latestLocations": "Tasks, Location & Notifications",
+  "locationPings": "Tasks, Location & Notifications",
+  "notifications": "Tasks, Location & Notifications",
+  "membershipBranches": "Multi-Branch Architecture",
+  "stockBalances": "Catalog & Inventory",
+  "organizationUsageDaily": "Analytics & Usage Metering",
+  "organizationUsageMonthly": "Analytics & Usage Metering",
+  "branchUsageDaily": "Analytics & Usage Metering",
+  "branchUsageMonthly": "Analytics & Usage Metering",
+  "usageRateCards": "Analytics & Usage Metering",
+  "usageCounterShards": "Analytics & Usage Metering",
+  "uniqueKeys": "System Infrastructure",
+  "serials": "Catalog & Inventory",
+  "stockAdjustmentRequests": "Catalog & Inventory",
+  "recurringExpenses": "Operations & Transactions"
+};
+
+function deriveCollections() {
+  const names = new Set();
+  const walk = (dir) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) { if (e.name !== "test") walk(p); continue; }
+      if (!e.name.endsWith(".ts")) continue;
+      const src = fs.readFileSync(p, "utf-8");
+      for (const m of src.matchAll(/\.collection(?:Group)?\(\s*"([A-Za-z]+)"\s*\)/g)) names.add(m[1]);
+    }
+  };
+  walk(path.join(ROOT, "functions/src"));
+  const out = [];
+  for (const name of Array.from(names).sort()) {
+    const key = name === "branches" ? "organizations/branches" : name === "devices" ? "users/devices" : name;
+    if (!COLLECTION_DOMAINS[key]) throw new Error(`Collection "${key}" used in source has no domain label in COLLECTION_DOMAINS`);
+    const pathTpl = key === "organizations/branches" ? "organizations/{organizationId}/branches/{branchId}"
+      : key === "users/devices" ? "users/{uid}/devices/{deviceId}" : `${key}/{id}`;
+    out.push({ path: pathTpl, type: key.includes("/") ? "subcollection" : "root", domain: COLLECTION_DOMAINS[key] });
+  }
+  return out;
+}
+const CONCRETE_FIRESTORE_COLLECTIONS = deriveCollections();
 
 function main() {
   console.log("================================================================================");
@@ -294,17 +359,13 @@ function main() {
   const foundTriggers = rawExports.filter((e) => triggerNames.includes(e.name));
   const foundCallables = rawExports.filter((e) => !triggerNames.includes(e.name));
 
-  if (foundTriggers.length !== 4) {
-    throw new Error(`Expected exactly 4 triggers, found ${foundTriggers.length}`);
-  }
-  if (foundCallables.length !== 101) {
-    throw new Error(`Expected exactly 101 callables, found ${foundCallables.length}`);
-  }
-  if (rawExports.length !== 105) {
-    throw new Error(`Expected exactly 105 total exports, found ${rawExports.length}`);
+  const TRIGGER_COUNT = TRIGGER_DEFINITIONS.length;
+  const CALLABLE_COUNT = foundCallables.length;
+  if (foundTriggers.length !== TRIGGER_COUNT) {
+    throw new Error(`Expected ${TRIGGER_COUNT} triggers (TRIGGER_DEFINITIONS), found ${foundTriggers.length}`);
   }
 
-  console.log(`✓ Confirmed exactly 101 HTTPS Callables and 4 Firestore Event Triggers (105 total).`);
+  console.log(`✓ Found ${CALLABLE_COUNT} HTTPS Callables and ${TRIGGER_COUNT} triggers (${rawExports.length} total).`);
 
   // Verify each callable belongs to exactly one category
   const categorizedCallables = new Map();
@@ -343,8 +404,8 @@ function main() {
       throw new Error(`Uncategorized callable found: ${c.name}`);
     }
   }
-  if (categorizedCallables.size !== 101) {
-    throw new Error(`Expected 101 categorized callables, got ${categorizedCallables.size}`);
+  if (categorizedCallables.size !== CALLABLE_COUNT) {
+    throw new Error(`Expected ${CALLABLE_COUNT} categorized callables, got ${categorizedCallables.size}`);
   }
 
   console.log("\n--- Category & Subgroup Parity Verification ---");
@@ -364,29 +425,26 @@ function main() {
     }
   }
 
-  if (grandTotal !== 101) {
-    throw new Error(`Grand total of categories (${grandTotal}) does not match 101 callables!`);
+  if (grandTotal !== CALLABLE_COUNT) {
+    throw new Error(`Grand total of categories (${grandTotal}) does not match ${CALLABLE_COUNT} callables!`);
   }
   console.log(`✓ All category subtotals match exact list lengths (Total: ${grandTotal}).`);
 
-  // Verify concrete collections count
-  if (CONCRETE_FIRESTORE_COLLECTIONS.length !== 44) {
-    throw new Error(`Expected exactly 44 concrete collections, found ${CONCRETE_FIRESTORE_COLLECTIONS.length}`);
-  }
+  // Collections are derived from source; every one must carry a domain label (checked in deriveCollections)
   const rootCount = CONCRETE_FIRESTORE_COLLECTIONS.filter((c) => c.type === "root").length;
   const subCount = CONCRETE_FIRESTORE_COLLECTIONS.filter((c) => c.type === "subcollection").length;
-  console.log(`✓ Confirmed 44 concrete Firestore collection paths (${rootCount} root + ${subCount} subcollections).`);
+  console.log(`✓ Confirmed ${CONCRETE_FIRESTORE_COLLECTIONS.length} concrete Firestore collection paths (${rootCount} root + ${subCount} subcollections).`);
 
   // Build JSON Manifest
   const manifestData = {
     generatedAt: new Date().toISOString(),
     projectId: "trado-x",
     region: "asia-south1",
-    totalExports: 105,
+    totalExports: rawExports.length,
     summary: {
-      callableCount: 101,
-      triggerCount: 4,
-      concreteCollectionsCount: 44,
+      callableCount: CALLABLE_COUNT,
+      triggerCount: TRIGGER_COUNT,
+      concreteCollectionsCount: CONCRETE_FIRESTORE_COLLECTIONS.length,
       categoryCounts,
       subgroupCounts,
     },
@@ -400,7 +458,7 @@ function main() {
 
   // Build Authoritative Markdown Inventory
   let md = `# Trado Backend: Comprehensive Callable & Trigger Inventory\n\n`;
-  md += `This document is the authoritative, source-verified inventory of all Cloud Functions exports in the Trado Firebase backend. It provides the programmatic breakdown of all 101 HTTPS Callable functions, 4 Firestore Event Triggers, and the context derivation exceptions allowlist.\n\n`;
+  md += `This document is the authoritative, source-verified inventory of all Cloud Functions exports in the Trado Firebase backend. It provides the programmatic breakdown of all ${CALLABLE_COUNT} HTTPS Callable functions, ${TRIGGER_COUNT} triggers (Firestore event + scheduled), and the context derivation exceptions allowlist.\n\n`;
   md += `--- \n\n## 1. Export Overview\n\n`;
   md += `| Category | Export Type | Count |\n`;
   md += `|---|---|:---:|\n`;
@@ -416,7 +474,7 @@ function main() {
   md += `| **Firestore Event Triggers** | Asynchronous Background Triggers | **${TRIGGER_DEFINITIONS.length}** |\n`;
   md += `| **Total Cloud Functions Exports** | | **${grandTotal + TRIGGER_DEFINITIONS.length}** |\n\n`;
 
-  md += `--- \n\n## 2. HTTPS Callable Inventory (101 Functions)\n\n`;
+  md += `--- \n\n## 2. HTTPS Callable Inventory (${CALLABLE_COUNT} Functions)\n\n`;
 
   // Public
   md += `### A. Public Auth & Health Adapter (${categoryCounts.PUBLIC_AUTH_ADAPTER})\n`;

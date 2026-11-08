@@ -7,7 +7,12 @@
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db } from "../services/firebase.js";
-import { CreatePlanSchema, UpdatePlanSchema } from "../validation/schemas.js";
+import {
+  CreatePlanSchema,
+  UpdatePlanSchema,
+  ListPlansSchema,
+} from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
 import { SubscriptionPlanDoc } from "../types/models.js";
 import { createAuditLog } from "../services/audit.js";
 
@@ -16,11 +21,7 @@ export const plansCreate = onCall({ region: "asia-south1" }, async (request) => 
     throw new HttpsError("permission-denied", "Super Admin privileges required to create subscription plans.");
   }
 
-  const parsed = CreatePlanSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(CreatePlanSchema, request.data);
 
   const planRef = db.collection("subscriptionPlans").doc();
   const planDoc: SubscriptionPlanDoc = {
@@ -56,11 +57,7 @@ export const plansUpdate = onCall({ region: "asia-south1" }, async (request) => 
     throw new HttpsError("permission-denied", "Super Admin privileges required to update subscription plans.");
   }
 
-  const parsed = UpdatePlanSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdatePlanSchema, request.data);
 
   const planRef = db.collection("subscriptionPlans").doc(input.planId);
   const planDoc = await planRef.get();
@@ -97,7 +94,7 @@ export const plansList = onCall({ region: "asia-south1" }, async (request) => {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const includeInactive = request.data?.includeInactive === true;
+  const includeInactive = parseInput(ListPlansSchema, request.data).includeInactive === true;
   let query = db.collection("subscriptionPlans").orderBy("price");
 
   if (!includeInactive) {

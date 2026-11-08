@@ -2,81 +2,197 @@
 
 ---
 
-## 1. Purpose & Scope
-This module manages the product master catalog for an organization:
-- **Product Catalog**: `products/{productId}` stores catalog attributes, pricing, Weighted Average Cost (WAC), tax rates, and aggregate stock mirror.
-- **Categories & Brands**: `productCategories/{categoryId}` and `productBrands/{brandId}` organize products hierarchically with support for subcategories (`parentCategoryId`).
-- **Units**: `units/{unitId}` defines inventory counting units (e.g. `kg`, `pcs`, `box`, `bag`).
-- **Barcode Concurrency Locks**: `barcodeLocks/{orgId}_{barcode}` ensures barcodes remain strictly unique within an organization under high-concurrency requests.
+## 1. Module Overview & Catalog Architecture
+
+The Product Catalog Engine manages master items, categorization hierarchies, multi-unit conversions, barcode concurrency locks, taxability rules, and discount ceilings for Trado:
+- **Product Master (`products/{productId}`)**: Master catalog item containing retail/wholesale pricing, cost price, base counting unit, tax rates, tax exemption flags, discount caps, physical dimensions, and stock control flags.
+- **Category Hierarchy (`categories/{categoryId}`)**: Multi-level organizational hierarchy with optional parent linkage (`parentId`) and nature tags.
+- **Units & Measurement Conversions (`units/{unitId}`)**: Units of measure (e.g. `piece`, `kg`, `box`, `pack`, `meter`) and conversion factor mappings.
+- **Alternate Units (`alternateUnits`)**: Defines box-to-piece or sack-to-kg conversion factors (e.g. 1 box = 12 pieces) with dedicated unit selling prices and purchase/sale unit toggles.
+- **Barcode Concurrency Locks (`uniqueKeys/{lockId}`)**: Tenant-scoped natural key locks preventing duplicate barcode or SKU registration under concurrent API calls.
+
+```mermaid
+flowchart TD
+    subgraph MasterData["Master Data Structure"]
+        Category["categories/{categoryId}\n(name, parentId, nature)"]
+        Unit["units/{unitId}\n(name, code, group, precision)"]
+        Product["products/{productId}\n(name, prices, baseUnit, barcode, sku)"]
+    end
+
+    subgraph SpecialAttributes["Specialized Behavioral Controls"]
+        TaxRule["Taxability Rules\n(isTaxable: boolean, taxExemptionReason)"]
+        DiscountRule["Discount Ceilings\n(isDiscountable: boolean, maxDiscountPercent)"]
+        TrackingRule["Tracking Flags\n(trackStock, trackSerial, hasExpiry, trackBatch)"]
+        AlternateUnits["Alternate Unit Mappings\n(alternateUnits: [{unit: 'box', factor: 12}])"]
+    end
+
+    subgraph ConcurrencyLock["Natural Key Lock"]
+        BarcodeLock["uniqueKeys/{orgId}_barcode_{barcode}\n(Prevents duplicate barcode collision)"]
+    end
+
+    Category --> Product
+    Unit --> Product
+    Product --> TaxRule
+    Product --> DiscountRule
+    Product --> TrackingRule
+    Product --> AlternateUnits
+    Product --> BarcodeLock
+```
 
 ---
 
-## 2. Actors & Permissions
-- **Organization Owner & Inventory Admin**: Possess `inventory:write` and `inventory:create`. Can add or edit products, categories, units, and barcode assignments.
-- **Sales & Cashier Staff**: Possess `inventory:read` and `bill:create`. Can search products, scan barcodes, and view prices and stock availability.
-- **Cross-Tenant Guard**: Products are isolated per tenant (`products.organizationId == context.organizationId`). Catalog items from other organizations cannot be viewed or referenced.
+## 2. Product-Level Taxability & Discount Rules
+
+### 2.1 Taxability & Exemption Controls
+- **`isTaxable: boolean`**: Defaults to `true`. When set to `false`, the product is legally tax-exempt (e.g. fresh unprocessed agricultural grains, unbranded milk, bread). The billing and tax engines force **0% tax** regardless of the organization's tax regime or item tax code.
+- **`taxExemptionReason: string`**: Required or snapshotted whenever a tax-exempt product is billed (e.g. "Notification 2/2017 Central Tax - Fresh Agricultural Produce").
+
+### 2.2 Discountability & Ceiling Controls
+- **`isDiscountable: boolean`**: Defaults to `true`. When set to `false`, the product is strictly price-controlled (e.g. government-subsidized fertilizer, regulated medicine, fixed-margin electronics). The billing engine will throw an `invalid-argument` error if any line or header discount is allocated to this item.
+- **`maxDiscountPercent: number`**: Configurable maximum discount cap (0% to 100%). If a cashier or sales executive attempts a discount higher than this threshold, the billing engine rejects the request.
 
 ---
 
-## 3. Product Data Structure & Source of Truth
+## 3. End-to-End Sequence Diagrams
 
-### Physical vs. Catalog Stock
-- **`stockBalances/{orgId}_{branchId}_{productId}`**: Authoritative source of truth for physical inventory at each branch location.
-- **`products/{productId}.currentStock`**: Read-optimized aggregate mirror representing total inventory across all branches in the organization.
-- When initial stock is supplied during `productsCreate`, it is credited to the resolved active branch (`targetBranchId`) in `stockBalances`, a `stockMovements` inward record is created, and `products.currentStock` is initialized to that value.
+### 3.1 Creating a Product with Initial Stock (`productsCreate`)
 
-### Weighted Average Cost (WAC)
-- Products maintain `weightedAvgCost` with 4-decimal precision.
-- Initial creation sets `weightedAvgCost = costPrice`.
-- Subsequent inward purchases recalculate WAC:
-  $$\text{WAC}_{\text{new}} = \frac{(\text{Current Stock} \times \text{Old WAC}) + (\text{Incoming Qty} \times \text{Purchase Rate})}{\text{Current Stock} + \text{Incoming Qty}}$$
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Staff as Inventory / Store Manager
+    participant GW as Cloud Functions (productsCreate)
+    participant DB as Cloud Firestore
 
----
-
-## 4. Step-by-Step Happy Path Workflows
-
-### 4.1 Creating a Tracked Product with Barcode
-1. **Client calls `productsCreate`**:
-   - Payload:
-     ```json
-     {
-       "organizationId": "org_demo",
-       "name": "Basmati Rice 5kg",
-       "barcode": "8901234567890",
-       "sellingPrice": 450,
-       "costPrice": 320,
-       "baseUnit": "bag",
-       "trackStock": true,
-       "initialStock": 50,
-       "branchId": "main-branch"
-     }
-     ```
-2. **Backend Concurrency Guard**:
-   - Reads `barcodeLocks/org_demo_8901234567890`. If document exists, throws `already-exists: "Barcode already in use"`.
-3. **Atomic Commit**:
-   - Creates `products/{productId}` with `currentStock: 50` and `weightedAvgCost: 320`.
-   - Creates `barcodeLocks/org_demo_8901234567890`.
-   - Creates `stockBalances/org_demo_main-branch_{productId}` with `currentStock: 50`.
-   - Creates `stockMovements` entry with `movementType: "adjustment_in"`, `quantity: 50`.
-
-### 4.2 Updating Product Prices & Attributes
-1. **Client calls `productsUpdate`**:
-   - Payload: `{ organizationId, productId, sellingPrice: 475 }`.
-2. **Backend Validation**:
-   - Ensures barcode cannot be changed to an existing barcode without releasing the old lock.
-   - Price updates apply to future transactions; existing bills maintain historical `productSnapshot`.
+    Staff->>GW: Call productsCreate(name, baseUnit, sellingPrice, costPrice, barcode, trackStock, initialStock: 50)
+    GW->>GW: Verify caller has inventory:create or inventory:write permission
+    GW->>GW: Validate CreateProductSchema (Zod parseInput)
+    GW->>DB: Check idempotency lease
+    
+    Note over GW,DB: Atomic Multi-Document Firestore Transaction
+    alt Barcode Provided
+        GW->>DB: Read uniqueKeys/orgId_barcode_{barcode.toLowerCase()}
+        GW->>GW: Verify barcode is not already claimed
+        GW->>DB: Write uniqueKeys/orgId_barcode_{barcode.toLowerCase()} lock
+    end
+    
+    GW->>DB: Write products/{productId} (currentStock: 50, weightedAvgCost: costPrice)
+    
+    alt initialStock > 0 and trackStock === true
+        GW->>DB: Write stockBalances/{orgId}_{branchId}_{productId} (currentStock: 50)
+        GW->>DB: Append stockMovements (movementType: "adjustment_in", quantity: 50, reason: "Initial product stock")
+    end
+    
+    GW->>DB: Append auditLogs/{auditId}
+    
+    GW-->>Staff: Return CreateProductResponse (productId, name, currentStock: 50)
+```
 
 ---
 
-## 5. Alternate Paths & Concurrency Guarantees
-- **Duplicate Barcode Race**: If two staff members attempt to create different products with the same barcode simultaneously, the Firestore transaction ensures only one lock document is written; the second request fails with `already-exists`.
-- **Cross-Tenant Same Barcode**: Two different organizations CAN use the same manufacturer barcode because lock keys are prefixed with `organizationId` (`barcodeLocks/{orgId}_{barcode}`).
-- **Untracked Products**: Products with `trackStock: false` (services, delivery charges) bypass stock deductions and balance validation during billing.
+## 4. API Reference & Parameter Specifications
+
+### 4.1 `productsCreate`
+Creates a master product, sets up natural key barcode locks, and optionally seeds opening shelf stock.
+
+#### Request Parameters
+```typescript
+interface CreateProductRequest {
+  idempotencyKey?: string;           // 8-128 char unique lease key
+  organizationId?: string;           // Optional (derived from token context)
+  branchId?: string;                 // Optional (derived from token context)
+  name: string;                      // 1-150 characters, product name
+  description?: string;              // Max 1000 characters
+  categoryId?: string | null;        // Category reference ID
+  baseUnit: string;                  // Default: "piece" (must match code in units)
+  sellingPrice: number;              // Standard retail selling price
+  costPrice: number;                 // Base procurement cost price
+  mrp?: number | null;               // Maximum Retail Price
+  wholesalePrice?: number | null;    // Wholesale tier pricing
+  taxInclusive?: boolean;            // Default: false
+  taxRatePercent?: number;           // Standard tax rate percentage (e.g. 5, 12, 18)
+  taxCode?: string;                  // HSN / SAC code
+  barcode?: string | null;           // Scannable barcode (UPC / EAN / custom)
+  sku?: string | null;               // Stock Keeping Unit
+  hasExpiry?: boolean;               // Perishable item flag (default: false)
+  trackStock?: boolean;              // Default: true (set false for services/freight)
+  initialStock?: number;             // Opening stock quantity (default: 0)
+  lowStockThreshold?: number;        // Reorder alert threshold (default: 5)
+  trackBatch?: boolean;              // Enable batch/lot tracking
+  trackSerial?: boolean;             // Enable individual serial/IMEI tracking
+  isTaxable?: boolean;               // Default: true (false = 0% tax enforced)
+  taxExemptionReason?: string;       // Reason for 0% tax exemption
+  isDiscountable?: boolean;          // Default: true (false = discounts forbidden)
+  maxDiscountPercent?: number;       // Discount ceiling (0 to 100)
+  isReturnable?: boolean;            // Can customer return this item?
+  returnWindowDays?: number;         // Allowed return window in days
+  alternateUnits?: Array<{           // Alternate unit conversions (e.g. box of 12)
+    unit: string;                    // Alternate unit name (e.g. "box")
+    factor: number;                  // Multiplier (e.g. 12 base units per box)
+    sellingPrice?: number;           // Unit price when sold as alternate unit
+    wholesalePrice?: number;
+    barcode?: string;
+    isPurchaseUnit?: boolean;
+    isSaleUnit?: boolean;
+  }>;
+  brand?: string;
+  weight?: { value: number; unit: string };
+  dimensions?: { length?: number; width?: number; height?: number; unit: string };
+  imagePaths?: string[];             // Cloud Storage object paths
+}
+```
+
+#### Success Response (200 OK)
+```json
+{
+  "productId": "prod_1a2b3c4d5e",
+  "organizationId": "org_apex_sample",
+  "name": "Whole Wheat Bread 400g",
+  "baseUnit": "pack",
+  "sellingPrice": 45.00,
+  "costPrice": 32.00,
+  "currentStock": 50,
+  "status": "active",
+  "message": "Product created successfully."
+}
+```
 
 ---
 
-## 6. Local Testing & Verification
-- **Test File**: `functions/scripts/test-callables-integration.js`
-  - Tests verify `productsCreate` barcode concurrency race, stock movement initialization, and catalog retrieval.
-- **Unit Tests**: `functions/src/test/unit/branchValidationAndSharing.test.ts` (Product branch attribution tests).
+### 4.2 `productsUpdate`
+Updates catalog attributes, pricing, or taxability.
 
+#### Request Parameters
+```typescript
+interface UpdateProductRequest {
+  productId: string;                 // Target product ID
+  name?: string;
+  description?: string;
+  categoryId?: string | null;
+  sellingPrice?: number;
+  costPrice?: number;
+  wholesalePrice?: number | null;
+  taxRatePercent?: number;
+  isTaxable?: boolean;
+  taxExemptionReason?: string;
+  isDiscountable?: boolean;
+  maxDiscountPercent?: number;
+  barcode?: string | null;           // Reclaims uniqueKeys lock if modified
+  isActive?: boolean;
+}
+```
+
+---
+
+## 5. Manual Emulator Testing Commands
+
+```powershell
+# 1. Run Schema and Validation tests for Products, Units and Categories
+node functions/scripts/test-callable-schemas.cjs
+
+# 2. Run Two-Business Simulation (Bicycle variants and Kitchenware multi-unit box conversions)
+node functions/scripts/test-two-business-simulation.cjs
+
+# 3. Check seeded products and category reference data
+node functions/lib/scripts/seed-emulator.js --check
+```

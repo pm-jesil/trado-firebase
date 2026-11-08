@@ -1,33 +1,33 @@
 {
-  "generatedAt": "2026-11-05T21:14:00.755Z",
+  "generatedAt": "2026-11-08T04:45:01.056Z",
   "projectId": "trado-x",
   "region": "asia-south1",
-  "totalExports": 105,
+  "totalExports": 121,
   "summary": {
-    "callableCount": 101,
-    "triggerCount": 4,
-    "concreteCollectionsCount": 44,
+    "callableCount": 115,
+    "triggerCount": 6,
+    "concreteCollectionsCount": 46,
     "categoryCounts": {
       "PUBLIC_AUTH_ADAPTER": 2,
       "CALLER_IDENTITY": 4,
       "CONTEXT_SELECTION": 1,
       "ORGANIZATION_ONBOARDING": 4,
-      "PLATFORM_SUPER_ADMIN": 9,
+      "PLATFORM_SUPER_ADMIN": 10,
       "REFERENCE_DATA": 4,
-      "DERIVED_TENANT_OPERATION": 40,
-      "FILTER_OPTIONAL_TENANT": 37
+      "DERIVED_TENANT_OPERATION": 48,
+      "FILTER_OPTIONAL_TENANT": 42
     },
     "subgroupCounts": {
       "DERIVED_TENANT_OPERATION": {
-        "RBAC & Memberships": 12,
+        "RBAC & Memberships": 13,
         "Catalog & Parties": 10,
-        "Transactions & Operations": 7,
+        "Transactions & Operations": 14,
         "Stock & Reconciliation": 4,
         "Tasks & Telemetry": 7
       },
       "FILTER_OPTIONAL_TENANT": {
-        "Entities & Catalog Lists": 25,
-        "Reports & Telemetry": 9,
+        "Entities & Catalog Lists": 28,
+        "Reports & Telemetry": 11,
         "Usage & Quotas": 3
       }
     }
@@ -78,23 +78,51 @@
         "Dispatches delivery_assigned notification with customer details to rider"
       ],
       "idempotency": "Only triggers when rider assignment changes; non-blocking notification dispatch"
+    },
+    {
+      "name": "onStorageObjectFinalized",
+      "documentPath": "(storage: onObjectFinalized)",
+      "region": "asia-south1",
+      "eventType": "onObjectFinalized",
+      "sideEffects": [
+        "Tracks uploaded storage bytes per organization via sharded counters",
+        "Deletes file and refunds counter if organization hard_block storage limit is exceeded"
+      ],
+      "idempotency": "Guarded by storage object generation and metadata; safe on retry"
+    },
+    {
+      "name": "subscriptionAndUsageSweep",
+      "documentPath": "(scheduled: 0 2 * * * Asia/Kolkata)",
+      "region": "asia-south1",
+      "eventType": "onSchedule",
+      "sideEffects": [
+        "Sends 7/3/1-day subscription expiry reminders to organization Owners",
+        "Flips subscriptionStatus to expired after expiry + grace (audited)",
+        "Sends server-observed usage warnings (>= warning threshold) to Owners"
+      ],
+      "idempotency": "Every notification guarded by reserveIdempotency (scheduled.notify); safe to re-run"
     }
   ],
   "concreteCollections": [
     {
-      "path": "users/{uid}",
+      "path": "auditLogs/{id}",
       "type": "root",
-      "domain": "Tenant & RBAC"
+      "domain": "System Infrastructure"
     },
     {
-      "path": "memberships/{membershipId}",
+      "path": "bills/{id}",
       "type": "root",
-      "domain": "Tenant & RBAC"
+      "domain": "Operations & Transactions"
     },
     {
-      "path": "organizations/{organizationId}",
+      "path": "branchUsageDaily/{id}",
       "type": "root",
-      "domain": "Tenant & RBAC"
+      "domain": "Analytics & Usage Metering"
+    },
+    {
+      "path": "branchUsageMonthly/{id}",
+      "type": "root",
+      "domain": "Analytics & Usage Metering"
     },
     {
       "path": "organizations/{organizationId}/branches/{branchId}",
@@ -102,204 +130,209 @@
       "domain": "Multi-Branch Architecture"
     },
     {
+      "path": "categories/{id}",
+      "type": "root",
+      "domain": "Catalog & Inventory"
+    },
+    {
+      "path": "customers/{id}",
+      "type": "root",
+      "domain": "Parties & Ledgers"
+    },
+    {
+      "path": "dailySummaries/{id}",
+      "type": "root",
+      "domain": "Analytics & Usage Metering"
+    },
+    {
+      "path": "deliveries/{id}",
+      "type": "root",
+      "domain": "Operations & Transactions"
+    },
+    {
+      "path": "departments/{id}",
+      "type": "root",
+      "domain": "Tenant & RBAC"
+    },
+    {
       "path": "users/{uid}/devices/{deviceId}",
       "type": "subcollection",
       "domain": "System Infrastructure"
     },
     {
-      "path": "roles/{roleId}",
-      "type": "root",
-      "domain": "Tenant & RBAC"
-    },
-    {
-      "path": "departments/{departmentId}",
-      "type": "root",
-      "domain": "Tenant & RBAC"
-    },
-    {
-      "path": "jobRoles/{jobRoleId}",
-      "type": "root",
-      "domain": "Tenant & RBAC"
-    },
-    {
-      "path": "teams/{teamId}",
-      "type": "root",
-      "domain": "Tenant & RBAC"
-    },
-    {
-      "path": "subscriptionPlans/{planId}",
-      "type": "root",
-      "domain": "Tenant & RBAC"
-    },
-    {
-      "path": "permissionCatalog/{permissionCode}",
-      "type": "root",
-      "domain": "Tenant & RBAC"
-    },
-    {
-      "path": "modules/{moduleCode}",
-      "type": "root",
-      "domain": "Tenant & RBAC"
-    },
-    {
-      "path": "taxRegimes/{taxRegimeCode}",
-      "type": "root",
-      "domain": "Tenant & RBAC"
-    },
-    {
-      "path": "idempotencyRecords/{recordId}",
+      "path": "documentCounters/{id}",
       "type": "root",
       "domain": "System Infrastructure"
     },
     {
-      "path": "auditLogs/{logId}",
+      "path": "idempotencyRecords/{id}",
       "type": "root",
       "domain": "System Infrastructure"
     },
     {
-      "path": "notificationOutbox/{outboxId}",
+      "path": "jobRoles/{id}",
       "type": "root",
       "domain": "Tenant & RBAC"
     },
     {
-      "path": "products/{productId}",
-      "type": "root",
-      "domain": "Catalog & Inventory"
-    },
-    {
-      "path": "categories/{categoryId}",
-      "type": "root",
-      "domain": "Catalog & Inventory"
-    },
-    {
-      "path": "units/{unitId}",
-      "type": "root",
-      "domain": "Catalog & Inventory"
-    },
-    {
-      "path": "customers/{customerId}",
-      "type": "root",
-      "domain": "Parties & Ledgers"
-    },
-    {
-      "path": "vendors/{vendorId}",
-      "type": "root",
-      "domain": "Parties & Ledgers"
-    },
-    {
-      "path": "outflows/{outflowId}",
-      "type": "root",
-      "domain": "Operations & Transactions"
-    },
-    {
-      "path": "bills/{billId}",
-      "type": "root",
-      "domain": "Operations & Transactions"
-    },
-    {
-      "path": "stockMovements/{movementId}",
-      "type": "root",
-      "domain": "Catalog & Inventory"
-    },
-    {
-      "path": "deliveries/{deliveryId}",
-      "type": "root",
-      "domain": "Operations & Transactions"
-    },
-    {
-      "path": "returns/{returnId}",
-      "type": "root",
-      "domain": "Operations & Transactions"
-    },
-    {
-      "path": "payments/{paymentId}",
-      "type": "root",
-      "domain": "Operations & Transactions"
-    },
-    {
-      "path": "documentCounters/{counterId}",
-      "type": "root",
-      "domain": "System Infrastructure"
-    },
-    {
-      "path": "tasks/{taskId}",
+      "path": "latestLocations/{id}",
       "type": "root",
       "domain": "Tasks, Location & Notifications"
     },
     {
-      "path": "dailySummaries/{summaryId}",
-      "type": "root",
-      "domain": "Analytics & Usage Metering"
-    },
-    {
-      "path": "monthlySummaries/{summaryId}",
-      "type": "root",
-      "domain": "Analytics & Usage Metering"
-    },
-    {
-      "path": "latestLocations/{locationId}",
+      "path": "locationPings/{id}",
       "type": "root",
       "domain": "Tasks, Location & Notifications"
     },
     {
-      "path": "locationPings/{pingId}",
-      "type": "root",
-      "domain": "Tasks, Location & Notifications"
-    },
-    {
-      "path": "notifications/{notificationId}",
-      "type": "root",
-      "domain": "Tasks, Location & Notifications"
-    },
-    {
-      "path": "branchCodeLocks/{lockId}",
+      "path": "membershipBranches/{id}",
       "type": "root",
       "domain": "Multi-Branch Architecture"
     },
     {
-      "path": "membershipBranches/{membershipBranchId}",
+      "path": "memberships/{id}",
       "type": "root",
-      "domain": "Multi-Branch Architecture"
+      "domain": "Tenant & RBAC"
     },
     {
-      "path": "stockBalances/{stockBalanceId}",
+      "path": "modules/{id}",
+      "type": "root",
+      "domain": "Tenant & RBAC"
+    },
+    {
+      "path": "monthlySummaries/{id}",
+      "type": "root",
+      "domain": "Analytics & Usage Metering"
+    },
+    {
+      "path": "notificationOutbox/{id}",
+      "type": "root",
+      "domain": "Tenant & RBAC"
+    },
+    {
+      "path": "notifications/{id}",
+      "type": "root",
+      "domain": "Tasks, Location & Notifications"
+    },
+    {
+      "path": "organizationUsageDaily/{id}",
+      "type": "root",
+      "domain": "Analytics & Usage Metering"
+    },
+    {
+      "path": "organizationUsageMonthly/{id}",
+      "type": "root",
+      "domain": "Analytics & Usage Metering"
+    },
+    {
+      "path": "organizations/{id}",
+      "type": "root",
+      "domain": "Tenant & RBAC"
+    },
+    {
+      "path": "outflows/{id}",
+      "type": "root",
+      "domain": "Operations & Transactions"
+    },
+    {
+      "path": "payments/{id}",
+      "type": "root",
+      "domain": "Operations & Transactions"
+    },
+    {
+      "path": "permissionCatalog/{id}",
+      "type": "root",
+      "domain": "Tenant & RBAC"
+    },
+    {
+      "path": "products/{id}",
       "type": "root",
       "domain": "Catalog & Inventory"
     },
     {
-      "path": "organizationUsageDaily/{docId}",
+      "path": "recurringExpenses/{id}",
+      "type": "root",
+      "domain": "Operations & Transactions"
+    },
+    {
+      "path": "returns/{id}",
+      "type": "root",
+      "domain": "Operations & Transactions"
+    },
+    {
+      "path": "roles/{id}",
+      "type": "root",
+      "domain": "Tenant & RBAC"
+    },
+    {
+      "path": "serials/{id}",
+      "type": "root",
+      "domain": "Catalog & Inventory"
+    },
+    {
+      "path": "stockAdjustmentRequests/{id}",
+      "type": "root",
+      "domain": "Catalog & Inventory"
+    },
+    {
+      "path": "stockBalances/{id}",
+      "type": "root",
+      "domain": "Catalog & Inventory"
+    },
+    {
+      "path": "stockMovements/{id}",
+      "type": "root",
+      "domain": "Catalog & Inventory"
+    },
+    {
+      "path": "subscriptionPlans/{id}",
+      "type": "root",
+      "domain": "Tenant & RBAC"
+    },
+    {
+      "path": "tasks/{id}",
+      "type": "root",
+      "domain": "Tasks, Location & Notifications"
+    },
+    {
+      "path": "taxRegimes/{id}",
+      "type": "root",
+      "domain": "Tenant & RBAC"
+    },
+    {
+      "path": "teams/{id}",
+      "type": "root",
+      "domain": "Tenant & RBAC"
+    },
+    {
+      "path": "uniqueKeys/{id}",
+      "type": "root",
+      "domain": "System Infrastructure"
+    },
+    {
+      "path": "units/{id}",
+      "type": "root",
+      "domain": "Catalog & Inventory"
+    },
+    {
+      "path": "usageCounterShards/{id}",
       "type": "root",
       "domain": "Analytics & Usage Metering"
     },
     {
-      "path": "organizationUsageMonthly/{docId}",
+      "path": "usageRateCards/{id}",
       "type": "root",
       "domain": "Analytics & Usage Metering"
     },
     {
-      "path": "branchUsageDaily/{docId}",
+      "path": "users/{id}",
       "type": "root",
-      "domain": "Analytics & Usage Metering"
+      "domain": "Tenant & RBAC"
     },
     {
-      "path": "branchUsageMonthly/{docId}",
+      "path": "vendors/{id}",
       "type": "root",
-      "domain": "Analytics & Usage Metering"
-    },
-    {
-      "path": "platformUsageSnapshots/{docId}",
-      "type": "root",
-      "domain": "Analytics & Usage Metering"
-    },
-    {
-      "path": "usageRateCards/{docId}",
-      "type": "root",
-      "domain": "Analytics & Usage Metering"
-    },
-    {
-      "path": "usageAllocationRuns/{docId}",
-      "type": "root",
-      "domain": "Analytics & Usage Metering"
+      "domain": "Parties & Ledgers"
     }
   ],
   "categories": {
@@ -345,7 +378,8 @@
         "usageGetPlatformSummary",
         "usageGetOrganizations",
         "usageCalculateDryRunStatement",
-        "usageUpdateLimits"
+        "usageUpdateLimits",
+        "organizationsSetSubscription"
       ]
     },
     "REFERENCE_DATA": {
@@ -372,7 +406,8 @@
           "jobRolesCreate",
           "jobRolesUpdate",
           "teamsCreate",
-          "teamsUpdate"
+          "teamsUpdate",
+          "teamsAssignMember"
         ],
         "Catalog & Parties": [
           "productsCreate",
@@ -390,10 +425,17 @@
           "outflowsCreate",
           "billsCreate",
           "billsFinalize",
+          "billsUpdateDraft",
+          "billsVoid",
+          "outflowsVoid",
+          "documentsDecide",
           "deliveriesCreate",
           "deliveriesUpdateStatus",
           "returnsCreate",
-          "paymentsCreate"
+          "paymentsCreate",
+          "paymentsVoid",
+          "recurringExpensesCreate",
+          "recurringExpensesUpdate"
         ],
         "Stock & Reconciliation": [
           "stockAdjust",
@@ -440,7 +482,10 @@
           "deliveriesGet",
           "returnsList",
           "paymentsList",
-          "stockMovementsList"
+          "stockMovementsList",
+          "productsGetPriceHistory",
+          "auditGetEntityHistory",
+          "recurringExpensesList"
         ],
         "Reports & Telemetry": [
           "reportsGetRevenue",
@@ -449,6 +494,8 @@
           "reportsGetTopEntities",
           "reportsGetStaffActivity",
           "reportsExportCsv",
+          "reportsGetPartyStatement",
+          "reportsGetOutflowSummary",
           "tasksList",
           "locationsGetLatest",
           "locationsGetHistory"

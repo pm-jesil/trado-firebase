@@ -12,6 +12,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { calculateTax } from "../../services/taxCalculation.js";
 import { Money } from "../../services/money.js";
+import { buildLogDoc, sanitizeAuditDetails } from "../../services/audit.js";
 
 describe("Business Core Services - Tax Calculation", () => {
   it("calculates standard India GST (18%) split into CGST (9%) and SGST (9%) for intra-state sales", () => {
@@ -212,5 +213,24 @@ describe("Business Core Services - Decimal-Safe Money & Precision Utility", () =
     const added = Money.addTax(84.75, 18, "INR");
     assert.equal(added.tax, 15.26); // commercial rounding of 84.75 * 0.18 = 15.255 -> 15.26
     assert.equal(added.gross, 100.01);
+  });
+});
+
+describe("Business Core Services - Audit log hygiene", () => {
+  it("redacts camelCase secrets (initialPassword, fcmToken, refreshToken, accessToken)", () => {
+    const out = sanitizeAuditDetails({ initialPassword: "x", fcmToken: "t", refreshToken: "r", accessToken: "a", reason: "ok" });
+    assert.deepEqual(out, { initialPassword: "[REDACTED]", fcmToken: "[REDACTED]", refreshToken: "[REDACTED]", accessToken: "[REDACTED]", reason: "ok" });
+  });
+
+  it("never copies entity attributes into details; keeps event facts and the changed fields", () => {
+    const doc = buildLogDoc({
+      organizationId: "org1", actorUid: "u1", action: "BILL_CREATED", entityType: "bill", entityId: "b1",
+      details: { billNumber: "INV-1", totalAmount: 100, name: "Tea", reason: "walk-in", approvalNote: null },
+      changes: [{ field: "sellingPrice", from: 10, to: 12 }],
+    });
+    assert.deepEqual(doc.details, { reason: "walk-in", approvalNote: null });
+    assert.deepEqual(doc.changedFields, ["sellingPrice"]);
+    const empty = buildLogDoc({ actorUid: "u1", action: "X", entityType: "bill", entityId: "b1", details: { name: "only" } });
+    assert.equal(empty.details, undefined);
   });
 });

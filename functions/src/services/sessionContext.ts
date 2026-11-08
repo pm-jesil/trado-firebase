@@ -8,6 +8,7 @@
 
 import { HttpsError } from "firebase-functions/v2/https";
 import { db, auth } from "./firebase.js";
+import { effectiveBusinessConfig } from "../constants/businessDefaults.js";
 import {
   UserDoc,
   MembershipDoc,
@@ -31,12 +32,25 @@ import {
 } from "../types/api.js";
 import { resolveAllEffectivePermissions } from "./permissionResolver.js";
 import { DEFAULT_SYSTEM_ROLES } from "../constants/catalogs.js";
+import { evaluateSubscription } from "./subscription.js";
+import { GateReason } from "../constants/enums.js";
 
 export interface BuildAuthSessionContextOptions {
   uid: string;
   deviceId?: string;
   requestedOrgId?: string;
   requestedBranchId?: string;
+}
+
+function toSubscriptionContext(org: OrganizationDoc): NonNullable<AuthSessionContext["subscription"]> {
+  const sub = evaluateSubscription(org);
+  return {
+    state: sub.state,
+    planId: org.planId || null,
+    expiresAt: sub.expiresAt ?? null,
+    graceEndsAt: sub.graceEndsAt ?? null,
+    daysRemaining: sub.daysRemaining ?? null,
+  };
 }
 
 export async function buildAuthSessionContext(
@@ -66,7 +80,6 @@ export async function buildAuthSessionContext(
     
     await deviceRef.set(
       {
-        deviceId: cleanDeviceId,
         lastLoginAt: nowIso,
         updatedAt: nowIso,
       },
@@ -250,10 +263,37 @@ export async function buildAuthSessionContext(
 
   const primaryOrgContext: AuthPrimaryOrganizationContext | null = primaryOrgData
     ? {
-        organizationId: primaryMembership.organizationId,
-        name: primaryOrgData.name,
-      }
+      organizationId: primaryMembership.organizationId,
+      name: primaryOrgData.name,
+    }
     : null;
+
+  // 7b. Organization status & subscription: a locked tenant gets a distinct status, zero permissions
+  if (primaryOrgData) {
+    const sub = evaluateSubscription(primaryOrgData);
+    const subscriptionContext = toSubscriptionContext(primaryOrgData);
+    let lockedStatus: AuthSessionContext["contextStatus"] | null = null;
+    if (primaryOrgData.status !== "active") lockedStatus = "organization_inactive";
+    else if (sub.reason === GateReason.SUBSCRIPTION_EXPIRED) lockedStatus = "subscription_expired";
+    else if (sub.reason === GateReason.SUBSCRIPTION_NOT_STARTED) lockedStatus = "subscription_not_started";
+    else if (sub.reason) lockedStatus = "subscription_suspended";
+    if (lockedStatus) {
+      return {
+        user: tenantUser,
+        role: null,
+        jobRoles: [],
+        permissions: [],
+        platformPermissions: [],
+        organizations: organizationsList,
+        primaryOrganization: { organizationId: primaryMembership.organizationId, name: primaryOrgData.name },
+        branches: [],
+        primaryBranch: null,
+        device: deviceContext,
+        contextStatus: lockedStatus,
+        subscription: subscriptionContext,
+      };
+    }
+  }
 
   // 8. Resolve Role, Job Roles & Branch Context for Primary Organization
   const roleCode = roleData?.code || "employee";
@@ -360,7 +400,7 @@ export async function buildAuthSessionContext(
     rolePermissions: roleData?.permissions || [],
     membershipOverrides: primaryMembership.permissions || {},
     planModuleFlags: planFlags,
-    orgModuleToggles: primaryOrgData?.moduleToggles || {},
+    orgModuleToggles: primaryOrgData ? effectiveBusinessConfig(primaryOrgData).modules : {},
   });
 
   // 10. Compute Context Status
@@ -381,6 +421,8 @@ export async function buildAuthSessionContext(
     primaryBranch: primaryBranchContext,
     device: deviceContext,
     contextStatus,
+    businessConfig: primaryOrgData ? effectiveBusinessConfig(primaryOrgData) : null, // override ?? business-type default
+    subscription: primaryOrgData ? toSubscriptionContext(primaryOrgData) : null,
   };
 }
 

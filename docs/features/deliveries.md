@@ -2,90 +2,183 @@
 
 ---
 
-## 1. Purpose & Scope
-This module provides delivery dispatch, rider assignment, and order fulfillment tracking for Trado:
-- **Delivery Document**: `deliveries/{deliveryId}` tracks fulfillment lifecycle, recipient contact details, delivery addresses, and rider assignments.
-- **Reference-by-ID Architecture**: Deliveries reference their parent order via `billId` by bare ID only. The entire bill document is never embedded.
-- **Status Lifecycle**: Tracks shipment progression (`pending -> dispatched -> delivered -> failed`).
-- **Automated Push Notifications**: The trigger `onDeliveryWritten` automatically dispatches an in-app and push notification when a rider is assigned to a delivery.
+## 1. Module Overview & Fulfillment Architecture
 
----
+The Deliveries module provides order fulfillment tracking, rider dispatching, Cash-on-Delivery (COD) reconciliation, and push notification triggers for Trado:
+- **Delivery Master (`deliveries/{deliveryId}`)**: Manages fulfillment state, partial delivery line items, recipient contact details, physical delivery address, and rider assignment.
+- **Bare Reference Architecture**: Deliveries reference their parent order via `billId` by bare ID only. The entire bill document is never embedded.
+- **Partial Delivery Support**: Allows splitting an order across multiple shipments by specifying `lines: [{ lineId, quantity }]`.
+- **Cash-on-Delivery (COD) Engine**: Supports door-step cash and UPI collection, automatically settling pre-sale orders and generating payment records.
+- **Automated Dispatch Triggers**: Trigger `onDeliveryWritten` dispatches real-time in-app and FCM push notifications when a rider is assigned.
 
-## 2. Actors & Permissions
-- **Dispatch Manager / Cashier**: Requires `delivery:create` or `delivery:write`. Can schedule deliveries upon bill creation, enter shipping addresses, and assign riders.
-- **Delivery Rider**: Requires `delivery:read` and `delivery:status`. Can view assigned delivery orders, access customer phone/address, and update transit status (`dispatched`, `delivered`, `failed`).
-- **Customer Support / Auditor**: Requires `delivery:read`. Can inspect delivery logs and retrieve tracking information.
+```mermaid
+flowchart TD
+    subgraph BillingLayer["Sales Billing"]
+        Bill["bills/{billId}\n(Invoice / Sales Order)"]
+    end
 
----
+    subgraph DeliveryCore["Deliveries Module"]
+        Delivery["deliveries/{deliveryId}\n(DEL-YYYY-XXXXXX)\nstatus: pending | dispatched | delivered | failed"]
+        Address["address: { line1, line2, city, pincode }"]
+        COD["cod: { isCod: boolean, amount: number }"]
+    end
 
-## 3. Delivery Status Lifecycle
+    subgraph FulfillmentDispatch["Rider Dispatch & Notifications"]
+        Rider["Rider Membership\n(riderMembershipId)"]
+        FCM["FCM Notification Delivery\n(onDeliveryWritten trigger)"]
+        DoorPayment["Door Payment Entry\n(payments/{paymentId} on COD)"]
+    end
 
+    Bill --> Delivery
+    Delivery --> Address
+    Delivery --> COD
+    Delivery --> Rider
+    Rider --> FCM
+    Delivery -.->|If COD Collected| DoorPayment
 ```
-    [Create Delivery]
-           |
-           v
-       (PENDING) ------[Rider Assigned / Dispatched]------> (DISPATCHED)
-           |                                                      |
-           |                                                      +-----> (DELIVERED) [Success]
-           +------------[Immediate Cancel / Abort]---------> (FAILED)   [Address Not Found / Rejected]
+
+---
+
+## 2. Delivery Status Lifecycle & State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Pending: deliveriesCreate (Awaiting packaging/rider)
+    Pending --> Dispatched: deliveriesUpdateStatus (Assigned to rider & in transit)
+    Pending --> Failed: Order cancelled before dispatch
+    
+    Dispatched --> Delivered: Handed over to recipient (COD settled if applicable)
+    Dispatched --> Failed: Recipient unavailable / address incorrect
+    
+    Failed --> Dispatched: Re-attempted delivery
+    Delivered --> [*]
 ```
 
-### Supported Status Transitions
-- `pending`: Delivery order created, awaiting packing or vehicle assignment.
-- `dispatched`: Goods handed over to rider or transport courier; in transit to customer.
-- `delivered`: Goods successfully handed over to customer; electronic proof or receipt confirmed.
-- `failed`: Delivery attempted but unsuccessful (customer unavailable, incorrect address, goods refused).
+---
+
+## 3. End-to-End Sequence Diagrams
+
+### 3.1 Delivery Creation & Dispatch Flow (`deliveriesCreate`)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Staff as Dispatch Clerk / Cashier
+    participant GW as Cloud Functions (deliveriesCreate)
+    participant DB as Cloud Firestore
+    participant Trigger as Event Trigger (onDeliveryWritten)
+    participant FCM as Firebase Cloud Messaging
+
+    Staff->>GW: Call deliveriesCreate(billId, address, riderMembershipId, cod)
+    GW->>GW: Verify caller has delivery:create permission
+    GW->>GW: Validate CreateDeliverySchema & check idempotency lease
+    
+    Note over GW,DB: Atomic Multi-Document Firestore Transaction
+    GW->>DB: Read bills/{billId} (verify exists & belongs to org)
+    GW->>DB: Verify riderMembershipId belongs to org and has role_rider
+    GW->>DB: Reserve sequential delivery number (DEL-2026-XXXXXX)
+    
+    GW->>DB: Write deliveries/{deliveryId} (status: "pending", deliveryNumber)
+    GW->>DB: Append auditLogs/{auditId}
+    
+    GW->>Trigger: Document written to deliveries collection
+    Trigger->>DB: Write in-app notification to notifications collection
+    Trigger->>FCM: Dispatch push notification to rider device
+    
+    GW-->>Staff: Return CreateDeliveryResponse (deliveryId, deliveryNumber, status: "pending")
+```
 
 ---
 
-## 4. Step-by-Step Happy Path Workflows
+## 4. API Reference & Parameter Specifications
 
-### 4.1 Creating a Delivery Order
-1. **Cashier calls `deliveriesCreate`**:
-   - Payload:
-     ```json
-     {
-       "organizationId": "org_demo",
-       "branchId": "main-branch",
-       "billId": "bill_inv_001",
-       "riderMembershipId": "mem_rider_alex",
-       "recipientName": "Rahul Sharma",
-       "recipientPhone": "+919876543210",
-       "deliveryAddress": "Flat 4B, Emerald Heights, Kochi",
-       "notes": "Fragile items inside"
-     }
-     ```
-2. **Backend Execution**:
-   - Verifies `bill_inv_001` exists in `org_demo`.
-   - Generates sequential delivery number `DEL-2026-000001`.
-   - Commits `deliveries/{deliveryId}` with `status: "pending"`.
-   - Fires trigger `onDeliveryWritten`: writes in-app notification to `notifications` assigned to rider `mem_rider_alex`.
+### 4.1 `deliveriesCreate`
+Creates a delivery fulfillment record for an invoice or sales order.
 
-### 4.2 Rider Updates Delivery Status to Delivered
-1. **Rider calls `deliveriesUpdateStatus`**:
-   - Payload:
-     ```json
-     {
-       "organizationId": "org_demo",
-       "deliveryId": "del_001",
-       "status": "delivered",
-       "proofOfDelivery": "Received by customer Rahul S."
-     }
-     ```
-2. **Backend Execution**:
-   - Updates `deliveries/del_001`: sets `status: "delivered"`, `completedAt: "<timestamp>"`.
-   - Records audit log entry in `auditLogs`.
+#### Request Parameters
+```typescript
+interface CreateDeliveryRequest {
+  idempotencyKey?: string;           // 8-128 char unique lease key
+  organizationId?: string;           // Optional (derived from token context)
+  branchId?: string;                 // Optional (derived from token context)
+  billId: string;                    // Target bill / order ID
+  lines?: Array<{                    // Optional partial line item fulfillment
+    lineId: string;
+    quantity: number;
+  }>;
+  recipient?: {                      // Person receiving package (if different from bill-to party)
+    name: string;
+    phone: string;
+  };
+  address: {                         // Physical delivery address
+    line1: string;
+    line2?: string;
+    landmark?: string;
+    city: string;
+    pincode: string;
+  };
+  riderMembershipId?: string | null; // Assigned delivery rider membership ID
+  partner?: "internal" | "dunzo" | "shadowfax" | "other"; // Default: "internal"
+  deliveryFee?: number;              // Extra shipping/delivery charge (default: 0)
+  cod?: {                            // Cash-on-Delivery specifications
+    isCod: boolean;
+    amount: number;
+  };
+  notes?: string;                    // Delivery instructions
+}
+```
+
+#### Success Response (200 OK)
+```json
+{
+  "deliveryId": "del_1a2b3c4d5e",
+  "organizationId": "org_apex_sample",
+  "deliveryNumber": "DEL-2026-000031",
+  "status": "pending",
+  "billId": "bill_6a7b8c9d0e",
+  "partner": "internal",
+  "message": "Delivery scheduled successfully."
+}
+```
 
 ---
 
-## 5. Security & Anti-Embedding Compliance
-- **Anti-Embedding**: The delivery document stores `billId` as a reference string. It does not duplicate invoice line items, tax breakdowns, or customer master records.
-- **Branch Attribution**: Deliveries belong to the originating dispatch branch (`branchId`). Riders only see deliveries originating from their assigned operating branches.
+### 4.2 `deliveriesUpdateStatus`
+Updates transit progression, door-step COD collection, and final completion.
+
+#### Request Parameters
+```typescript
+interface UpdateDeliveryStatusRequest {
+  deliveryId: string;                // Target delivery ID
+  status: "pending" | "dispatched" | "delivered" | "failed";
+  riderMembershipId?: string;        // Optional reassignment
+  codCollected?: boolean;            // True if cash/UPI was collected at the door
+  collectedAmount?: number;          // Exact monetary amount collected
+  paymentMethod?: PaymentMethod;     // "cash" | "upi"
+  notes?: string;                    // Delivery feedback / failure reason
+}
+```
+
+#### Success Response (200 OK)
+```json
+{
+  "deliveryId": "del_1a2b3c4d5e",
+  "status": "delivered",
+  "codCollected": true,
+  "collectedAmount": 1450.00,
+  "completedAt": "2026-11-08T18:15:00.000Z",
+  "message": "Delivery status updated to delivered."
+}
+```
 
 ---
 
-## 6. Local Testing & Verification
-- **Integration Tests**: `functions/scripts/test-callables-integration.js`
-  - Tests verify `deliveriesCreate` stores `billId` by ID only without embedding the bill document.
-- **Trigger Test**: Part 4 of `functions/scripts/test-phase3-integration.js` verifies automated notification generation on delivery assignment.
+## 5. Manual Emulator Testing Commands
 
+```powershell
+# 1. Run Schema and Validation tests for Deliveries
+node functions/scripts/test-callable-schemas.cjs
+
+# 2. Run Delivery Event Trigger and Notification tests
+node functions/scripts/test-event-triggers.cjs
+```

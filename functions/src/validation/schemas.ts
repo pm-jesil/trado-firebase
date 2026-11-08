@@ -3,6 +3,37 @@
  */
 
 import { z } from "zod";
+
+/** Cap on owned line arrays (bills.items, outflows.lines, returns.items): keeps documents far below 1 MiB. */
+export const MAX_DOCUMENT_LINES = 200;
+
+/** Request-context fields every callable may send (read by the gate; derived from the token when absent). */
+export const ContextFields = {
+  organizationId: z.string().trim().min(2).optional(),
+  branchId: z.string().trim().optional(),
+};
+
+// Not added to AuthLoginSchema / AuthMeSchema: sign-in must never accept tenant context from the client.
+/** Callables that take no business input still reject unknown keys. */
+export const ContextOnlySchema = z.strictObject(ContextFields);
+
+/** Single-document get by id: { <idField>: string } plus the context fields. */
+function getByIdSchema<K extends string>(idField: K) {
+  return z.strictObject({ ...ContextFields, [idField]: z.string().trim().min(2, `${idField} is required`) } as { organizationId: typeof ContextFields.organizationId; branchId: typeof ContextFields.branchId } & Record<K, z.ZodString>);
+}
+export const GetBillSchema = getByIdSchema("billId");
+export const GetProductSchema = getByIdSchema("productId");
+export const GetCustomerSchema = getByIdSchema("customerId");
+export const GetVendorSchema = getByIdSchema("vendorId");
+export const GetOutflowSchema = getByIdSchema("outflowId");
+export const GetDeliverySchema = getByIdSchema("deliveryId");
+export const ListPlansSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId, includeInactive: z.boolean().optional() });
+export const RecordClientMetricSchema = z.strictObject({
+  ...ContextFields,
+  metrics: z.record(z.string(), z.number()), // keys/ranges validated against CLIENT_METRIC_KEYS in the callable
+});
 import {
   BusinessType,
   BusinessCategory,
@@ -19,21 +50,43 @@ import {
   PaymentDirection,
   UnitGroup,
   DocumentType,
+  StockAdjustmentReason,
+  SalesChannel,
+  SubscriptionStatus,
 } from "../constants/enums.js";
 
-export const AuthLoginSchema = z.object({
+export const AuthLoginSchema = z.strictObject({
   email: z.string().trim().email().toLowerCase(),
   password: z.string().min(1, "Password is required").max(512),
   deviceId: z.string().trim().min(4).max(128).optional(),
-}).strict();
+});
 export type AuthLoginInput = z.infer<typeof AuthLoginSchema>;
 
-export const AuthMeSchema = z.object({
+export const AuthMeSchema = z.strictObject({
   deviceId: z.string().trim().min(4).max(128).optional(),
-}).strict();
+});
 export type AuthMeInput = z.infer<typeof AuthMeSchema>;
 
-export const CreateOrganizationSchema = z.object({
+export const OrganizationContactSchema = z.strictObject({
+  id: z.string().trim().min(2).max(64),
+  name: z.string().trim().min(2).max(100),
+  designation: z.string().trim().max(100).nullable().optional(),
+  phone: z.string().trim().max(30).nullable().optional(),
+  email: z.string().trim().email().toLowerCase().nullable().optional(),
+  type: z.enum(["primary", "billing", "technical", "operations", "other"]).optional(),
+  isPrimary: z.boolean().default(false),
+  notifyBy: z.enum(["email", "sms", "both", "none"]).optional(),
+  isActive: z.boolean().default(true),
+  createdAt: z.string().trim().optional(),
+  updatedAt: z.string().trim().optional(),
+  createdBy: z.string().trim().optional(),
+  updatedBy: z.string().trim().optional(),
+});
+export type OrganizationContactInput = z.infer<typeof OrganizationContactSchema>;
+
+export const CreateOrganizationSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
   name: z.string().trim().min(2).max(100),
   businessType: z.nativeEnum(BusinessType),
@@ -48,29 +101,110 @@ export const CreateOrganizationSchema = z.object({
   initialPassword: z.string().min(8).max(128).optional(),
   defaultBranchName: z.string().trim().min(2).max(100).optional(),
   defaultBranchCode: z.string().trim().min(2).max(20).regex(/^[A-Za-z0-9_-]+$/).optional(),
+  salesChannels: z.array(z.nativeEnum(SalesChannel)).min(1).max(4).optional(),
+  timezone: z.string().trim().min(3).max(64).optional(), // IANA, default Asia/Kolkata
+  contacts: z.array(OrganizationContactSchema).max(20).optional(),
+  subscription: z.strictObject({
+    status: z.nativeEnum(SubscriptionStatus).optional(), // default trial
+    startsAt: z.string().trim().optional(), // ISO instant, default now
+    expiresOn: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), // date in org timezone
+    durationDays: z.number().int().min(1).max(3660).optional(), // default 30
+    graceDays: z.number().int().min(0).max(90).optional(),
+  }).optional(),
 });
 
-export const UpdateOrganizationSchema = z.object({
+const OrganizationAddressSchema = z.strictObject({
+  line1: z.string().trim().max(200).optional(),
+  line2: z.string().trim().max(200).optional(),
+  city: z.string().trim().max(100).optional(),
+  state: z.string().trim().max(100).optional(),
+  pincode: z.string().trim().max(20).optional(),
+  country: z.string().trim().max(2).optional(),
+});
+
+/**
+ * Field-level write policy is enforced in organizationsUpdate (ORGANIZATION_FIELD_POLICY).
+ * Unknown fields are rejected (every schema is a z.strictObject; see validation/parseInput.ts).
+ */
+export const UpdateOrganizationSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2),
+  // Super Admin only (identity, entitlements, billing-affecting)
   name: z.string().trim().min(2).max(100).optional(),
   businessType: z.nativeEnum(BusinessType).optional(),
   businessCategory: z.nativeEnum(BusinessCategory).optional(),
   moduleToggles: z.record(z.string(), z.boolean()).optional(),
+  salesChannels: z.array(z.nativeEnum(SalesChannel)).min(1).max(4).optional(),
+  timezone: z.string().trim().min(3).max(64).optional(),
+  // Owner-editable profile and operational settings
+  displayName: z.string().trim().min(2).max(100).optional(),
   logoUrl: z.string().url().optional(),
+  imageUrls: z.array(z.string().url()).max(10).optional(),
+  taxNumber: z.string().trim().max(30).nullable().optional(),
+  website: z.string().url().nullable().optional(),
+  contactEmail: z.string().trim().email().nullable().optional(),
+  contactPhone: z.string().trim().max(20).nullable().optional(),
+  contacts: z.array(OrganizationContactSchema).max(20).optional(),
+  address: OrganizationAddressSchema.optional(),
+  bankDetails: z.strictObject({
+    accountName: z.string().trim().max(100).optional(),
+    bankName: z.string().trim().max(100).optional(),
+    accountNumber: z.string().trim().regex(/^[0-9]{6,20}$/).optional(),
+    ifsc: z.string().trim().max(15).optional(),
+    upiId: z.string().trim().max(60).optional(),
+  }).nullable().optional(),
+  settings: z.strictObject({
+    approvals: z.strictObject({
+      enabled: z.boolean(),
+      modules: z.strictObject({
+        sale: z.boolean().optional(),
+        purchase: z.boolean().optional(),
+        expense: z.boolean().optional(),
+        return: z.boolean().optional(),
+        stock_adjustment: z.boolean().optional(),
+      }).optional(),
+      amountThreshold: z.number().min(0).optional(),
+    }).optional(),
+    // Overrides of the business-type defaults (absent = default; constants/businessDefaults.ts)
+    businessConfig: z.strictObject({
+      defaultUnits: z.array(z.string().trim().min(1).max(20)).max(20).optional(),
+      productFields: z.record(z.enum(["expiry", "batch", "serial", "variants", "alternateUnits", "jewellery"]), z.boolean()).optional(),
+      salesMode: z.nativeEnum(SalesMode).optional(),
+    }).optional(),
+  }).optional(),
 });
 
-export const DeactivateOrganizationSchema = z.object({
+/** Super Admin subscription lifecycle. */
+export const SetSubscriptionSchema = z.strictObject({
+  branchId: ContextFields.branchId,
+  organizationId: z.string().trim().min(2),
+  action: z.enum(["set", "renew", "extend", "suspend", "reactivate", "cancel", "change_plan"]),
+  planId: z.string().trim().min(2).max(64).optional(),
+  status: z.nativeEnum(SubscriptionStatus).optional(),
+  expiresOn: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  durationDays: z.number().int().min(1).max(3660).optional(),
+  extendDays: z.number().int().min(1).max(3660).optional(),
+  graceDays: z.number().int().min(0).max(90).optional(),
+  reason: z.string().trim().max(500).optional(),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const DeactivateOrganizationSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2),
   reason: z.string().trim().max(500).optional(),
 });
 
-export const ListOrganizationsSchema = z.object({
+export const ListOrganizationsSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   limit: z.number().int().min(1).max(100).default(20).optional(),
   startAfterId: z.string().trim().optional(),
   status: z.nativeEnum(EntityStatus).optional(),
 });
 
-export const CreateEmployeeSchema = z.object({
+export const CreateEmployeeSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2),
   email: z.string().trim().email().toLowerCase(),
@@ -79,100 +213,134 @@ export const CreateEmployeeSchema = z.object({
   initialPassword: z.string().min(8).max(128).optional(),
   roleId: z.string().trim().min(2).default("role_employee").optional(),
   departmentId: z.string().trim().optional(),
-  jobRoleIds: z.array(z.string().trim()).default([]).optional(),
+  jobRoleIds: z.array(z.string().trim()).max(20).default([]).optional(),
   teamId: z.string().trim().optional(),
-  reportingToIds: z.array(z.string().trim()).default([]).optional(),
+  reportingToIds: z.array(z.string().trim()).max(10).default([]).optional(),
   permissionOverrides: z.record(z.string(), z.boolean()).default({}).optional(),
-  branchIds: z.array(z.string().trim()).optional(),
+  branchIds: z.array(z.string().trim()).max(100).optional(),
   defaultBranchId: z.string().trim().optional(),
 });
 
-export const UpdateEmployeeSchema = z.object({
+export const UpdateEmployeeSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2),
   membershipId: z.string().trim().min(2),
   name: z.string().trim().min(2).max(100).optional(),
   phone: z.string().trim().optional(),
   roleId: z.string().trim().optional(),
   departmentId: z.string().trim().nullable().optional(),
-  jobRoleIds: z.array(z.string().trim()).optional(),
+  jobRoleIds: z.array(z.string().trim()).max(20).optional(),
   teamId: z.string().trim().nullable().optional(),
-  reportingToIds: z.array(z.string().trim()).optional(),
+  reportingToIds: z.array(z.string().trim()).max(10).optional(),
   permissionOverrides: z.record(z.string(), z.boolean()).optional(),
   status: z.nativeEnum(EntityStatus).optional(),
+  dataScopes: z.record(
+    z.enum(["sales", "purchases", "expenses", "deliveries", "returns", "payments", "stock", "tasks"]),
+    z.enum(["self", "team", "branch", "organization"])
+  ).optional(),
 });
 
-export const DeactivateEmployeeSchema = z.object({
+export const DeactivateEmployeeSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2),
   membershipId: z.string().trim().min(2),
   reason: z.string().trim().max(500).optional(),
 });
 
-export const ListEmployeesSchema = z.object({
+export const ListEmployeesSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
   status: z.nativeEnum(EntityStatus).optional(),
 });
 
-export const CreateRoleSchema = z.object({
+export const CreateRoleSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().nullable().optional(),
   name: z.string().trim().min(2).max(100),
   code: z.string().trim().min(2).max(50).toLowerCase(),
-  permissions: z.array(z.string().trim()).min(1),
+  permissions: z.array(z.string().trim()).max(300).min(1),
   description: z.string().trim().max(500),
 });
 
-export const UpdateRoleSchema = z.object({
+export const UpdateRoleSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   roleId: z.string().trim().min(2),
   name: z.string().trim().min(2).max(100).optional(),
-  permissions: z.array(z.string().trim()).optional(),
+  permissions: z.array(z.string().trim()).max(300).optional(),
   description: z.string().trim().max(500).optional(),
 });
 
-export const CreateDepartmentSchema = z.object({
+export const CreateDepartmentSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().nullable().optional(),
   name: z.string().trim().min(2).max(100),
-  headMembershipIds: z.array(z.string().trim()).optional(),
+  headMembershipIds: z.array(z.string().trim()).max(20).optional(),
 });
 
-export const UpdateDepartmentSchema = z.object({
+export const UpdateDepartmentSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   departmentId: z.string().trim().min(2),
   name: z.string().trim().min(2).max(100).optional(),
-  headMembershipIds: z.array(z.string().trim()).optional(),
+  headMembershipIds: z.array(z.string().trim()).max(20).optional(),
 });
 
-export const CreateJobRoleSchema = z.object({
+export const CreateJobRoleSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().nullable().optional(),
   name: z.string().trim().min(2).max(100),
 });
 
-export const UpdateJobRoleSchema = z.object({
+export const UpdateJobRoleSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   jobRoleId: z.string().trim().min(2),
   name: z.string().trim().min(2).max(100).optional(),
 });
 
-export const CreateTeamSchema = z.object({
+export const CreateTeamSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2),
   name: z.string().trim().min(2).max(100),
+  description: z.string().trim().max(500).optional(),
+  leaderMembershipId: z.string().trim().min(2).optional(),
 });
 
-export const UpdateTeamSchema = z.object({
+export const UpdateTeamSchema = z.strictObject({
+  branchId: ContextFields.branchId,
+  organizationId: z.string().trim().min(2).optional(),
   teamId: z.string().trim().min(2),
   name: z.string().trim().min(2).max(100).optional(),
+  description: z.string().trim().max(500).optional(),
+  leaderMembershipId: z.string().trim().min(2).nullable().optional(),
+  isActive: z.boolean().optional(),
 });
 
-export const CreatePlanSchema = z.object({
+export const TeamMemberSchema = z.strictObject({
+  branchId: ContextFields.branchId,
+  organizationId: z.string().trim().min(2).optional(),
+  teamId: z.string().trim().min(2),
+  membershipId: z.string().trim().min(2),
+  action: z.enum(["add", "remove"]),
+});
+
+export const CreatePlanSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
   name: z.string().trim().min(2).max(100),
   price: z.number().nonnegative(),
   currency: z.string().trim().length(3).toUpperCase(),
   storageLimitMb: z.number().positive(),
   monthlyDocumentVolumeLimit: z.number().positive(),
-  seatLimits: z.object({
+  seatLimits: z.strictObject({
     admin: z.number().int().positive(),
     staff: z.number().int().positive(),
   }),
@@ -181,7 +349,9 @@ export const CreatePlanSchema = z.object({
   isActive: z.boolean().default(true).optional(),
 });
 
-export const UpdatePlanSchema = z.object({
+export const UpdatePlanSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   planId: z.string().trim().min(2),
   name: z.string().trim().min(2).max(100).optional(),
   price: z.number().nonnegative().optional(),
@@ -190,7 +360,9 @@ export const UpdatePlanSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-export const RegisterFcmTokenSchema = z.object({
+export const RegisterFcmTokenSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   deviceId: z.string().trim().min(4).max(128),
   fcmToken: z.string().trim().min(10).max(512),
   platform: z.enum(["android", "ios", "web"]),
@@ -201,7 +373,55 @@ export const RegisterFcmTokenSchema = z.object({
 // ============================================================
 
 // 1. Products
-export const CreateProductSchema = z.object({
+export const ProductAlternateUnitSchema = z.strictObject({
+  unit: z.string().trim().min(1).max(30), // e.g. "box"
+  factor: z.number().positive(), // base units per this unit, e.g. 1 box = 12 piece
+  sellingPrice: z.number().min(0).optional(), // price per this unit (defaults to factor * base price)
+  wholesalePrice: z.number().min(0).optional(),
+  barcode: z.string().trim().max(100).optional(),
+  isPurchaseUnit: z.boolean().optional(),
+  isSaleUnit: z.boolean().optional(),
+});
+
+const PhysicalMeasureSchema = z.strictObject({ value: z.number().min(0), unit: z.string().trim().min(1).max(10) });
+
+const ProductAttributeFields = {
+  brand: z.string().trim().max(100).optional(),
+  alternateUnits: z.array(ProductAlternateUnitSchema).max(10).optional(),
+  isTaxable: z.boolean().default(true).optional(),
+  taxExemptionReason: z.string().trim().max(200).optional(),
+  isDiscountable: z.boolean().default(true).optional(),
+  maxDiscountPercent: z.number().min(0).max(100).optional(), // Enforced in billing
+  isReturnable: z.boolean().optional(),
+  returnWindowDays: z.number().int().min(0).max(3650).optional(),
+  reorderLevel: z.number().min(0).optional(),
+  maxStockLevel: z.number().min(0).optional(),
+  weight: PhysicalMeasureSchema.optional(),
+  dimensions: z.strictObject({
+    length: z.number().min(0).optional(),
+    width: z.number().min(0).optional(),
+    height: z.number().min(0).optional(),
+    unit: z.string().trim().min(1).max(10),
+  }).optional(),
+  size: z.string().trim().max(50).optional(),
+  imagePaths: z.array(z.string().trim().max(500)).max(8).optional(), // Cloud Storage object paths
+  warrantyMonths: z.number().int().min(0).max(240).optional(),
+  jewellery: z.strictObject({
+    grossWeightGrams: z.number().min(0).optional(),
+    netWeightGrams: z.number().min(0).optional(),
+    purity: z.string().trim().max(20).optional(), // e.g. "22K", "916", "925"
+    makingCharge: z.number().min(0).optional(),
+    makingChargeType: z.enum(["per_gram", "flat", "percent"]).optional(),
+    hallmarkId: z.string().trim().max(50).optional(),
+    priceByDailyRate: z.boolean().optional(),
+  }).optional(),
+  variantGroupId: z.string().trim().max(128).nullable().optional(), // Shared by all variants of one model
+  variantAttributes: z.record(z.string().trim().max(30), z.string().trim().max(60)).optional(), // {size:"26in", colour:"red"}
+  visibilityScope: z.enum(["all_branches", "selected_branches", "branch_only"]).optional(),
+  sharedForBranchIds: z.array(z.string().trim()).max(100).optional(),
+};
+
+export const CreateProductSchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(), // Derived server-side from active context
@@ -228,10 +448,12 @@ export const CreateProductSchema = z.object({
   isPurchaseOnly: z.boolean().optional(),
   isExpenseOnly: z.boolean().optional(),
   isSaleOnly: z.boolean().optional(),
+  ...ProductAttributeFields,
 });
 
-export const UpdateProductSchema = z.object({
+export const UpdateProductSchema = z.strictObject({
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
+  branchId: z.string().trim().optional(),
   productId: z.string().trim().min(2),
   name: z.string().trim().min(1).max(150).optional(),
   description: z.string().trim().max(1000).optional(),
@@ -249,10 +471,14 @@ export const UpdateProductSchema = z.object({
   hasExpiry: z.boolean().optional(),
   trackStock: z.boolean().optional(),
   lowStockThreshold: z.number().min(0).optional(),
+  trackBatch: z.boolean().optional(),
+  trackSerial: z.boolean().optional(),
   isActive: z.boolean().optional(),
+  ...ProductAttributeFields,
 });
 
-export const ListProductsSchema = z.object({
+export const ListProductsSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   categoryId: z.string().trim().optional(),
   isActive: z.boolean().optional(),
@@ -261,7 +487,8 @@ export const ListProductsSchema = z.object({
 });
 
 // 2. Categories
-export const CreateCategorySchema = z.object({
+export const CreateCategorySchema = z.strictObject({
+  branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().nullable().optional(), // Null for platform/global
   name: z.string().trim().min(1).max(100),
@@ -269,7 +496,9 @@ export const CreateCategorySchema = z.object({
   nature: z.string().trim().optional(),
 });
 
-export const UpdateCategorySchema = z.object({
+export const UpdateCategorySchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   categoryId: z.string().trim().min(2),
   name: z.string().trim().min(1).max(100).optional(),
   parentId: z.string().trim().nullable().optional(),
@@ -277,13 +506,15 @@ export const UpdateCategorySchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-export const ListCategoriesSchema = z.object({
+export const ListCategoriesSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().optional(),
   includeGlobal: z.boolean().default(true).optional(),
 });
 
 // 3. Units
-export const CreateUnitSchema = z.object({
+export const CreateUnitSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().nullable().optional(),
   name: z.string().trim().min(1).max(50),
@@ -294,25 +525,28 @@ export const CreateUnitSchema = z.object({
   conversionFactor: z.number().positive().optional(),
 });
 
-export const UpdateUnitSchema = z.object({
+export const UpdateUnitSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   unitId: z.string().trim().min(2),
   name: z.string().trim().min(1).max(50).optional(),
   precision: z.number().int().min(0).max(4).optional(),
   isActive: z.boolean().optional(),
 });
 
-export const ListUnitsSchema = z.object({
-  organizationId: z.string().trim().optional(),
-  includeGlobal: z.boolean().default(true).optional(),
-});
+/** Units and categories are listed with one input shape (tenant + optional global catalog). */
+export const ListUnitsSchema = ListCategoriesSchema;
 
 // 4. Customers
-export const CreateCustomerSchema = z.object({
+export const CreateCustomerSchema = z.strictObject({
+  duplicateOverrideReason: z.string().trim().min(5).max(300).optional(), // Owner/Admin: allow a duplicate phone/tax id
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(), // Derived server-side from active context
   name: z.string().trim().min(1).max(100),
   mobile: z.string().trim().optional(),
+  additionalPhones: z.array(z.string().trim().max(30)).max(5).optional(),
+  whatsApp: z.string().trim().max(30).nullable().optional(),
   email: z.string().trim().email().toLowerCase().optional(),
   taxNumber: z.string().trim().max(50).optional(),
   billingAddress: z.string().trim().max(500).optional(),
@@ -321,15 +555,19 @@ export const CreateCustomerSchema = z.object({
   creditLimit: z.number().min(0).default(0),
   creditPeriodDays: z.number().int().min(0).default(30),
   visibilityScope: z.enum(["all_branches", "selected_branches", "branch_only"]).default("all_branches").optional(),
-  sharedForBranchIds: z.array(z.string().trim()).optional(),
+  sharedForBranchIds: z.array(z.string().trim()).max(100).optional(),
   isDefault: z.boolean().default(false).optional(),
 });
 
-export const UpdateCustomerSchema = z.object({
+export const UpdateCustomerSchema = z.strictObject({
+  duplicateOverrideReason: z.string().trim().min(5).max(300).optional(), // Owner/Admin: allow a duplicate phone/tax id
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   customerId: z.string().trim().min(2),
   name: z.string().trim().min(1).max(100).optional(),
   mobile: z.string().trim().optional(),
+  additionalPhones: z.array(z.string().trim().max(30)).max(5).optional(),
+  whatsApp: z.string().trim().max(30).nullable().optional(),
   email: z.string().trim().email().toLowerCase().optional(),
   taxNumber: z.string().trim().max(50).optional(),
   billingAddress: z.string().trim().max(500).optional(),
@@ -338,25 +576,27 @@ export const UpdateCustomerSchema = z.object({
   creditLimit: z.number().min(0).optional(),
   creditPeriodDays: z.number().int().min(0).optional(),
   visibilityScope: z.enum(["all_branches", "selected_branches", "branch_only"]).optional(),
-  sharedForBranchIds: z.array(z.string().trim()).optional(),
+  sharedForBranchIds: z.array(z.string().trim()).max(100).optional(),
   isActive: z.boolean().optional(),
 });
 
-export const ListCustomersSchema = z.object({
+export const ListCustomersSchema = z.strictObject({
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
-  search: z.string().trim().optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
 });
 
 // 5. Vendors
-export const CreateVendorSchema = z.object({
+export const CreateVendorSchema = z.strictObject({
+  duplicateOverrideReason: z.string().trim().min(5).max(300).optional(), // Owner/Admin: allow a duplicate phone/tax id
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(), // Derived server-side from active context
   name: z.string().trim().min(1).max(100),
   mobile: z.string().trim().optional(),
+  additionalPhones: z.array(z.string().trim().max(30)).max(5).optional(),
+  whatsApp: z.string().trim().max(30).nullable().optional(),
   email: z.string().trim().email().toLowerCase().optional(),
   taxNumber: z.string().trim().max(50).optional(),
   address: z.string().trim().max(500).optional(),
@@ -364,15 +604,19 @@ export const CreateVendorSchema = z.object({
   paymentTermsDays: z.number().int().min(0).default(0).optional(),
   creditLimit: z.number().min(0).default(0).optional(),
   visibilityScope: z.enum(["all_branches", "selected_branches", "branch_only"]).default("all_branches").optional(),
-  sharedForBranchIds: z.array(z.string().trim()).optional(),
+  sharedForBranchIds: z.array(z.string().trim()).max(100).optional(),
   isDefault: z.boolean().default(false).optional(),
 });
 
-export const UpdateVendorSchema = z.object({
+export const UpdateVendorSchema = z.strictObject({
+  duplicateOverrideReason: z.string().trim().min(5).max(300).optional(), // Owner/Admin: allow a duplicate phone/tax id
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   vendorId: z.string().trim().min(2),
   name: z.string().trim().min(1).max(100).optional(),
   mobile: z.string().trim().optional(),
+  additionalPhones: z.array(z.string().trim().max(30)).max(5).optional(),
+  whatsApp: z.string().trim().max(30).nullable().optional(),
   email: z.string().trim().email().toLowerCase().optional(),
   taxNumber: z.string().trim().max(50).optional(),
   address: z.string().trim().max(500).optional(),
@@ -380,23 +624,18 @@ export const UpdateVendorSchema = z.object({
   paymentTermsDays: z.number().int().min(0).optional(),
   creditLimit: z.number().min(0).optional(),
   visibilityScope: z.enum(["all_branches", "selected_branches", "branch_only"]).optional(),
-  sharedForBranchIds: z.array(z.string().trim()).optional(),
+  sharedForBranchIds: z.array(z.string().trim()).max(100).optional(),
   isActive: z.boolean().optional(),
 });
 
-export const ListVendorsSchema = z.object({
-  organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
-  branchId: z.string().trim().optional(),
-  search: z.string().trim().optional(),
-  limit: z.number().int().min(1).max(100).default(50).optional(),
-  startAfterId: z.string().trim().optional(),
-});
+/** Vendors and customers are listed with one input shape. */
+export const ListVendorsSchema = ListCustomersSchema;
 
 // 6. Unified Outflows (Purchase / Expense)
-export const OutflowLineSchema = z.object({
+export const OutflowLineSchema = z.strictObject({
   productId: z.string().trim().nullable().optional(),
-  itemName: z.string().trim().min(1).max(150),
-  sku: z.string().trim().optional(),
+  // Non-catalog lines only (expenses, unlisted items): a catalog line is the productId alone
+  itemName: z.string().trim().min(1).max(150).optional(),
   categoryId: z.string().trim().nullable().optional(),
   quantity: z.number().positive(),
   unit: z.string().trim().min(1).max(30).default("piece"),
@@ -406,44 +645,66 @@ export const OutflowLineSchema = z.object({
   addToStock: z.boolean().default(true).optional(),
   batch: z.string().trim().optional(),
   expiryDate: z.string().trim().optional(),
+  // Goods receipt: damaged-on-receipt units are billed by the vendor but never enter stock
+  damagedQuantity: z.number().min(0).optional(),
+  damageReason: z.string().trim().max(300).optional(),
+  serialNumbers: z.array(z.string().trim().min(1).max(64)).max(500).optional(), // IMEI / frame numbers
+}).superRefine((line, ctx) => {
+  if (line.productId && (line.itemName !== undefined || line.categoryId)) {
+    ctx.addIssue({ code: "custom", message: "[REFERENCE_ATTRIBUTE_COPY] A catalog line references productId only; itemName/categoryId are for non-catalog lines." });
+  }
+  if (!line.productId && !line.itemName) {
+    ctx.addIssue({ code: "custom", message: "A non-catalog line needs itemName." });
+  }
 });
 
-export const CreateOutflowSchema = z.object({
+export const CreateOutflowSchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(), // Derived server-side from active context
   kind: z.nativeEnum(OutflowKind),
   docDate: z.string().trim().optional(), // ISO string, defaults to now
   vendorId: z.string().trim().nullable().optional(),
-  vendorName: z.string().trim().optional(),
-  payee: z.string().trim().optional(),
+  // Free-text counterparty for an unregistered vendor / other payee (never beside vendorId or payeeMembershipId)
+  payee: z.string().trim().min(1).max(200).optional(),
+  recurringTemplateId: z.string().trim().min(2).optional(), // set by the recurring-expense generator
   invoiceNumber: z.string().trim().optional(),
   dueDate: z.string().trim().optional(),
-  lines: z.array(OutflowLineSchema).min(1),
+  lines: z.array(OutflowLineSchema).min(1).max(MAX_DOCUMENT_LINES),
   paidAmount: z.number().min(0).default(0).optional(),
   paymentMethod: z.nativeEnum(PaymentMethod).optional(),
   notes: z.string().trim().max(1000).optional(),
+  // Expense payee: vendor / employee (membership id, sensitive) / other (free-text payee snapshot)
+  payeeType: z.enum(["vendor", "employee", "other"]).optional(),
+  payeeMembershipId: z.string().trim().min(2).optional(),
+  expenseCategoryId: z.string().trim().optional(),
+  billDiscountAmount: z.number().min(0).optional(), // Bill-level (cash) discount after line totals
+  billDiscountPercent: z.number().min(0).max(100).optional(),
+  attachmentPaths: z.array(z.string().trim().max(500)).max(10).optional(), // Receipt images in Storage
 });
 
-export const ListOutflowsSchema = z.object({
+export const ListOutflowsSchema = z.strictObject({
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   kind: z.nativeEnum(OutflowKind).optional(),
   vendorId: z.string().trim().optional(),
+  status: z.string().trim().optional(),
+  payeeMembershipId: z.string().trim().optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
 });
 
 // 7. Shared Bills (POS / B2B)
-export const BillItemSchema = z.object({
+export const BillItemSchema = z.strictObject({
   productId: z.string().trim().min(2),
   quantity: z.number().positive(),
   unitPriceOverride: z.number().min(0).optional(),
   discountValue: z.number().min(0).default(0).optional(),
   unit: z.string().trim().optional(),
+  serialNumbers: z.array(z.string().trim().min(1).max(64)).max(500).optional(),
 });
 
-export const CreateBillSchema = z.object({
+export const CreateBillSchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(), // Derived server-side from active context
@@ -451,46 +712,68 @@ export const CreateBillSchema = z.object({
   documentType: z.nativeEnum(DocumentType).default(DocumentType.INVOICE).optional(),
   status: z.enum(["draft", "active"]).default("active").optional(),
   customerId: z.string().trim().nullable().optional(),
-  customerSnapshot: z.object({
-    name: z.string().trim().min(1),
-    mobile: z.string().trim().optional(),
-    email: z.string().trim().optional(),
-    taxNumber: z.string().trim().optional(),
-    billingAddress: z.string().trim().optional(),
-    shippingAddress: z.string().trim().optional(),
+  // Walk-in party details (only without customerId; a registered customer is referenced by id)
+  walkInCustomer: z.strictObject({
+    name: z.string().trim().min(1).max(200),
+    mobile: z.string().trim().max(20).optional(),
+    taxNumber: z.string().trim().max(30).optional(),
+    billingAddress: z.string().trim().max(500).optional(),
   }).optional(),
-  items: z.array(BillItemSchema).min(1),
+  items: z.array(BillItemSchema).min(1).max(MAX_DOCUMENT_LINES),
   discountTotal: z.number().min(0).default(0).optional(),
   paidAmount: z.number().min(0).default(0).optional(),
   paymentMethod: z.nativeEnum(PaymentMethod).default(PaymentMethod.CASH).optional(),
   notes: z.string().trim().max(1000).optional(),
 });
 
-export const FinalizeBillSchema = z.object({
+/** Edit of a quotation / proforma / draft invoice (re-priced; finalized documents are immutable). */
+export const UpdateDraftBillSchema = z.strictObject({
+  ...ContextFields,
+  billId: z.string().trim().min(2),
+  customerId: z.string().trim().nullable().optional(),
+  walkInCustomer: z.strictObject({
+    name: z.string().trim().min(1).max(200),
+    mobile: z.string().trim().max(20).optional(),
+    taxNumber: z.string().trim().max(30).optional(),
+    billingAddress: z.string().trim().max(500).optional(),
+  }).optional(),
+  items: z.array(BillItemSchema).min(1).max(MAX_DOCUMENT_LINES).optional(),
+  discountTotal: z.number().min(0).optional(),
+  notes: z.string().trim().max(1000).optional(),
+});
+
+export const FinalizeBillSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   billId: z.string().trim().min(2),
   idempotencyKey: z.string().min(8).max(128).optional(),
 });
 
-export const ListBillsSchema = z.object({
+export const ListBillsSchema = z.strictObject({
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   salesMode: z.nativeEnum(SalesMode).optional(),
   customerId: z.string().trim().optional(),
+  status: z.string().trim().optional(),
+  createdBy: z.string().trim().optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
 });
 
 // 8. Deliveries
-export const CreateDeliverySchema = z.object({
+export const CreateDeliverySchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(), // Derived server-side from active context
-  billId: z.string().trim().min(2), // ID reference ONLY!
-  customerId: z.string().trim().nullable().optional(),
-  customerName: z.string().trim().min(1).max(100),
-  customerPhone: z.string().trim().min(4).max(30),
-  address: z.object({
+  billId: z.string().trim().min(2), // ID reference ONLY! The customer is the bill's customerId
+  // Partial delivery: quantities per bill line (default: everything not yet out for delivery)
+  lines: z.array(z.strictObject({ lineId: z.string().trim().min(1).max(10), quantity: z.number().positive() })).min(1).max(MAX_DOCUMENT_LINES).optional(),
+  // Person at the door, only when different from the bill-to party (owned delivery fact)
+  recipient: z.strictObject({
+    name: z.string().trim().min(1).max(100),
+    phone: z.string().trim().min(4).max(30),
+  }).optional(),
+  address: z.strictObject({
     line1: z.string().trim().min(1),
     line2: z.string().trim().optional(),
     landmark: z.string().trim().optional(),
@@ -498,27 +781,28 @@ export const CreateDeliverySchema = z.object({
     pincode: z.string().trim().min(1),
   }),
   riderMembershipId: z.string().trim().nullable().optional(),
-  riderName: z.string().trim().optional(),
   partner: z.nativeEnum(DeliveryPartner).default(DeliveryPartner.INTERNAL),
   deliveryFee: z.number().min(0).default(0),
-  cod: z.object({
+  cod: z.strictObject({
     isCod: z.boolean().default(false),
     amount: z.number().min(0).default(0),
   }).optional(),
   notes: z.string().trim().max(500).optional(),
 });
 
-export const UpdateDeliveryStatusSchema = z.object({
+export const UpdateDeliveryStatusSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   deliveryId: z.string().trim().min(2),
   status: z.nativeEnum(DeliveryStatus),
   riderMembershipId: z.string().trim().optional(),
-  riderName: z.string().trim().optional(),
   codCollected: z.boolean().optional(),
+  collectedAmount: z.number().min(0).optional(), // Cash/UPI collected at the door (finalizes pre-sale orders)
+  paymentMethod: z.nativeEnum(PaymentMethod).optional(),
   notes: z.string().trim().max(500).optional(),
 });
 
-export const ListDeliveriesSchema = z.object({
+export const ListDeliveriesSchema = z.strictObject({
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   status: z.nativeEnum(DeliveryStatus).optional(),
@@ -527,28 +811,30 @@ export const ListDeliveriesSchema = z.object({
 });
 
 // 9. Returns
-export const ReturnItemSchema = z.object({
+export const ReturnItemSchema = z.strictObject({
   productId: z.string().trim().min(2),
+  // Required when the product appears on more than one line of the source document
+  sourceLineId: z.string().trim().min(1).max(10).optional(),
+  serialNumbers: z.array(z.string().trim().min(1).max(64)).max(500).optional(), // required for serial-tracked products
   quantity: z.number().positive(),
   refundAmount: z.number().min(0),
   reason: z.string().trim().min(1).max(200),
   disposition: z.nativeEnum(ReturnDisposition).default(ReturnDisposition.RESTOCKED_TO_INVENTORY),
 });
 
-export const CreateReturnSchema = z.object({
+export const CreateReturnSchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(), // Derived server-side from active context
   returnType: z.nativeEnum(ReturnType),
-  referenceId: z.string().trim().min(2), // billId or outflowId
-  partyId: z.string().trim().nullable().optional(),
-  partyName: z.string().trim().optional(),
-  items: z.array(ReturnItemSchema).min(1),
+  referenceId: z.string().trim().min(2), // billId or outflowId; the party is derived from it
+  items: z.array(ReturnItemSchema).min(1).max(MAX_DOCUMENT_LINES),
   refundMethod: z.enum(["cash", "credit_note", "original_payment"]).default("cash"),
   notes: z.string().trim().max(500).optional(),
 });
+export type CreateReturnInput = z.infer<typeof CreateReturnSchema>;
 
-export const ListReturnsSchema = z.object({
+export const ListReturnsSchema = z.strictObject({
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   returnType: z.nativeEnum(ReturnType).optional(),
@@ -558,22 +844,39 @@ export const ListReturnsSchema = z.object({
 });
 
 // 10. Payments Ledger
-export const CreatePaymentSchema = z.object({
+export const CreatePaymentSchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(), // Derived server-side from active context
   direction: z.nativeEnum(PaymentDirection),
   partyType: z.nativeEnum(PartyType),
   partyId: z.string().trim().nullable().optional(),
-  partyName: z.string().trim().min(1).max(100),
+  // Free text only for a standalone payment (no partyId, no referenceId); otherwise the party is referenced
+  partyName: z.string().trim().min(1).max(100).optional(),
   amount: z.number().positive(),
   method: z.nativeEnum(PaymentMethod).default(PaymentMethod.CASH),
   referenceId: z.string().trim().nullable().optional(), // billId or outflowId
   referenceModel: z.enum(["bill", "outflow"]).nullable().optional(),
   notes: z.string().trim().max(500).optional(),
+  // Future payment-gateway extension point (no gateway integrated today). Never card numbers.
+  gateway: z.strictObject({
+    externalReference: z.string().trim().max(128).optional(), // UPI RRN, card auth code, cheque no.
+    gatewayProvider: z.string().trim().max(50).optional(),
+    gatewayStatus: z.enum(["initiated", "authorized", "captured", "failed", "refunded"]).optional(),
+    cardBrand: z.string().trim().max(20).optional(),
+    cardLast4: z.string().trim().regex(/^d{4}$/).optional(),
+  }).optional(),
 });
 
-export const ListPaymentsSchema = z.object({
+export const VoidPaymentSchema = z.strictObject({
+  organizationId: z.string().trim().min(2).optional(),
+  branchId: z.string().trim().optional(),
+  paymentId: z.string().trim().min(2),
+  reason: z.string().trim().min(3).max(500),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const ListPaymentsSchema = z.strictObject({
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   direction: z.nativeEnum(PaymentDirection).optional(),
@@ -584,16 +887,19 @@ export const ListPaymentsSchema = z.object({
 });
 
 // 11. Stock Movements / Adjustments
-export const StockAdjustSchema = z.object({
+export const StockAdjustSchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(), // Derived server-side from active context
   productId: z.string().trim().min(2),
   quantity: z.number(), // Positive to add, negative to deduct
   reason: z.string().trim().min(2).max(500),
+  // Loss codes (damaged, expired, lost_theft, sample, internal_use) are P&L write-offs
+  reasonCode: z.nativeEnum(StockAdjustmentReason).optional(),
+  serialNumbers: z.array(z.string().trim().min(1).max(64)).max(500).optional(), // required for serial-tracked products
 });
 
-export const ListStockMovementsSchema = z.object({
+export const ListStockMovementsSchema = z.strictObject({
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
   productId: z.string().trim().optional(),
@@ -606,7 +912,7 @@ export const ListStockMovementsSchema = z.object({
 // Branch Validation Schemas
 // ============================================================
 
-export const BranchAddressSchema = z.object({
+export const BranchAddressSchema = z.strictObject({
   line1: z.string().trim().min(1).max(200),
   line2: z.string().trim().max(200).optional(),
   city: z.string().trim().min(1).max(100),
@@ -615,20 +921,21 @@ export const BranchAddressSchema = z.object({
   country: z.string().trim().length(2).toUpperCase(),
 });
 
-export const BranchContactSchema = z.object({
+export const BranchContactSchema = z.strictObject({
   phone: z.string().trim().nullable().optional(),
   email: z.string().trim().email().toLowerCase().nullable().optional(),
   contactPerson: z.string().trim().max(100).nullable().optional(),
 });
 
-export const BranchSettingsSchema = z.object({
+export const BranchSettingsSchema = z.strictObject({
   taxNumber: z.string().trim().nullable().optional(),
   allowNegativeStock: z.boolean().default(false).optional(),
   defaultSalesMode: z.nativeEnum(SalesMode).default(SalesMode.POS).optional(),
   moduleOverrides: z.record(z.string(), z.boolean()).default({}).optional(),
 });
 
-export const CreateBranchSchema = z.object({
+export const CreateBranchSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().optional(),
   name: z.string().trim().min(2).max(100),
@@ -638,7 +945,7 @@ export const CreateBranchSchema = z.object({
   settings: BranchSettingsSchema.optional(),
 });
 
-export const UpdateBranchSchema = z.object({
+export const UpdateBranchSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
   branchId: z.string().trim().min(2),
   name: z.string().trim().min(2).max(100).optional(),
@@ -648,31 +955,35 @@ export const UpdateBranchSchema = z.object({
   settings: BranchSettingsSchema.optional(),
 });
 
-export const DeactivateBranchSchema = z.object({
+export const DeactivateBranchSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
   branchId: z.string().trim().min(2),
   reason: z.string().trim().max(500).optional(),
 });
 
-export const ListBranchesSchema = z.object({
+export const ListBranchesSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
   status: z.nativeEnum(EntityStatus).optional(),
 });
 
-export const GetBranchSchema = z.object({
+export const GetBranchSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
   branchId: z.string().trim().min(2),
 });
 
-export const SwitchBranchContextSchema = z.object({
+export const SwitchBranchContextSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   targetBranchId: z.string().trim().min(2),
 });
 
-export const UpdateSharingPoliciesSchema = z.object({
+export const UpdateSharingPoliciesSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().optional(),
-  policies: z.object({
+  policies: z.strictObject({
     products: z.enum(["organization_shared", "branch_scoped"]).optional(),
     categories: z.enum(["organization_shared", "branch_scoped"]).optional(),
     customers: z.enum(["organization_shared", "branch_scoped"]).optional(),
@@ -692,7 +1003,7 @@ export const UpdateSharingPoliciesSchema = z.object({
  */
 
 // Reporting
-export const GetRevenueReportSchema = z.object({
+export const GetRevenueReportSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
   branchId: z.string().trim().optional(),
   from: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "from date must be YYYY-MM-DD").optional(),
@@ -700,20 +1011,20 @@ export const GetRevenueReportSchema = z.object({
   groupBy: z.enum(["day", "month", "year"]).default("day").optional(),
 });
 
-export const GetProfitLossReportSchema = z.object({
+export const GetProfitLossReportSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
   branchId: z.string().trim().optional(),
   from: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "from date must be YYYY-MM-DD").optional(),
   to: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "to date must be YYYY-MM-DD").optional(),
 });
 
-export const GetStockValuationReportSchema = z.object({
+export const GetStockValuationReportSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
   branchId: z.string().trim().optional(),
   categoryId: z.string().trim().optional(),
 });
 
-export const GetTopEntitiesReportSchema = z.object({
+export const GetTopEntitiesReportSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
   branchId: z.string().trim().optional(),
   entityType: z.enum(["products", "customers", "vendors"]),
@@ -722,7 +1033,7 @@ export const GetTopEntitiesReportSchema = z.object({
   to: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "to date must be YYYY-MM-DD").optional(),
 });
 
-export const GetStaffReportSchema = z.object({
+export const GetStaffReportSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
   branchId: z.string().trim().optional(),
   staffMembershipId: z.string().trim().optional(),
@@ -730,12 +1041,14 @@ export const GetStaffReportSchema = z.object({
   to: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "to date must be YYYY-MM-DD").optional(),
 });
 
-export const GetPlatformOverviewReportSchema = z.object({
+export const GetPlatformOverviewReportSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   from: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "from date must be YYYY-MM-DD").optional(),
   to: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "to date must be YYYY-MM-DD").optional(),
 });
 
-export const ExportReportSchema = z.object({
+export const ExportReportSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
   branchId: z.string().trim().optional(),
   reportType: z.enum(["revenue", "profit_loss", "stock_valuation", "top_products", "staff_sales"]),
@@ -744,7 +1057,8 @@ export const ExportReportSchema = z.object({
 });
 
 // Tasks
-export const CreateTaskSchema = z.object({
+export const CreateTaskSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   idempotencyKey: z.string().trim().optional(),
   organizationId: z.string().trim().optional(),
   title: z.string().trim().min(2, "Task title must be at least 2 characters").max(200),
@@ -756,7 +1070,8 @@ export const CreateTaskSchema = z.object({
   relatedEntityId: z.string().trim().nullable().optional(),
 });
 
-export const UpdateTaskSchema = z.object({
+export const UpdateTaskSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   taskId: z.string().trim().min(3, "taskId is required"),
   organizationId: z.string().trim().optional(),
   title: z.string().trim().min(2).max(200).optional(),
@@ -767,19 +1082,22 @@ export const UpdateTaskSchema = z.object({
   status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
 });
 
-export const AssignTaskSchema = z.object({
+export const AssignTaskSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   taskId: z.string().trim().min(3, "taskId is required"),
   organizationId: z.string().trim().optional(),
   assignedToMembershipId: z.string().trim().min(3, "Valid membershipId required"),
 });
 
-export const UpdateTaskStatusSchema = z.object({
+export const UpdateTaskStatusSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   taskId: z.string().trim().min(3, "taskId is required"),
   organizationId: z.string().trim().optional(),
   status: z.enum(["pending", "in_progress", "completed", "cancelled"]),
 });
 
-export const ListTasksSchema = z.object({
+export const ListTasksSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().optional(),
   assignedToMembershipId: z.string().trim().optional(),
   status: z.enum(["pending", "in_progress", "completed", "cancelled"]).optional(),
@@ -788,13 +1106,14 @@ export const ListTasksSchema = z.object({
   startAfterId: z.string().trim().optional(),
 });
 
-export const DeleteTaskSchema = z.object({
+export const DeleteTaskSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   taskId: z.string().trim().min(3, "taskId is required"),
   organizationId: z.string().trim().optional(),
 });
 
 // Live Location Tracking
-export const RecordLocationPingSchema = z.object({
+export const RecordLocationPingSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
   branchId: z.string().trim().optional(),
   latitude: z.number().min(-90).max(90),
@@ -806,12 +1125,14 @@ export const RecordLocationPingSchema = z.object({
   recordedAt: z.string().trim().optional(),
 });
 
-export const GetLatestLocationsSchema = z.object({
+export const GetLatestLocationsSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().optional(),
   membershipIds: z.array(z.string().trim()).max(50).optional(),
 });
 
-export const GetLocationHistorySchema = z.object({
+export const GetLocationHistorySchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().optional(),
   membershipId: z.string().trim().min(3, "membershipId is required"),
   from: z.string().trim().datetime({ offset: true }).optional(),
@@ -820,28 +1141,35 @@ export const GetLocationHistorySchema = z.object({
 });
 
 // Notifications
-export const ListNotificationsSchema = z.object({
+export const ListNotificationsSchema = z.strictObject({
+  ...ContextFields,
   limit: z.number().int().min(1).max(100).default(50).optional(),
   unreadOnly: z.boolean().default(false).optional(),
 });
 
-export const MarkNotificationReadSchema = z.object({
+export const MarkNotificationReadSchema = z.strictObject({
+  ...ContextFields,
   notificationId: z.string().trim().min(3, "notificationId is required"),
 });
 
 // Branch Reconciliation
-export const ReconcileBranchCountsSchema = z.object({
+export const ReconcileBranchCountsSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   repair: z.boolean().default(false).optional(),
 });
 
 // Super Admin Usage Metering Schemas
-export const GetPlatformUsageSummarySchema = z.object({
+export const GetPlatformUsageSummarySchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   startDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "Format must be YYYY-MM-DD").optional(),
   endDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "Format must be YYYY-MM-DD").optional(),
 });
 
-export const GetOrganizationsUsageSchema = z.object({
+export const GetOrganizationsUsageSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
   startDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "Format must be YYYY-MM-DD").optional(),
   endDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "Format must be YYYY-MM-DD").optional(),
   sortBy: z.enum(["activity", "cost", "name"]).default("activity").optional(),
@@ -849,13 +1177,14 @@ export const GetOrganizationsUsageSchema = z.object({
   startAfterOrgId: z.string().trim().optional(),
 });
 
-export const GetBranchesUsageSchema = z.object({
+export const GetBranchesUsageSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2),
   startDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "Format must be YYYY-MM-DD").optional(),
   endDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "Format must be YYYY-MM-DD").optional(),
 });
 
-export const GetUsageDetailSchema = z.object({
+export const GetUsageDetailSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
   branchId: z.string().trim().optional(),
   service: z.enum(["firestore", "functions", "storage", "auth", "fcm", "location"]).optional(),
@@ -864,28 +1193,111 @@ export const GetUsageDetailSchema = z.object({
   granularity: z.enum(["daily", "monthly"]).default("daily").optional(),
 });
 
-export const CalculateDryRunStatementSchema = z.object({
+export const CalculateDryRunStatementSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2),
   billingPeriod: z.string().trim().regex(/^\d{4}-\d{2}$/, "Format must be YYYY-MM"),
   rateCardVersion: z.string().trim().optional(),
 });
 
-export const GetUsageLimitsSchema = z.object({
+export const GetUsageLimitsSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().optional(),
 });
 
-export const MetricLimitConfigSchema = z.object({
+export const MetricLimitConfigSchema = z.strictObject({
   dailyLimit: z.number().int().nonnegative().optional(),
+  weeklyLimit: z.number().int().nonnegative().optional(),
   monthlyLimit: z.number().int().nonnegative().optional(),
   warningThresholdPercent: z.number().min(0).max(100).default(80),
   hardThresholdPercent: z.number().min(0).max(100).default(100),
-  enforcementMode: z.enum(["warn_only", "soft_throttle", "hard_block"]).default("warn_only"),
+  enforcementMode: z.enum(["warn_only", "hard_block"]).default("warn_only"),
   enabled: z.boolean().default(true),
 });
 
-export const UpdateUsageLimitsSchema = z.object({
+export const UpdateUsageLimitsSchema = z.strictObject({
+  branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2, "organizationId is required"),
   limits: z.record(z.string(), MetricLimitConfigSchema),
 });
 
 
+// ============================================================
+// Document Lifecycle, Statements & History
+// ============================================================
+
+/** Approve or reject a pending (maker–checker) document. */
+export const DocumentDecisionSchema = z.strictObject({
+  organizationId: z.string().trim().min(2).optional(),
+  branchId: z.string().trim().optional(),
+  // One approval entry point (documentsDecide) for every maker–checker document type
+  documentType: z.enum(["bill", "outflow", "return", "stock_adjustment"]),
+  documentId: z.string().trim().min(2),
+  decision: z.enum(["approve", "reject"]),
+  reason: z.string().trim().max(500).optional(),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+export type DocumentDecisionInput = z.infer<typeof DocumentDecisionSchema>;
+
+/** Void a finalized financial document (reversal entries) or cancel a draft/pending one. */
+export const VoidDocumentSchema = z.strictObject({
+  organizationId: z.string().trim().min(2).optional(),
+  branchId: z.string().trim().optional(),
+  documentId: z.string().trim().min(2),
+  reason: z.string().trim().min(3).max(500),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+const IsoDateOrDateTime = z.string().trim().regex(/^d{4}-d{2}-d{2}(T.*)?$/, "Expected YYYY-MM-DD or ISO-8601 date-time");
+
+export const PartyStatementSchema = z.strictObject({
+  organizationId: z.string().trim().min(2).optional(),
+  branchId: z.string().trim().optional(),
+  partyType: z.enum(["customer", "vendor"]),
+  partyId: z.string().trim().min(2),
+  from: IsoDateOrDateTime.optional(),
+  to: IsoDateOrDateTime.optional(),
+});
+
+export const OutflowSummarySchema = z.strictObject({
+  organizationId: z.string().trim().min(2).optional(),
+  branchId: z.string().trim().optional(),
+  from: IsoDateOrDateTime.optional(),
+  to: IsoDateOrDateTime.optional(),
+  groupBy: z.enum(["day", "category", "employee", "vendor", "branch"]).default("day").optional(),
+});
+
+export const PriceHistorySchema = z.strictObject({
+  organizationId: z.string().trim().min(2).optional(),
+  branchId: z.string().trim().optional(),
+  productId: z.string().trim().min(2),
+  vendorId: z.string().trim().optional(),
+  limit: z.number().int().min(1).max(200).default(50).optional(),
+});
+
+export const EntityHistorySchema = z.strictObject({
+  organizationId: z.string().trim().min(2).optional(),
+  branchId: z.string().trim().optional(),
+  entityType: z.enum([
+    "product",
+    "customer",
+    "vendor",
+    "bill",
+    "outflow",
+    "employee",
+    "organization",
+    "team",
+    "return",
+    "stock",
+    "payment",
+    "delivery",
+    "role",
+    "department",
+    "job_role",
+    "unit",
+    "category",
+    "recurring_expense",
+  ]).optional(),
+  entityId: z.string().trim().min(2).optional(),
+  limit: z.number().int().min(1).max(200).default(50).optional(),
+});

@@ -4,11 +4,14 @@
  */
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { parseInput } from "../validation/parseInput.js";
+import { ContextOnlySchema } from "../validation/schemas.js";
 import { db } from "../services/firebase.js";
 import { DEFAULT_MODULES, DEFAULT_TAX_REGIMES } from "../constants/catalogs.js";
 import { ModuleDoc, TaxRegimeDoc, PermissionCatalogDoc } from "../types/models.js";
 
 export const permissionCatalogList = onCall({ region: "asia-south1" }, async (request) => {
+  parseInput(ContextOnlySchema, request.data);
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
@@ -23,6 +26,7 @@ export const permissionCatalogList = onCall({ region: "asia-south1" }, async (re
 });
 
 export const modulesList = onCall({ region: "asia-south1" }, async (request) => {
+  parseInput(ContextOnlySchema, request.data);
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
@@ -41,6 +45,7 @@ export const modulesList = onCall({ region: "asia-south1" }, async (request) => 
 });
 
 export const taxRegimesList = onCall({ region: "asia-south1" }, async (request) => {
+  parseInput(ContextOnlySchema, request.data);
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }

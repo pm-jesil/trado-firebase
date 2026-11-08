@@ -3,6 +3,7 @@
 ---
 
 ## 1. Overview & Business Context
+
 This runbook covers subscription plan enforcement, multi-tenant resource telemetry, and Super Admin diagnostic statement calculations for Trado:
 - Managing platform subscription plans and capacity limits (`subscriptionPlans`).
 - Enforcing branch quotas during branch creation (`branchesCreate`).
@@ -13,6 +14,7 @@ This runbook covers subscription plan enforcement, multi-tenant resource telemet
 ---
 
 ## 2. Actors & Permissions
+
 - **Platform Super Admin** (`isSuperAdmin: true`): Exclusively authorized to manage subscription plans, inspect cross-tenant usage summaries, and generate platform dry-run statements.
 - **Organization Owner**: Can view their current subscription plan and branch limits. Can request plan upgrades to unlock multi-branch capacity.
 - **Tenant Staff / Non-Super Admins**: Completely denied access to platform-level usage metering APIs.
@@ -23,43 +25,61 @@ This runbook covers subscription plan enforcement, multi-tenant resource telemet
 
 ### 3.1 Super Admin Configures a Subscription Plan
 1. **Super Admin calls `plansCreate`**:
-   - Payload:
+   - **Endpoint**: `POST /plansCreate`
+   - **Request Payload**:
      ```json
      {
        "data": {
-         "planKey": "plan_growth",
          "name": "Growth Tier",
-         "description": "Multi-branch tier for growing wholesale businesses",
-         "branchLimit": 3,
-         "userLimit": 15,
-         "modules": { "billing": true, "inventory": true, "sales": true, "reports": true },
-         "priceMonthly": 2999,
+         "price": 2999.00,
          "currency": "INR",
-         "isActive": true
+         "storageLimitMb": 5120,
+         "monthlyDocumentVolumeLimit": 10000,
+         "seatLimits": {
+           "admin": 3,
+           "staff": 25
+         },
+         "branchLimit": 5,
+         "moduleFlags": {
+           "billing": true,
+           "inventory": true,
+           "sales": true,
+           "staff": true,
+           "reports": true,
+           "deliveries": true
+         },
+         "isActive": true,
+         "idempotencyKey": "plan_growth_create_001"
        }
      }
      ```
 2. **Backend Processing**:
-   - Validates plan structure.
+   - Validates plan structure against `CreatePlanSchema`.
    - Commits `subscriptionPlans/{planId}`.
 
 ### 3.2 Branch Quota Enforcement on Tenant
-1. **Tenant on `plan_standard` (limit: 1) attempts to add a second branch**:
-   - Calls `branchesCreate` with `{ organizationId: "org_demo", branchCode: "SOUTH" }`.
-   - **Backend Guard**: Checks `org.branchCount (1) >= plan.branchLimit (1)`.
-   - **Outcome**: Rejected with `failed-precondition: "Branch limit exceeded. Upgrade your subscription plan."`.
-2. **Owner Upgrades to `plan_growth`**:
-   - Super Admin or Billing engine updates `organizations/org_demo`: `planId = "plan_growth"`, `branchLimit = 3`.
+1. **Tenant on `plan_starter` (limit: 1) attempts to add a second branch**:
+   - Calls `branchesCreate` with `{ name: "South Hub", code: "SOUTH" }`.
+   - **Backend Guard**: Evaluates `org.branchCount (1) >= plan.branchLimit (1)`.
+   - **Outcome**: Rejected with `resource-exhausted: "Branch limit reached for current subscription plan"`.
+2. **Super Admin Upgrades Tenant Subscription (`organizationsSetSubscription`)**:
+   - Calls `organizationsSetSubscription` with `{ organizationId: "org_demo", action: "change_plan", planId: "plan_growth" }`.
 3. **Owner Retries `branchesCreate`**:
-   - Backend evaluates `branchCount (1) < branchLimit (3)`.
+   - Backend evaluates `branchCount (1) < plan.branchLimit (5)`.
    - Branch created successfully. `organizations/org_demo.branchCount` increments to 2.
 
 ### 3.3 Auditing Branch Quotas (`reconcileBranchCounts`)
 1. **Admin calls `reconcileBranchCounts`**:
-   - Payload: `{ "data": { "organizationId": "org_demo" } }`.
+   - **Endpoint**: `POST /reconcileBranchCounts`
+   - **Request Payload**:
+     ```json
+     {
+       "data": {}
+     }
+     ```
 2. **Backend Engine**:
-   - Counts actual active branch documents in `organizations/org_demo/branches`.
-   - Compares against cached `organizations/org_demo.branchCount`.
+   - Counts actual active branch documents in `organizations/{orgId}/branches`.
+   - Compares against cached `organizations/{orgId}.branchCount`.
    - Corrects cached count if drift occurred and returns audit report.
 
 ### 3.4 Ingesting Telemetry & Evaluating Diagnostic Statements
@@ -68,44 +88,25 @@ This runbook covers subscription plan enforcement, multi-tenant resource telemet
      ```json
      {
        "data": {
-         "organizationId": "org_demo",
-         "branchId": "main-branch",
-         "service": "firestore",
-         "operation": "read",
-         "count": 50
+         "metrics": {
+           "pos_scans": 150,
+           "receipt_prints": 85
+         }
        }
      }
      ```
-   - Increments daily counters in `organizationUsageDaily` and `branchUsageDaily`.
-2. **Super Admin Generates Diagnostic Dry-Run Statement**:
-   - Calls `usageCalculateDryRunStatement`:
-     ```json
-     {
-       "data": {
-         "organizationId": "org_demo",
-         "period": "2026-10",
-         "rateCardVersion": "v1"
-       }
-     }
-     ```
-   - Evaluates monthly consumption against `ratecard_v1`.
-   - Appends audit entry in `usageAllocationRuns`.
-   - Returns estimated infrastructure cost with mandatory disclaimer:
-     > *"This statement is an internal diagnostic estimate of infrastructure resource consumption. It is NOT an invoice and no automated charge has occurred."*
+2. **Super Admin Evaluates Dry-Run Statement**:
+   - Calls `usageCalculateDryRunStatement` with `{ organizationId: "org_demo", month: "2026-11" }`.
+   - Returns platform consumption breakdown and calculated dry-run statement containing explicit disclaimer:
+     `"THIS IS A NON-INVOICE DIAGNOSTIC USAGE ESTIMATE FOR INTERNAL PLATFORM EVALUATION ONLY"`.
 
 ---
 
-## 4. Failure & Invariant Safeguards
+## 4. Verification Checkpoints
 
-| Scenario | Trigger | Outcome | Reason |
-|---|---|:---:|---|
-| **Non-Superadmin Accesses Platform Metrics** | Tenant Owner calls `usageGetPlatformSummary` | Rejected with `permission-denied` | Platform usage metrics are strictly Super Admin-only. |
-| **Branch Limit Exceeded** | Calling `branchesCreate` when active count equals plan limit | Rejected with `failed-precondition` | Subscription capacity enforcement. |
-| **Recursive Telemetry Loop** | Telemetry ingestion triggers usage metrics | Prevented | Metering writes use direct `FieldValue.increment` without triggering background notification triggers. |
-
----
-
-## 5. Local Testing & Verification
-- **Unit Tests**: `functions/src/test/unit/branchLimitEnforcement.test.ts` and `usageMetering.test.ts`.
-- **Integration Tests**: Parts 5 & 6 of `functions/scripts/test-phase3-integration.js`.
-
+1. **Verify Plan Capacity Rejection**:
+   Attempting to add branches beyond `plan.branchLimit` throws `resource-exhausted`.
+2. **Verify Non-Super-Admin Denial**:
+   Calling `plansCreate` with a tenant user token throws `permission-denied`.
+3. **Verify Dry-Run Disclaimer**:
+   Assert that every output of `usageCalculateDryRunStatement` contains the non-invoice diagnostic disclaimer.

@@ -780,6 +780,62 @@ Total Concrete Collections & Subcollections: **44** (42 Root Collections + 2 Sub
 
 ---
 
+### 45. `usageCounterShards` (server-observed usage)
+
+Doc id `{organizationId}_{YYYY-MM}_{shard 0..7}`. Fields: `organizationId`, `month`, `shard`, `days.{YYYY-MM-DD}.{functionsInvocations|firestoreReads|firestoreWrites|locationPings}`, `branches.{branchId}.{YYYY-MM-DD}.{metric}`, `updatedAt`. One increment per gated call on a random shard; daily/weekly (ISO, Monday start, org timezone)/monthly totals are sums across shards. Rules: Super Admin read only.
+
+### 46. `vendorInvoiceLocks` (purchase invoice uniqueness)
+
+Doc id `{organizationId}_{vendorId}_{invoiceNumber lower-case}`. Fields: `organizationId`, `vendorId`, `outflowId`, `createdAt` (the invoice number is the id; nothing is copied). Created in the purchase transaction; deleted when the purchase is voided/cancelled. Rules: no client access.
+
+### Field additions (2026-11-07)
+
+| Collection | New fields |
+|---|---|
+| `organizations` | `subscriptionStatus`, `subscriptionStartsAt`, `subscriptionExpiresAt` (end of day in `timezone`), `graceDays`, `timezone`, `salesChannels[]`, `activeEmployeeCount`, `displayName`, `taxNumber`, `website`, `contactEmail`, `contactPhone`, `address`, `imageUrls[]`, `bankDetails{accountName,bankName,accountNumber,ifsc,upiId}`, `settings.approvals`, `updatedBy` |
+| `memberships` | `dataScopes{module: self|team|branch|organization}`, `updatedBy` |
+| `teams` | `description`, `leaderMembershipId`, `isActive`, `updatedBy` |
+| `products` | `brand`, `alternateUnits[{unit,factor,sellingPrice,wholesalePrice,barcode,isPurchaseUnit,isSaleUnit}]`, `maxDiscountPercent`, `isReturnable`, `returnWindowDays`, `reorderLevel`, `maxStockLevel`, `weight`, `dimensions`, `size`, `imagePaths[]`, `warrantyMonths`, `jewellery{grossWeightGrams,netWeightGrams,purity,makingCharge,makingChargeType,hallmarkId,priceByDailyRate}`, `variantGroupId`, `variantAttributes`, `visibilityScope`, `sharedForBranchIds`, `ownerBranchId`, `updatedBy` |
+| `bills` | `approvalStatus`, `approvalNote`, `requestedPaidAmount`, `requestedPaymentMethod`, `stockReserved`, `createdByMembershipId`, `voidReason/voidedAt/voidedBy`, `approvedAt/By`, `rejectedAt/By`; items: `conversionFactor`, `baseQuantity`, `trackStock`, `serialNumbers[]`, `isReturnable` |
+| `outflows` | `approvalStatus`, `approvalNote`, `requestedPaidAmount`, `requestedPaymentMethod`, `payeeType`, `payeeMembershipId`, `expenseCategoryId`, `billDiscountAmount`, `attachmentPaths[]`, `productIds[]`, `createdByMembershipId`, void/approval actor fields; lines: `conversionFactor`, `baseQuantity`, `damagedQuantity`, `damageReason`, `serialNumbers[]` |
+| `stockMovements` | `reasonCode` (damaged, expired, lost_theft, sample, internal_use, damaged_on_receipt, count_correction, opening_stock, other), `unitCostSnapshot` |
+| `stockBalances` | `allocatedStock` (sales-order reservations; available = current − allocated) |
+| `payments` | `gateway{externalReference,gatewayProvider,gatewayStatus,cardBrand,cardLast4}` (never card numbers); `partyType` adds `employee`, `other` |
+| `deliveries` | `deliveredAt`, `updatedBy` |
+| `returns` | `createdByMembershipId` |
+| `auditLogs` | `changes[{field,from,to}]`, `changedFields[]` (per-entity change history) |
+
+## Whole-System Schema Matrix (2026-11-07)
+
+Dates: every business date is a server-set ISO-8601 UTC string; native Timestamps are used only for TTL (`locationPings.expiresAt`). "Rules read" is the direct client SDK path; "callable" means denied in rules and served by callables.
+
+| Collection | organizationId | branchId | created actor+time | updated actor+time | Rules read |
+|---|---|---|---|---|---|
+| users | — | — | createdAt/By | updatedAt | own |
+| users/{uid}/devices | — | — | createdAt | updatedAt | own |
+| memberships | ✓ | primaryBranchId | createdAt/By | updatedAt/By | own / active org member |
+| organizations | (id) | defaultBranchId | createdAt/By | updatedAt/By | active member |
+| organizations/{id}/branches | ✓ | (id) | createdAt/By | updatedAt/By | active member |
+| membershipBranches | ✓ | ✓ | createdAt/By | updatedAt | own / active member |
+| roles, departments, jobRoles | ✓ or null | — | createdAt/By | updatedAt/By | active member / global |
+| teams | ✓ | — | createdAt/By | updatedAt/By | active member |
+| subscriptionPlans, permissionCatalog, modules, taxRegimes | — | — | createdAt/By (plans) | updatedAt/By | authenticated |
+| products | ✓ | ownerBranchId | createdAt/By | updatedAt/By | **callable** |
+| categories, units | ✓ or null | — | createdAt/By | updatedAt/By | active member / global |
+| customers, vendors | ✓ | sharedForBranchIds | createdAt/By | updatedAt/By | **callable** |
+| outflows, bills | ✓ | ✓ | createdAt/By (+MembershipId) | updatedAt/By | **callable** |
+| stockMovements | ✓ | ✓ | createdAt/By | immutable | **callable** |
+| stockBalances | ✓ | ✓ | — | updatedAt/By | active member |
+| deliveries, returns, payments | ✓ | ✓ | createdAt/By | updatedAt/By | **callable** |
+| tasks | ✓ | — | createdAt/By | updatedAt | own (assignee/creator) |
+| dailySummaries, monthlySummaries | ✓ | — | — | updatedAt (trigger) | **callable** |
+| latestLocations, locationPings | ✓ | ✓ (pings) | recordedAt, createdAt | updatedAt | own only |
+| notifications | ✓ | — | createdAt | readAt | own |
+| documentCounters, idempotencyRecords, auditLogs, notificationOutbox, barcodeLocks, branchCodeLocks, vendorInvoiceLocks | ✓ (most) | — | createdAt / timestamp | updatedAt | none |
+| organizationUsageDaily/Monthly, branchUsageDaily/Monthly, usageCounterShards, platformUsageSnapshots, usageRateCards, usageAllocationRuns | ✓ (tenant ones) | ✓ (branch ones) | createdAt (rate cards/runs) | updatedAt | Super Admin |
+
+Gaps still open: `departments`/`jobRoles` documents have no `isActive`; `notificationOutbox` has no `updatedBy`; `organizationUsageMonthly` has no explicit rule (falls to catch-all deny, so even Super Admin cannot read it directly).
+
 ## Conditional Data Invariants & Cross-Field Rules
 
 To guarantee strict transactional integrity across financial, inventory, and multi-tenant domain boundaries, the backend enforces the following mandatory conditional invariants:
@@ -856,3 +912,87 @@ To guarantee strict transactional integrity across financial, inventory, and mul
   - Core business transactions (`billsCreate`, `outflowsCreate`, `paymentsCreate`) remain strictly non-blocking even when warnings trigger.
 
 
+
+### 9. Units, Write-offs, Reservations & Reversal Invariants (2026-11-07)
+
+- **Base-unit stock**: stock and WAC are always in `product.baseUnit`. A line in an alternate unit freezes `conversionFactor` and `baseQuantity`; `costSnapshot` is per line unit (base cost × factor) so COGS = quantity × costSnapshot. Several lines of one product in one document chain correctly in the stock engine.
+- **Untracked items** (`trackStock: false`) never create stock movements or balances.
+- **Write-offs**: outward manual adjustments (`adjustment_out`, `damage_out`) and damaged-on-receipt units are valued at `unitCostSnapshot` and reported as `inventoryWriteOff` in the P&L. Sales returns marked `wasted_discarded` keep their COGS (no reversal), so they are not double counted.
+- **Sales orders** reserve `allocatedStock`; finalization (`billsFinalize` or delivery `delivered`) releases the reservation and deducts stock; cancellation releases it.
+- **Pending approval** documents have no stock, ledger, payment or reservation effect.
+- **Void** never deletes: it posts reversal movements, reverses party balances and voids linked payments; documents with live returns must have the returns voided first.
+- **Total outflow** (purchases + expenses) is a spend view; the P&L uses COGS for purchased goods.
+
+## Allowed duplication register
+
+The zero-duplication rule: a value lives in exactly one place and everything else stores the owner's **id**. The only permitted exceptions are listed below. **R2** is a frozen fact of the transaction date and is never descriptive, except the GST bill-to block. **R3** is an aggregate cache with one writer path and a reconcile check run by `npm run check:data`. **R4** is a ledger entry. **OWNED** marks a value that has no source record. **BOUNDED_ARRAY** marks a list with a cap the input enforces. The table is generated from `functions/scripts/duplication-allowlist.json` by `node scripts/check-schema-duplicates.js --write` and checked for drift by `npm run test:static`. Do not edit it by hand.
+
+<!-- DUPLICATION-REGISTER:START (generated by scripts/check-schema-duplicates.js --write; do not edit) -->
+
+| ID | Kind | Collection | Field | Reason | Single writer | Reconcile / cap |
+|---|---|---|---|---|---|---|
+| DUP-020 | R3 | `auditLogs` | `changedFields` | Field names of `changes`, stored for array-contains queries (price history). Bounded by the entity's field count. | `buildLogDoc` | reconcile:auditChangedFields |
+| DUP-058 | BOUNDED_ARRAY | `auditLogs` | `changes` | Changed fields of one write (field, from, to); bounded by the entity's field count, written only by buildLogDoc. | `buildLogDoc` | cap 100 |
+| DUP-028 | R3 | `bills` | `balanceAmount` | totalAmount − paidAmount, stored so statements and receivables can query open documents. | `paymentsCreate` | reconcile:documentPayments |
+| DUP-017 | R2 | `bills` | `billToSnapshot` | GST Rule 46 (CGST Rules 2017): a tax invoice must show the recipient's name, address and GSTIN as at issue. Frozen only on finalized invoices of a registered customer; for walk-in sales it is the typed counter data (no customer record exists). | `billToFromCustomer` | — |
+| DUP-002 | R2 | `bills` | `discountTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
+| DUP-055 | BOUNDED_ARRAY | `bills` | `items` | Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 200 |
+| DUP-011 | R2 | `bills` | `items.baseQuantity` | quantity × the conversionFactor frozen at sale time; the product's unit factors may change later. | — | — |
+| DUP-010 | R2 | `bills` | `items.lineTotal` | Line net amount after discount and tax as issued; the refund ceiling for returns reads it by reference. | — | — |
+| DUP-034 | R3 | `bills` | `items.returnedQty` | SUM(return items for this line) so concurrent returns cannot exceed the sold quantity (checked in the return transaction). | `returnsCreate` | reconcile:returnedQty |
+| DUP-009 | R2 | `bills` | `items.subtotal` | Line amount at the frozen price snapshot (price × quantity at sale time). | — | — |
+| DUP-027 | R3 | `bills` | `paidAmount` | Settled amount = SUM(non-void payments referencing the document); kept for open-balance queries and overpayment checks. | `paymentsCreate` | reconcile:documentPayments |
+| DUP-029 | R3 | `bills` | `paymentStatus` | Derived from paidAmount vs totalAmount; stored for list filters (paid / partial / pending). | `paymentStatusFor` | reconcile:documentPayments |
+| DUP-001 | R2 | `bills` | `subTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
+| DUP-003 | R2 | `bills` | `taxTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
+| DUP-004 | R2 | `bills` | `totalAmount` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
+| DUP-064 | BOUNDED_ARRAY | `customers` | `additionalPhones` | Structured additional phone numbers list capped at 5 by Zod input, keeping the document far below the 1 MiB limit. | — | cap 5 |
+| DUP-023 | R3 | `customers` | `outstandingBalance` | Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns. | `reconcilePartyBalances` | reconcile:partyBalances |
+| DUP-050 | BOUNDED_ARRAY | `customers` | `sharedForBranchIds` | Owned list capped at 100 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 100 |
+| DUP-024 | R3 | `customers` | `totalSpend` | Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns. | `reconcilePartyBalances` | reconcile:partyBalances |
+| DUP-060 | BOUNDED_ARRAY | `deliveries` | `lines` | Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 200 |
+| DUP-046 | BOUNDED_ARRAY | `departments` | `headMembershipIds` | Owned list capped at 20 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
+| DUP-041 | BOUNDED_ARRAY | `memberships` | `jobRoleIds` | Owned list capped at 20 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
+| DUP-042 | BOUNDED_ARRAY | `memberships` | `reportingToIds` | Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
+| DUP-019 | R3 | `organizations` | `activeEmployeeCount` | Transactional seat counter so concurrent employee creation cannot exceed the plan (a count query cannot be locked). | `assertSeatAvailable` | reconcile:activeEmployeeCount |
+| DUP-018 | R3 | `organizations` | `branchCount` | Plan branchLimit check inside the branch-create transaction (counting branches there would need a collection read per create). | `branchesCreate` | reconcile:branchCount |
+| DUP-063 | BOUNDED_ARRAY | `organizations` | `contacts` | Structured contact persons list capped at 20 by Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
+| DUP-044 | BOUNDED_ARRAY | `organizations` | `imageUrls` | Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
+| DUP-043 | BOUNDED_ARRAY | `organizations` | `salesChannels` | Owned list capped at 4 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 4 |
+| DUP-059 | BOUNDED_ARRAY | `organizations` | `settings.businessConfig.defaultUnits` | Owned list of default unit codes capped at 20 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
+| DUP-052 | BOUNDED_ARRAY | `outflows` | `attachmentPaths` | Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
+| DUP-031 | R3 | `outflows` | `balanceAmount` | totalAmount − paidAmount, stored so statements and receivables can query open documents. | `paymentsCreate` | reconcile:documentPayments |
+| DUP-006 | R2 | `outflows` | `discountTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
+| DUP-053 | BOUNDED_ARRAY | `outflows` | `lines` | Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 200 |
+| DUP-014 | R2 | `outflows` | `lines.baseQuantity` | Good units received in the base unit with the conversionFactor frozen at receipt. | — | — |
+| DUP-012 | R2 | `outflows` | `lines.grossAmount` | Line amount at the vendor's invoiced price. | — | — |
+| DUP-039 | OWNED | `outflows` | `lines.itemName` | Only on non-catalog lines (no productId): an expense or unlisted item has no record to reference. OutflowLineSchema rejects itemName beside productId. | — | — |
+| DUP-013 | R2 | `outflows` | `lines.lineTotal` | Line net amount after discount and tax as invoiced by the vendor. | — | — |
+| DUP-035 | R3 | `outflows` | `lines.returnedQty` | SUM(purchase-return items for this line), same rule as bills. | `returnsCreate` | reconcile:returnedQty |
+| DUP-030 | R3 | `outflows` | `paidAmount` | Settled amount = SUM(non-void payments referencing the document); kept for open-balance queries and overpayment checks. | `paymentsCreate` | reconcile:documentPayments |
+| DUP-032 | R3 | `outflows` | `paymentStatus` | Derived from paidAmount vs totalAmount; stored for list filters (paid / partial / pending). | `paymentStatusFor` | reconcile:documentPayments |
+| DUP-033 | R3 | `outflows` | `productIds` | Line productIds for array-contains queries (price history by product); capped by the line limit. | `outflowsCreate` | reconcile:outflowProductIds |
+| DUP-005 | R2 | `outflows` | `subTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
+| DUP-007 | R2 | `outflows` | `taxTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
+| DUP-008 | R2 | `outflows` | `totalAmount` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
+| DUP-040 | OWNED | `payments` | `partyName` | Only on a standalone payment with neither partyId nor referenceId (e.g. a one-off payee). paymentsCreate rejects it otherwise (REFERENCE_ATTRIBUTE_COPY). | — | — |
+| DUP-047 | BOUNDED_ARRAY | `products` | `alternateUnits` | Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
+| DUP-021 | R3 | `products` | `currentStock` | Organization-wide stock shown on product lists = SUM(stockBalances.currentStock) for the product. | `commitStockChangesInTxn` | reconcile:productStock |
+| DUP-048 | BOUNDED_ARRAY | `products` | `imagePaths` | Owned list capped at 8 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 8 |
+| DUP-049 | BOUNDED_ARRAY | `products` | `sharedForBranchIds` | Owned list capped at 100 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 100 |
+| DUP-022 | R3 | `products` | `weightedAverageCost` | Moving-average cost per base unit; path dependent, re-derived by replaying PURCHASE_IN movements in order. | `prepareStockChangesInTxn` | reconcile:productWac |
+| DUP-057 | BOUNDED_ARRAY | `returns` | `items` | Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 200 |
+| DUP-015 | R2 | `returns` | `items.baseQuantity` | Returned quantity × the source line's frozen conversionFactor; the stock movement uses it. | — | — |
+| DUP-061 | BOUNDED_ARRAY | `returns` | `requestedItems` | Pending return request lines bounded by the 200-item create limit, written only by returnsCreate. | `returnsCreate` | cap 200 |
+| DUP-016 | R2 | `returns` | `totalRefundAmount` | Sum of the refunds as issued on the credit note / refund voucher. | — | — |
+| DUP-045 | BOUNDED_ARRAY | `roles` | `permissions` | Owned list capped at 300 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 300 |
+| DUP-062 | BOUNDED_ARRAY | `stockAdjustmentRequests` | `serialNumbers` | Owned list of serial numbers capped at 500 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 500 |
+| DUP-037 | R3 | `stockBalances` | `allocatedStock` | SUM(base quantity of open sales orders) per (organization, branch, product); available = current − allocated is computed. | `commitReservationInTxn` | reconcile:allocatedStock |
+| DUP-036 | R3 | `stockBalances` | `currentStock` | SUM(stockMovements.quantity) per (organization, branch, product); read on every sale for the negative-stock rule. For serial-tracked products it also equals the units in hand in serials/ (reconcile:serialStock). | `commitStockChangesInTxn` | reconcile:stockBalances |
+| DUP-038 | R4 | `stockMovements` | `balanceAfter` | Running branch balance at the moment of the movement: an immutable audit fact of the stock ledger (the movement is the source of truth for itself). | — | — |
+| DUP-065 | BOUNDED_ARRAY | `vendors` | `additionalPhones` | Structured additional phone numbers list capped at 5 by Zod input, keeping the document far below the 1 MiB limit. | — | cap 5 |
+| DUP-025 | R3 | `vendors` | `outstandingPayable` | Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns. | `reconcilePartyBalances` | reconcile:partyBalances |
+| DUP-051 | BOUNDED_ARRAY | `vendors` | `sharedForBranchIds` | Owned list capped at 100 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 100 |
+| DUP-026 | R3 | `vendors` | `totalPurchase` | Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns. | `reconcilePartyBalances` | reconcile:partyBalances |
+
+<!-- DUPLICATION-REGISTER:END -->

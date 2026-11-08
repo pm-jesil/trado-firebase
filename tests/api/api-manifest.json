@@ -1,13 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "generatedAt": "2026-10-30T00:00:00Z",
+  "generatedAt": "2026-11-07T00:00:00Z",
   "projectId": "trado-x",
-  "totalExports": 105,
+  "totalExports": 121,
   "phases": {
     "phase1Count": 29,
     "phase2Count": 37,
     "branchReadinessCount": 8,
-    "phase3Count": 28
+    "phase3Count": 47
   },
   "endpoints": [
     {
@@ -3194,6 +3194,534 @@
       "indexesRequired": [],
       "coveredInIntegrationTests": true,
       "coveredInE2ETest": true
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": true,
+      "indexesRequired": [],
+      "sideEffects": [
+        "Reverses stock, customer ledger and voids payments; drafts/pending are cancelled"
+      ],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "billsVoid",
+      "logicalName": "bills.void",
+      "domain": "billing",
+      "requiredPermissions": [
+        "bill:void"
+      ],
+      "inputSchema": "VoidDocumentSchema",
+      "firestoreCollectionsRead": [
+        "bills",
+        "returns",
+        "payments",
+        "customers"
+      ],
+      "firestoreCollectionsWritten": [
+        "bills",
+        "products",
+        "stockBalances",
+        "stockMovements",
+        "customers",
+        "payments",
+        "auditLogs"
+      ]
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": true,
+      "indexesRequired": [],
+      "sideEffects": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "outflowsVoid",
+      "logicalName": "outflows.void",
+      "domain": "procurement",
+      "requiredPermissions": [
+        "purchase:void",
+        "expense:void",
+        "outflow:void"
+      ],
+      "inputSchema": "VoidDocumentSchema",
+      "firestoreCollectionsRead": [
+        "outflows",
+        "returns",
+        "payments",
+        "vendors"
+      ],
+      "firestoreCollectionsWritten": [
+        "outflows",
+        "products",
+        "stockBalances",
+        "stockMovements",
+        "vendors",
+        "payments",
+        "vendorInvoiceLocks",
+        "auditLogs"
+      ]
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "teamsAssignMember",
+      "logicalName": "teams.assignMember",
+      "domain": "staff",
+      "requiredPermissions": [
+        "team:manage",
+        "employee:view"
+      ],
+      "inputSchema": "TeamMemberSchema",
+      "firestoreCollectionsRead": [
+        "teams",
+        "memberships"
+      ],
+      "firestoreCollectionsWritten": [
+        "memberships",
+        "auditLogs"
+      ]
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "explicit_super_admin_target",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "organizationsSetSubscription",
+      "logicalName": "organizations.setSubscription",
+      "domain": "platform",
+      "requiredPermissions": [
+        "platform:subscriptions:manage"
+      ],
+      "inputSchema": "SetSubscriptionSchema",
+      "firestoreCollectionsRead": [
+        "organizations",
+        "subscriptionPlans"
+      ],
+      "firestoreCollectionsWritten": [
+        "organizations",
+        "auditLogs"
+      ]
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "productsGetPriceHistory",
+      "logicalName": "products.getPriceHistory",
+      "domain": "catalog",
+      "requiredPermissions": [
+        "product:view",
+        "inventory:view",
+        "bill:create",
+        "purchase:create"
+      ],
+      "inputSchema": "PriceHistorySchema",
+      "firestoreCollectionsRead": [
+        "products",
+        "outflows",
+        "auditLogs"
+      ],
+      "firestoreCollectionsWritten": []
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "auditGetEntityHistory",
+      "logicalName": "audit.getEntityHistory",
+      "domain": "audit",
+      "requiredPermissions": [
+        "audit:view"
+      ],
+      "inputSchema": "EntityHistorySchema",
+      "firestoreCollectionsRead": [
+        "auditLogs",
+        "users"
+      ],
+      "firestoreCollectionsWritten": []
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "reportsGetPartyStatement",
+      "logicalName": "reports.getPartyStatement",
+      "domain": "reports",
+      "requiredPermissions": [
+        "vendor:view_balance",
+        "customer:view_balance",
+        "payment:view"
+      ],
+      "inputSchema": "PartyStatementSchema",
+      "firestoreCollectionsRead": [
+        "vendors",
+        "customers",
+        "outflows",
+        "bills",
+        "payments",
+        "returns"
+      ],
+      "firestoreCollectionsWritten": []
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "reportsGetOutflowSummary",
+      "logicalName": "reports.getOutflowSummary",
+      "domain": "reports",
+      "requiredPermissions": [
+        "report:view",
+        "outflow:view"
+      ],
+      "inputSchema": "OutflowSummarySchema",
+      "firestoreCollectionsRead": [
+        "outflows",
+        "payments"
+      ],
+      "firestoreCollectionsWritten": []
+    },
+    {
+      "phase": 3,
+      "triggerType": "schedule",
+      "region": "asia-south1",
+      "authRequired": false,
+      "requiredClaims": {},
+      "activeContextDerivation": "none",
+      "superAdminBypass": false,
+      "idempotent": true,
+      "indexesRequired": [],
+      "sideEffects": [
+        "Expiry reminders 7/3/1 days, expired flip, usage warnings (idempotent)"
+      ],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "subscriptionAndUsageSweep",
+      "logicalName": "scheduled.subscriptionAndUsageSweep",
+      "domain": "platform",
+      "requiredPermissions": [],
+      "inputSchema": "None",
+      "firestoreCollectionsRead": [
+        "organizations",
+        "subscriptionPlans",
+        "usageCounterShards",
+        "memberships"
+      ],
+      "firestoreCollectionsWritten": [
+        "organizations",
+        "notifications",
+        "idempotencyRecords",
+        "auditLogs"
+      ]
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [
+        "Updates draft bill lines, customer, and notes before finalization"
+      ],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "billsUpdateDraft",
+      "logicalName": "bills.updateDraft",
+      "domain": "billing",
+      "requiredPermissions": [
+        "bill:create"
+      ],
+      "inputSchema": "UpdateDraftBillSchema",
+      "firestoreCollectionsRead": [
+        "bills",
+        "products",
+        "customers"
+      ],
+      "firestoreCollectionsWritten": [
+        "bills",
+        "auditLogs"
+      ]
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [
+        "Decides pending documents across bills, outflows, returns, stock adjustments, and transfers"
+      ],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "documentsDecide",
+      "logicalName": "approvals.decide",
+      "domain": "approvals",
+      "requiredPermissions": [
+        "bill:approve",
+        "purchase:approve",
+        "expense:approve",
+        "outflow:approve",
+        "return:approve",
+        "stock:adjust"
+      ],
+      "inputSchema": "DocumentDecisionSchema",
+      "firestoreCollectionsRead": [
+        "bills",
+        "outflows",
+        "returns",
+        "stockAdjustmentRequests",
+        "stockTransfers",
+        "products",
+        "stockBalances",
+        "customers",
+        "vendors"
+      ],
+      "firestoreCollectionsWritten": [
+        "bills",
+        "outflows",
+        "returns",
+        "stockAdjustmentRequests",
+        "stockTransfers",
+        "products",
+        "stockBalances",
+        "stockMovements",
+        "customers",
+        "vendors",
+        "payments",
+        "documentCounters",
+        "auditLogs"
+      ]
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [
+        "Voids payment, restores linked bill or outflow unsettled balance, resets paymentStatus, and reverts customer receivable or vendor payable"
+      ],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "paymentsVoid",
+      "logicalName": "payments.void",
+      "domain": "payments",
+      "requiredPermissions": [
+        "payment:void"
+      ],
+      "inputSchema": "VoidPaymentSchema",
+      "firestoreCollectionsRead": [
+        "payments",
+        "bills",
+        "outflows",
+        "customers",
+        "vendors"
+      ],
+      "firestoreCollectionsWritten": [
+        "payments",
+        "bills",
+        "outflows",
+        "customers",
+        "vendors",
+        "auditLogs"
+      ]
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [
+        "Creates recurring expense template for automated sweep scheduled generation"
+      ],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "recurringExpensesCreate",
+      "logicalName": "recurringExpenses.create",
+      "domain": "procurement",
+      "requiredPermissions": [
+        "expense:create",
+        "outflow:create"
+      ],
+      "inputSchema": "RecurringExpenseCreateSchema",
+      "firestoreCollectionsRead": [
+        "recurringExpenses",
+        "categories",
+        "vendors"
+      ],
+      "firestoreCollectionsWritten": [
+        "recurringExpenses",
+        "auditLogs"
+      ]
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [
+        "Updates recurring expense schedule, interval, active status, or lines"
+      ],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "recurringExpensesUpdate",
+      "logicalName": "recurringExpenses.update",
+      "domain": "procurement",
+      "requiredPermissions": [
+        "expense:edit",
+        "outflow:edit"
+      ],
+      "inputSchema": "RecurringExpenseUpdateSchema",
+      "firestoreCollectionsRead": [
+        "recurringExpenses"
+      ],
+      "firestoreCollectionsWritten": [
+        "recurringExpenses",
+        "auditLogs"
+      ]
+    },
+    {
+      "phase": 3,
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "superAdminBypass": false,
+      "idempotent": false,
+      "indexesRequired": [],
+      "sideEffects": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false,
+      "exportName": "recurringExpensesList",
+      "logicalName": "recurringExpenses.list",
+      "domain": "procurement",
+      "requiredPermissions": [
+        "expense:view",
+        "outflow:view"
+      ],
+      "inputSchema": "PaginationQuerySchema",
+      "firestoreCollectionsRead": [
+        "recurringExpenses"
+      ],
+      "firestoreCollectionsWritten": []
+    },
+    {
+      "exportName": "onStorageObjectFinalized",
+      "logicalName": "storage.onObjectFinalized",
+      "phase": 3,
+      "domain": "system",
+      "triggerType": "storage_trigger",
+      "region": "asia-south1",
+      "authRequired": false,
+      "requiredClaims": {},
+      "activeContextDerivation": "none",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "None",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "organizations",
+        "subscriptionPlans"
+      ],
+      "firestoreCollectionsWritten": [
+        "usageCounterShards"
+      ],
+      "sideEffects": [
+        "Meters organization storage upload bytes and deletes object if hard block limit breached"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
     }
   ]
 }

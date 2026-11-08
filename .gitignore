@@ -62,8 +62,13 @@ node_modules/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
+# dotenv environment variables files
 .env
+.env.*
+
+# Emulator data exports
+emulator-data/
+firebase-export-*/
 
 # dataconnect generated files
 .dataconnect
@@ -75,3 +80,11 @@ scratch/
 .local/
 
 
+
+# AI tooling (local only)
+.claude/
+.agents/
+.cursor/
+skills-lock.json
+CLAUDE.md
+AGENTS.md

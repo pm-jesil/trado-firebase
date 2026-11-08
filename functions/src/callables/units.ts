@@ -5,28 +5,25 @@
  * - unitsList: List units available to tenant (including global catalog)
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { onCall, HttpsError, type CallableRequest } from "firebase-functions/v2/https";
+import { nameKey } from "../services/naturalKeys.js";
+import { commitWithKeys, changedClaims } from "../services/uniqueKeys.js";
+import { resolveCatalogWriteAccess } from "../services/contextResolver.js";
+import { AppPermissions } from "../constants/permissions.js";
 import { db } from "../services/firebase.js";
 import {
   CreateUnitSchema,
   UpdateUnitSchema,
   ListUnitsSchema,
 } from "../validation/schemas.js";
-import { UnitDoc, MembershipDoc } from "../types/models.js";
+import { parseInput } from "../validation/parseInput.js";
+import { UnitDoc } from "../types/models.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { createAuditLog } from "../services/audit.js";
 
-async function verifyTenantOrSuperAdmin(auth: any, organizationId?: string | null): Promise<void> {
-  if (auth.token.isSuperAdmin === true) return;
-  if (!organizationId) {
-    throw new HttpsError("permission-denied", "Super Admin privileges required to manage global units.");
-  }
-
-  const memRef = db.collection("memberships").doc(`${auth.uid}_${organizationId}`);
-  const memDoc = await memRef.get();
-  if (!memDoc.exists || (memDoc.data() as MembershipDoc).status !== "active") {
-    throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-  }
+/** Global records: Super Admin; organization records: tenant gate with catalog permission. */
+function verifyTenantOrSuperAdmin(request: CallableRequest, organizationId?: string | null) {
+  return resolveCatalogWriteAccess(request, organizationId, [AppPermissions.UNIT_MANAGE, AppPermissions.INVENTORY_MANAGE]);
 }
 
 export const unitsCreate = onCall({ region: "asia-south1" }, async (request) => {
@@ -34,13 +31,9 @@ export const unitsCreate = onCall({ region: "asia-south1" }, async (request) => 
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = CreateUnitSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(CreateUnitSchema, request.data);
 
-  await verifyTenantOrSuperAdmin(request.auth, input.organizationId);
+  await verifyTenantOrSuperAdmin(request, input.organizationId);
 
   const scope = input.organizationId || "platform";
   const idempotency = await reserveIdempotency({
@@ -76,7 +69,10 @@ export const unitsCreate = onCall({ region: "asia-south1" }, async (request) => 
       createdBy: request.auth.uid,
     };
 
-    await unitRef.set(unitDoc);
+    // Unique name per organization ("global" for platform catalog entries)
+    await commitWithKeys(unitDoc.organizationId || "global", "unit", unitRef.id, (batch) => batch.set(unitRef, unitDoc), {
+      claim: [{ kind: "unit_name", key: nameKey(unitDoc.name) }],
+    });
 
     const response = {
       unitId,
@@ -120,11 +116,7 @@ export const unitsUpdate = onCall({ region: "asia-south1" }, async (request) => 
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = UpdateUnitSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdateUnitSchema, request.data);
 
   const unitRef = db.collection("units").doc(input.unitId);
   const docSnap = await unitRef.get();
@@ -133,7 +125,7 @@ export const unitsUpdate = onCall({ region: "asia-south1" }, async (request) => 
   }
 
   const existing = docSnap.data() as UnitDoc;
-  await verifyTenantOrSuperAdmin(request.auth, existing.organizationId);
+  await verifyTenantOrSuperAdmin(request, existing.organizationId);
 
   const updates: Partial<UnitDoc> = {
     updatedAt: new Date().toISOString(),
@@ -143,7 +135,10 @@ export const unitsUpdate = onCall({ region: "asia-south1" }, async (request) => 
   if (input.precision !== undefined) updates.precision = input.precision;
   if (input.isActive !== undefined) updates.isActive = input.isActive;
 
-  await unitRef.update(updates);
+  const nameChange = updates.name !== undefined && updates.name !== existing.name
+    ? changedClaims([{ kind: "unit_name", key: nameKey(existing.name) }], [{ kind: "unit_name", key: nameKey(updates.name as string) }])
+    : { claim: [], release: [] };
+  await commitWithKeys(existing.organizationId || "global", "unit", input.unitId, (batch) => batch.update(unitRef, updates), nameChange);
 
   await createAuditLog({
     organizationId: existing.organizationId,
@@ -162,8 +157,7 @@ export const unitsList = onCall({ region: "asia-south1" }, async (request) => {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = ListUnitsSchema.safeParse(request.data);
-  const input = parsed.success ? parsed.data : {};
+  const input = parseInput(ListUnitsSchema, request.data);
 
   const items: Array<{ unitId: string } & UnitDoc> = [];
 

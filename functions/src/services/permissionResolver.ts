@@ -42,10 +42,16 @@ export function getModuleForPermission(permissionCode: string): string {
     case "sales":
     case "order":
     case "orders":
+      return "sales";
     case "delivery":
+      return "delivery";
     case "return":
     case "returns":
-      return "sales";
+      return "returns";
+    case "task":
+      return "tasks";
+    case "location":
+      return "employee_tracking";
     case "inventory":
     case "stock":
     case "item":

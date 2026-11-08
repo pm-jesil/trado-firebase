@@ -156,7 +156,7 @@ function runCheck() {
 
   console.log(`Total exports discovered in functions/src/index.ts: ${exports.size}`);
 
-  const driftResult = evaluateDrift(exports, combinedDoc, 105);
+  const driftResult = evaluateDrift(exports, combinedDoc, exports.size);
 
   let hasError = false;
 

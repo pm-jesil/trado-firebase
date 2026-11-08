@@ -209,7 +209,7 @@ export const onPaymentWritten = onDocumentWritten(
               membershipId: targetMembershipId || targetUserId,
               type: "payment_received",
               title: "Payment Received",
-              body: `Payment of Rs ${payment.amount} received for invoice ${bill.billNumber || payment.referenceNumber || ""}.`,
+              body: `Payment of Rs ${payment.amount} received for invoice ${bill.billNumber}.`,
               relatedEntityType: "payment",
               relatedEntityId: event.params.paymentId,
             });
@@ -247,7 +247,7 @@ export const onDeliveryWritten = onDocumentWritten(
             membershipId: delivery.riderMembershipId,
             type: "delivery_assigned",
             title: "New Delivery Assigned",
-            body: `You have been assigned delivery ${event.params.deliveryId} to ${delivery.customerName}.`,
+            body: `You have been assigned delivery ${event.params.deliveryId} to ${delivery.address?.city || "the customer"}.`,
             relatedEntityType: "delivery",
             relatedEntityId: event.params.deliveryId,
           });

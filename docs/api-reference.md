@@ -1,15 +1,15 @@
 # Trado API Reference
 
-This document is the single, authoritative reference for all **105 exported Cloud Functions** (101 HTTPS Callables + 4 Firestore Event Triggers) in the Trado backend. All HTTPS Callables are deployed to region `asia-south1` (Mumbai) using Cloud Functions Gen 2 on Node.js 22.
+This document is the single, authoritative reference for all **121 exported Cloud Functions** (115 HTTPS Callables + 5 Firestore/Auth Event Triggers + 1 scheduled sweep function) in the Trado backend. All HTTPS Callables are deployed to region `asia-south1` (Mumbai) using Cloud Functions Gen 2 on Node.js 22.
 
 ## Global Calling Convention
 
 - **Authentication**: All endpoints require a Firebase Authentication ID token passed via the `Authorization: Bearer <token>` header or client SDK `FirebaseFunctions.instanceFor(region: "asia-south1").httpsCallable(name)`.
-- **Tenant Scoping**: The active organization is derived automatically from the caller's token custom claims (`primaryOrganizationId`) or explicitly verified via `request.data.organizationId`.
+- **Tenant Scoping**: The active organization is derived from the caller's token custom claims (`primaryOrganizationId`); a client-supplied `organizationId` must match it (`TENANT_MISMATCH`). Subscription, plan module, permission, branch and usage checks run on every call — see [Gate, Error Reasons & Lifecycle Callables](#gate-error-reasons--lifecycle-callables-2026-11-07).
 - **Branch Scoping**: When operating in multi-branch mode, requests accept `branchId`. If omitted, standard staff operate in their assigned `primaryBranchId`, and owners default to `main-branch`.
 - **Idempotency**: State-mutating writes accept an optional or mandatory `idempotencyKey` UUID to guarantee zero-risk network retries.
 
-## Function Catalog (105 Exports)
+## Function Catalog (116 Exports)
 
 | # | Export Name | Type | Domain | Required Permission |
 |---|---|---|---|---|
@@ -83,41 +83,44 @@ This document is the single, authoritative reference for all **105 exported Clou
 | 67 | `returnsList` | Callable | Returns Management | `return:create / return:view / return:approve` |
 | 68 | `paymentsCreate` | Callable | Payments Ledger | `payment:create / payment:view / payment:void` |
 | 69 | `paymentsList` | Callable | Payments Ledger | `payment:create / payment:view / payment:void` |
-| 70 | `stockAdjust` | Callable | Inventory & Stock | `stock:view / stock:adjust / stock:transfer` |
-| 71 | `stockMovementsList` | Callable | Inventory & Stock | `stock:view / stock:adjust / stock:transfer` |
-| 72 | `reconcileStockBalances` | Callable | Reconciliation Tooling | `Admin / Org Owner / Super Admin` |
-| 73 | `reconcilePartyLedgers` | Callable | Reconciliation Tooling | `Admin / Org Owner / Super Admin` |
-| 74 | `reconcileBranchCounts` | Callable | Reconciliation Tooling | `Admin / Org Owner / Super Admin` |
-| 75 | `reportsGetRevenue` | Callable | Reporting & Analytics | `report:view` |
-| 76 | `reportsGetProfitLoss` | Callable | Reporting & Analytics | `report:profit` |
-| 77 | `reportsGetStockValuation` | Callable | Reporting & Analytics | `report:view` |
-| 78 | `reportsGetTopEntities` | Callable | Reporting & Analytics | `report:view` |
-| 79 | `reportsGetStaffActivity` | Callable | Reporting & Analytics | `report:view` |
-| 80 | `reportsGetPlatformOverview` | Callable | Reporting & Analytics | `report:view` |
-| 81 | `reportsExportCsv` | Callable | Reporting & Analytics | `report:export` |
-| 82 | `tasksCreate` | Callable | Task Management | `task:create` |
-| 83 | `tasksUpdate` | Callable | Task Management | `task:view` |
-| 84 | `tasksAssign` | Callable | Task Management | `task:assign` |
-| 85 | `tasksUpdateStatus` | Callable | Task Management | `task:view` |
-| 86 | `tasksList` | Callable | Task Management | `task:view` |
-| 87 | `tasksDelete` | Callable | Task Management | `task:view` |
-| 88 | `locationsRecordPing` | Callable | Live Location Tracking | `location:ping` |
-| 89 | `locationsGetLatest` | Callable | Live Location Tracking | `location:view_own / location:view_all` |
-| 90 | `locationsGetHistory` | Callable | Live Location Tracking | `location:view_own / location:view_all` |
-| 91 | `notificationsList` | Callable | Notifications | `notification:view / Authenticated` |
-| 92 | `notificationsMarkRead` | Callable | Notifications | `notification:view / Authenticated` |
-| 93 | `usageGetPlatformSummary` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
-| 94 | `usageGetOrganizations` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
-| 95 | `usageGetBranches` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
-| 96 | `usageGetDetail` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
-| 97 | `usageCalculateDryRunStatement` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
-| 98 | `usageRecordClientMetric` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
-| 99 | `usageGetLimits` | Callable | Usage Metering & Quotas | `Platform Super Admin / Tenant Owner` |
-| 100 | `usageUpdateLimits` | Callable | Usage Metering & Quotas | `Platform Super Admin Only` |
-| 101 | `onBillWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
-| 102 | `onOutflowWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
-| 103 | `onPaymentWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
-| 104 | `onDeliveryWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 70 | `paymentsVoid` | Callable | Payments Ledger | `payment:void` |
+| 71 | `stockAdjust` | Callable | Inventory & Stock | `stock:view / stock:adjust / stock:transfer` |
+| 72 | `stockMovementsList` | Callable | Inventory & Stock | `stock:view / stock:adjust / stock:transfer` |
+| 73 | `reconcileStockBalances` | Callable | Reconciliation Tooling | `Admin / Org Owner / Super Admin` |
+| 74 | `reconcilePartyLedgers` | Callable | Reconciliation Tooling | `Admin / Org Owner / Super Admin` |
+| 75 | `reconcileBranchCounts` | Callable | Reconciliation Tooling | `Admin / Org Owner / Super Admin` |
+| 76 | `reportsGetRevenue` | Callable | Reporting & Analytics | `report:view` |
+| 77 | `reportsGetProfitLoss` | Callable | Reporting & Analytics | `report:profit` |
+| 78 | `reportsGetStockValuation` | Callable | Reporting & Analytics | `report:view` |
+| 79 | `reportsGetTopEntities` | Callable | Reporting & Analytics | `report:view` |
+| 80 | `reportsGetStaffActivity` | Callable | Reporting & Analytics | `report:view` |
+| 81 | `reportsGetPlatformOverview` | Callable | Reporting & Analytics | `report:view` |
+| 82 | `reportsExportCsv` | Callable | Reporting & Analytics | `report:export` |
+| 83 | `tasksCreate` | Callable | Task Management | `task:create` |
+| 84 | `tasksUpdate` | Callable | Task Management | `task:view` |
+| 85 | `tasksAssign` | Callable | Task Management | `task:assign` |
+| 86 | `tasksUpdateStatus` | Callable | Task Management | `task:view` |
+| 87 | `tasksList` | Callable | Task Management | `task:view` |
+| 88 | `tasksDelete` | Callable | Task Management | `task:view` |
+| 89 | `locationsRecordPing` | Callable | Live Location Tracking | `location:ping` |
+| 90 | `locationsGetLatest` | Callable | Live Location Tracking | `location:view_own / location:view_all` |
+| 91 | `locationsGetHistory` | Callable | Live Location Tracking | `location:view_own / location:view_all` |
+| 92 | `notificationsList` | Callable | Notifications | `notification:view / Authenticated` |
+| 93 | `notificationsMarkRead` | Callable | Notifications | `notification:view / Authenticated` |
+| 94 | `usageGetPlatformSummary` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
+| 95 | `usageGetOrganizations` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
+| 96 | `usageGetBranches` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
+| 97 | `usageGetDetail` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
+| 98 | `usageCalculateDryRunStatement` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
+| 99 | `usageRecordClientMetric` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
+| 100 | `usageGetLimits` | Callable | Usage Metering & Quotas | `Platform Super Admin / Tenant Owner` |
+| 101 | `usageUpdateLimits` | Callable | Usage Metering & Quotas | `Platform Super Admin Only` |
+| 102 | `onBillWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 103 | `onOutflowWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 104 | `onPaymentWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 105 | `onDeliveryWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 106 | `onStorageObjectFinalized` | Storage Trigger | Usage Metering | `System Trigger (Internal)` |
+| 107 | `subscriptionAndUsageSweep` | Scheduled | Subscription Lifecycle | `System Trigger (Internal)` |
 
 ---
 
@@ -663,6 +666,16 @@ This document is the single, authoritative reference for all **105 exported Clou
 - **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/paymentsList` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/paymentsList` (Emulator)
 - **Summary**: Cloud function handling `paymentsList` business workflow with transactional integrity and anti-embedding validation.
 
+#### `paymentsVoid`
+
+- **Function Export**: `paymentsVoid`
+- **Source File**: `functions/src/callables/payments.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/paymentsVoid` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/paymentsVoid` (Emulator)
+- **Permission**: `payment:void`
+- **Summary**: Voids a completed payment entry. Reverses the settlement on the linked bill/outflow (restores paidAmount/balanceAmount/paymentStatus) and restores the party's outstanding balance (customer receivable or vendor payable). Idempotent — rejects double-void with `failed-precondition`. Cross-tenant access rejected. Only reverses document settlement when the linked document is still active/confirmed.
+- **Input**: `{ paymentId: string, reason: string, idempotencyKey?: string }`
+- **Output**: `{ paymentId, paymentNumber, status: "voided", reversedDocumentId, message }`
+
 ### Module: `./callables/stock.js` (Stock)
 
 #### `stockAdjust`
@@ -926,26 +939,116 @@ This document is the single, authoritative reference for all **105 exported Clou
 
 ---
 
+## Gate, Error Reasons & Lifecycle Callables (2026-11-07)
+
+> The authoritative callable → permission → plan-module matrix is generated from source by
+> `scripts/check-gate-conformance.js` into [the callable inventory](audit/callable-and-trigger-inventory.md#gate--permission-matrix-generated-by-scriptscheck-gate-conformancejs).
+> Where the catalog table above disagrees, the generated matrix wins.
+
+### Gate order and stable error reasons
+
+Every tenant callable runs one gate (`functions/src/services/contextResolver.ts`): authenticated → user active → membership active → organization active → subscription valid → plan includes module → org/branch module toggle → permission (deny wins) → branch exists/active/assigned → usage limit → business logic.
+Failures carry `error.details.reason` and a `[REASON]` message prefix:
+
+| Reason | HTTPS code | Client action |
+|---|---|---|
+| `UNAUTHENTICATED` | unauthenticated | sign in |
+| `USER_INACTIVE`, `NO_MEMBERSHIP`, `MEMBERSHIP_INACTIVE` | permission-denied | sign out / contact admin |
+| `ORG_NOT_FOUND`, `ORG_INACTIVE` | not-found / failed-precondition | locked tenant screen |
+| `SUBSCRIPTION_EXPIRED`, `SUBSCRIPTION_SUSPENDED`, `SUBSCRIPTION_CANCELLED`, `SUBSCRIPTION_NOT_STARTED` | failed-precondition | renewal screen (also `authMe.contextStatus`) |
+| `MODULE_NOT_IN_PLAN` | permission-denied | upgrade prompt |
+| `MODULE_DISABLED` | permission-denied | feature turned off by Owner |
+| `PERMISSION_DENIED` | permission-denied | hide action |
+| `TENANT_MISMATCH` | permission-denied / invalid-argument | client bug: wrong organizationId |
+| `BRANCH_NOT_FOUND`, `BRANCH_INACTIVE`, `BRANCH_NOT_ASSIGNED` | not-found / failed-precondition / permission-denied | branch picker |
+| `SUPER_ADMIN_TENANT_FORBIDDEN` | permission-denied | Super Admin is platform-only |
+| `USAGE_LIMIT_EXCEEDED` | resource-exhausted | limit banner; `details` has metric, period, usage, limit |
+| `PLAN_LIMIT_REACHED` | resource-exhausted | seat/branch limit |
+| `FIELD_NOT_EDITABLE` | permission-denied | `details.fields` lists rejected fields |
+
+Super Admin may run `platform:*` callables and read-only tenant views (support); never tenant mutations.
+
+### Module: `./callables/bills.js` — lifecycle
+
+- `billsUpdateDraft` — `bill:update`. Input `{ billId, items?, notes?, idempotencyKey? }`. Updates a draft invoice or quotation (recalculates pricing and total). Audited with field changes in entity history. Finalized invoices are immutable and reject draft updates with `DOCUMENT_IMMUTABLE`.
+- `billsApprove` / `documentsDecide` — `bill:approve`. Unified via `documentsDecide`. Input `{ documentType: "bill", documentId, decision: "approve"|"reject", reason? }`. Applies the held stock, customer-ledger and tender payment on approve; `rejected` leaves no effect. Makers cannot approve their own bills.
+- `billsVoid` — `bill:void`. Input `{ documentId, reason, idempotencyKey? }`. Active bill → `voided` with stock returned, customer `totalSpend`/`outstandingBalance` reversed and linked payments voided; drafts / pending → `cancelled` (reservation released). Rejected when non-voided returns exist.
+- `billsCreate` changes: sales orders reserve stock (`allocatedStock`) instead of deducting; line `unit` may be an alternate unit (`conversionFactor`, `baseQuantity` frozen); discounts need `bill:discount`; discount above `maxDiscountPercent` or a credit-limit breach routes the bill to `pending_approval`; B2B requires `customerId`.
+
+### Module: `./callables/approvals.js` — unified maker-checker
+
+- `documentsDecide` — maker-checker decision router across bills, purchases/expenses, returns, and stock adjustments. Input `{ documentType: "bill"|"outflow"|"return"|"stock_adjustment", documentId, decision: "approve"|"reject", reason?, idempotencyKey? }`.
+
+### Module: `./callables/recurringExpenses.js` — recurring expense templates
+
+- `recurringExpensesCreate` — `expense:create` / `outflow:create`. Creates a recurring expense schedule.
+- `recurringExpensesUpdate` — `expense:create` / `outflow:create`. Updates template details or active state.
+- `recurringExpensesList` — `expense:view` / `outflow:view`. Lists recurring expense templates for the organization.
+
+### Module: `./callables/outflows.js` — lifecycle
+
+- `outflowsApprove` — `purchase:approve` / `expense:approve` / `outflow:approve`. Unified via `documentsDecide`. Same contract as `billsApprove`.
+- `outflowsVoid` — `purchase:void` / `expense:void` / `outflow:void`. Reverses good units received, vendor payable/total purchase, voids payments, releases the vendor-invoice lock.
+- `outflowsCreate` changes: per-vendor unique `invoiceNumber`; lines accept `damagedQuantity`/`damageReason` (written off at receipt) and `serialNumbers`; `payeeType` (`vendor`|`employee`|`other`), `payeeMembershipId` (sensitive, needs `expense:view_sensitive` to read), `expenseCategoryId`, `billDiscountAmount`/`billDiscountPercent`, `attachmentPaths`.
+
+### Module: `./callables/organizations.js` — subscriptions
+
+- `organizationsSetSubscription` — Super Admin only. Input `{ organizationId, action: "set"|"renew"|"extend"|"suspend"|"reactivate"|"cancel"|"change_plan", planId?, expiresOn? (YYYY-MM-DD), durationDays?, extendDays?, graceDays?, reason? }`. Returns the stored fields, an `evaluation`, and `overLimit` (`branches`/`employees`) after a downgrade.
+- `organizationsUpdate` field policy: Super Admin — `name`, `businessType`, `businessCategory`, `moduleToggles`, `salesChannels`, `timezone` (+ all Owner fields); Owner — `displayName`, `logoUrl`, `imageUrls`, `taxNumber`, `website`, `contactEmail`, `contactPhone`, `address`, `bankDetails`, `settings.approvals`; Admin — none. Unknown fields → `INVALID_ARGUMENT`.
+
+### Module: `./callables/teams.js`
+
+- `teamsAssignMember` — `team:manage`, or the team leader (own reportees / unassigned staff). Input `{ teamId, membershipId, action: "add"|"remove" }`.
+
+### Module: `./callables/products.js`
+
+- `productsGetPriceHistory` — product read permission. Purchase cost trend per base unit (last/min/max/quantity-weighted average, per vendor) derived from purchase lines (cost needs `product:view_cost`), and selling-price/MRP/wholesale/cost changes from change history.
+
+### Module: `./callables/history.js`
+
+- `auditGetEntityHistory` — `audit:view`. Input `{ entityType, entityId, limit? }`. Immutable change history: action, actor (name resolved at read), time, `changes[{field, from, to}]`.
+
+### Module: `./callables/reports.js` — statements & outflow
+
+- `reportsGetPartyStatement` — vendor: `vendor:view_balance` or `payment:view`; customer: `customer:view_balance` or `payment:view`. Input `{ partyType, partyId, from?, to?, branchId? }`. Opening/closing balance, entries with running balance, per-document paid status, day-wise totals, ageing (current, 1–30, 31–60, 61–90, 90+), and `ledgerBalance` for cross-check.
+- `reportsGetOutflowSummary` — `report:view` / `outflow:view`. `accrual.totalOutflow = purchases + expenses`, `cash.paid`, grouped by day/category/employee/vendor/branch. Never add `totalOutflow` to the P&L (purchases reach it only as COGS).
+- `reportsGetProfitLoss` now returns `inventoryWriteOff` (damage/expiry/theft/samples/internal use/count shortfall/damaged on receipt at movement cost) and `netProfit = grossProfit − expenses − inventoryWriteOff`.
+- `reportsGetStaffActivity` now covers sales, purchases, expenses, returns, deliveries, stock adjustments, approvals and tasks per employee, scoped (Owner/Admin all, managers team, others self).
+
+### Scheduled: `./triggers/scheduled.js`
+
+- `subscriptionAndUsageSweep` — daily 02:00 Asia/Kolkata. Expiry reminders 7/3/1 days before, `subscriptionStatus → expired` after expiry + grace, usage warnings; idempotent (re-runs never duplicate notifications).
+
 ## Interactive API Explorer & OpenAPI Contract
 
-The Trado backend includes a **generated OpenAPI 3.0.3 specification** ([`docs/openapi.json`](openapi.json)) covering all 100 HTTPS callables with typed request schemas derived from Zod validation.
+The Trado backend includes a **generated OpenAPI 3.0.3 specification** ([`docs/openapi.json`](openapi.json)) covering all 101 HTTPS callables with typed request schemas derived from Zod validation.
 
 ### Quick Start
 
 ```powershell
-# Generate/regenerate the OpenAPI spec
+# 1. Compile backend functions
+npm --prefix functions run build
+
+# 2. Start Firebase Emulators (Terminal 1)
+$env:FUNCTIONS_DISCOVERY_TIMEOUT = "60"
+firebase emulators:start --project trado-x
+
+# 3. Seed demo organizations & personas (Terminal 2)
+node functions/lib/scripts/seed-emulator.js --profile api-explorer-demo
+
+# 4. Generate OpenAPI specification (Terminal 2)
 node scripts/generate-openapi.js
 
-# Start the local Swagger UI explorer (requires emulators running)
+# 5. Launch Local API Explorer (Terminal 2)
 node tools/api-explorer/server.js
-# → http://127.0.0.1:3939
+# → Open browser to http://127.0.0.1:3939
 ```
 
 ### Related Resources
 
 | Resource | Path | Purpose |
 |----------|------|---------|
-| OpenAPI Spec | [`docs/openapi.json`](openapi.json) | Machine-readable 100-callable contract |
+| OpenAPI Spec | [`docs/openapi.json`](openapi.json) | Machine-readable 101-callable contract |
 | Flutter Client Guide | [`docs/flutter-client-integration.md`](flutter-client-integration.md) | Canonical Flutter Web integration & DTO guide |
 | API Explorer | [`tools/api-explorer/server.js`](../tools/api-explorer/server.js) | Local Swagger UI with persona login |
 | Manual Testing Guide | [`docs/manual-api-testing-guide.md`](manual-api-testing-guide.md) | Step-by-step beginner walkthrough |

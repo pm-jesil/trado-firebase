@@ -74,7 +74,6 @@ async function run() {
       vendorId,
       lines: [
         {
-          itemName: "Organic Honey 500g",
           productId,
           quantity: 20,
           unit: "piece",
@@ -92,10 +91,8 @@ async function run() {
     organizationId: orgId,
     kind: "purchase",
     vendorId,
-    vendorName: "Pure Agro Organics",
     lines: [
       {
-        itemName: "Organic Honey 500g",
         productId,
         quantity: 20,
         unit: "piece",
@@ -272,7 +269,6 @@ async function run() {
     organizationId: orgId,
     returnType: "sales_return",
     referenceId: activeBillId,
-    partyId: customerId,
     items: [
       {
         productId,

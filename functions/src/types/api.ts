@@ -2,6 +2,7 @@
  * Request and Response Data Transfer Objects (DTOs) for Cloud Functions Callables
  */
 
+import type { EffectiveBusinessConfig } from "../constants/businessDefaults.js";
 import { BusinessType, BusinessCategory, EntityStatus } from "../constants/enums.js";
 
 // Canonical Session Context DTOs
@@ -10,7 +11,19 @@ export type AuthContextStatus =
   | "platform"
   | "organization_selection_required"
   | "branch_selection_required"
-  | "no_active_membership";
+  | "no_active_membership"
+  | "organization_inactive" // Organization status is not active (Super Admin locked it)
+  | "subscription_expired" // Past expiry + grace: no tenant operations
+  | "subscription_suspended" // Suspended or cancelled by the platform
+  | "subscription_not_started";
+
+export interface AuthSubscriptionContext {
+  state: string; // trial | active | grace | expired | suspended | cancelled | legacy_unset
+  planId: string | null;
+  expiresAt: string | null;
+  graceEndsAt: string | null;
+  daysRemaining: number | null;
+}
 
 export interface AuthUserContext {
   uid: string;
@@ -69,6 +82,8 @@ export interface AuthDeviceContext {
 
 export interface AuthSessionContext {
   user: AuthUserContext;
+  /** Effective business configuration: organization override ?? business-type default (computed). */
+  businessConfig?: EffectiveBusinessConfig | null;
   role: AuthRoleContext | null;
   jobRoles: AuthJobRoleContext[];
   permissions: string[];
@@ -79,6 +94,7 @@ export interface AuthSessionContext {
   primaryBranch: AuthPrimaryBranchContext | null;
   device: AuthDeviceContext | null;
   contextStatus: AuthContextStatus;
+  subscription?: AuthSubscriptionContext | null;
 }
 
 // Authentication Login DTOs (Emulator Adapter)

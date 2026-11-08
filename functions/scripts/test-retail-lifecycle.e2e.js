@@ -82,36 +82,9 @@ async function runE2EBusinessFlow() {
     console.log(`\n[STEP ${step++}] ${title}`);
   }
 
-  // Pre-seed minimum catalogs
-  await db.collection("subscriptionPlans").doc("plan_enterprise").set({
-    id: "plan_enterprise",
-    name: "Enterprise",
-    price: 9999,
-    seatLimits: { admin: 10, staff: 100 },
-    moduleFlags: { billing: true, sales: true, inventory: true, staff: true, accounting: true },
-    isActive: true,
-  });
-
-  await db.collection("roles").doc("role_org_owner").set({
-    name: "Organization Owner",
-    code: "org_owner",
-    permissions: ["*"],
-    isSystem: true,
-  });
-
-  await db.collection("roles").doc("role_admin").set({
-    name: "Administrator",
-    code: "admin",
-    permissions: ["org:view", "employee:create", "employee:view", "product:create", "product:view", "inventory:view", "inventory:adjust", "outflow:create", "outflow:view", "payment:create", "payment:view", "bill:create", "bill:finalize", "bill:view", "return:create", "return:view"],
-    isSystem: true,
-  });
-
-  await db.collection("roles").doc("role_employee").set({
-    name: "Standard Employee",
-    code: "employee",
-    permissions: ["org:view", "product:view", "inventory:view", "bill:create", "bill:finalize", "bill:view", "return:create", "payment:create"],
-    isSystem: true,
-  });
+  // Canonical reference data (plans, roles, catalogs). Suites must never overwrite shared
+  // system roles or plans: other suites running on the same emulator depend on them.
+  await (await import("../lib/scripts/seed-emulator.js")).seedReferenceData(db);
 
   // Setup Super Admin Actor
   const superAdminEmail = `superadmin_e2e_${runId}@trado.local`;
@@ -188,6 +161,11 @@ async function runE2EBusinessFlow() {
     roleId: "role_employee",
     initialPassword: "TempPassword123!",
     idempotencyKey: `e2e_emp_staff_${runId}`,
+    // Floor staff duties granted per membership (the base employee role is view-only)
+    permissionOverrides: {
+      "product:view": true, "inventory:view": true, "bill:create": true, "bill:view": true,
+      "bill:update": true, "return:create": true, "payment:create": true, "customer:view": true,
+    },
   }, ownerToken);
   assert.equal(empRes.ok, true, `employeesCreate employee failed: ${JSON.stringify(empRes.error)}`);
   const empUid = empRes.data.userId;
@@ -265,12 +243,10 @@ async function runE2EBusinessFlow() {
     organizationId: orgId,
     kind: "purchase",
     vendorId,
-    vendorName: "Kerala Spice Suppliers Ltd",
     docDate: new Date().toISOString(),
     lines: [
       {
         productId,
-        itemName: "Green Cardamom Grade A (50g)",
         quantity: 100,
         unit: "piece",
         unitPrice: 200,
@@ -309,7 +285,6 @@ async function runE2EBusinessFlow() {
     direction: "out",
     partyType: "vendor",
     partyId: vendorId,
-    partyName: "Kerala Spice Suppliers Ltd",
     amount: 8000,
     method: "bank_transfer",
     referenceId: outflowId,
@@ -418,7 +393,6 @@ async function runE2EBusinessFlow() {
     direction: "in",
     partyType: "customer",
     partyId: customerId,
-    partyName: "Spice Bazaar Wholesalers",
     amount: 3000,
     method: "bank_transfer",
     referenceId: quotationBillId,
@@ -470,7 +444,6 @@ async function runE2EBusinessFlow() {
     organizationId: orgId,
     returnType: "sales_return",
     referenceId: quotationBillId,
-    partyId: customerId,
     items: [
       {
         productId,

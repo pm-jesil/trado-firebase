@@ -7,6 +7,7 @@
  */
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { parseInput } from "../validation/parseInput.js";
 import { AuthLoginResponse } from "../types/api.js";
 import { AuthLoginSchema } from "../validation/schemas.js";
 import { buildAuthSessionContext } from "../services/sessionContext.js";
@@ -26,15 +27,9 @@ export const authLogin = onCall({ region: "asia-south1" }, async (request): Prom
   }
 
   // 2. Validate Input
-  const parsed = AuthLoginSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError(
-      "invalid-argument",
-      `Validation failed: ${parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`
-    );
-  }
+  const input = parseInput(AuthLoginSchema, request.data);
 
-  const { email, password, deviceId } = parsed.data;
+  const { email, password, deviceId } = input;
 
   // 3. Authenticate against local Firebase Auth Emulator REST Endpoint
   const authUrl = `http://${authEmulatorHost}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=fake-key`;

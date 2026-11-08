@@ -4,8 +4,11 @@
  */
 
 import { onCall } from "firebase-functions/v2/https";
+import { parseInput } from "../validation/parseInput.js";
+import { ContextOnlySchema } from "../validation/schemas.js";
 
-export const healthCheck = onCall({ region: "asia-south1" }, async () => {
+export const healthCheck = onCall({ region: "asia-south1" }, async (request) => {
+  parseInput(ContextOnlySchema, request.data);
   return {
     status: "ok",
     service: "trado-firebase-functions",

@@ -12,7 +12,9 @@ import { db } from "../services/firebase.js";
 import {
   CreatePaymentSchema,
   ListPaymentsSchema,
+  VoidPaymentSchema,
 } from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
 import { PaymentDoc, BillDoc, OutflowDoc, CustomerDoc, VendorDoc } from "../types/models.js";
 import { Money } from "../services/money.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
@@ -21,25 +23,41 @@ import {
   commitDocumentNumberInTxn,
 } from "../services/documentCounter.js";
 import { createAuditLog } from "../services/audit.js";
-import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
+import { hydrate } from "../services/hydration.js";
+import { fetchPage } from "../services/pagination.js";
+import { resolveRequestContext, resolveDataScope, applyDataScope } from "../services/contextResolver.js";
+import { AppPermissions } from "../constants/permissions.js";
+
+/** Rejects references to documents of another organization. */
+function assertSameOrg(snap: FirebaseFirestore.DocumentSnapshot | null, orgId: string, label: string): void {
+  if (snap && snap.exists && snap.data()?.organizationId !== orgId) {
+    throw new HttpsError("permission-denied", `Cross-tenant ${label} reference rejected.`);
+  }
+  if (snap && !snap.exists) {
+    throw new HttpsError("not-found", `Referenced ${label} not found.`);
+  }
+}
 
 export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = CreatePaymentSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
+  const input = parseInput(CreatePaymentSchema, request.data);
+  if (input.partyName && (input.partyId || input.referenceId)) {
+    throw new HttpsError("invalid-argument", "[REFERENCE_ATTRIBUTE_COPY] partyName is only for a standalone payment; a referenced party or document is resolved by id.", { reason: "REFERENCE_ATTRIBUTE_COPY" });
   }
-  const input = parsed.data;
+  if (!input.partyName && !input.partyId && !input.referenceId) {
+    throw new HttpsError("invalid-argument", "A standalone payment needs partyName, partyId or referenceId.");
+  }
 
-  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
-  const branchId = await resolveBranchContext(request.auth, orgId, input.branchId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.PAYMENT_CREATE });
+  const orgId = ctx.organizationId;
+  const branchId = ctx.branchId;
 
   const idempotency = await reserveIdempotency({
     scope: orgId,
-    actorUid: request.auth.uid,
+    actorUid: ctx.callerUid,
     operation: "payments.create",
     clientKey: input.idempotencyKey,
     payload: input as unknown as Record<string, unknown>,
@@ -56,7 +74,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
     const paymentRef = db.collection("payments").doc();
     const paymentId = paymentRef.id;
     const now = new Date().toISOString();
-    const callerUid = request.auth.uid;
+    const callerUid = ctx.callerUid;
 
     const finalResult = await db.runTransaction(async (txn) => {
       // === STEP 1: ALL TRANSACTIONAL READS FIRST ===
@@ -79,18 +97,47 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
         outflowSnap = await txn.get(outflowRef);
       }
 
+      assertSameOrg(billSnap, orgId, "bill");
+      assertSameOrg(outflowSnap, orgId, "outflow");
+
+      // The party of a document payment is the document's own party (never a second, divergent copy)
+      const docParty = billSnap?.exists ? ((billSnap.data() as BillDoc).customerId || null)
+        : outflowSnap?.exists ? ((outflowSnap.data() as OutflowDoc).vendorId || null) : undefined;
+      if (billSnap && input.partyType !== "customer") {
+        throw new HttpsError("invalid-argument", "A bill payment's partyType must be customer.");
+      }
+      if (input.partyId && docParty !== undefined && input.partyId !== docParty) {
+        throw new HttpsError("invalid-argument", "[REFERENCE_MISMATCH] partyId differs from the referenced document's party.", { reason: "REFERENCE_MISMATCH" });
+      }
+      const partyId = input.partyId || docParty || null;
+
       let custRef = null;
       let custSnap = null;
-      if (input.partyType === "customer" && input.partyId) {
-        custRef = db.collection("customers").doc(input.partyId);
+      if (input.partyType === "customer" && partyId) {
+        custRef = db.collection("customers").doc(partyId);
         custSnap = await txn.get(custRef);
       }
 
       let vendRef = null;
       let vendSnap = null;
-      if (input.partyType === "vendor" && input.partyId) {
-        vendRef = db.collection("vendors").doc(input.partyId);
+      if (input.partyType === "vendor" && partyId) {
+        vendRef = db.collection("vendors").doc(partyId);
         vendSnap = await txn.get(vendRef);
+      }
+
+      assertSameOrg(custSnap, orgId, "customer");
+      assertSameOrg(vendSnap, orgId, "vendor");
+
+      // Settlement guards: only active/confirmed documents, never beyond the open balance
+      const settled = (billSnap?.data() as BillDoc | undefined) || (outflowSnap?.data() as OutflowDoc | undefined);
+      if (settled) {
+        const openStatus = billSnap ? (settled as BillDoc).status === "active" : (settled as OutflowDoc).status === "confirmed";
+        if (!openStatus) {
+          throw new HttpsError("failed-precondition", `Cannot record a payment against a document in status "${settled.status}".`);
+        }
+        if (input.amount > Money.amount(settled.balanceAmount || 0) + 0.005) {
+          throw new HttpsError("invalid-argument", `Payment ${input.amount} exceeds the open balance ${settled.balanceAmount}.`);
+        }
       }
 
       // === STEP 2: ALL TRANSACTIONAL WRITES ===
@@ -103,8 +150,8 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
         paymentNumber,
         direction: input.direction,
         partyType: input.partyType,
-        partyId: input.partyId || null,
-        partyName: input.partyName.trim(),
+        partyId,
+        ...(input.partyName ? { partyName: input.partyName } : {}),
         amount: input.amount,
         method: input.method,
         referenceId: input.referenceId || null,
@@ -114,6 +161,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
         createdAt: now,
         createdBy: callerUid,
       };
+      if (input.gateway) paymentDoc.gateway = input.gateway;
 
       txn.set(paymentRef, paymentDoc);
 
@@ -189,7 +237,9 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
 
     await createAuditLog({
       organizationId: orgId,
-      actorUid: request.auth.uid,
+      branchId,
+      actorUid: ctx.callerUid,
+      actorMembershipId: ctx.membershipId,
       action: "PAYMENT_RECORDED",
       entityType: "payment",
       entityId: paymentId,
@@ -210,22 +260,178 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
   }
 });
 
+// ---------------------------------------------------------------------------
+// paymentsVoid: reverses a completed payment entry
+// ---------------------------------------------------------------------------
+
+export const paymentsVoid = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const input = parseInput(VoidPaymentSchema, request.data);
+
+  const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.PAYMENT_VOID });
+  const orgId = ctx.organizationId;
+
+  const idempotency = await reserveIdempotency({
+    scope: orgId,
+    actorUid: ctx.callerUid,
+    operation: "payments.void",
+    clientKey: input.idempotencyKey || `void_payment_${input.paymentId}`,
+    payload: { paymentId: input.paymentId },
+  });
+
+  if (idempotency.isDuplicate) {
+    if (idempotency.isProcessing) {
+      throw new HttpsError("already-exists", "Operation in progress. Please retry shortly.");
+    }
+    return idempotency.cachedResult;
+  }
+
+  try {
+    const now = new Date().toISOString();
+    const paymentRef = db.collection("payments").doc(input.paymentId);
+
+    const result = await db.runTransaction(async (txn) => {
+      // === READS ===
+      const paySnap = await txn.get(paymentRef);
+      if (!paySnap.exists) throw new HttpsError("not-found", "Payment not found.");
+      const payment = paySnap.data() as PaymentDoc;
+      if (payment.organizationId !== orgId) {
+        throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+      }
+      if (payment.status === "voided") {
+        throw new HttpsError("failed-precondition", "Payment is already voided.");
+      }
+
+      // Reverse the settlement on the linked document (bill or outflow)
+      let docRef: FirebaseFirestore.DocumentReference | null = null;
+      let docSnap: FirebaseFirestore.DocumentSnapshot | null = null;
+      if (payment.referenceId && payment.referenceModel) {
+        const collection = payment.referenceModel === "bill" ? "bills" : "outflows";
+        docRef = db.collection(collection).doc(payment.referenceId);
+        docSnap = await txn.get(docRef);
+      }
+
+      // Reverse party balance (customer receivable or vendor payable)
+      let partyRef: FirebaseFirestore.DocumentReference | null = null;
+      let partySnap: FirebaseFirestore.DocumentSnapshot | null = null;
+      if (payment.partyId) {
+        const partyCollection = payment.partyType === "customer" ? "customers" : "vendors";
+        partyRef = db.collection(partyCollection).doc(payment.partyId);
+        partySnap = await txn.get(partyRef);
+      }
+
+      // === WRITES ===
+
+      // 1. Mark payment as voided
+      txn.update(paymentRef, {
+        status: "voided",
+        voidReason: input.reason,
+        voidedAt: now,
+        voidedBy: ctx.callerUid,
+        updatedAt: now,
+        updatedBy: ctx.callerUid,
+      });
+
+      // 2. Reverse referenced document settlement
+      let reversedDocumentId: string | null = null;
+      if (docRef && docSnap?.exists) {
+        const docData = docSnap.data() as BillDoc | OutflowDoc;
+        // Only reverse if the document is still active/confirmed (not voided/cancelled itself)
+        const docStatus = docData.status;
+        const isActive = payment.referenceModel === "bill"
+          ? docStatus === "active"
+          : docStatus === "confirmed";
+        if (isActive) {
+          const newPaid = Money.amount(Math.max(0, (docData.paidAmount || 0) - payment.amount));
+          const newBal = Money.amount(docData.totalAmount - newPaid);
+          const newPaymentStatus = newPaid <= 0 ? "pending" : (newBal <= 0 ? "paid" : "partial");
+          txn.update(docRef, {
+            paidAmount: newPaid,
+            balanceAmount: newBal,
+            paymentStatus: newPaymentStatus,
+            updatedAt: now,
+          });
+          reversedDocumentId = docSnap.id;
+        }
+      }
+
+      // 3. Reverse party balance
+      if (partyRef && partySnap?.exists) {
+        if (payment.partyType === "customer") {
+          const cust = partySnap.data() as CustomerDoc;
+          // Voiding an inbound collection restores the customer's outstanding balance
+          txn.update(partyRef, {
+            outstandingBalance: Money.amount((cust.outstandingBalance || 0) + payment.amount),
+            updatedAt: now,
+          });
+        } else if (payment.partyType === "vendor") {
+          const vend = partySnap.data() as VendorDoc;
+          // Voiding an outbound payment restores the vendor's outstanding payable
+          txn.update(partyRef, {
+            outstandingPayable: Money.amount((vend.outstandingPayable || 0) + payment.amount),
+            updatedAt: now,
+          });
+        }
+      }
+
+      return {
+        paymentId: paySnap.id,
+        paymentNumber: payment.paymentNumber,
+        status: "voided" as const,
+        reversedDocumentId,
+        message: `Payment ${payment.paymentNumber} voided successfully.`,
+      };
+    });
+
+    if (idempotency.recordId) {
+      await db.collection("idempotencyRecords").doc(idempotency.recordId).update({
+        status: "succeeded",
+        result,
+        updatedAt: now,
+      });
+    }
+
+    await createAuditLog({
+      organizationId: orgId,
+      branchId: ctx.branchId,
+      actorUid: ctx.callerUid,
+      actorMembershipId: ctx.membershipId,
+      action: "PAYMENT_VOIDED",
+      entityType: "payment",
+      entityId: input.paymentId,
+      details: {
+        paymentNumber: result.paymentNumber,
+        reason: input.reason,
+        reversedDocumentId: result.reversedDocumentId,
+      },
+    });
+
+    return result;
+  } catch (error) {
+    if (idempotency.recordId) {
+      await finalizeIdempotencyFailure(idempotency.recordId, "VOID_PAYMENT_FAILED", (error as Error).message);
+    }
+    if (error instanceof HttpsError) throw error;
+    throw new HttpsError("internal", `Failed to void payment: ${(error as Error).message}`);
+  }
+});
+
 export const paymentsList = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = ListPaymentsSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(ListPaymentsSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.PAYMENT_VIEW });
+  const scope = await resolveDataScope(ctx, "payments", AppPermissions.PAYMENT_VIEW, input.branchId);
+  const orgId = ctx.organizationId;
 
-  let query = db.collection("payments")
-    .where("organizationId", "==", orgId)
-    .limit(input.limit || 50);
+  let query: FirebaseFirestore.Query = db.collection("payments")
+    .where("organizationId", "==", orgId);
 
   if (input.direction) {
     query = query.where("direction", "==", input.direction);
@@ -236,15 +442,11 @@ export const paymentsList = onCall({ region: "asia-south1" }, async (request) =>
   if (input.referenceId) {
     query = query.where("referenceId", "==", input.referenceId);
   }
-  if (input.branchId) {
-    query = query.where("branchId", "==", input.branchId);
-  }
+  const scoped = applyDataScope(query, scope);
+  const { snapshot, nextCursor } = await fetchPage(scoped.query, "payments", input.startAfterId, input.limit || 50);
+  const items = snapshot.docs
+    .map((doc) => ({ paymentId: doc.id, ...(doc.data() as PaymentDoc) }))
+    .filter((pmt) => scoped.keep(pmt as unknown as Record<string, unknown>));
 
-  const snapshot = await query.get();
-  const items = snapshot.docs.map((doc) => ({
-    paymentId: doc.id,
-    ...(doc.data() as PaymentDoc),
-  }));
-
-  return { items, count: items.length };
+  return { items, count: items.length, nextCursor, included: await hydrate(ctx, items) };
 });

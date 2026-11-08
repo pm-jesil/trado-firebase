@@ -113,14 +113,19 @@ async function run() {
   );
   console.log("✓ organizationsCreate rejected non-super-admin caller");
 
-  // Valid organizationsUpdate by Owner
-  const newOrgName = "TenancySuiteOrg Renamed";
+  // Owner may edit the profile (display name, tax id, contact) but not the legal name
   const updateOrgRes = await callFunction("organizationsUpdate", {
     organizationId: owner.organizationId,
-    name: newOrgName,
+    displayName: "TenancySuiteOrg Renamed",
+    taxNumber: "29ABCDE1234F1Z5",
   }, owner.idToken);
   assert.ok(updateOrgRes.success, "Update must succeed");
-  console.log("✓ organizationsUpdate succeeded for Owner");
+  console.log("✓ organizationsUpdate succeeded for Owner (profile fields)");
+  await assertCallableError(
+    callFunction("organizationsUpdate", { organizationId: owner.organizationId, name: "Legal Rename" }, owner.idToken),
+    ["FIELD_NOT_EDITABLE"]
+  );
+  console.log("✓ organizationsUpdate rejected Owner edit of Super-Admin-only field (name)");
 
   // organizationsList
   const listOrgsSuper = await callFunction("organizationsList", {}, superAdmin.idToken);
@@ -149,8 +154,8 @@ async function run() {
       organizationId: owner.organizationId,
       email: directEmail,
       name: "Direct Staff",
-      roleCode: "employee",
-      password: "TestPassword123!",
+      roleId: "role_employee",
+      initialPassword: "TestPassword123!",
     }, unassigned.idToken),
     ["permission-denied"]
   );
@@ -161,8 +166,8 @@ async function run() {
       organizationId: owner.organizationId,
       email: "invalid-email-format",
       name: "Bad Staff",
-      roleCode: "employee",
-      password: "TestPassword123!",
+      roleId: "role_employee",
+      initialPassword: "TestPassword123!",
     }, owner.idToken),
     ["invalid-argument"]
   );
@@ -172,8 +177,8 @@ async function run() {
     organizationId: owner.organizationId,
     email: directEmail,
     name: "Direct Staff",
-    roleCode: "employee",
-    password: "TestPassword123!",
+    roleId: "role_employee",
+    initialPassword: "TestPassword123!",
   }, owner.idToken);
   assert.ok(createEmpDirectRes.userId, "employeesCreate must return userId");
   assert.ok(createEmpDirectRes.membershipId, "employeesCreate must return membershipId");
@@ -182,7 +187,7 @@ async function run() {
   console.log(`✓ employeesCreate direct call succeeded (userId: ${createEmpDirectRes.userId})`);
 
   const employee = await createEmployeePersona(owner.idToken, owner.organizationId, {
-    roleCode: "employee",
+    roleId: "role_employee",
   });
   console.log(`✓ employeesCreate persona helper succeeded (Created: ${employee.email})`);
 

@@ -1,0 +1,581 @@
+{
+  "$comment": "Single source of the allowed-duplication register (Part 1.4). docs/data-model.md is generated from this file by scripts/check-schema-duplicates.js --write. Kinds: R2 frozen fact, R3 aggregate cache (writerFunction + reconcileTest required), R4 ledger, OWNED (looks like a copy but has no source record), BOUNDED_ARRAY (cap enforced by Zod or the single server writer).",
+  "entries": [
+    {
+      "id": "DUP-001",
+      "kind": "R2",
+      "collection": "bills",
+      "field": "subTotal",
+      "owner": "bills",
+      "reason": "Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document."
+    },
+    {
+      "id": "DUP-002",
+      "kind": "R2",
+      "collection": "bills",
+      "field": "discountTotal",
+      "owner": "bills",
+      "reason": "Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document."
+    },
+    {
+      "id": "DUP-003",
+      "kind": "R2",
+      "collection": "bills",
+      "field": "taxTotal",
+      "owner": "bills",
+      "reason": "Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document."
+    },
+    {
+      "id": "DUP-004",
+      "kind": "R2",
+      "collection": "bills",
+      "field": "totalAmount",
+      "owner": "bills",
+      "reason": "Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document."
+    },
+    {
+      "id": "DUP-005",
+      "kind": "R2",
+      "collection": "outflows",
+      "field": "subTotal",
+      "owner": "outflows",
+      "reason": "Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document."
+    },
+    {
+      "id": "DUP-006",
+      "kind": "R2",
+      "collection": "outflows",
+      "field": "discountTotal",
+      "owner": "outflows",
+      "reason": "Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document."
+    },
+    {
+      "id": "DUP-007",
+      "kind": "R2",
+      "collection": "outflows",
+      "field": "taxTotal",
+      "owner": "outflows",
+      "reason": "Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document."
+    },
+    {
+      "id": "DUP-008",
+      "kind": "R2",
+      "collection": "outflows",
+      "field": "totalAmount",
+      "owner": "outflows",
+      "reason": "Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document."
+    },
+    {
+      "id": "DUP-009",
+      "kind": "R2",
+      "collection": "bills",
+      "field": "items.subtotal",
+      "owner": "bills",
+      "reason": "Line amount at the frozen price snapshot (price × quantity at sale time)."
+    },
+    {
+      "id": "DUP-010",
+      "kind": "R2",
+      "collection": "bills",
+      "field": "items.lineTotal",
+      "owner": "bills",
+      "reason": "Line net amount after discount and tax as issued; the refund ceiling for returns reads it by reference."
+    },
+    {
+      "id": "DUP-011",
+      "kind": "R2",
+      "collection": "bills",
+      "field": "items.baseQuantity",
+      "owner": "bills",
+      "reason": "quantity × the conversionFactor frozen at sale time; the product's unit factors may change later."
+    },
+    {
+      "id": "DUP-012",
+      "kind": "R2",
+      "collection": "outflows",
+      "field": "lines.grossAmount",
+      "owner": "outflows",
+      "reason": "Line amount at the vendor's invoiced price."
+    },
+    {
+      "id": "DUP-013",
+      "kind": "R2",
+      "collection": "outflows",
+      "field": "lines.lineTotal",
+      "owner": "outflows",
+      "reason": "Line net amount after discount and tax as invoiced by the vendor."
+    },
+    {
+      "id": "DUP-014",
+      "kind": "R2",
+      "collection": "outflows",
+      "field": "lines.baseQuantity",
+      "owner": "outflows",
+      "reason": "Good units received in the base unit with the conversionFactor frozen at receipt."
+    },
+    {
+      "id": "DUP-015",
+      "kind": "R2",
+      "collection": "returns",
+      "field": "items.baseQuantity",
+      "owner": "returns",
+      "reason": "Returned quantity × the source line's frozen conversionFactor; the stock movement uses it."
+    },
+    {
+      "id": "DUP-016",
+      "kind": "R2",
+      "collection": "returns",
+      "field": "totalRefundAmount",
+      "owner": "returns",
+      "reason": "Sum of the refunds as issued on the credit note / refund voucher."
+    },
+    {
+      "id": "DUP-017",
+      "kind": "R2",
+      "collection": "bills",
+      "field": "billToSnapshot",
+      "owner": "bills",
+      "reason": "GST Rule 46 (CGST Rules 2017): a tax invoice must show the recipient's name, address and GSTIN as at issue. Frozen only on finalized invoices of a registered customer; for walk-in sales it is the typed counter data (no customer record exists).",
+      "writerFunction": "billToFromCustomer"
+    },
+    {
+      "id": "DUP-018",
+      "kind": "R3",
+      "collection": "organizations",
+      "field": "branchCount",
+      "owner": "organizations",
+      "reason": "Plan branchLimit check inside the branch-create transaction (counting branches there would need a collection read per create).",
+      "writerFunction": "branchesCreate",
+      "reconcileTest": "reconcile:branchCount"
+    },
+    {
+      "id": "DUP-019",
+      "kind": "R3",
+      "collection": "organizations",
+      "field": "activeEmployeeCount",
+      "owner": "organizations",
+      "reason": "Transactional seat counter so concurrent employee creation cannot exceed the plan (a count query cannot be locked).",
+      "writerFunction": "assertSeatAvailable",
+      "reconcileTest": "reconcile:activeEmployeeCount"
+    },
+    {
+      "id": "DUP-020",
+      "kind": "R3",
+      "collection": "auditLogs",
+      "field": "changedFields",
+      "owner": "auditLogs",
+      "reason": "Field names of `changes`, stored for array-contains queries (price history). Bounded by the entity's field count.",
+      "writerFunction": "buildLogDoc",
+      "reconcileTest": "reconcile:auditChangedFields",
+      "cap": 100,
+      "serverWritten": true
+    },
+    {
+      "id": "DUP-021",
+      "kind": "R3",
+      "collection": "products",
+      "field": "currentStock",
+      "owner": "products",
+      "reason": "Organization-wide stock shown on product lists = SUM(stockBalances.currentStock) for the product.",
+      "writerFunction": "commitStockChangesInTxn",
+      "reconcileTest": "reconcile:productStock"
+    },
+    {
+      "id": "DUP-022",
+      "kind": "R3",
+      "collection": "products",
+      "field": "weightedAverageCost",
+      "owner": "products",
+      "reason": "Moving-average cost per base unit; path dependent, re-derived by replaying PURCHASE_IN movements in order.",
+      "writerFunction": "prepareStockChangesInTxn",
+      "reconcileTest": "reconcile:productWac"
+    },
+    {
+      "id": "DUP-023",
+      "kind": "R3",
+      "collection": "customers",
+      "field": "outstandingBalance",
+      "owner": "customers",
+      "reason": "Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns.",
+      "writerFunction": "reconcilePartyBalances",
+      "reconcileTest": "reconcile:partyBalances"
+    },
+    {
+      "id": "DUP-024",
+      "kind": "R3",
+      "collection": "customers",
+      "field": "totalSpend",
+      "owner": "customers",
+      "reason": "Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns.",
+      "writerFunction": "reconcilePartyBalances",
+      "reconcileTest": "reconcile:partyBalances"
+    },
+    {
+      "id": "DUP-025",
+      "kind": "R3",
+      "collection": "vendors",
+      "field": "outstandingPayable",
+      "owner": "vendors",
+      "reason": "Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns.",
+      "writerFunction": "reconcilePartyBalances",
+      "reconcileTest": "reconcile:partyBalances"
+    },
+    {
+      "id": "DUP-026",
+      "kind": "R3",
+      "collection": "vendors",
+      "field": "totalPurchase",
+      "owner": "vendors",
+      "reason": "Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns.",
+      "writerFunction": "reconcilePartyBalances",
+      "reconcileTest": "reconcile:partyBalances"
+    },
+    {
+      "id": "DUP-027",
+      "kind": "R3",
+      "collection": "bills",
+      "field": "paidAmount",
+      "owner": "bills",
+      "reason": "Settled amount = SUM(non-void payments referencing the document); kept for open-balance queries and overpayment checks.",
+      "writerFunction": "paymentsCreate",
+      "reconcileTest": "reconcile:documentPayments"
+    },
+    {
+      "id": "DUP-028",
+      "kind": "R3",
+      "collection": "bills",
+      "field": "balanceAmount",
+      "owner": "bills",
+      "reason": "totalAmount − paidAmount, stored so statements and receivables can query open documents.",
+      "writerFunction": "paymentsCreate",
+      "reconcileTest": "reconcile:documentPayments"
+    },
+    {
+      "id": "DUP-029",
+      "kind": "R3",
+      "collection": "bills",
+      "field": "paymentStatus",
+      "owner": "bills",
+      "reason": "Derived from paidAmount vs totalAmount; stored for list filters (paid / partial / pending).",
+      "writerFunction": "paymentStatusFor",
+      "reconcileTest": "reconcile:documentPayments"
+    },
+    {
+      "id": "DUP-030",
+      "kind": "R3",
+      "collection": "outflows",
+      "field": "paidAmount",
+      "owner": "outflows",
+      "reason": "Settled amount = SUM(non-void payments referencing the document); kept for open-balance queries and overpayment checks.",
+      "writerFunction": "paymentsCreate",
+      "reconcileTest": "reconcile:documentPayments"
+    },
+    {
+      "id": "DUP-031",
+      "kind": "R3",
+      "collection": "outflows",
+      "field": "balanceAmount",
+      "owner": "outflows",
+      "reason": "totalAmount − paidAmount, stored so statements and receivables can query open documents.",
+      "writerFunction": "paymentsCreate",
+      "reconcileTest": "reconcile:documentPayments"
+    },
+    {
+      "id": "DUP-032",
+      "kind": "R3",
+      "collection": "outflows",
+      "field": "paymentStatus",
+      "owner": "outflows",
+      "reason": "Derived from paidAmount vs totalAmount; stored for list filters (paid / partial / pending).",
+      "writerFunction": "paymentStatusFor",
+      "reconcileTest": "reconcile:documentPayments"
+    },
+    {
+      "id": "DUP-033",
+      "kind": "R3",
+      "collection": "outflows",
+      "field": "productIds",
+      "owner": "outflows",
+      "reason": "Line productIds for array-contains queries (price history by product); capped by the line limit.",
+      "writerFunction": "outflowsCreate",
+      "reconcileTest": "reconcile:outflowProductIds",
+      "cap": 200,
+      "serverWritten": true
+    },
+    {
+      "id": "DUP-034",
+      "kind": "R3",
+      "collection": "bills",
+      "field": "items.returnedQty",
+      "owner": "bills",
+      "reason": "SUM(return items for this line) so concurrent returns cannot exceed the sold quantity (checked in the return transaction).",
+      "writerFunction": "returnsCreate",
+      "reconcileTest": "reconcile:returnedQty"
+    },
+    {
+      "id": "DUP-035",
+      "kind": "R3",
+      "collection": "outflows",
+      "field": "lines.returnedQty",
+      "owner": "outflows",
+      "reason": "SUM(purchase-return items for this line), same rule as bills.",
+      "writerFunction": "returnsCreate",
+      "reconcileTest": "reconcile:returnedQty"
+    },
+    {
+      "id": "DUP-036",
+      "kind": "R3",
+      "collection": "stockBalances",
+      "field": "currentStock",
+      "owner": "stockBalances",
+      "reason": "SUM(stockMovements.quantity) per (organization, branch, product); read on every sale for the negative-stock rule. For serial-tracked products it also equals the units in hand in serials/ (reconcile:serialStock).",
+      "writerFunction": "commitStockChangesInTxn",
+      "reconcileTest": "reconcile:stockBalances"
+    },
+    {
+      "id": "DUP-037",
+      "kind": "R3",
+      "collection": "stockBalances",
+      "field": "allocatedStock",
+      "owner": "stockBalances",
+      "reason": "SUM(base quantity of open sales orders) per (organization, branch, product); available = current − allocated is computed.",
+      "writerFunction": "commitReservationInTxn",
+      "reconcileTest": "reconcile:allocatedStock"
+    },
+    {
+      "id": "DUP-038",
+      "kind": "R4",
+      "collection": "stockMovements",
+      "field": "balanceAfter",
+      "owner": "stockMovements",
+      "reason": "Running branch balance at the moment of the movement: an immutable audit fact of the stock ledger (the movement is the source of truth for itself)."
+    },
+    {
+      "id": "DUP-039",
+      "kind": "OWNED",
+      "collection": "outflows",
+      "field": "lines.itemName",
+      "owner": "outflows",
+      "reason": "Only on non-catalog lines (no productId): an expense or unlisted item has no record to reference. OutflowLineSchema rejects itemName beside productId."
+    },
+    {
+      "id": "DUP-040",
+      "kind": "OWNED",
+      "collection": "payments",
+      "field": "partyName",
+      "owner": "payments",
+      "reason": "Only on a standalone payment with neither partyId nor referenceId (e.g. a one-off payee). paymentsCreate rejects it otherwise (REFERENCE_ATTRIBUTE_COPY)."
+    },
+    {
+      "id": "DUP-041",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "memberships",
+      "field": "jobRoleIds",
+      "owner": "memberships",
+      "reason": "Owned list capped at 20 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 20
+    },
+    {
+      "id": "DUP-042",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "memberships",
+      "field": "reportingToIds",
+      "owner": "memberships",
+      "reason": "Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 10
+    },
+    {
+      "id": "DUP-043",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "organizations",
+      "field": "salesChannels",
+      "owner": "organizations",
+      "reason": "Owned list capped at 4 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 4
+    },
+    {
+      "id": "DUP-044",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "organizations",
+      "field": "imageUrls",
+      "owner": "organizations",
+      "reason": "Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 10
+    },
+    {
+      "id": "DUP-045",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "roles",
+      "field": "permissions",
+      "owner": "roles",
+      "reason": "Owned list capped at 300 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 300
+    },
+    {
+      "id": "DUP-046",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "departments",
+      "field": "headMembershipIds",
+      "owner": "departments",
+      "reason": "Owned list capped at 20 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 20
+    },
+    {
+      "id": "DUP-047",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "products",
+      "field": "alternateUnits",
+      "owner": "products",
+      "reason": "Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 10
+    },
+    {
+      "id": "DUP-048",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "products",
+      "field": "imagePaths",
+      "owner": "products",
+      "reason": "Owned list capped at 8 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 8
+    },
+    {
+      "id": "DUP-049",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "products",
+      "field": "sharedForBranchIds",
+      "owner": "products",
+      "reason": "Owned list capped at 100 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 100
+    },
+    {
+      "id": "DUP-050",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "customers",
+      "field": "sharedForBranchIds",
+      "owner": "customers",
+      "reason": "Owned list capped at 100 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 100
+    },
+    {
+      "id": "DUP-051",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "vendors",
+      "field": "sharedForBranchIds",
+      "owner": "vendors",
+      "reason": "Owned list capped at 100 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 100
+    },
+    {
+      "id": "DUP-052",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "outflows",
+      "field": "attachmentPaths",
+      "owner": "outflows",
+      "reason": "Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 10
+    },
+    {
+      "id": "DUP-053",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "outflows",
+      "field": "lines",
+      "owner": "outflows",
+      "reason": "Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 200
+    },
+    {
+      "id": "DUP-055",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "bills",
+      "field": "items",
+      "owner": "bills",
+      "reason": "Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 200
+    },
+    {
+      "id": "DUP-057",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "returns",
+      "field": "items",
+      "owner": "returns",
+      "reason": "Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 200
+    },
+    {
+      "id": "DUP-058",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "auditLogs",
+      "field": "changes",
+      "owner": "auditLogs",
+      "reason": "Changed fields of one write (field, from, to); bounded by the entity's field count, written only by buildLogDoc.",
+      "cap": 100,
+      "serverWritten": true,
+      "writerFunction": "buildLogDoc"
+    },
+    {
+      "id": "DUP-059",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "organizations",
+      "field": "settings.businessConfig.defaultUnits",
+      "owner": "organizations",
+      "reason": "Owned list of default unit codes capped at 20 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 20
+    },
+    {
+      "id": "DUP-060",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "deliveries",
+      "field": "lines",
+      "owner": "deliveries",
+      "reason": "Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 200
+    },
+    {
+      "id": "DUP-061",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "returns",
+      "field": "requestedItems",
+      "owner": "returns",
+      "reason": "Pending return request lines bounded by the 200-item create limit, written only by returnsCreate.",
+      "cap": 200,
+      "serverWritten": true,
+      "writerFunction": "returnsCreate"
+    },
+    {
+      "id": "DUP-062",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "stockAdjustmentRequests",
+      "field": "serialNumbers",
+      "owner": "stockAdjustmentRequests",
+      "reason": "Owned list of serial numbers capped at 500 by the Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 500
+    },
+    {
+      "id": "DUP-063",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "organizations",
+      "field": "contacts",
+      "owner": "organizations",
+      "reason": "Structured contact persons list capped at 20 by Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 20
+    },
+    {
+      "id": "DUP-064",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "customers",
+      "field": "additionalPhones",
+      "owner": "customers",
+      "reason": "Structured additional phone numbers list capped at 5 by Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 5
+    },
+    {
+      "id": "DUP-065",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "vendors",
+      "field": "additionalPhones",
+      "owner": "vendors",
+      "reason": "Structured additional phone numbers list capped at 5 by Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 5
+    }
+  ]
+}

@@ -164,6 +164,7 @@ export async function reserveIdempotency(config: IdempotencyConfig): Promise<Ide
           // Side-effects did not complete (or no recovery checker): allow re-attempt
           txn.set(recordRef, {
             operationId: `${config.operation}_${now.getTime()}`,
+            scope: config.scope,
             requestHash,
             status: IdempotencyStatus.PROCESSING,
             createdAt: now.toISOString(),
@@ -186,6 +187,7 @@ export async function reserveIdempotency(config: IdempotencyConfig): Promise<Ide
     // Reserve new processing slot
     txn.set(recordRef, {
       operationId: `${config.operation}_${now.getTime()}`,
+      scope: config.scope,
       requestHash,
       status: IdempotencyStatus.PROCESSING,
       createdAt: now.toISOString(),

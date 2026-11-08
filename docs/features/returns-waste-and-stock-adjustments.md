@@ -2,106 +2,153 @@
 
 ---
 
-## 1. Purpose & Scope
-This module provides inventory restoration, credit note generation, waste tracking, and manual count corrections for Trado:
-- **Sales & Purchase Returns**: `returns/{returnId}` manages return vouchers for sold goods (restoring stock and issuing customer credits) and rejected purchases (returning goods to vendors).
-- **Over-Return Guard**: Strict mathematical enforcement preventing customers from returning more quantity than was originally billed.
-- **Waste & Damage Deductions**: Handled via `stockAdjust` with movement types `waste_out` and `damage_out`.
-- **Note on Waste Module Scope**: Trado currently implements waste and damage tracking as verified movement types on `stockAdjust`. A standalone multi-step approval workflow UI for waste disposal is not part of the current core backend scope.
+## 1. Module Overview & Return Lifecycles
+
+This module manages goods returns, customer refunds, credit notes, non-returnable product enforcement, and inventory write-offs for Trado:
+- **Unified Returns Master (`returns/{returnId}`)**: Records customer returns (`returnType: "sales_return"`) and vendor returns (`returnType: "purchase_return"`).
+- **Disposition Engine**: Controls physical item disposition:
+  - `restocked_to_inventory`: Item is undamaged and restocked into active shelf stock in `stockBalances`.
+  - `damaged_write_off`: Item is broken or unusable; not returned to active shelf stock.
+- **Refund & Settlement Modes**: Cash refund, original payment method reversal, or credit note issuance.
+- **Over-Return Guard**: Strict validation preventing returns exceeding the remaining returnable quantity on the source document:
+  $$\text{Returnable Qty} = \text{Billed Qty} - \sum \text{Prior Returns}$$
+- **Non-Returnable Product Protection**: Products flagged with `isReturnable: false` (e.g. personal hygiene items, custom-cut cables, food items) are automatically rejected by `returnsCreate`.
+- **Return Window Enforcement**: Verifies return occurs within `product.returnWindowDays`.
+
+```mermaid
+flowchart TD
+    ReturnReq(["returnsCreate(payload)"]) --> TypeCheck{"returnType == 'sales_return' or 'purchase_return'?"}
+
+    subgraph SalesReturn["Customer Sales Return"]
+        VerifyBill["Verify Source bills/{billId}"]
+        CheckReturnable["Verify isReturnable !== false and within returnWindowDays"]
+        CheckOverReturn["Assert returnQty <= (billedQty - priorReturnedQty)"]
+        DispCheck{"disposition == 'restocked_to_inventory'?"}
+        Restock["Increment stockBalances (sale_return_in)"]
+        WriteOff["Record Loss / Scrap (Zero shelf stock)"]
+        CustCredit["Credit customer balance / Issue Credit Note"]
+    end
+
+    subgraph PurchaseReturn["Vendor Purchase Return"]
+        VerifyOutflow["Verify Source outflows/{outflowId}"]
+        DeductStock["Decrement stockBalances (purchase_return_out)"]
+        VendorDebit["Debit vendor payable balance"]
+    end
+
+    TypeCheck -- sales_return --> SalesReturn
+    VerifyBill --> CheckReturnable --> CheckOverReturn --> DispCheck
+    DispCheck -- Yes --> Restock --> CustCredit
+    DispCheck -- No --> WriteOff --> CustCredit
+
+    TypeCheck -- purchase_return --> PurchaseReturn
+    PurchaseReturn --> DeductStock --> VendorDebit
+
+    CustCredit --> ReturnDoc["returns/{returnId}\n(RET-YYYY-XXXXXX)"]
+    VendorDebit --> ReturnDoc
+```
 
 ---
 
-## 2. Actors & Permissions
-- **Returns Officer / Cashier**: Requires `return:create`. Can process customer item returns and verify item condition.
-- **Warehouse Manager**: Requires `stock:adjust`. Can record spoiled, expired, or physically broken items as waste/damage.
-- **Store Manager**: Requires `return:delete` or `reconciliation:read`. Can audit return history and check restocked items.
+## 2. End-to-End Sequence Diagrams
+
+### 2.1 Customer Sales Return & Credit Note Workflow (`returnsCreate`)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Cashier as Cashier / Returns Clerk
+    participant GW as Cloud Functions (returnsCreate)
+    participant Stock as Stock Engine (stock.ts)
+    participant DB as Cloud Firestore
+
+    Cashier->>GW: Call returnsCreate(returnType: "sales_return", referenceId: billId, items, refundMethod: "credit_note")
+    GW->>GW: Verify caller has return:create permission
+    GW->>GW: Validate CreateReturnSchema (Zod parseInput)
+    
+    Note over GW,DB: Atomic Multi-Document Firestore Transaction
+    GW->>DB: Read bills/{billId} (verify exists and is active)
+    GW->>DB: Verify items: check isReturnable !== false
+    GW->>DB: Assert quantity <= (line.quantity - line.returnedQuantity)
+    
+    alt disposition === "restocked_to_inventory"
+        GW->>Stock: Prepare stock additions in stockBalances
+        GW->>DB: Increment branch stock in stockBalances
+        GW->>DB: Increment products.currentStock aggregate mirror
+        GW->>DB: Append stockMovements (movementType: "sale_return_in")
+    end
+    
+    alt Product Tracks Serials
+        GW->>DB: Update serialNumbers/{serialId} (status: "in_stock" or "damaged")
+    end
+    
+    alt Customer is Registered
+        GW->>DB: Decrement customer outstandingBalance (or record credit note)
+        GW->>DB: Append customerLedgers (entryType: "return_credit")
+    end
+    
+    GW->>DB: Update bills/{billId} lines (returnedQuantity += returnQty)
+    GW->>DB: Reserve return number (uniqueKeys: RET-2026-XXXXXX)
+    GW->>DB: Write returns/{returnId} (status: "completed")
+    GW->>DB: Append auditLogs/{auditId}
+    
+    GW-->>Cashier: Return CreateReturnResponse (returnId, returnNumber, refundAmount)
+```
 
 ---
 
-## 3. Return Types & Mathematical Invariants
+## 3. API Reference & Parameter Specifications
 
-| Return Type | Reference Document | Inventory Effect | Financial / Ledger Effect |
-|---|---|---|---|
-| `sale_return` | `bills/{billId}` | Restores physical stock (`sale_return_in`) in `stockBalances` | Credits customer ledger (`return_credit`) or issues cash refund |
-| `purchase_return`| `outflows/{outflowId}`| Deducts physical stock (`purchase_return_out`) in `stockBalances` | Debits vendor ledger (reduces outstanding payable) |
+### 3.1 `returnsCreate`
+Processes a customer sales return or vendor purchase return.
 
-### Strict Over-Return Validation
-When a return request is submitted for a bill:
-1. The backend reads all line items from the original bill: retrieves `billedQuantity`.
-2. The backend sums all previously returned quantities across prior returns for that bill: retrieves `priorReturnedQuantity`.
-3. If:
-   $$\text{Requested Return Qty} > (\text{Billed Qty} - \text{Prior Returned Qty})$$
-   The transaction immediately fails with `invalid-argument: "Return quantity exceeds remaining returnable quantity"`.
+#### Request Parameters
+```typescript
+interface CreateReturnRequest {
+  idempotencyKey?: string;           // 8-128 char unique lease key
+  organizationId?: string;           // Optional (derived from token context)
+  branchId?: string;                 // Optional (derived from token context)
+  returnType: "sales_return" | "purchase_return";
+  referenceId: string;               // billId (for sales) or outflowId (for purchases)
+  refundMethod?: "cash" | "credit_note" | "original_payment";
+  notes?: string;                    // Max 500 characters
+  items: Array<{
+    productId: string;               // Returned product ID
+    sourceLineId?: string;           // Required if item appears on multiple document lines
+    quantity: number;                // Positive return quantity
+    refundAmount: number;            // Total monetary refund for this line
+    reason: string;                  // Mandatory reason (e.g. "Customer ordered wrong size")
+    disposition: "restocked_to_inventory" | "damaged_write_off";
+    serialNumbers?: string[];        // Required if product has trackSerial: true
+  }>;
+}
+```
 
----
+#### Success Response (200 OK)
+```json
+{
+  "returnId": "ret_3c4d5e6f7a",
+  "organizationId": "org_apex_sample",
+  "returnNumber": "RET-2026-000014",
+  "returnType": "sales_return",
+  "refundAmount": 150.00,
+  "refundMethod": "credit_note",
+  "status": "completed",
+  "message": "Return processed and stock restocked successfully."
+}
+```
 
-## 4. Step-by-Step Happy Path Workflows
-
-### 4.1 Processing a Sales Return (Restocking Goods)
-1. **Cashier calls `returnsCreate`**:
-   - Payload:
-     ```json
-     {
-       "organizationId": "org_demo",
-       "branchId": "main-branch",
-       "returnType": "sale_return",
-       "referenceId": "bill_inv_001",
-       "partyId": "cust_sunrise",
-       "items": [
-         {
-           "productId": "prod_cardamom",
-           "quantity": 5,
-           "unitPrice": 350,
-           "subtotal": 1750,
-           "restock": true
-         }
-       ],
-       "refundAmount": 1750,
-       "refundMode": "credit_note",
-       "reason": "Customer ordered excess bags"
-     }
-     ```
-2. **Backend Transaction Execution**:
-   - Validates over-return limit (e.g. 5 <= remaining 20).
-   - Generates sequential return number `RET-2026-000001`.
-   - Restocks inventory:
-     - Increments `stockBalances/org_demo_main-branch_prod_cardamom` by 5.
-     - Increments `products/prod_cardamom.currentStock` by 5.
-     - Appends `stockMovements` (`sale_return_in`, qty: 5).
-   - Credits customer balance:
-     - Decrements `customers/cust_sunrise.outstandingBalance` by ₹1,750.
-     - Appends `customerLedgers` entry (`return_credit`).
-   - Updates original bill line item `returnedQty = 5`.
-   - Commits `returns/{returnId}`.
-
-### 4.2 Recording Damaged or Expired Stock (Waste)
-1. **Warehouse Manager calls `stockAdjust`**:
-   - Payload:
-     ```json
-     {
-       "organizationId": "org_demo",
-       "branchId": "main-branch",
-       "productId": "prod_basmati",
-       "quantity": 2,
-       "movementType": "waste_out",
-       "reason": "Bags torn during transport; grain spoiled"
-     }
-     ```
-2. **Backend Execution**:
-   - Decrements branch stock by 2 in `stockBalances`.
-   - Decrements `products/prod_basmati.currentStock` by 2.
-   - Appends audit entry in `stockMovements` (`waste_out`, qty: -2).
+#### Common Error Codes
+- `invalid-argument`: Product is non-returnable (`isReturnable === false`), return quantity exceeds remaining returnable quantity, or return window has expired.
+- `not-found`: Source bill or outflow document does not exist in caller's organization.
 
 ---
 
-## 5. Security & Concurrency Rules
-- **Concurrent Return Race**: If two terminals attempt to return the last 5 remaining items on a bill concurrently, the Firestore transaction ensures only the first succeeds. The second attempt detects that remaining quantity is 0 and rejects.
-- **Reference-by-ID**: Returns store `referenceId` (bill ID) and `partyId` by ID only. The original sale document is never embedded.
+## 4. Manual Emulator Testing Commands
 
----
+```powershell
+# 1. Run Two-Business Simulation (Tests non-returnable toilet brush rejection)
+node functions/scripts/test-two-business-simulation.cjs
 
-## 6. Local Testing & Verification
-- **Integration Tests**: `functions/scripts/test-callables-integration.js`
-  - Tests verify over-return rejection (e.g. returning 25 on a 20-item bill), stock restoration on valid return, and movement logging.
-- **Connected Business Flow**: Step 9 of `functions/scripts/test-e2e-business-flow.js`.
-
+# 2. Run Retail POS Lifecycle and Return verification
+node functions/scripts/test-e2e-retail-lifecycle.cjs
+```

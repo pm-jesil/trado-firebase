@@ -12,11 +12,19 @@ import {
   CreateVendorSchema,
   UpdateVendorSchema,
   ListVendorsSchema,
+  GetVendorSchema,
 } from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
 import { VendorDoc } from "../types/models.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
-import { createAuditLog } from "../services/audit.js";
-import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
+import { commitWithKeys, partyClaims, changedClaims, duplicateOverride } from "../services/uniqueKeys.js";
+import { createAuditLog, diffChanges } from "../services/audit.js";
+import { fetchPage } from "../services/pagination.js";
+import { resolveRequestContext } from "../services/contextResolver.js";
+import { redactVendor } from "../services/redaction.js";
+import { AppPermissions } from "../constants/permissions.js";
+
+const VENDOR_READ = [AppPermissions.VENDOR_VIEW, AppPermissions.PURCHASE_CREATE];
 
 async function validateBranchIds(organizationId: string, branchIds: string[]): Promise<void> {
   for (const bId of branchIds) {
@@ -32,14 +40,11 @@ export const vendorsCreate = onCall({ region: "asia-south1" }, async (request) =
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = CreateVendorSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(CreateVendorSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
-  const callerBranchId = await resolveBranchContext(request.auth, orgId, input.branchId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.VENDOR_CREATE });
+  const orgId = ctx.organizationId;
+  const callerBranchId = ctx.branchId;
 
   const idempotency = await reserveIdempotency({
     scope: orgId,
@@ -95,6 +100,8 @@ export const vendorsCreate = onCall({ region: "asia-south1" }, async (request) =
       vendorCode,
       name: input.name.trim(),
       mobile: input.mobile?.trim() || null,
+      additionalPhones: input.additionalPhones || [],
+      whatsApp: input.whatsApp?.trim() || null,
       email: input.email?.trim().toLowerCase() || null,
       taxNumber: input.taxNumber?.trim() || null,
       address: input.address?.trim() || null,
@@ -111,7 +118,9 @@ export const vendorsCreate = onCall({ region: "asia-south1" }, async (request) =
       createdBy: request.auth.uid,
     };
 
-    await vendorRef.set(vendorDoc);
+    await commitWithKeys(orgId, "vendor", vendorId, (batch) => batch.set(vendorRef, vendorDoc), {
+      claim: duplicateOverride(ctx, input.duplicateOverrideReason) ? [] : partyClaims("vendor", vendorDoc),
+    });
 
     const response = {
       vendorId,
@@ -137,7 +146,7 @@ export const vendorsCreate = onCall({ region: "asia-south1" }, async (request) =
       action: "VENDOR_CREATED",
       entityType: "vendor",
       entityId: vendorId,
-      details: { name: vendorDoc.name, vendorCode },
+      details: { duplicateOverrideReason: input.duplicateOverrideReason || null },
     });
 
     return response;
@@ -155,13 +164,13 @@ export const vendorsUpdate = onCall({ region: "asia-south1" }, async (request) =
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = UpdateVendorSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdateVendorSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.VENDOR_UPDATE });
+  const orgId = ctx.organizationId;
+  if (input.creditLimit !== undefined && !ctx.can(AppPermissions.VENDOR_VIEW_BALANCE)) {
+    throw new HttpsError("permission-denied", "[FIELD_NOT_EDITABLE] creditLimit requires vendor:view_balance.", { reason: "FIELD_NOT_EDITABLE", field: "creditLimit" });
+  }
 
   const vendorRef = db.collection("vendors").doc(input.vendorId);
   const docSnap = await vendorRef.get();
@@ -176,10 +185,13 @@ export const vendorsUpdate = onCall({ region: "asia-south1" }, async (request) =
 
   const updates: Partial<VendorDoc> = {
     updatedAt: new Date().toISOString(),
+    updatedBy: ctx.callerUid,
   };
 
   if (input.name) updates.name = input.name.trim();
   if (input.mobile !== undefined) updates.mobile = input.mobile?.trim() || null;
+  if (input.additionalPhones !== undefined) updates.additionalPhones = input.additionalPhones;
+  if (input.whatsApp !== undefined) updates.whatsApp = input.whatsApp?.trim() || null;
   if (input.email !== undefined) updates.email = input.email?.trim().toLowerCase() || null;
   if (input.taxNumber !== undefined) updates.taxNumber = input.taxNumber?.trim() || null;
   if (input.address !== undefined) updates.address = input.address?.trim() || null;
@@ -197,15 +209,20 @@ export const vendorsUpdate = onCall({ region: "asia-south1" }, async (request) =
     }
   }
 
-  await vendorRef.update(updates);
+  const before = partyClaims("vendor", existing);
+  const after = partyClaims("vendor", { ...existing, ...updates });
+  const keyChange = duplicateOverride(ctx, input.duplicateOverrideReason) ? { claim: [], release: changedClaims(before, after).release } : changedClaims(before, after);
+  await commitWithKeys(orgId, "vendor", input.vendorId, (batch) => batch.update(vendorRef, updates), keyChange);
 
   await createAuditLog({
     organizationId: orgId,
-    actorUid: request.auth.uid,
+    branchId: ctx.branchId,
+    actorUid: ctx.callerUid,
+    actorMembershipId: ctx.membershipId,
     action: "VENDOR_UPDATED",
     entityType: "vendor",
     entityId: input.vendorId,
-    details: updates as Record<string, unknown>,
+    changes: diffChanges(existing as unknown as Record<string, unknown>, updates as Record<string, unknown>),
   });
 
   return { success: true, message: "Vendor updated successfully." };
@@ -216,27 +233,22 @@ export const vendorsList = onCall({ region: "asia-south1" }, async (request) => 
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = ListVendorsSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(ListVendorsSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: VENDOR_READ, operation: "read" });
+  const orgId = ctx.organizationId;
 
-  const query = db.collection("vendors")
-    .where("organizationId", "==", orgId)
-    .limit(input.limit || 50);
-
-  const snapshot = await query.get();
+  const query = db.collection("vendors").where("organizationId", "==", orgId);
+  const { snapshot, nextCursor } = await fetchPage(query, "vendors", input.startAfterId, input.limit || 50);
   let items = snapshot.docs.map((doc) => ({
     vendorId: doc.id,
     ...(doc.data() as VendorDoc),
   }));
 
   // Enforce branch-level visibility in query scope
-  const targetBranchId = input.branchId || (request.auth.token?.primaryBranchId as string | undefined);
-  if (targetBranchId && request.auth.token?.isSuperAdmin !== true) {
+  // Branch-level visibility uses the gate-validated branch, never an unchecked client value
+  const targetBranchId = ctx.branchId;
+  if (!ctx.isSuperAdmin) {
     items = items.filter((v) => {
       if (!v.visibilityScope || v.visibilityScope === "all_branches") return true;
       if (v.visibilityScope === "branch_only" || v.visibilityScope === "selected_branches") {
@@ -246,7 +258,7 @@ export const vendorsList = onCall({ region: "asia-south1" }, async (request) => 
     });
   }
 
-  return { items, count: items.length };
+  return { items: items.map((i) => redactVendor(i, ctx)), count: items.length, nextCursor };
 });
 
 export const vendorsGet = onCall({ region: "asia-south1" }, async (request) => {
@@ -254,12 +266,10 @@ export const vendorsGet = onCall({ region: "asia-south1" }, async (request) => {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const vendorId = request.data?.vendorId;
-  if (!vendorId) {
-    throw new HttpsError("invalid-argument", "vendorId is required.");
-  }
+  const { vendorId } = parseInput(GetVendorSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, request.data?.organizationId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: VENDOR_READ, operation: "read" });
+  const orgId = ctx.organizationId;
 
   const docSnap = await db.collection("vendors").doc(vendorId).get();
   if (!docSnap.exists) {
@@ -272,8 +282,8 @@ export const vendorsGet = onCall({ region: "asia-south1" }, async (request) => {
   }
 
   // Branch visibility validation
-  const callerBranchId = request.data?.branchId || (request.auth.token?.primaryBranchId as string | undefined);
-  if (callerBranchId && request.auth.token?.isSuperAdmin !== true) {
+  const callerBranchId = ctx.branchId;
+  if (!ctx.isSuperAdmin) {
     if (data.visibilityScope === "branch_only" || data.visibilityScope === "selected_branches") {
       if (!Array.isArray(data.sharedForBranchIds) || !data.sharedForBranchIds.includes(callerBranchId)) {
         throw new HttpsError("permission-denied", "Vendor record is not shared with caller's branch.");
@@ -281,6 +291,6 @@ export const vendorsGet = onCall({ region: "asia-south1" }, async (request) => {
     }
   }
 
-  return { vendorId: docSnap.id, ...data };
+  return redactVendor({ vendorId: docSnap.id, ...data }, ctx);
 });
 

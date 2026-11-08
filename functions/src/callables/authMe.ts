@@ -7,6 +7,7 @@
  */
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { parseInput } from "../validation/parseInput.js";
 import { AuthMeResponse } from "../types/api.js";
 import { AuthMeSchema } from "../validation/schemas.js";
 import { buildAuthSessionContext } from "../services/sessionContext.js";
@@ -16,15 +17,9 @@ export const authMe = onCall({ region: "asia-south1" }, async (request): Promise
     throw new HttpsError("unauthenticated", "Authentication required to access session details.");
   }
 
-  const parsedInput = AuthMeSchema.safeParse(request.data || {});
-  if (!parsedInput.success) {
-    throw new HttpsError(
-      "invalid-argument",
-      `Validation failed: ${parsedInput.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`
-    );
-  }
+  const input = parseInput(AuthMeSchema, request.data);
 
-  const { deviceId } = parsedInput.data;
+  const { deviceId } = input;
 
   const context = await buildAuthSessionContext({
     uid: request.auth.uid,

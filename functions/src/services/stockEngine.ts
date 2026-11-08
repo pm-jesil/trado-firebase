@@ -10,8 +10,8 @@
 import { Transaction } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 import { db } from "./firebase.js";
-import { StockMovementDoc, ProductDoc, StockBalanceDoc } from "../types/models.js";
-import { StockMovementType } from "../constants/enums.js";
+import { StockMovementDoc, ProductDoc, StockBalanceDoc, ProductAlternateUnit } from "../types/models.js";
+import { StockMovementType, StockAdjustmentReason } from "../constants/enums.js";
 import { roundQty } from "./money.js";
 import { calculateNewWeightedAverageCost } from "./costingEngine.js";
 
@@ -34,11 +34,12 @@ export interface StockChangeItem {
   productId: string;
   quantity: number; // Signed: positive for inward, negative for outward
   costPrice?: number; // Inward unit purchase price for transactional WAC calculation
-  type: StockMovementType;
-  unit: string;
+  type: StockMovementType; // quantity is always in the product's base unit
   referenceId: string;
   referenceModel: "bill" | "outflow" | "return" | "manual_adjustment";
+  referenceLineId?: string; // lineId on the source document (bills.items / outflows.lines / returns via sourceLineId)
   reason?: string;
+  reasonCode?: StockAdjustmentReason;
 }
 
 export interface ApplyStockChangesParams {
@@ -120,8 +121,15 @@ export async function prepareStockChangesInTxn(
     productReads.push({ item, docSnap, balanceSnap });
   }
 
+  // Running balances per product so several lines of the same product in one document chain
+  // correctly (e.g. a "piece" line and a "box" line) instead of overwriting each other.
+  const running = new Map<string, { stock: number; branchStock: number; wac: number }>();
+
   // 2. Perform calculations and precompute updates + movements
   for (const { item, docSnap, balanceSnap } of productReads) {
+    if (!(docSnap.data() as ProductDoc).trackStock) {
+      continue; // Non-trackable items never touch stock (no balance change, no movement)
+    }
     // Validate movement directional sign matches type
     if (INWARD_MOVEMENT_TYPES.has(item.type) && item.quantity <= 0) {
       throw new HttpsError(
@@ -140,10 +148,12 @@ export async function prepareStockChangesInTxn(
     const balanceData = balanceSnap.exists ? (balanceSnap.data() as StockBalanceDoc) : null;
 
     // Previous branch stock: if stockBalance exists, use it; otherwise fallback to product currentStock for main-branch, or 0
-    const previousBranchStock = balanceData
+    const prior = running.get(item.productId);
+    const previousBranchStock = prior ? prior.branchStock : (balanceData
       ? (balanceData.currentStock || 0)
-      : (branchId === "main-branch" ? (prodData.currentStock || 0) : 0);
-    const previousStock = prodData.currentStock || 0;
+      : (branchId === "main-branch" ? (prodData.currentStock || 0) : 0));
+    const previousStock = prior ? prior.stock : (prodData.currentStock || 0);
+    const currentWac = prior ? prior.wac : (prodData.weightedAverageCost ?? prodData.costPrice ?? 0);
     const roundedQuantity = roundQty(item.quantity, 4);
 
     const newBranchStock = roundQty(previousBranchStock + roundedQuantity, 4);
@@ -166,10 +176,16 @@ export async function prepareStockChangesInTxn(
       type: item.type,
       quantity: item.quantity,
       balanceAfter: prodData.trackStock ? newBranchStock : previousBranchStock,
-      unit: item.unit || prodData.baseUnit || "piece",
       referenceId: item.referenceId,
       referenceModel: item.referenceModel,
+      ...(item.referenceLineId ? { referenceLineId: item.referenceLineId } : {}),
       reason: item.reason || null,
+      reasonCode: item.reasonCode || null,
+      // Per-base-unit cost at movement time: purchase cost for receipts, WAC otherwise.
+      // Values write-offs (damage/waste/theft) in P&L without re-reading mutable product cost.
+      unitCostSnapshot: item.type === StockMovementType.PURCHASE_IN && item.costPrice !== undefined
+        ? item.costPrice
+        : currentWac,
       createdAt: now,
       createdBy: params.actorUid,
     };
@@ -180,7 +196,6 @@ export async function prepareStockChangesInTxn(
       branchId,
       productId: item.productId,
       currentStock: prodData.trackStock ? newBranchStock : previousBranchStock,
-      lowStockThreshold: prodData.lowStockThreshold || 5,
       updatedAt: now,
       updatedBy: params.actorUid,
     };
@@ -196,13 +211,16 @@ export async function prepareStockChangesInTxn(
     // Calculate new Weighted-Average Cost atomically for inward purchases
     let newWac: number | undefined;
     if (item.type === StockMovementType.PURCHASE_IN && item.costPrice !== undefined && item.costPrice !== null) {
-      const currentWac = prodData.weightedAverageCost ?? prodData.costPrice ?? 0;
       newWac = calculateNewWeightedAverageCost(
         previousStock,
         currentWac,
         item.quantity,
         item.costPrice
       );
+    }
+
+    if (prodData.trackStock) {
+      running.set(item.productId, { stock: newStock, branchStock: newBranchStock, wac: newWac ?? currentWac });
     }
 
     operations.push({
@@ -267,4 +285,85 @@ export async function applyStockChangesInTxn(
 ): Promise<StockChangeResult[]> {
   const prepared = await prepareStockChangesInTxn(txn, params);
   return commitStockChangesInTxn(txn, prepared);
+}
+
+// ---------------------------------------------------------------------------
+// Unit conversion (stock is always held in the product's base unit)
+// ---------------------------------------------------------------------------
+
+export interface UnitConversion {
+  unit: string;
+  factor: number; // base units per one line unit
+  alternate?: ProductAlternateUnit;
+}
+
+/**
+ * Resolves a document line's unit against the product. Base unit → factor 1; a configured
+ * alternate unit → its factor (1 box = 12 piece). An unknown unit is rejected when the product
+ * defines alternate units; legacy products without alternates keep factor 1.
+ */
+export function resolveUnitConversion(product: ProductDoc, unit?: string | null): UnitConversion {
+  const base = (product.baseUnit || "piece").toLowerCase();
+  const requested = (unit || base).trim().toLowerCase();
+  if (requested === base) return { unit: base, factor: 1 };
+  const alternate = product.alternateUnits?.find((a) => a.unit.toLowerCase() === requested);
+  if (alternate) return { unit: requested, factor: alternate.factor, alternate };
+  if (product.alternateUnits && product.alternateUnits.length > 0) {
+    throw new HttpsError(
+      "invalid-argument",
+      `Unit "${requested}" is not configured for "${product.name}". Allowed: ${[base, ...product.alternateUnits.map((a) => a.unit)].join(", ")}.`
+    );
+  }
+  return { unit: requested, factor: 1 };
+}
+
+// ---------------------------------------------------------------------------
+// Stock reservation for sales orders (allocatedStock on stockBalances)
+// ---------------------------------------------------------------------------
+
+export interface ReservationLine {
+  productId: string;
+  baseQuantity: number;
+}
+
+export interface PreparedReservation {
+  writes: Array<{ ref: FirebaseFirestore.DocumentReference; allocatedStock: number }>;
+}
+
+/**
+ * Reads branch balances and computes allocation changes. `direction` +1 reserves, -1 releases.
+ * Reserving fails when available (current − allocated) stock is insufficient.
+ * MUST run in the transaction read phase.
+ */
+export async function prepareReservationInTxn(
+  txn: Transaction,
+  params: { organizationId: string; branchId: string; lines: ReservationLine[]; direction: 1 | -1; allowNegativeStock?: boolean }
+): Promise<PreparedReservation> {
+  const totals = new Map<string, number>();
+  for (const l of params.lines) totals.set(l.productId, (totals.get(l.productId) || 0) + l.baseQuantity);
+  const writes: PreparedReservation["writes"] = [];
+  for (const [productId, qty] of totals) {
+    const productSnap = await txn.get(db.collection("products").doc(productId));
+    const product = productSnap.data() as ProductDoc | undefined;
+    if (!product || product.organizationId !== params.organizationId || !product.trackStock) continue;
+    const ref = db.collection("stockBalances").doc(`${params.organizationId}_${params.branchId}_${productId}`);
+    const snap = await txn.get(ref);
+    const bal = snap.exists ? (snap.data() as StockBalanceDoc) : null;
+    const current = bal ? bal.currentStock || 0 : (params.branchId === "main-branch" ? product.currentStock || 0 : 0);
+    const allocated = Math.max(0, roundQty((bal?.allocatedStock || 0) + params.direction * qty, 4));
+    const available = roundQty(current - allocated, 4);
+    if (params.direction === 1 && available < 0 && !params.allowNegativeStock) {
+      throw new HttpsError("failed-precondition",
+        `Insufficient available stock to reserve "${product.name}". Available: ${roundQty(current - (bal?.allocatedStock || 0), 4)}, requested: ${qty}.`);
+    }
+    writes.push({ ref, allocatedStock: allocated });
+  }
+  return { writes };
+}
+
+export function commitReservationInTxn(txn: Transaction, prepared: PreparedReservation, actorUid: string): void {
+  const now = new Date().toISOString();
+  for (const w of prepared.writes) {
+    txn.set(w.ref, { allocatedStock: w.allocatedStock, updatedAt: now, updatedBy: actorUid }, { merge: true });
+  }
 }

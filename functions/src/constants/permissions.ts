@@ -63,6 +63,7 @@ export const AppPermissions = {
   BILL_DISCOUNT: "bill:discount",
   BILL_VOID: "bill:void",
   BILL_RETURN: "bill:return",
+  BILL_APPROVE: "bill:approve",
 
   // Sales
   SALE_CREATE: "sale:create",
@@ -80,24 +81,30 @@ export const AppPermissions = {
   PURCHASE_CREATE: "purchase:create",
   PURCHASE_VIEW: "purchase:view",
   PURCHASE_APPROVE: "purchase:approve",
+  PURCHASE_VOID: "purchase:void",
+  EXPENSE_VOID: "expense:void",
+  EXPENSE_VIEW_SENSITIVE: "expense:view_sensitive", // Salary / employee-linked expenses
 
   // Customers
   CUSTOMER_CREATE: "customer:create",
   CUSTOMER_VIEW: "customer:view",
   CUSTOMER_UPDATE: "customer:update",
   CUSTOMER_DELETE: "customer:delete",
+  CUSTOMER_VIEW_BALANCE: "customer:view_balance", // Outstanding, credit, total spend
 
   // Vendors & Suppliers
   VENDOR_CREATE: "vendor:create",
   VENDOR_VIEW: "vendor:view",
   VENDOR_UPDATE: "vendor:update",
   VENDOR_DELETE: "vendor:delete",
+  VENDOR_VIEW_BALANCE: "vendor:view_balance", // Payables, total purchase
 
   // Products, Categories & Units
   PRODUCT_CREATE: "product:create",
   PRODUCT_VIEW: "product:view",
   PRODUCT_UPDATE: "product:update",
   PRODUCT_DELETE: "product:delete",
+  PRODUCT_VIEW_COST: "product:view_cost", // Cost price, WAC, margins
   CATEGORY_MANAGE: "category:manage",
   CATEGORY_VIEW: "category:view",
   UNIT_MANAGE: "unit:manage",
@@ -107,6 +114,7 @@ export const AppPermissions = {
   STOCK_VIEW: "stock:view",
   STOCK_ADJUST: "stock:adjust",
   STOCK_TRANSFER: "stock:transfer",
+  STOCK_APPROVE: "stock:approve",
 
   // Outflows (Unified Purchases & Expenses)
   OUTFLOW_CREATE: "outflow:create",

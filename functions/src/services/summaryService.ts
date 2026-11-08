@@ -48,7 +48,6 @@ export async function recordBillSummary(
         billCount: 0,
         outflowCount: 0,
         paymentBreakdown: { cash: 0, upi: 0, card: 0, bank_transfer: 0, credit: 0, other: 0 },
-        topProducts: [],
         updatedAt: new Date().toISOString(),
       };
 
@@ -143,7 +142,6 @@ export async function recordOutflowSummary(outflow: OutflowDoc): Promise<void> {
         billCount: 0,
         outflowCount: 0,
         paymentBreakdown: { cash: 0, upi: 0, card: 0, bank_transfer: 0, credit: 0, other: 0 },
-        topProducts: [],
         updatedAt: new Date().toISOString(),
       };
 

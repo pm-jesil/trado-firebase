@@ -1,337 +1,119 @@
 rules_version = '2';
 
+// Trado Firestore rules.
+// - Every client write is denied (nothing below grants write): all writes go through callables.
+// - Reads are granted per collection by ONE rule each; the expectation table in
+//   functions/src/test/rules/firestoreRules.test.ts (RULES_MATRIX) is the contract and
+//   scripts/check-gate-conformance.js checks that every collection is listed here and there.
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- Helper Functions ---
+    // --- Helpers ---------------------------------------------------------------
 
-    function isAuthenticated() {
+    function signedIn() {
       return request.auth != null;
     }
 
     function isSuperAdmin() {
-      return isAuthenticated() && ('isSuperAdmin' in request.auth.token) && request.auth.token.isSuperAdmin == true;
+      return signedIn() && request.auth.token.get('isSuperAdmin', false) == true;
     }
 
-    function isOwner(uid) {
-      return isAuthenticated() && request.auth.uid == uid;
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
     }
 
+    // ACTIVE membership only: a deactivated employee loses direct read access immediately.
     function isOrgMember(orgId) {
-      return isAuthenticated() &&
-        exists(/databases/$(database)/documents/memberships/$(request.auth.uid + '_' + orgId));
+      return signedIn() && orgId != null &&
+        exists(/databases/$(database)/documents/memberships/$(request.auth.uid + '_' + orgId)) &&
+        get(/databases/$(database)/documents/memberships/$(request.auth.uid + '_' + orgId)).data.status == 'active';
     }
 
-    // Direct client writes are globally denied.
-    // All writes in Phase 1 MUST pass through authenticated Cloud Functions with business validation.
-    function writesDenied() {
-      return false;
+    // The document belongs to the caller (userId field).
+    function ownsDoc() {
+      return signedIn() && resource.data.userId == request.auth.uid;
     }
 
-    // --- 1. Users Collection ---
-    // users/{uid}
+    // Active member of the document's organization.
+    function memberOfDocOrg() {
+      return isOrgMember(resource.data.organizationId);
+    }
+
+    // Platform catalog entry (organizationId null / system) or the caller's organization's entry.
+    function globalOrMember() {
+      return signedIn() && (resource.data.get('organizationId', null) == null ||
+        resource.data.get('isSystem', false) == true || memberOfDocOrg());
+    }
+
+    // --- Collections readable by clients -----------------------------------------
+    // Read-metering strategy (decision D-04, hybrid): business and financial collections are
+    // readable ONLY through callables (plan/permission/data scope, redaction, metering). Direct
+    // SDK reads stay for small bounded reference documents and the caller's own documents.
+
     match /users/{uid} {
-      allow read: if isOwner(uid) || isSuperAdmin();
-      allow write: if writesDenied();
-
-      // Subcollection for device push tokens
+      allow read: if isSelf(uid) || isSuperAdmin();
       match /devices/{deviceId} {
-        allow read: if isOwner(uid) || isSuperAdmin();
-        allow write: if writesDenied();
+        allow read: if isSelf(uid) || isSuperAdmin();
       }
     }
 
-    // --- 2. Memberships Collection ---
-    // Document ID: ${userId}_${organizationId}
     match /memberships/{membershipId} {
-      allow read: if isSuperAdmin()
-        || (isAuthenticated() && resource.data.userId == request.auth.uid)
-        || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
+      allow read: if isSuperAdmin() || ownsDoc() || memberOfDocOrg();
     }
 
-    // --- 3. Organizations Collection ---
-    // organizations/{organizationId}
+    match /membershipBranches/{membershipBranchId} {
+      allow read: if isSuperAdmin() || ownsDoc() || memberOfDocOrg();
+    }
+
     match /organizations/{organizationId} {
       allow read: if isSuperAdmin() || isOrgMember(organizationId);
-      allow write: if writesDenied();
-
-      // Subcollection for branches
       match /branches/{branchId} {
         allow read: if isSuperAdmin() || isOrgMember(organizationId);
-        allow write: if writesDenied();
       }
     }
 
-    // --- Membership Branches Collection (Join Table) ---
-    // membershipBranches/{membershipId_branchId}
-    match /membershipBranches/{membershipBranchId} {
-      allow read: if isSuperAdmin()
-        || (isAuthenticated() && resource.data.userId == request.auth.uid)
-        || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // --- Stock Balances Collection ---
-    // stockBalances/{organizationId_branchId_productId}
     match /stockBalances/{stockBalanceId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
+      allow read: if isSuperAdmin() || memberOfDocOrg();
     }
 
-    // --- 4. Roles Collection ---
-    // roles/{roleId}
-    match /roles/{roleId} {
-      allow read: if isSuperAdmin()
-        || (isAuthenticated() && (resource.data.isSystem == true || resource.data.organizationId == null))
-        || (isAuthenticated() && resource.data.organizationId != null && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // --- 5. Departments Collection ---
-    // departments/{departmentId}
-    match /departments/{departmentId} {
-      allow read: if isSuperAdmin()
-        || (isAuthenticated() && (resource.data.isSystem == true || resource.data.organizationId == null))
-        || (isAuthenticated() && resource.data.organizationId != null && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // --- 6. Job Roles Collection ---
-    // jobRoles/{jobRoleId}
-    match /jobRoles/{jobRoleId} {
-      allow read: if isSuperAdmin()
-        || (isAuthenticated() && (resource.data.isSystem == true || resource.data.organizationId == null))
-        || (isAuthenticated() && resource.data.organizationId != null && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // --- 7. Teams Collection ---
-    // teams/{teamId}
     match /teams/{teamId} {
-      allow read: if isSuperAdmin()
-        || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
+      allow read: if isSuperAdmin() || memberOfDocOrg();
     }
 
-    // --- 8. Subscription Plans Collection ---
-    // subscriptionPlans/{planId} (Platform catalog)
-    match /subscriptionPlans/{planId} {
-      allow read: if isAuthenticated();
-      allow write: if writesDenied();
+    // Tenant or platform catalogs
+    match /{catalog}/{docId} {
+      allow read: if catalog in ['roles', 'departments', 'jobRoles', 'categories', 'units'] &&
+        (isSuperAdmin() || globalOrMember());
     }
 
-    // --- 9. Permission Catalog Collection ---
-    // permissionCatalog/{permissionCode} (Platform catalog)
-    match /permissionCatalog/{permissionCode} {
-      allow read: if isAuthenticated();
-      allow write: if writesDenied();
+    // Platform catalogs: any signed-in user
+    match /{catalog}/{docId} {
+      allow read: if catalog in ['subscriptionPlans', 'permissionCatalog', 'modules', 'taxRegimes'] && signedIn();
     }
 
-    // --- 10. Modules Collection ---
-    // modules/{moduleCode} (Platform catalog)
-    match /modules/{moduleCode} {
-      allow read: if isAuthenticated();
-      allow write: if writesDenied();
-    }
-
-    // --- 11. Tax Regimes Collection ---
-    // taxRegimes/{taxRegimeCode} (Platform catalog)
-    match /taxRegimes/{taxRegimeCode} {
-      allow read: if isAuthenticated();
-      allow write: if writesDenied();
-    }
-
-    // --- Phase 2 Collections ---
-
-    // 15. Products Collection
-    // products/{productId}
-    match /products/{productId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // 16. Categories Collection
-    // categories/{categoryId}
-    match /categories/{categoryId} {
-      allow read: if isSuperAdmin()
-        || (isAuthenticated() && (resource.data.organizationId == null || isOrgMember(resource.data.organizationId)));
-      allow write: if writesDenied();
-    }
-
-    // 17. Units Collection
-    // units/{unitId}
-    match /units/{unitId} {
-      allow read: if isSuperAdmin()
-        || (isAuthenticated() && (resource.data.organizationId == null || isOrgMember(resource.data.organizationId)));
-      allow write: if writesDenied();
-    }
-
-    // 18. Customers Collection
-    // customers/{customerId}
-    match /customers/{customerId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // 19. Vendors Collection
-    // vendors/{vendorId}
-    match /vendors/{vendorId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // 20. Outflows Collection (Unified Purchases & Expenses)
-    // outflows/{outflowId}
-    match /outflows/{outflowId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // 21. Bills Collection (POS & B2B)
-    // bills/{billId}
-    match /bills/{billId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // 22. Stock Movements Collection
-    // stockMovements/{movementId}
-    match /stockMovements/{movementId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // 23. Deliveries Collection
-    // deliveries/{deliveryId}
-    match /deliveries/{deliveryId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // 24. Returns Collection
-    // returns/{returnId}
-    match /returns/{returnId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // 25. Payments Collection
-    // payments/{paymentId}
-    match /payments/{paymentId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
-    }
-
-    // --- Phase 3 Collections ---
-
-    // 26. Tasks Collection
+    // Own documents only (other staff's tasks / locations need the callables' permissions)
     match /tasks/{taskId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
+      allow read: if isSuperAdmin() || (memberOfDocOrg() &&
+        (resource.data.assignedToMembershipId == request.auth.uid + '_' + resource.data.organizationId ||
+         resource.data.createdBy == request.auth.uid));
     }
 
-    // 27. Daily Summaries Collection
-    match /dailySummaries/{summaryId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
+    match /{own}/{docId} {
+      allow read: if own in ['latestLocations', 'locationPings', 'notifications'] && (isSuperAdmin() || ownsDoc());
     }
 
-    // 28. Monthly Summaries Collection
-    match /monthlySummaries/{summaryId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && isOrgMember(resource.data.organizationId));
-      allow write: if writesDenied();
+    // --- Callable-only business collections and platform usage: Super Admin direct read ---
+    match /{superAdminOnly}/{docId} {
+      allow read: if superAdminOnly in [
+        'products', 'customers', 'vendors', 'outflows', 'bills', 'stockMovements', 'deliveries',
+        'returns', 'payments', 'dailySummaries', 'monthlySummaries',
+        'organizationUsageDaily', 'organizationUsageMonthly', 'branchUsageDaily', 'branchUsageMonthly',
+        'usageRateCards', 'usageCounterShards', 'serials', 'stockAdjustmentRequests', 'recurringExpenses'
+      ] && isSuperAdmin();
     }
 
-    // 29. Latest Locations Collection
-    match /latestLocations/{locationId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && (resource.data.userId == request.auth.uid || isOrgMember(resource.data.organizationId)));
-      allow write: if writesDenied();
-    }
-
-    // 30. Location Pings Collection
-    match /locationPings/{pingId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && (resource.data.userId == request.auth.uid || isOrgMember(resource.data.organizationId)));
-      allow write: if writesDenied();
-    }
-
-    // 31. In-App Notifications Collection
-    match /notifications/{notificationId} {
-      allow read: if isSuperAdmin() || (isAuthenticated() && resource.data.userId == request.auth.uid);
-      allow write: if writesDenied();
-    }
-
-    // 32. Document Counters Collection
-    // Internal server sequence generator - completely denied to client SDKs
-    match /documentCounters/{counterId} {
-      allow read, write: if false;
-    }
-
-    // 33. Super Admin Usage Collections
-    // Completely denied to client writes; readable ONLY by platform Super Admin
-    match /organizationUsageDaily/{docId} {
-      allow read: if isSuperAdmin();
-      allow write: if writesDenied();
-    }
-
-    match /branchUsageDaily/{docId} {
-      allow read: if isSuperAdmin();
-      allow write: if writesDenied();
-    }
-
-    match /branchUsageMonthly/{docId} {
-      allow read: if isSuperAdmin();
-      allow write: if writesDenied();
-    }
-
-    match /platformUsageSnapshots/{docId} {
-      allow read: if isSuperAdmin();
-      allow write: if writesDenied();
-    }
-
-    match /usageRateCards/{docId} {
-      allow read: if isSuperAdmin();
-      allow write: if writesDenied();
-    }
-
-    match /usageAllocationRuns/{docId} {
-      allow read: if isSuperAdmin();
-      allow write: if writesDenied();
-    }
-
-    // 27. Barcode Locks Collection
-    // Internal server concurrency lock - completely denied to client SDKs
-    match /barcodeLocks/{lockId} {
-      allow read, write: if false;
-    }
-
-    // 28. Branch Code Locks Collection
-    // Internal server concurrency lock - completely denied to client SDKs
-    match /branchCodeLocks/{lockId} {
-      allow read, write: if false;
-    }
-
-    // --- Internal Operational Collections ---
-
-    // --- 12. Idempotency Records Collection ---
-    // Completely denied to client SDKs
-    match /idempotencyRecords/{recordId} {
-      allow read, write: if false;
-    }
-
-    // --- 13. Audit Logs Collection ---
-    // Completely denied to client SDKs
-    match /auditLogs/{logId} {
-      allow read, write: if false;
-    }
-
-    // --- 14. Notification Outbox / Records ---
-    // Internal server outbox
-    match /notificationOutbox/{outboxId} {
-      allow read, write: if false;
-    }
-
-    // Catch-all deny
+    // Internal server collections (documentCounters, idempotencyRecords, auditLogs,
+    // notificationOutbox, uniqueKeys) and anything unlisted: no client access at all.
     match /{document=**} {
       allow read, write: if false;
     }

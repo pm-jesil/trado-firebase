@@ -11,6 +11,7 @@
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db } from "../services/firebase.js";
+import { uniqueKeyRef } from "../services/uniqueKeys.js";
 import {
   CreateBranchSchema,
   UpdateBranchSchema,
@@ -18,10 +19,11 @@ import {
   ListBranchesSchema,
   SwitchBranchContextSchema,
   UpdateSharingPoliciesSchema,
+  ContextOnlySchema,
 } from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
 import {
   BranchDoc,
-  BranchCodeLockDoc,
   MembershipBranchDoc,
   OrganizationDoc,
   OrganizationSharingPolicies,
@@ -29,6 +31,7 @@ import {
 } from "../types/models.js";
 import { EntityStatus } from "../constants/enums.js";
 import { AppPermissions } from "../constants/permissions.js";
+import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { setPrimaryBranchClaim } from "../services/claims.js";
 import { createAuditLog } from "../services/audit.js";
@@ -39,6 +42,7 @@ import { reserveIdempotency } from "../services/idempotency.js";
  * Returns the default branch for the caller's active organization.
  */
 export const branchesGetDefault = onCall({ region: "asia-south1" }, async (request) => {
+  parseInput(ContextOnlySchema, request.data);
   const context = await resolveRequestContext(request);
   const defaultBranchId = context.organization.defaultBranchId || "main-branch";
 
@@ -64,11 +68,7 @@ export const branchesGetDefault = onCall({ region: "asia-south1" }, async (reque
  * Lists branches accessible to the caller.
  */
 export const branchesList = onCall({ region: "asia-south1" }, async (request) => {
-  const parsed = ListBranchesSchema.safeParse(request.data || {});
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(ListBranchesSchema, request.data || {});
 
   const context = await resolveRequestContext(request);
   const orgId = context.organizationId;
@@ -81,16 +81,7 @@ export const branchesList = onCall({ region: "asia-south1" }, async (request) =>
     query = query.where("isActive", "==", input.status === EntityStatus.ACTIVE);
   }
 
-  query = query.orderBy("name").limit(input.limit || 50);
-
-  if (input.startAfterId) {
-    const startDoc = await branchesCol.doc(input.startAfterId).get();
-    if (startDoc.exists) {
-      query = query.startAfter(startDoc);
-    }
-  }
-
-  const snapshot = await query.get();
+  const { snapshot, nextCursor } = await fetchPage(query.orderBy("name"), `organizations/${orgId}/branches`, input.startAfterId, input.limit || 50);
   let branchDocs = snapshot.docs.map((doc) => ({
     id: doc.id,
     ...(doc.data() as BranchDoc),
@@ -112,6 +103,7 @@ export const branchesList = onCall({ region: "asia-south1" }, async (request) =>
   return {
     items: branchDocs,
     count: branchDocs.length,
+    nextCursor,
   };
 });
 
@@ -121,14 +113,10 @@ export const branchesList = onCall({ region: "asia-south1" }, async (request) =>
  * Enforces:
  * - branch:create permission
  * - Plan branchLimit check
- * - Atomic uppercase branchCode uniqueness lock
+ * - Atomic uppercase branch code uniqueness (uniqueKeys kind branch_code)
  */
 export const branchesCreate = onCall({ region: "asia-south1" }, async (request) => {
-  const parsed = CreateBranchSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(CreateBranchSchema, request.data);
 
   const context = await resolveRequestContext(request, {
     requiredPermission: AppPermissions.BRANCH_CREATE,
@@ -156,7 +144,7 @@ export const branchesCreate = onCall({ region: "asia-south1" }, async (request) 
   try {
     const branchRef = db.collection("organizations").doc(orgId).collection("branches").doc();
     const branchId = branchRef.id;
-    const lockRef = db.collection("branchCodeLocks").doc(`${orgId}_${codeUpper}`);
+    const lockRef = uniqueKeyRef(orgId, "branch_code", codeUpper);
     const orgRef = db.collection("organizations").doc(orgId);
     const now = new Date().toISOString();
 
@@ -174,12 +162,7 @@ export const branchesCreate = onCall({ region: "asia-south1" }, async (request) 
       updatedAt: now,
     };
 
-    const lockDoc: BranchCodeLockDoc = {
-      organizationId: orgId,
-      branchCode: codeUpper,
-      branchId,
-      createdAt: now,
-    };
+    const lockDoc = { organizationId: orgId, kind: "branch_code", entityType: "branch", entityId: branchId, createdAt: now };
 
     // Transactional write: enforce plan branchLimit and unique code lock
     await db.runTransaction(async (txn) => {
@@ -286,11 +269,7 @@ export const branchesCreate = onCall({ region: "asia-south1" }, async (request) 
  * Cannot alter branch code or deactivate default branch.
  */
 export const branchesUpdate = onCall({ region: "asia-south1" }, async (request) => {
-  const parsed = UpdateBranchSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdateBranchSchema, request.data);
 
   const context = await resolveRequestContext(request, {
     requiredPermission: AppPermissions.BRANCH_UPDATE,
@@ -428,11 +407,7 @@ export const branchesUpdate = onCall({ region: "asia-south1" }, async (request) 
  * Prohibits deactivating default branch or the last active branch.
  */
 export const branchesDeactivate = onCall({ region: "asia-south1" }, async (request) => {
-  const parsed = DeactivateBranchSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(DeactivateBranchSchema, request.data);
 
   const context = await resolveRequestContext(request, {
     requiredPermission: AppPermissions.BRANCH_DEACTIVATE,
@@ -520,11 +495,7 @@ export const branchesDeactivate = onCall({ region: "asia-south1" }, async (reque
  * Validates caller's assignment and updates their primaryBranchId claim.
  */
 export const branchContextSwitch = onCall({ region: "asia-south1" }, async (request) => {
-  const parsed = SwitchBranchContextSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(SwitchBranchContextSchema, request.data);
 
   const context = await resolveRequestContext(request);
   const orgId = context.organizationId;
@@ -583,11 +554,7 @@ export const branchContextSwitch = onCall({ region: "asia-south1" }, async (requ
  * Strictly guarantees stock remains branch_scoped.
  */
 export const sharingPoliciesUpdate = onCall({ region: "asia-south1" }, async (request) => {
-  const parsed = UpdateSharingPoliciesSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdateSharingPoliciesSchema, request.data);
 
   const context = await resolveRequestContext(request, {
     requiredPermission: AppPermissions.ORG_SETTINGS,

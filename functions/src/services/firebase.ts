@@ -15,5 +15,9 @@ if (getApps().length === 0) {
 
 export const adminApp = app;
 export const db: Firestore = getFirestore(app);
-db.settings({ ignoreUndefinedProperties: true });
+try {
+  db.settings({ ignoreUndefinedProperties: true });
+} catch {
+  // Ignore if already configured
+}
 export const auth: Auth = getAuth(app);

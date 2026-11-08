@@ -5,28 +5,25 @@
  * - categoriesList: Tenant-scoped listing including system categories
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { onCall, HttpsError, type CallableRequest } from "firebase-functions/v2/https";
+import { commitWithKeys, changedClaims } from "../services/uniqueKeys.js";
+import { nameKey } from "../services/naturalKeys.js";
+import { resolveCatalogWriteAccess } from "../services/contextResolver.js";
+import { AppPermissions } from "../constants/permissions.js";
 import { db } from "../services/firebase.js";
 import {
   CreateCategorySchema,
   UpdateCategorySchema,
   ListCategoriesSchema,
 } from "../validation/schemas.js";
-import { CategoryDoc, MembershipDoc } from "../types/models.js";
+import { parseInput } from "../validation/parseInput.js";
+import { CategoryDoc } from "../types/models.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { createAuditLog } from "../services/audit.js";
 
-async function verifyTenantOrSuperAdmin(auth: any, organizationId?: string | null): Promise<void> {
-  if (auth.token.isSuperAdmin === true) return;
-  if (!organizationId) {
-    throw new HttpsError("permission-denied", "Super Admin privileges required to manage global categories.");
-  }
-
-  const memRef = db.collection("memberships").doc(`${auth.uid}_${organizationId}`);
-  const memDoc = await memRef.get();
-  if (!memDoc.exists || (memDoc.data() as MembershipDoc).status !== "active") {
-    throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-  }
+/** Global records: Super Admin; organization records: tenant gate with catalog permission. */
+function verifyTenantOrSuperAdmin(request: CallableRequest, organizationId?: string | null) {
+  return resolveCatalogWriteAccess(request, organizationId, [AppPermissions.CATEGORY_MANAGE, AppPermissions.INVENTORY_MANAGE]);
 }
 
 export const categoriesCreate = onCall({ region: "asia-south1" }, async (request) => {
@@ -34,13 +31,9 @@ export const categoriesCreate = onCall({ region: "asia-south1" }, async (request
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = CreateCategorySchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(CreateCategorySchema, request.data);
 
-  await verifyTenantOrSuperAdmin(request.auth, input.organizationId);
+  await verifyTenantOrSuperAdmin(request, input.organizationId);
 
   const scope = input.organizationId || "platform";
   const idempotency = await reserveIdempotency({
@@ -66,7 +59,7 @@ export const categoriesCreate = onCall({ region: "asia-south1" }, async (request
     const categoryDoc: CategoryDoc = {
       organizationId: input.organizationId || null,
       name: input.name.trim(),
-      nameKey: input.name.trim().toLowerCase(),
+      nameKey: nameKey(input.name),
       parentId: input.parentId || null,
       nature: input.nature?.trim() || "general",
       isActive: true,
@@ -74,7 +67,10 @@ export const categoriesCreate = onCall({ region: "asia-south1" }, async (request
       createdBy: request.auth.uid,
     };
 
-    await categoryRef.set(categoryDoc);
+    // Unique name per organization ("global" for platform catalog entries)
+    await commitWithKeys(categoryDoc.organizationId || "global", "category", categoryRef.id, (batch) => batch.set(categoryRef, categoryDoc), {
+      claim: [{ kind: "category_name", key: nameKey(categoryDoc.name) }],
+    });
 
     const response = {
       categoryId,
@@ -117,11 +113,7 @@ export const categoriesUpdate = onCall({ region: "asia-south1" }, async (request
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = UpdateCategorySchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdateCategorySchema, request.data);
 
   const categoryRef = db.collection("categories").doc(input.categoryId);
   const docSnap = await categoryRef.get();
@@ -130,7 +122,7 @@ export const categoriesUpdate = onCall({ region: "asia-south1" }, async (request
   }
 
   const existing = docSnap.data() as CategoryDoc;
-  await verifyTenantOrSuperAdmin(request.auth, existing.organizationId);
+  await verifyTenantOrSuperAdmin(request, existing.organizationId);
 
   const updates: Partial<CategoryDoc> = {
     updatedAt: new Date().toISOString(),
@@ -138,13 +130,16 @@ export const categoriesUpdate = onCall({ region: "asia-south1" }, async (request
 
   if (input.name) {
     updates.name = input.name.trim();
-    updates.nameKey = input.name.trim().toLowerCase();
+    updates.nameKey = nameKey(input.name);
   }
   if (input.parentId !== undefined) updates.parentId = input.parentId;
   if (input.nature !== undefined) updates.nature = input.nature;
   if (input.isActive !== undefined) updates.isActive = input.isActive;
 
-  await categoryRef.update(updates);
+  const nameChange = updates.name !== undefined && updates.name !== existing.name
+    ? changedClaims([{ kind: "category_name", key: nameKey(existing.name) }], [{ kind: "category_name", key: nameKey(updates.name as string) }])
+    : { claim: [], release: [] };
+  await commitWithKeys(existing.organizationId || "global", "category", input.categoryId, (batch) => batch.update(categoryRef, updates), nameChange);
 
   await createAuditLog({
     organizationId: existing.organizationId,
@@ -163,8 +158,7 @@ export const categoriesList = onCall({ region: "asia-south1" }, async (request) 
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = ListCategoriesSchema.safeParse(request.data);
-  const input = parsed.success ? parsed.data : {};
+  const input = parseInput(ListCategoriesSchema, request.data);
 
   const items: Array<{ categoryId: string } & CategoryDoc> = [];
 

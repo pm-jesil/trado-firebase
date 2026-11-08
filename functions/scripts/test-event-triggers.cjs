@@ -131,7 +131,6 @@ async function run() {
     paidAmount: 7000,
     lines: [{
       productId: prodId,
-      itemName: "Trigger Event Item",
       quantity: 10,
       unitPrice: 700,
       taxPercent: 0,
@@ -182,7 +181,6 @@ async function run() {
     organizationId: orgId,
     direction: "in",
     partyType: "customer",
-    partyName: "Test Customer",
     amount: 500,
     method: "cash",
     referenceModel: "bill",
@@ -216,8 +214,6 @@ async function run() {
   const deliveryRes = await callFunction("deliveriesCreate", {
     organizationId: orgId,
     billId,
-    customerName: "Trigger Recipient",
-    customerPhone: "+919876543210",
     address: {
       line1: "12 Brigade Road",
       city: "Bengaluru",
@@ -246,8 +242,45 @@ async function run() {
   assert.equal(deliveryNotif.relatedEntityId, deliveryId);
   console.log(`✓ onDeliveryWritten dispatched 'delivery_assigned' notification: "${deliveryNotif.title}"`);
 
+  // ============================================================
+  // 5. onStorageObjectFinalized Trigger
+  // ============================================================
+  console.log("\n[TRIGGER 5: onStorageObjectFinalized] Testing storage upload byte accounting...");
+  const { handleStorageObjectFinalized } = require("../lib/triggers/storageTriggers.js");
+  await handleStorageObjectFinalized({
+    name: `organizations/${orgId}/assets/logo.png`,
+    size: 2048,
+    bucket: "trado-x.appspot.com",
+  });
+  console.log(`✓ Executed onStorageObjectFinalized for org ${orgId} (2048 bytes).`);
+
+  console.log("Polling for storageUploadBytes in usageCounterShards...");
+  const usageSnap = await waitForCondition(
+    `storageUploadBytes for org ${orgId}`,
+    async () => {
+      const snap = await db.collection("usageCounterShards")
+        .where("organizationId", "==", orgId)
+        .get();
+      if (!snap.empty) {
+        let total = 0;
+        for (const doc of snap.docs) {
+          const days = doc.data().days || {};
+          for (const d of Object.values(days)) {
+            if (d && typeof d.storageUploadBytes === "number") {
+              total += d.storageUploadBytes;
+            }
+          }
+        }
+        if (total >= 2048) return total;
+      }
+      return null;
+    }
+  );
+  assert.ok(usageSnap >= 2048, `Expected storageUploadBytes >= 2048, got ${usageSnap}`);
+  console.log(`✓ onStorageObjectFinalized successfully metered ${usageSnap} bytes of storage!`);
+
   console.log("\n================================================================================");
-  console.log("   [PASS] ALL 4 FIRESTORE EVENT TRIGGERS FULLY VERIFIED! ✓                     ");
+  console.log("   [PASS] ALL 5 EVENT & STORAGE TRIGGERS FULLY VERIFIED! ✓                     ");
   console.log("================================================================================\n");
 }
 

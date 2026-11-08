@@ -3,9 +3,18 @@
  */
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { nameKey } from "../services/naturalKeys.js";
+import { commitWithKeys, changedClaims } from "../services/uniqueKeys.js";
+import { resolveCatalogWriteAccess } from "../services/contextResolver.js";
+import { AppPermissions } from "../constants/permissions.js";
 import { db } from "../services/firebase.js";
-import { CreateDepartmentSchema, UpdateDepartmentSchema } from "../validation/schemas.js";
-import { DepartmentDoc, MembershipDoc } from "../types/models.js";
+import {
+  CreateDepartmentSchema,
+  UpdateDepartmentSchema,
+  ContextOnlySchema,
+} from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
+import { DepartmentDoc } from "../types/models.js";
 import { createAuditLog } from "../services/audit.js";
 
 export const departmentsCreate = onCall({ region: "asia-south1" }, async (request) => {
@@ -13,24 +22,9 @@ export const departmentsCreate = onCall({ region: "asia-south1" }, async (reques
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = CreateDepartmentSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(CreateDepartmentSchema, request.data);
 
-  const isSuperAdmin = request.auth.token.isSuperAdmin === true;
-
-  if (input.organizationId) {
-    if (!isSuperAdmin) {
-      const callerMem = await db.collection("memberships").doc(`${request.auth.uid}_${input.organizationId}`).get();
-      if (!callerMem.exists || (callerMem.data() as MembershipDoc).status !== "active") {
-        throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-      }
-    }
-  } else if (!isSuperAdmin) {
-    throw new HttpsError("permission-denied", "Super Admin privileges required to create global departments.");
-  }
+  await resolveCatalogWriteAccess(request, input.organizationId, AppPermissions.DEPARTMENT_MANAGE);
 
   const deptRef = db.collection("departments").doc();
   const deptDoc: DepartmentDoc = {
@@ -42,7 +36,10 @@ export const departmentsCreate = onCall({ region: "asia-south1" }, async (reques
     createdBy: request.auth.uid,
   };
 
-  await deptRef.set(deptDoc);
+  // Unique name per organization ("global" for platform catalog entries)
+  await commitWithKeys(deptDoc.organizationId || "global", "department", deptRef.id, (batch) => batch.set(deptRef, deptDoc), {
+    claim: [{ kind: "department_name", key: nameKey(deptDoc.name) }],
+  });
 
   await createAuditLog({
     organizationId: input.organizationId,
@@ -61,11 +58,7 @@ export const departmentsUpdate = onCall({ region: "asia-south1" }, async (reques
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = UpdateDepartmentSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdateDepartmentSchema, request.data);
 
   const deptRef = db.collection("departments").doc(input.departmentId);
   const deptDoc = await deptRef.get();
@@ -75,6 +68,8 @@ export const departmentsUpdate = onCall({ region: "asia-south1" }, async (reques
 
   const deptData = deptDoc.data() as DepartmentDoc;
   const isSuperAdmin = request.auth.token.isSuperAdmin === true;
+  // Org records: tenant gate on the record's own organization (blocks cross-tenant edits)
+  await resolveCatalogWriteAccess(request, deptData.organizationId, AppPermissions.DEPARTMENT_MANAGE);
 
   if (deptData.isSystem && !isSuperAdmin) {
     throw new HttpsError("permission-denied", "Cannot modify system-level departments.");
@@ -87,7 +82,10 @@ export const departmentsUpdate = onCall({ region: "asia-south1" }, async (reques
   if (input.name) updates.name = input.name;
   if (input.headMembershipIds) updates.headMembershipIds = input.headMembershipIds;
 
-  await deptRef.update(updates);
+  const nameChange = updates.name !== undefined && updates.name !== deptData.name
+    ? changedClaims([{ kind: "department_name", key: nameKey(deptData.name) }], [{ kind: "department_name", key: nameKey(updates.name as string) }])
+    : { claim: [], release: [] };
+  await commitWithKeys(deptData.organizationId || "global", "department", input.departmentId, (batch) => batch.update(deptRef, updates), nameChange);
 
   await createAuditLog({
     organizationId: deptData.organizationId,
@@ -102,11 +100,11 @@ export const departmentsUpdate = onCall({ region: "asia-south1" }, async (reques
 });
 
 export const departmentsList = onCall({ region: "asia-south1" }, async (request) => {
+  const { organizationId } = parseInput(ContextOnlySchema, request.data);
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const organizationId = request.data?.organizationId as string | undefined;
 
   const systemQuery = await db.collection("departments").where("isSystem", "==", true).get();
   const systemDepts = systemQuery.docs.map((d) => ({ departmentId: d.id, ...(d.data() as DepartmentDoc) }));

@@ -12,6 +12,7 @@
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db } from "../services/firebase.js";
+import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { AppPermissions } from "../constants/permissions.js";
 import {
@@ -22,6 +23,7 @@ import {
   ListTasksSchema,
   DeleteTaskSchema,
 } from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
 import { TaskDoc } from "../types/models.js";
 import { createAndDispatchNotification } from "../services/notificationService.js";
 
@@ -34,11 +36,7 @@ export const tasksCreate = onCall({ region: "asia-south1" }, async (request) => 
     allowPlatformSuperAdmin: true,
   });
 
-  const parsed = CreateTaskSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const validated = parsed.data;
+  const validated = parseInput(CreateTaskSchema, request.data);
   const orgId = validated.organizationId || context.organizationId;
 
   if (orgId !== context.organizationId && !context.isSuperAdmin) {
@@ -46,7 +44,7 @@ export const tasksCreate = onCall({ region: "asia-south1" }, async (request) => 
   }
 
   const callerMembershipId = `${context.callerUid}_${orgId}`;
-  const isOwnerOrAdmin = context.membership?.isPrimary || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
+  const isOwnerOrAdmin = context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
   const canAssignOthers = isOwnerOrAdmin || context.effectivePermissions.includes(AppPermissions.TASK_ASSIGN);
   const targetMembershipId = validated.assignedToMembershipId;
 
@@ -117,14 +115,11 @@ export const tasksCreate = onCall({ region: "asia-south1" }, async (request) => 
  */
 export const tasksUpdate = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: [AppPermissions.TASK_UPDATE, AppPermissions.TASK_VIEW],
     allowPlatformSuperAdmin: true,
   });
 
-  const parsed = UpdateTaskSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const validated = parsed.data;
+  const validated = parseInput(UpdateTaskSchema, request.data);
 
   const taskRef = db.collection("tasks").doc(validated.taskId);
   const taskSnap = await taskRef.get();
@@ -140,7 +135,7 @@ export const tasksUpdate = onCall({ region: "asia-south1" }, async (request) => 
   const callerMembershipId = `${context.callerUid}_${task.organizationId}`;
   const isAssignee = task.assignedToMembershipId === callerMembershipId;
   const isCreator = task.assignedByMembershipId === callerMembershipId || task.createdBy === context.callerUid;
-  const isOwnerOrAdmin = context.membership?.isPrimary || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
+  const isOwnerOrAdmin = context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
   const canUpdate = isOwnerOrAdmin || isAssignee || isCreator || context.effectivePermissions.includes(AppPermissions.TASK_UPDATE);
 
   if (!canUpdate) {
@@ -175,11 +170,7 @@ export const tasksAssign = onCall({ region: "asia-south1" }, async (request) => 
     allowPlatformSuperAdmin: true,
   });
 
-  const parsed = AssignTaskSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const validated = parsed.data;
+  const validated = parseInput(AssignTaskSchema, request.data);
 
   const taskRef = db.collection("tasks").doc(validated.taskId);
   const taskSnap = await taskRef.get();
@@ -234,14 +225,11 @@ export const tasksAssign = onCall({ region: "asia-south1" }, async (request) => 
  */
 export const tasksUpdateStatus = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: [AppPermissions.TASK_UPDATE, AppPermissions.TASK_VIEW],
     allowPlatformSuperAdmin: true,
   });
 
-  const parsed = UpdateTaskStatusSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const validated = parsed.data;
+  const validated = parseInput(UpdateTaskStatusSchema, request.data);
 
   const taskRef = db.collection("tasks").doc(validated.taskId);
   const taskSnap = await taskRef.get();
@@ -257,7 +245,7 @@ export const tasksUpdateStatus = onCall({ region: "asia-south1" }, async (reques
   const callerMembershipId = `${context.callerUid}_${task.organizationId}`;
   const isAssignee = task.assignedToMembershipId === callerMembershipId;
   const isCreator = task.assignedByMembershipId === callerMembershipId;
-  const isOwnerOrAdmin = context.membership?.isPrimary || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
+  const isOwnerOrAdmin = context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
   const canChangeStatus = isOwnerOrAdmin || isAssignee || isCreator;
 
   if (!canChangeStatus) {
@@ -295,11 +283,7 @@ export const tasksList = onCall({ region: "asia-south1" }, async (request) => {
     allowPlatformSuperAdmin: true,
   });
 
-  const parsed = ListTasksSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const validated = parsed.data;
+  const validated = parseInput(ListTasksSchema, request.data);
   const orgId = validated.organizationId || context.organizationId;
 
   if (orgId !== context.organizationId && !context.isSuperAdmin) {
@@ -307,7 +291,7 @@ export const tasksList = onCall({ region: "asia-south1" }, async (request) => {
   }
 
   const callerMembershipId = `${context.callerUid}_${orgId}`;
-  const isOwnerOrAdmin = context.membership?.isPrimary || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
+  const isOwnerOrAdmin = context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
   const canViewAll = isOwnerOrAdmin || context.effectivePermissions.includes(AppPermissions.TASK_ASSIGN);
 
   let query = db.collection("tasks").where("organizationId", "==", orgId);
@@ -326,8 +310,7 @@ export const tasksList = onCall({ region: "asia-south1" }, async (request) => {
     query = query.where("priority", "==", validated.priority);
   }
 
-  const limit = validated.limit || 50;
-  const snap = await query.limit(limit).get();
+  const { snapshot: snap, nextCursor } = await fetchPage(query, "tasks", validated.startAfterId, validated.limit || 50);
 
   const tasks = snap.docs.map((d) => ({
     taskId: d.id,
@@ -337,6 +320,7 @@ export const tasksList = onCall({ region: "asia-south1" }, async (request) => {
   return {
     organizationId: orgId,
     items: tasks,
+    nextCursor,
     count: tasks.length,
   };
 });
@@ -350,11 +334,7 @@ export const tasksDelete = onCall({ region: "asia-south1" }, async (request) => 
     allowPlatformSuperAdmin: true,
   });
 
-  const parsed = DeleteTaskSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const validated = parsed.data;
+  const validated = parseInput(DeleteTaskSchema, request.data);
 
   const taskRef = db.collection("tasks").doc(validated.taskId);
   const taskSnap = await taskRef.get();
@@ -367,10 +347,20 @@ export const tasksDelete = onCall({ region: "asia-south1" }, async (request) => 
     throw new HttpsError("permission-denied", "Cross-organization access denied");
   }
 
-  await taskRef.delete();
+  // Notifications deep-link to the task: delete them with it so no reference is left dangling
+  const notes = await db.collection("notifications")
+    .where("organizationId", "==", task.organizationId)
+    .where("relatedEntityType", "==", "task")
+    .where("relatedEntityId", "==", validated.taskId)
+    .get();
+  const batch = db.batch();
+  batch.delete(taskRef);
+  notes.docs.forEach((n) => batch.delete(n.ref));
+  await batch.commit();
 
   return {
     taskId: validated.taskId,
     deleted: true,
+    deletedNotifications: notes.size,
   };
 });

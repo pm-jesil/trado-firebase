@@ -62,6 +62,27 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
       invoiceTitle = "Tax Invoice";
       break;
 
+    case "OM_VAT":
+      if (params.taxRatePercent === undefined) effectiveRate = 5; // Standard Oman 5%
+      taxName = "VAT";
+      regLabel = "VATIN";
+      invoiceTitle = "Tax Invoice";
+      break;
+
+    case "BH_VAT":
+      if (params.taxRatePercent === undefined) effectiveRate = 10; // Standard Bahrain 10%
+      taxName = "VAT";
+      regLabel = "TRN";
+      invoiceTitle = "Tax Invoice";
+      break;
+
+    case "SG_GST":
+      if (params.taxRatePercent === undefined) effectiveRate = 9; // Standard Singapore 9%
+      taxName = "GST";
+      regLabel = "GST Reg No";
+      invoiceTitle = "Tax Invoice";
+      break;
+
     case "US_SALES_TAX":
       if (params.taxRatePercent === undefined) effectiveRate = 7;
       taxName = "Sales Tax";
@@ -118,7 +139,7 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
     country: params.country || "IN",
     taxRatePercent: effectiveRate,
     taxAmount,
-    taxType: regime === "IN_GST" ? "gst" : regime === "AE_VAT" ? "vat" : "sales_tax",
+    taxType: regime === "IN_GST" || regime === "SG_GST" ? "gst" : (regime === "AE_VAT" || regime === "OM_VAT" || regime === "BH_VAT") ? "vat" : "sales_tax",
     isRegistered: params.isRegistered ?? (regime !== "NONE"),
     registrationNumber: params.registrationNumber || undefined,
     labels: {

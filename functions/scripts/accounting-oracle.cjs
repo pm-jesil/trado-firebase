@@ -26,6 +26,7 @@ class AccountingOracle {
     this.vendors = new Map(); // vendorId -> { name, outstandingPayable, totalPurchases }
     this.bills = new Map(); // billId -> { ... }
     this.outflows = new Map(); // outflowId -> { ... }
+    this.writeOffs = []; // { branchId, productId, quantity, unitCost } inventory losses
   }
 
   registerProduct(productId, { name, costPrice, sellingPrice, initialStock = 0, branchId = "main-branch" }) {
@@ -212,6 +213,11 @@ class AccountingOracle {
     const prevBranchStock = prod.currentStockByBranch.get(branchId) || 0;
     prod.currentStockByBranch.set(branchId, prevBranchStock + quantity);
 
+    // Negative adjustments are inventory write-offs valued at the WAC at that moment
+    if (quantity < 0) {
+      this.writeOffs.push({ branchId, productId, quantity: Math.abs(quantity), unitCost: prod.wac || 0 });
+    }
+
     this.events.push({
       type: "STOCK_ADJUSTMENT",
       productId,
@@ -306,9 +312,15 @@ class AccountingOracle {
     }
 
     totalExpenses = round2(totalExpenses);
+    let inventoryWriteOff = 0;
+    for (const w of this.writeOffs) {
+      if (branchId && w.branchId !== branchId) continue;
+      inventoryWriteOff += w.quantity * w.unitCost;
+    }
+    inventoryWriteOff = round2(inventoryWriteOff);
     const grossProfit = round2(netRevenue - netCogs);
     const grossMarginPercent = netRevenue > 0 ? round2((grossProfit / netRevenue) * 100) : 0;
-    const netProfit = round2(grossProfit - totalExpenses);
+    const netProfit = round2(grossProfit - totalExpenses - inventoryWriteOff);
     const netMarginPercent = netRevenue > 0 ? round2((netProfit / netRevenue) * 100) : 0;
 
     return {
@@ -324,6 +336,7 @@ class AccountingOracle {
       grossMarginPercent,
       operatingExpenses: totalExpenses,
       totalExpenses,
+      inventoryWriteOff,
       netProfit,
       netMarginPercent,
       billCount,

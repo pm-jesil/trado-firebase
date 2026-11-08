@@ -7,7 +7,12 @@
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db } from "../services/firebase.js";
-import { CreateRoleSchema, UpdateRoleSchema } from "../validation/schemas.js";
+import {
+  CreateRoleSchema,
+  UpdateRoleSchema,
+  ContextOnlySchema,
+} from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
 import { RoleDoc, MembershipDoc } from "../types/models.js";
 import { createAuditLog } from "../services/audit.js";
 
@@ -16,11 +21,7 @@ export const rolesCreate = onCall({ region: "asia-south1" }, async (request) => 
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = CreateRoleSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(CreateRoleSchema, request.data);
 
   const isSuperAdmin = request.auth.token.isSuperAdmin === true;
 
@@ -74,11 +75,7 @@ export const rolesUpdate = onCall({ region: "asia-south1" }, async (request) => 
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = UpdateRoleSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdateRoleSchema, request.data);
 
   const roleRef = db.collection("roles").doc(input.roleId);
   const roleDoc = await roleRef.get();
@@ -132,11 +129,11 @@ export const rolesUpdate = onCall({ region: "asia-south1" }, async (request) => 
 });
 
 export const rolesList = onCall({ region: "asia-south1" }, async (request) => {
+  const { organizationId } = parseInput(ContextOnlySchema, request.data);
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const organizationId = request.data?.organizationId as string | undefined;
 
   // Fetch system roles (available platform-wide)
   const systemRolesQuery = await db.collection("roles").where("isSystem", "==", true).get();

@@ -48,6 +48,14 @@ async function run() {
   const staff = await createEmployeePersona(ownerToken, orgId, {
     roleCode: "cashier",
     branchId: "main-branch",
+    // Explicit grants: the base employee role has no task/location permissions
+    permissions: {
+      "task:view": true,
+      "task:update": true,
+      "location:ping": true,
+      "location:view_own": true,
+      "notification:view": true,
+    },
   });
   const staffToken = staff.idToken;
   const staffMembershipId = staff.membershipId;
@@ -269,8 +277,6 @@ async function run() {
   const deliveryCreateRes = await callFunction("deliveriesCreate", {
     organizationId: orgId,
     billId,
-    customerName: "Ananya Deshmukh",
-    customerPhone: "+919876511223",
     address: {
       line1: "Flat 402, Sunshine Apartments",
       city: "Bengaluru",

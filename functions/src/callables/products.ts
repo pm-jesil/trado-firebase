@@ -8,32 +8,50 @@
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db } from "../services/firebase.js";
+import { uniqueKeyRef } from "../services/uniqueKeys.js";
 import {
   CreateProductSchema,
   UpdateProductSchema,
   ListProductsSchema,
+  PriceHistorySchema,
+  GetProductSchema,
 } from "../validation/schemas.js";
-import { ProductDoc, StockMovementDoc } from "../types/models.js";
+import { parseInput } from "../validation/parseInput.js";
+import { ProductDoc, StockMovementDoc, OutflowDoc, AuditLogDoc } from "../types/models.js";
 import { StockMovementType } from "../constants/enums.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
-import { createAuditLog } from "../services/audit.js";
-import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
+import { createAuditLog, diffChanges } from "../services/audit.js";
+import { fetchPage } from "../services/pagination.js";
+import { nameKey } from "../services/naturalKeys.js";
+import { resolveRequestContext } from "../services/contextResolver.js";
+import { redactProduct, canViewCost } from "../services/redaction.js";
+import { hydrate } from "../services/hydration.js";
+import { AppPermissions } from "../constants/permissions.js";
+
+const PRODUCT_MANAGE = [AppPermissions.PRODUCT_CREATE, AppPermissions.INVENTORY_MANAGE];
+const PRODUCT_EDIT = [AppPermissions.PRODUCT_UPDATE, AppPermissions.INVENTORY_MANAGE];
+/** Cashiers need catalog visibility to bill; costs are redacted for them. */
+const PRODUCT_READ = [AppPermissions.PRODUCT_VIEW, AppPermissions.INVENTORY_VIEW, AppPermissions.BILL_CREATE, AppPermissions.PURCHASE_CREATE];
+
+/** True when a product is visible to `branchId` under its visibility scope. */
+function isVisibleToBranch(p: ProductDoc, branchId: string): boolean {
+  const scope = p.visibilityScope || "all_branches";
+  if (scope === "all_branches") return true;
+  if (scope === "branch_only") return p.ownerBranchId === branchId;
+  return (p.sharedForBranchIds || []).includes(branchId) || p.ownerBranchId === branchId;
+}
 
 export const productsCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = CreateProductSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(CreateProductSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
-  const branchId = await resolveBranchContext(request.auth, orgId, input.branchId);
-
-  const callerUid = request.auth.uid;
+  const ctx = await resolveRequestContext(request, { requiredPermission: PRODUCT_MANAGE });
+  const orgId = ctx.organizationId;
+  const branchId = ctx.branchId;
+  const callerUid = ctx.callerUid;
 
   const idempotency = await reserveIdempotency({
     scope: orgId,
@@ -44,7 +62,7 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
     recoveryChecker: async () => {
       const existing = await db.collection("products")
         .where("organizationId", "==", orgId)
-        .where("nameKey", "==", input.name.trim().toLowerCase())
+        .where("nameKey", "==", nameKey(input.name))
         .limit(1)
         .get();
       if (!existing.empty) {
@@ -69,13 +87,13 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
     const initialStock = input.initialStock || 0;
     const cleanBarcode = input.barcode?.trim() || null;
     const barcodeLockRef = cleanBarcode
-      ? db.collection("barcodeLocks").doc(`${orgId}_${cleanBarcode.toLowerCase()}`)
+      ? uniqueKeyRef(orgId, "barcode", cleanBarcode.toLowerCase())
       : null;
 
     const productDoc: ProductDoc = {
       organizationId: orgId,
       name: input.name.trim(),
-      nameKey: input.name.trim().toLowerCase(),
+      nameKey: nameKey(input.name),
       description: input.description?.trim() || "",
       categoryId: input.categoryId || null,
       baseUnit: input.baseUnit.trim().toLowerCase(),
@@ -98,9 +116,34 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
       isPurchaseOnly: input.isPurchaseOnly || false,
       isExpenseOnly: input.isExpenseOnly || false,
       isSaleOnly: input.isSaleOnly || false,
+      ...pickDefined({
+        brand: input.brand,
+        alternateUnits: input.alternateUnits?.map((u) => ({ ...u, unit: u.unit.toLowerCase() })),
+        isTaxable: input.isTaxable !== false,
+        taxExemptionReason: input.taxExemptionReason,
+        isDiscountable: input.isDiscountable !== false,
+        maxDiscountPercent: input.maxDiscountPercent,
+        isReturnable: input.isReturnable,
+        returnWindowDays: input.returnWindowDays,
+        reorderLevel: input.reorderLevel,
+        maxStockLevel: input.maxStockLevel,
+        weight: input.weight,
+        dimensions: input.dimensions,
+        size: input.size,
+        imagePaths: input.imagePaths,
+        warrantyMonths: input.warrantyMonths,
+        jewellery: input.jewellery,
+        variantGroupId: input.variantGroupId,
+        variantAttributes: input.variantAttributes,
+        visibilityScope: input.visibilityScope,
+        sharedForBranchIds: input.sharedForBranchIds,
+      }),
+      ownerBranchId: branchId,
       isActive: true,
       createdAt: now,
       createdBy: callerUid,
+      updatedAt: now,
+      updatedBy: callerUid,
     };
 
     const response = {
@@ -128,12 +171,7 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
       txn.set(productRef, productDoc);
 
       if (barcodeLockRef) {
-        txn.set(barcodeLockRef, {
-          organizationId: orgId,
-          productId,
-          barcode: cleanBarcode,
-          createdAt: now,
-        });
+        txn.set(barcodeLockRef, { organizationId: orgId, kind: "barcode", entityType: "product", entityId: productId, createdAt: now });
       }
 
       if (input.trackStock && initialStock > 0) {
@@ -145,7 +183,7 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
           type: StockMovementType.ADJUSTMENT_IN,
           quantity: initialStock,
           balanceAfter: initialStock,
-          unit: input.baseUnit.trim().toLowerCase(),
+          unitCostSnapshot: input.costPrice,
           referenceId: productId,
           referenceModel: "manual_adjustment",
           reason: "Initial stock / opening balance",
@@ -200,13 +238,15 @@ export const productsUpdate = onCall({ region: "asia-south1" }, async (request) 
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = UpdateProductSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdateProductSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: PRODUCT_EDIT });
+  const orgId = ctx.organizationId;
+
+  // Field-level write control: cost fields need cost visibility
+  if (input.costPrice !== undefined && !canViewCost(ctx)) {
+    throw new HttpsError("permission-denied", "[FIELD_NOT_EDITABLE] costPrice requires product:view_cost.", { reason: "FIELD_NOT_EDITABLE", field: "costPrice" });
+  }
 
   const productRef = db.collection("products").doc(input.productId);
   const docSnap = await productRef.get();
@@ -225,7 +265,7 @@ export const productsUpdate = onCall({ region: "asia-south1" }, async (request) 
 
   if (input.name) {
     updates.name = input.name.trim();
-    updates.nameKey = input.name.trim().toLowerCase();
+    updates.nameKey = nameKey(input.name);
   }
   if (input.description !== undefined) updates.description = input.description.trim();
   if (input.categoryId !== undefined) updates.categoryId = input.categoryId;
@@ -242,9 +282,34 @@ export const productsUpdate = onCall({ region: "asia-south1" }, async (request) 
   if (input.trackStock !== undefined) updates.trackStock = input.trackStock;
   if (input.lowStockThreshold !== undefined) updates.lowStockThreshold = input.lowStockThreshold;
   if (input.isActive !== undefined) updates.isActive = input.isActive;
+  if (input.trackBatch !== undefined) updates.trackBatch = input.trackBatch;
+  if (input.trackSerial !== undefined) updates.trackSerial = input.trackSerial;
+  Object.assign(updates, pickDefined({
+    brand: input.brand,
+    alternateUnits: input.alternateUnits?.map((u) => ({ ...u, unit: u.unit.toLowerCase() })),
+    isTaxable: input.isTaxable,
+    taxExemptionReason: input.taxExemptionReason,
+    isDiscountable: input.isDiscountable,
+    maxDiscountPercent: input.maxDiscountPercent,
+    isReturnable: input.isReturnable,
+    returnWindowDays: input.returnWindowDays,
+    reorderLevel: input.reorderLevel,
+    maxStockLevel: input.maxStockLevel,
+    weight: input.weight,
+    dimensions: input.dimensions,
+    size: input.size,
+    imagePaths: input.imagePaths,
+    warrantyMonths: input.warrantyMonths,
+    jewellery: input.jewellery,
+    variantGroupId: input.variantGroupId,
+    variantAttributes: input.variantAttributes,
+    visibilityScope: input.visibilityScope,
+    sharedForBranchIds: input.sharedForBranchIds,
+  }));
 
   const now = new Date().toISOString();
   updates.updatedAt = now;
+  updates.updatedBy = ctx.callerUid;
 
   const oldBarcode = existing.barcode?.trim() || null;
   const newBarcode = input.barcode !== undefined ? (input.barcode?.trim() || null) : undefined;
@@ -253,16 +318,16 @@ export const productsUpdate = onCall({ region: "asia-south1" }, async (request) 
   if (barcodeChanged) {
     updates.barcode = newBarcode;
     const newLockRef = newBarcode
-      ? db.collection("barcodeLocks").doc(`${input.organizationId}_${newBarcode.toLowerCase()}`)
+      ? uniqueKeyRef(orgId, "barcode", newBarcode.toLowerCase())
       : null;
     const oldLockRef = oldBarcode
-      ? db.collection("barcodeLocks").doc(`${input.organizationId}_${oldBarcode.toLowerCase()}`)
+      ? uniqueKeyRef(orgId, "barcode", oldBarcode.toLowerCase())
       : null;
 
     await db.runTransaction(async (txn) => {
       if (newLockRef) {
         const lockSnap = await txn.get(newLockRef);
-        if (lockSnap.exists && lockSnap.data()?.productId !== input.productId) {
+        if (lockSnap.exists && lockSnap.data()?.entityId !== input.productId) {
           throw new HttpsError(
             "already-exists",
             `Product with barcode "${newBarcode}" already exists in this organization.`
@@ -276,12 +341,7 @@ export const productsUpdate = onCall({ region: "asia-south1" }, async (request) 
         txn.delete(oldLockRef);
       }
       if (newLockRef) {
-        txn.set(newLockRef, {
-          organizationId: orgId,
-          productId: input.productId,
-          barcode: newBarcode,
-          createdAt: now,
-        });
+        txn.set(newLockRef, { organizationId: orgId, kind: "barcode", entityType: "product", entityId: input.productId, createdAt: now });
       }
     });
   } else {
@@ -290,11 +350,13 @@ export const productsUpdate = onCall({ region: "asia-south1" }, async (request) 
 
   await createAuditLog({
     organizationId: orgId,
-    actorUid: request.auth.uid,
+    branchId: ctx.branchId,
+    actorUid: ctx.callerUid,
+    actorMembershipId: ctx.membershipId,
     action: "PRODUCT_UPDATED",
     entityType: "product",
     entityId: input.productId,
-    details: updates as Record<string, unknown>,
+    changes: diffChanges(existing as unknown as Record<string, unknown>, updates as Record<string, unknown>),
   });
 
   return { success: true, message: "Product updated successfully." };
@@ -305,17 +367,12 @@ export const productsList = onCall({ region: "asia-south1" }, async (request) =>
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = ListProductsSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(ListProductsSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: PRODUCT_READ, operation: "read" });
+  const orgId = ctx.organizationId;
 
-  let query = db.collection("products")
-    .where("organizationId", "==", orgId)
-    .limit(input.limit || 50);
+  let query: FirebaseFirestore.Query = db.collection("products").where("organizationId", "==", orgId);
 
   if (input.categoryId) {
     query = query.where("categoryId", "==", input.categoryId);
@@ -324,13 +381,12 @@ export const productsList = onCall({ region: "asia-south1" }, async (request) =>
     query = query.where("isActive", "==", input.isActive);
   }
 
-  const snapshot = await query.get();
-  const items = snapshot.docs.map((doc) => ({
-    productId: doc.id,
-    ...(doc.data() as ProductDoc),
-  }));
+  const { snapshot, nextCursor } = await fetchPage(query, "products", input.startAfterId, input.limit || 50);
+  const items = snapshot.docs
+    .filter((doc) => isVisibleToBranch(doc.data() as ProductDoc, ctx.branchId))
+    .map((doc) => redactProduct({ productId: doc.id, ...(doc.data() as ProductDoc) }, ctx));
 
-  return { items, count: items.length };
+  return { items, count: items.length, nextCursor };
 });
 
 export const productsGet = onCall({ region: "asia-south1" }, async (request) => {
@@ -338,12 +394,10 @@ export const productsGet = onCall({ region: "asia-south1" }, async (request) => 
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const productId = request.data?.productId;
-  if (!productId) {
-    throw new HttpsError("invalid-argument", "productId required.");
-  }
+  const { productId } = parseInput(GetProductSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, request.data?.organizationId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: PRODUCT_READ, operation: "read" });
+  const orgId = ctx.organizationId;
 
   const docSnap = await db.collection("products").doc(productId).get();
   if (!docSnap.exists) {
@@ -355,5 +409,100 @@ export const productsGet = onCall({ region: "asia-south1" }, async (request) => 
     throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
   }
 
-  return { productId: docSnap.id, ...data };
+  if (!isVisibleToBranch(data, ctx.branchId)) {
+    throw new HttpsError("permission-denied", "Product is not shared with caller's branch.");
+  }
+
+  return redactProduct({ productId: docSnap.id, ...data }, ctx);
+});
+
+/** Returns a copy of `obj` without undefined values (Firestore rejects undefined). */
+function pickDefined<T extends Record<string, unknown>>(obj: T): Partial<T> {
+  return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined)) as Partial<T>;
+}
+
+/**
+ * productsGetPriceHistory
+ * Purchase-cost trend is derived from purchase lines (never duplicated): per base unit,
+ * per vendor, with last / min / max / quantity-weighted average. Selling price, MRP,
+ * wholesale and cost edits come from the product's change history (auditLogs.changes).
+ */
+export const productsGetPriceHistory = onCall({ region: "asia-south1" }, async (request) => {
+  const input = parseInput(PriceHistorySchema, request.data);
+  const ctx = await resolveRequestContext(request, { requiredPermission: PRODUCT_READ, operation: "read" });
+  const productSnap = await db.collection("products").doc(input.productId).get();
+  if (!productSnap.exists || (productSnap.data() as ProductDoc).organizationId !== ctx.organizationId) {
+    throw new HttpsError("not-found", "Product not found.");
+  }
+  const showCost = canViewCost(ctx);
+  const limit = input.limit || 50;
+
+  const [purchasesSnap, changesSnap] = await Promise.all([
+    showCost
+      ? db.collection("outflows")
+        .where("organizationId", "==", ctx.organizationId)
+        .where("productIds", "array-contains", input.productId)
+        .get()
+      : Promise.resolve(null),
+    db.collection("auditLogs")
+      .where("organizationId", "==", ctx.organizationId)
+      .where("entityType", "==", "product")
+      .where("entityId", "==", input.productId)
+      .get(),
+  ]);
+
+  const purchases: Array<Record<string, unknown>> = [];
+  purchasesSnap?.docs.forEach((d) => {
+    const o = d.data() as OutflowDoc;
+    if (o.kind !== "purchase" || o.status !== "confirmed") return;
+    if (input.vendorId && o.vendorId !== input.vendorId) return;
+    for (const line of o.lines) {
+      if (line.productId !== input.productId) continue;
+      const factor = line.conversionFactor || 1;
+      purchases.push({
+        outflowId: d.id,
+        outflowNumber: o.outflowNumber,
+        at: o.docDate || o.createdAt,
+        vendorId: o.vendorId || null,
+        lineId: line.lineId,
+        unit: line.unit,
+        quantity: line.quantity,
+        unitPrice: line.unitPrice,
+        baseUnitCost: Math.round((line.unitPrice / factor) * 10000) / 10000,
+        baseQuantity: line.baseQuantity ?? line.quantity * factor,
+      });
+    }
+  });
+  purchases.sort((a, b) => String(b.at).localeCompare(String(a.at)));
+
+  const costs = purchases.map((p) => p.baseUnitCost as number);
+  const totalQty = purchases.reduce((t, p) => t + (p.baseQuantity as number), 0);
+  const weighted = purchases.reduce((t, p) => t + (p.baseUnitCost as number) * (p.baseQuantity as number), 0);
+  const purchaseStats = costs.length
+    ? {
+      last: costs[0],
+      min: Math.min(...costs),
+      max: Math.max(...costs),
+      average: Math.round((weighted / (totalQty || 1)) * 10000) / 10000,
+      count: costs.length,
+    }
+    : null;
+
+  const PRICE_FIELDS = new Set(["sellingPrice", "mrp", "wholesalePrice", ...(showCost ? ["costPrice"] : [])]);
+  const priceChanges = changesSnap.docs
+    .map((d) => d.data() as AuditLogDoc)
+    .flatMap((log) => (log.changes || [])
+      .filter((c) => PRICE_FIELDS.has(c.field))
+      .map((c) => ({ at: log.timestamp, actorUid: log.actorUid, field: c.field, from: c.from, to: c.to })))
+    .sort((a, b) => b.at.localeCompare(a.at))
+    .slice(0, limit);
+
+  return {
+    productId: input.productId,
+    purchaseCostVisible: showCost,
+    purchases: purchases.slice(0, limit),
+    purchaseStats,
+    priceChanges,
+    included: await hydrate(ctx, purchases.slice(0, limit)),
+  };
 });

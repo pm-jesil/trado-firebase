@@ -3,7 +3,7 @@
   "info": {
     "title": "Trado Firebase Backend — Local Emulator API",
     "version": "1.0.0",
-    "description": "Authoritative OpenAPI 3.0.3 contract for the Trado Firebase backend.\n\n**101 HTTPS Callable functions** across 28 domains.\n**4 Firestore Triggers** (internal event-driven background automation).\n\n⚠️ **LOCAL EMULATOR ONLY** — Targets loopback Firebase Emulator Suite (`127.0.0.1:5001`).\nDo NOT use this contract against production cloud endpoints.\n\nGenerated from canonical source exports and validation schemas (105 total exports).\nInput schemas derived from 90 Zod schemas via z.toJSONSchema()."
+    "description": "Authoritative OpenAPI 3.0.3 contract for the Trado Firebase backend.\n\n**115 HTTPS Callable functions** across 35 domains.\n**6 Firestore Triggers** (internal event-driven background automation).\n\n⚠️ **LOCAL EMULATOR ONLY** — Targets loopback Firebase Emulator Suite (`127.0.0.1:5001`).\nDo NOT use this contract against production cloud endpoints.\n\nGenerated from canonical source exports and validation schemas (121 total exports).\nInput schemas derived from 111 Zod schemas via z.toJSONSchema()."
   },
   "servers": [
     {
@@ -13,8 +13,20 @@
   ],
   "tags": [
     {
+      "name": "approvals",
+      "description": "Callable functions in the \"approvals\" domain"
+    },
+    {
+      "name": "audit",
+      "description": "Callable functions in the \"audit\" domain"
+    },
+    {
       "name": "Authentication & Session",
       "description": "Callable functions in the \"auth\" domain"
+    },
+    {
+      "name": "billing",
+      "description": "Callable functions in the \"billing\" domain"
     },
     {
       "name": "Sales & Billing",
@@ -23,6 +35,10 @@
     {
       "name": "Branches & Multi-Branch",
       "description": "Callable functions in the \"branches\" domain"
+    },
+    {
+      "name": "catalog",
+      "description": "Callable functions in the \"catalog\" domain"
     },
     {
       "name": "Catalogs & Reference Data",
@@ -77,6 +93,14 @@
       "description": "Callable functions in the \"plans\" domain"
     },
     {
+      "name": "platform",
+      "description": "Callable functions in the \"platform\" domain"
+    },
+    {
+      "name": "procurement",
+      "description": "Callable functions in the \"procurement\" domain"
+    },
+    {
       "name": "Products & Inventory",
       "description": "Callable functions in the \"products\" domain"
     },
@@ -95,6 +119,10 @@
     {
       "name": "Roles & Capabilities",
       "description": "Callable functions in the \"roles\" domain"
+    },
+    {
+      "name": "staff",
+      "description": "Callable functions in the \"staff\" domain"
     },
     {
       "name": "Stock Movements",
@@ -9041,6 +9069,1197 @@
           "Valid organization ID and branch context"
         ]
       }
+    },
+    "/api/callables/billsVoid": {
+      "post": {
+        "operationId": "billsVoid",
+        "summary": "[ACTION] Bills Void",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `bills.void`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `bill:void`\n\n**Idempotent:** Yes (supply `idempotencyKey` UUID)\n\n**Input schema:** `VoidDocumentSchema`\n\n**Reads:** bills, returns, payments, customers\n\n**Writes:** bills, products, stockBalances, stockMovements, customers, payments, auditLogs\n\n**Side effects:** Reverses stock, customer ledger and voids payments; drafts/pending are cancelled\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "billing"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/VoidDocumentSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "organizationId": "org_apex_sample",
+                  "documentId": "bill_sample_001",
+                  "reason": "Duplicate entry",
+                  "idempotencyKey": "bill-void-ex-001"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (EntityCreatedResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityCreatedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/outflowsVoid": {
+      "post": {
+        "operationId": "outflowsVoid",
+        "summary": "[ACTION] Outflows Void",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `outflows.void`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `purchase:void`, `expense:void`, `outflow:void`\n\n**Idempotent:** Yes (supply `idempotencyKey` UUID)\n\n**Input schema:** `VoidDocumentSchema`\n\n**Reads:** outflows, returns, payments, vendors\n\n**Writes:** outflows, products, stockBalances, stockMovements, vendors, payments, vendorInvoiceLocks, auditLogs\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "procurement"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/VoidDocumentSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "organizationId": "org_apex_sample",
+                  "documentId": "outflow_sample_001",
+                  "reason": "Entered twice",
+                  "idempotencyKey": "outflow-void-ex-001"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (EntityCreatedResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityCreatedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/teamsAssignMember": {
+      "post": {
+        "operationId": "teamsAssignMember",
+        "summary": "[UPDATE] Teams Assign Member",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `teams.assignMember`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `team:manage`, `employee:view`\n\n**Input schema:** `TeamMemberSchema`\n\n**Reads:** teams, memberships\n\n**Writes:** memberships, auditLogs\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "staff"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/TeamMemberSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "organizationId": "org_apex_sample",
+                  "teamId": "team_sample_001",
+                  "membershipId": "uid_staff_org_apex_sample",
+                  "action": "add"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (EntityCreatedResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityCreatedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/organizationsSetSubscription": {
+      "post": {
+        "operationId": "organizationsSetSubscription",
+        "summary": "[ACTION] Organizations Set Subscription",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `organizations.setSubscription`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `platform:subscriptions:manage`\n\n**Required claims:** `isSuperAdmin=true`\n\n**Input schema:** `SetSubscriptionSchema`\n\n**Reads:** organizations, subscriptionPlans\n\n**Writes:** organizations, auditLogs\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "platform"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/SetSubscriptionSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "organizationId": "org_apex_sample",
+                  "action": "renew",
+                  "durationDays": 365,
+                  "reason": "Annual renewal"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (EntityCreatedResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityCreatedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/productsGetPriceHistory": {
+      "post": {
+        "operationId": "productsGetPriceHistory",
+        "summary": "[READ] Products Get Price History",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `products.getPriceHistory`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `product:view`, `inventory:view`, `bill:create`, `purchase:create`\n\n**Input schema:** `PriceHistorySchema`\n\n**Reads:** products, outflows, auditLogs\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "catalog"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/PriceHistorySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "organizationId": "org_apex_sample",
+                  "productId": "prod_bread_sample",
+                  "limit": 20
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (EntityGetResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityGetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "READ",
+        "x-trado-persona": "Retail Owner / Cashier / Staff",
+        "x-trado-repeatable": true,
+        "x-trado-prerequisites": [
+          "None — safe to execute repeatedly"
+        ]
+      }
+    },
+    "/api/callables/auditGetEntityHistory": {
+      "post": {
+        "operationId": "auditGetEntityHistory",
+        "summary": "[READ] Audit Get Entity History",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `audit.getEntityHistory`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `audit:view`\n\n**Input schema:** `EntityHistorySchema`\n\n**Reads:** auditLogs, users\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "audit"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/EntityHistorySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "organizationId": "org_apex_sample",
+                  "entityType": "product",
+                  "entityId": "prod_bread_sample"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (EntityGetResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityGetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "READ",
+        "x-trado-persona": "Retail Owner / Cashier / Staff",
+        "x-trado-repeatable": true,
+        "x-trado-prerequisites": [
+          "None — safe to execute repeatedly"
+        ]
+      }
+    },
+    "/api/callables/reportsGetPartyStatement": {
+      "post": {
+        "operationId": "reportsGetPartyStatement",
+        "summary": "[READ] Reports Get Party Statement",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `reports.getPartyStatement`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `vendor:view_balance`, `customer:view_balance`, `payment:view`\n\n**Input schema:** `PartyStatementSchema`\n\n**Reads:** vendors, customers, outflows, bills, payments, returns\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Reports & Analytics"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/PartyStatementSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "organizationId": "org_apex_sample",
+                  "partyType": "vendor",
+                  "partyId": "vendor_sample_001",
+                  "from": "2026-11-01",
+                  "to": "2026-11-30"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (StandardItemsListResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardItemsListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "READ",
+        "x-trado-persona": "Retail Owner / Cashier / Staff",
+        "x-trado-repeatable": true,
+        "x-trado-prerequisites": [
+          "None — safe to execute repeatedly"
+        ]
+      }
+    },
+    "/api/callables/reportsGetOutflowSummary": {
+      "post": {
+        "operationId": "reportsGetOutflowSummary",
+        "summary": "[READ] Reports Get Outflow Summary",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `reports.getOutflowSummary`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `report:view`, `outflow:view`\n\n**Input schema:** `OutflowSummarySchema`\n\n**Reads:** outflows, payments\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Reports & Analytics"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/OutflowSummarySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {
+                  "organizationId": "org_apex_sample",
+                  "from": "2026-11-01",
+                  "to": "2026-11-30",
+                  "groupBy": "category"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (StandardItemsListResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardItemsListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "READ",
+        "x-trado-persona": "Retail Owner / Cashier / Staff",
+        "x-trado-repeatable": true,
+        "x-trado-prerequisites": [
+          "None — safe to execute repeatedly"
+        ]
+      }
+    },
+    "/api/callables/billsUpdateDraft": {
+      "post": {
+        "operationId": "billsUpdateDraft",
+        "summary": "[UPDATE] Bills Update Draft",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `bills.updateDraft`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `bill:create`\n\n**Input schema:** `UpdateDraftBillSchema`\n\n**Reads:** bills, products, customers\n\n**Writes:** bills, auditLogs\n\n**Side effects:** Updates draft bill lines, customer, and notes before finalization\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "billing"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/UpdateDraftBillSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (StandardSuccessResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardSuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/documentsDecide": {
+      "post": {
+        "operationId": "documentsDecide",
+        "summary": "[ACTION] Documents Decide",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `approvals.decide`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `bill:approve`, `purchase:approve`, `expense:approve`, `outflow:approve`, `return:approve`, `stock:adjust`\n\n**Input schema:** `DocumentDecisionSchema`\n\n**Reads:** bills, outflows, returns, stockAdjustmentRequests, stockTransfers, products, stockBalances, customers, vendors\n\n**Writes:** bills, outflows, returns, stockAdjustmentRequests, stockTransfers, products, stockBalances, stockMovements, customers, vendors, payments, documentCounters, auditLogs\n\n**Side effects:** Decides pending documents across bills, outflows, returns, stock adjustments, and transfers\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "approvals"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/DocumentDecisionSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (EntityCreatedResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityCreatedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/paymentsVoid": {
+      "post": {
+        "operationId": "paymentsVoid",
+        "summary": "[ACTION] Payments Void",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `payments.void`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `payment:void`\n\n**Input schema:** `VoidPaymentSchema`\n\n**Reads:** payments, bills, outflows, customers, vendors\n\n**Writes:** payments, bills, outflows, customers, vendors, auditLogs\n\n**Side effects:** Voids payment, restores linked bill or outflow unsettled balance, resets paymentStatus, and reverts customer receivable or vendor payable\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Payments & Ledger"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/VoidPaymentSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (EntityCreatedResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityCreatedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/recurringExpensesCreate": {
+      "post": {
+        "operationId": "recurringExpensesCreate",
+        "summary": "[CREATE] Recurring Expenses Create",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `recurringExpenses.create`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `expense:create`, `outflow:create`\n\n**Input schema:** `RecurringExpenseCreateSchema`\n\n**Reads:** recurringExpenses, categories, vendors\n\n**Writes:** recurringExpenses, auditLogs\n\n**Side effects:** Creates recurring expense template for automated sweep scheduled generation\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "procurement"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FirebaseCallableRequest"
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (EntityCreatedResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityCreatedResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/recurringExpensesUpdate": {
+      "post": {
+        "operationId": "recurringExpensesUpdate",
+        "summary": "[UPDATE] Recurring Expenses Update",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `recurringExpenses.update`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `expense:edit`, `outflow:edit`\n\n**Input schema:** `RecurringExpenseUpdateSchema`\n\n**Reads:** recurringExpenses\n\n**Writes:** recurringExpenses, auditLogs\n\n**Side effects:** Updates recurring expense schedule, interval, active status, or lines\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "procurement"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FirebaseCallableRequest"
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (StandardSuccessResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardSuccessResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/recurringExpensesList": {
+      "post": {
+        "operationId": "recurringExpensesList",
+        "summary": "[READ] Recurring Expenses List",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `recurringExpenses.list`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `expense:view`, `outflow:view`\n\n**Input schema:** `PaginationQuerySchema`\n\n**Reads:** recurringExpenses\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "procurement"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FirebaseCallableRequest"
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (StandardItemsListResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardItemsListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "READ",
+        "x-trado-persona": "Retail Owner / Cashier / Staff",
+        "x-trado-repeatable": true,
+        "x-trado-prerequisites": [
+          "None — safe to execute repeatedly"
+        ]
+      }
     }
   },
   "components": {
@@ -9053,6 +10272,180 @@
       }
     },
     "schemas": {
+      "ContextOnlySchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetBillSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "billId": {
+            "type": "string",
+            "minLength": 2
+          }
+        },
+        "required": [
+          "billId"
+        ],
+        "additionalProperties": false
+      },
+      "GetProductSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string",
+            "minLength": 2
+          }
+        },
+        "required": [
+          "productId"
+        ],
+        "additionalProperties": false
+      },
+      "GetCustomerSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "customerId": {
+            "type": "string",
+            "minLength": 2
+          }
+        },
+        "required": [
+          "customerId"
+        ],
+        "additionalProperties": false
+      },
+      "GetVendorSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "vendorId": {
+            "type": "string",
+            "minLength": 2
+          }
+        },
+        "required": [
+          "vendorId"
+        ],
+        "additionalProperties": false
+      },
+      "GetOutflowSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "outflowId": {
+            "type": "string",
+            "minLength": 2
+          }
+        },
+        "required": [
+          "outflowId"
+        ],
+        "additionalProperties": false
+      },
+      "GetDeliverySchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "deliveryId": {
+            "type": "string",
+            "minLength": 2
+          }
+        },
+        "required": [
+          "deliveryId"
+        ],
+        "additionalProperties": false
+      },
+      "ListPlansSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "includeInactive": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecordClientMetricSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "metrics": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "metrics"
+        ],
+        "additionalProperties": false
+      },
       "AuthLoginSchema": {
         "type": "object",
         "properties": {
@@ -9089,9 +10482,111 @@
         },
         "additionalProperties": false
       },
+      "OrganizationContactSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 64
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "designation": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "primary",
+              "billing",
+              "technical",
+              "operations",
+              "other"
+            ]
+          },
+          "isPrimary": {
+            "default": false,
+            "type": "boolean"
+          },
+          "notifyBy": {
+            "type": "string",
+            "enum": [
+              "email",
+              "sms",
+              "both",
+              "none"
+            ]
+          },
+          "isActive": {
+            "default": true,
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "isPrimary",
+          "isActive"
+        ],
+        "additionalProperties": false
+      },
       "CreateOrganizationSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -9112,7 +10607,9 @@
               "restaurant",
               "cafe_bakery",
               "service",
-              "general_trading"
+              "general_trading",
+              "manufacturer_b2b",
+              "pos_counter"
             ]
           },
           "businessCategory": {
@@ -9131,6 +10628,11 @@
               "stationery_books",
               "food_beverage",
               "agri_products",
+              "jewellery",
+              "kitchenware_household",
+              "gifts_toys",
+              "restaurant_food_service",
+              "services_repair",
               "general"
             ]
           },
@@ -9182,6 +10684,158 @@
             "minLength": 2,
             "maxLength": 20,
             "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "salesChannels": {
+            "minItems": 1,
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "pos",
+                "b2b",
+                "order_taking",
+                "online"
+              ]
+            }
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 64
+          },
+          "contacts": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 64
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 100
+                },
+                "designation": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "phone": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 30
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "email": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "email",
+                      "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "primary",
+                    "billing",
+                    "technical",
+                    "operations",
+                    "other"
+                  ]
+                },
+                "isPrimary": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "notifyBy": {
+                  "type": "string",
+                  "enum": [
+                    "email",
+                    "sms",
+                    "both",
+                    "none"
+                  ]
+                },
+                "isActive": {
+                  "default": true,
+                  "type": "boolean"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                },
+                "createdBy": {
+                  "type": "string"
+                },
+                "updatedBy": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "isPrimary",
+                "isActive"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "subscription": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "trial",
+                  "active",
+                  "grace",
+                  "expired",
+                  "suspended",
+                  "cancelled"
+                ]
+              },
+              "startsAt": {
+                "type": "string"
+              },
+              "expiresOn": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "durationDays": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3660
+              },
+              "graceDays": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 90
+              }
+            },
+            "additionalProperties": false
           }
         },
         "required": [
@@ -9200,6 +10854,9 @@
       "UpdateOrganizationSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -9219,7 +10876,9 @@
               "restaurant",
               "cafe_bakery",
               "service",
-              "general_trading"
+              "general_trading",
+              "manufacturer_b2b",
+              "pos_counter"
             ]
           },
           "businessCategory": {
@@ -9238,6 +10897,11 @@
               "stationery_books",
               "food_beverage",
               "agri_products",
+              "jewellery",
+              "kitchenware_household",
+              "gifts_toys",
+              "restaurant_food_service",
+              "services_repair",
               "general"
             ]
           },
@@ -9250,9 +10914,339 @@
               "type": "boolean"
             }
           },
+          "salesChannels": {
+            "minItems": 1,
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "pos",
+                "b2b",
+                "order_taking",
+                "online"
+              ]
+            }
+          },
+          "timezone": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 64
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
           "logoUrl": {
             "type": "string",
             "format": "uri"
+          },
+          "imageUrls": {
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "taxNumber": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "contactEmail": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email",
+                "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "contactPhone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "contacts": {
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 64
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 100
+                },
+                "designation": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "phone": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 30
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "email": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "email",
+                      "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "primary",
+                    "billing",
+                    "technical",
+                    "operations",
+                    "other"
+                  ]
+                },
+                "isPrimary": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "notifyBy": {
+                  "type": "string",
+                  "enum": [
+                    "email",
+                    "sms",
+                    "both",
+                    "none"
+                  ]
+                },
+                "isActive": {
+                  "default": true,
+                  "type": "boolean"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                },
+                "createdBy": {
+                  "type": "string"
+                },
+                "updatedBy": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "isPrimary",
+                "isActive"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "line1": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "line2": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "city": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "state": {
+                "type": "string",
+                "maxLength": 100
+              },
+              "pincode": {
+                "type": "string",
+                "maxLength": 20
+              },
+              "country": {
+                "type": "string",
+                "maxLength": 2
+              }
+            },
+            "additionalProperties": false
+          },
+          "bankDetails": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "accountName": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "bankName": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "accountNumber": {
+                    "type": "string",
+                    "pattern": "^[0-9]{6,20}$"
+                  },
+                  "ifsc": {
+                    "type": "string",
+                    "maxLength": 15
+                  },
+                  "upiId": {
+                    "type": "string",
+                    "maxLength": 60
+                  }
+                },
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "settings": {
+            "type": "object",
+            "properties": {
+              "approvals": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "modules": {
+                    "type": "object",
+                    "properties": {
+                      "sale": {
+                        "type": "boolean"
+                      },
+                      "purchase": {
+                        "type": "boolean"
+                      },
+                      "expense": {
+                        "type": "boolean"
+                      },
+                      "return": {
+                        "type": "boolean"
+                      },
+                      "stock_adjustment": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "amountThreshold": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "enabled"
+                ],
+                "additionalProperties": false
+              },
+              "businessConfig": {
+                "type": "object",
+                "properties": {
+                  "defaultUnits": {
+                    "maxItems": 20,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 20
+                    }
+                  },
+                  "productFields": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string",
+                      "enum": [
+                        "expiry",
+                        "batch",
+                        "serial",
+                        "variants",
+                        "alternateUnits",
+                        "jewellery"
+                      ]
+                    },
+                    "additionalProperties": {
+                      "type": "boolean"
+                    },
+                    "required": [
+                      "expiry",
+                      "batch",
+                      "serial",
+                      "variants",
+                      "alternateUnits",
+                      "jewellery"
+                    ]
+                  },
+                  "salesMode": {
+                    "type": "string",
+                    "enum": [
+                      "pos",
+                      "b2b",
+                      "both"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
           }
         },
         "required": [
@@ -9260,9 +11254,85 @@
         ],
         "additionalProperties": false
       },
+      "SetSubscriptionSchema": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string"
+          },
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "set",
+              "renew",
+              "extend",
+              "suspend",
+              "reactivate",
+              "cancel",
+              "change_plan"
+            ]
+          },
+          "planId": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 64
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "trial",
+              "active",
+              "grace",
+              "expired",
+              "suspended",
+              "cancelled"
+            ]
+          },
+          "expiresOn": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "durationDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3660
+          },
+          "extendDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3660
+          },
+          "graceDays": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 90
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "organizationId",
+          "action"
+        ],
+        "additionalProperties": false
+      },
       "DeactivateOrganizationSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -9280,6 +11350,13 @@
       "ListOrganizationsSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "limit": {
             "default": 20,
             "type": "integer",
@@ -9303,6 +11380,9 @@
       "CreateEmployeeSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -9340,6 +11420,7 @@
           },
           "jobRoleIds": {
             "default": [],
+            "maxItems": 20,
             "type": "array",
             "items": {
               "type": "string"
@@ -9350,6 +11431,7 @@
           },
           "reportingToIds": {
             "default": [],
+            "maxItems": 10,
             "type": "array",
             "items": {
               "type": "string"
@@ -9366,6 +11448,7 @@
             }
           },
           "branchIds": {
+            "maxItems": 100,
             "type": "array",
             "items": {
               "type": "string"
@@ -9385,6 +11468,9 @@
       "UpdateEmployeeSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -9411,6 +11497,7 @@
             ]
           },
           "jobRoleIds": {
+            "maxItems": 20,
             "type": "array",
             "items": {
               "type": "string"
@@ -9423,6 +11510,7 @@
             ]
           },
           "reportingToIds": {
+            "maxItems": 10,
             "type": "array",
             "items": {
               "type": "string"
@@ -9444,6 +11532,41 @@
               "inactive",
               "suspended"
             ]
+          },
+          "dataScopes": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "enum": [
+                "sales",
+                "purchases",
+                "expenses",
+                "deliveries",
+                "returns",
+                "payments",
+                "stock",
+                "tasks"
+              ]
+            },
+            "additionalProperties": {
+              "type": "string",
+              "enum": [
+                "self",
+                "team",
+                "branch",
+                "organization"
+              ]
+            },
+            "required": [
+              "sales",
+              "purchases",
+              "expenses",
+              "deliveries",
+              "returns",
+              "payments",
+              "stock",
+              "tasks"
+            ]
           }
         },
         "required": [
@@ -9455,6 +11578,9 @@
       "DeactivateEmployeeSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -9477,6 +11603,9 @@
       "ListEmployeesSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -9507,6 +11636,9 @@
       "CreateRoleSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -9530,6 +11662,7 @@
           },
           "permissions": {
             "minItems": 1,
+            "maxItems": 300,
             "type": "array",
             "items": {
               "type": "string"
@@ -9551,6 +11684,13 @@
       "UpdateRoleSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "roleId": {
             "type": "string",
             "minLength": 2
@@ -9561,6 +11701,7 @@
             "maxLength": 100
           },
           "permissions": {
+            "maxItems": 300,
             "type": "array",
             "items": {
               "type": "string"
@@ -9579,6 +11720,9 @@
       "CreateDepartmentSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -9596,6 +11740,7 @@
             "maxLength": 100
           },
           "headMembershipIds": {
+            "maxItems": 20,
             "type": "array",
             "items": {
               "type": "string"
@@ -9610,6 +11755,13 @@
       "UpdateDepartmentSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "departmentId": {
             "type": "string",
             "minLength": 2
@@ -9620,6 +11772,7 @@
             "maxLength": 100
           },
           "headMembershipIds": {
+            "maxItems": 20,
             "type": "array",
             "items": {
               "type": "string"
@@ -9634,6 +11787,9 @@
       "CreateJobRoleSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -9659,6 +11815,13 @@
       "UpdateJobRoleSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "jobRoleId": {
             "type": "string",
             "minLength": 2
@@ -9677,6 +11840,9 @@
       "CreateTeamSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -9690,6 +11856,14 @@
             "type": "string",
             "minLength": 2,
             "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "leaderMembershipId": {
+            "type": "string",
+            "minLength": 2
           }
         },
         "required": [
@@ -9701,6 +11875,13 @@
       "UpdateTeamSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
           "teamId": {
             "type": "string",
             "minLength": 2
@@ -9709,6 +11890,24 @@
             "type": "string",
             "minLength": 2,
             "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "leaderMembershipId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 2
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -9716,9 +11915,49 @@
         ],
         "additionalProperties": false
       },
+      "TeamMemberSchema": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string"
+          },
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "teamId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "membershipId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "add",
+              "remove"
+            ]
+          }
+        },
+        "required": [
+          "teamId",
+          "membershipId",
+          "action"
+        ],
+        "additionalProperties": false
+      },
       "CreatePlanSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -9800,6 +12039,13 @@
       "UpdatePlanSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "planId": {
             "type": "string",
             "minLength": 2
@@ -9839,6 +12085,13 @@
       "RegisterFcmTokenSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "deviceId": {
             "type": "string",
             "minLength": 4,
@@ -9862,6 +12115,43 @@
           "deviceId",
           "fcmToken",
           "platform"
+        ],
+        "additionalProperties": false
+      },
+      "ProductAlternateUnitSchema": {
+        "type": "object",
+        "properties": {
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30
+          },
+          "factor": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "sellingPrice": {
+            "type": "number",
+            "minimum": 0
+          },
+          "wholesalePrice": {
+            "type": "number",
+            "minimum": 0
+          },
+          "barcode": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "isPurchaseUnit": {
+            "type": "boolean"
+          },
+          "isSaleUnit": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "unit",
+          "factor"
         ],
         "additionalProperties": false
       },
@@ -10003,6 +12293,220 @@
           },
           "isSaleOnly": {
             "type": "boolean"
+          },
+          "brand": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "alternateUnits": {
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 30
+                },
+                "factor": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "sellingPrice": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "wholesalePrice": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "barcode": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "isPurchaseUnit": {
+                  "type": "boolean"
+                },
+                "isSaleUnit": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "unit",
+                "factor"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "isTaxable": {
+            "default": true,
+            "type": "boolean"
+          },
+          "taxExemptionReason": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "isDiscountable": {
+            "default": true,
+            "type": "boolean"
+          },
+          "maxDiscountPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "isReturnable": {
+            "type": "boolean"
+          },
+          "returnWindowDays": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3650
+          },
+          "reorderLevel": {
+            "type": "number",
+            "minimum": 0
+          },
+          "maxStockLevel": {
+            "type": "number",
+            "minimum": 0
+          },
+          "weight": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 10
+              }
+            },
+            "required": [
+              "value",
+              "unit"
+            ],
+            "additionalProperties": false
+          },
+          "dimensions": {
+            "type": "object",
+            "properties": {
+              "length": {
+                "type": "number",
+                "minimum": 0
+              },
+              "width": {
+                "type": "number",
+                "minimum": 0
+              },
+              "height": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 10
+              }
+            },
+            "required": [
+              "unit"
+            ],
+            "additionalProperties": false
+          },
+          "size": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "imagePaths": {
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "warrantyMonths": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 240
+          },
+          "jewellery": {
+            "type": "object",
+            "properties": {
+              "grossWeightGrams": {
+                "type": "number",
+                "minimum": 0
+              },
+              "netWeightGrams": {
+                "type": "number",
+                "minimum": 0
+              },
+              "purity": {
+                "type": "string",
+                "maxLength": 20
+              },
+              "makingCharge": {
+                "type": "number",
+                "minimum": 0
+              },
+              "makingChargeType": {
+                "type": "string",
+                "enum": [
+                  "per_gram",
+                  "flat",
+                  "percent"
+                ]
+              },
+              "hallmarkId": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "priceByDailyRate": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "variantGroupId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "variantAttributes": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "maxLength": 30
+            },
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 60
+            }
+          },
+          "visibilityScope": {
+            "type": "string",
+            "enum": [
+              "all_branches",
+              "selected_branches",
+              "branch_only"
+            ]
+          },
+          "sharedForBranchIds": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -10024,6 +12528,9 @@
           "organizationId": {
             "type": "string",
             "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
           },
           "productId": {
             "type": "string",
@@ -10123,8 +12630,228 @@
             "type": "number",
             "minimum": 0
           },
+          "trackBatch": {
+            "type": "boolean"
+          },
+          "trackSerial": {
+            "type": "boolean"
+          },
           "isActive": {
             "type": "boolean"
+          },
+          "brand": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "alternateUnits": {
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "unit": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 30
+                },
+                "factor": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "sellingPrice": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "wholesalePrice": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "barcode": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "isPurchaseUnit": {
+                  "type": "boolean"
+                },
+                "isSaleUnit": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "unit",
+                "factor"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "isTaxable": {
+            "default": true,
+            "type": "boolean"
+          },
+          "taxExemptionReason": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "isDiscountable": {
+            "default": true,
+            "type": "boolean"
+          },
+          "maxDiscountPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "isReturnable": {
+            "type": "boolean"
+          },
+          "returnWindowDays": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3650
+          },
+          "reorderLevel": {
+            "type": "number",
+            "minimum": 0
+          },
+          "maxStockLevel": {
+            "type": "number",
+            "minimum": 0
+          },
+          "weight": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 10
+              }
+            },
+            "required": [
+              "value",
+              "unit"
+            ],
+            "additionalProperties": false
+          },
+          "dimensions": {
+            "type": "object",
+            "properties": {
+              "length": {
+                "type": "number",
+                "minimum": 0
+              },
+              "width": {
+                "type": "number",
+                "minimum": 0
+              },
+              "height": {
+                "type": "number",
+                "minimum": 0
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 10
+              }
+            },
+            "required": [
+              "unit"
+            ],
+            "additionalProperties": false
+          },
+          "size": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "imagePaths": {
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            }
+          },
+          "warrantyMonths": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 240
+          },
+          "jewellery": {
+            "type": "object",
+            "properties": {
+              "grossWeightGrams": {
+                "type": "number",
+                "minimum": 0
+              },
+              "netWeightGrams": {
+                "type": "number",
+                "minimum": 0
+              },
+              "purity": {
+                "type": "string",
+                "maxLength": 20
+              },
+              "makingCharge": {
+                "type": "number",
+                "minimum": 0
+              },
+              "makingChargeType": {
+                "type": "string",
+                "enum": [
+                  "per_gram",
+                  "flat",
+                  "percent"
+                ]
+              },
+              "hallmarkId": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "priceByDailyRate": {
+                "type": "boolean"
+              }
+            },
+            "additionalProperties": false
+          },
+          "variantGroupId": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 128
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "variantAttributes": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "maxLength": 30
+            },
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 60
+            }
+          },
+          "visibilityScope": {
+            "type": "string",
+            "enum": [
+              "all_branches",
+              "selected_branches",
+              "branch_only"
+            ]
+          },
+          "sharedForBranchIds": {
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -10135,6 +12862,9 @@
       "ListProductsSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -10160,6 +12890,9 @@
       "CreateCategorySchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -10194,6 +12927,13 @@
       "UpdateCategorySchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "categoryId": {
             "type": "string",
             "minLength": 2
@@ -10224,6 +12964,9 @@
       "ListCategoriesSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string"
           },
@@ -10237,6 +12980,9 @@
       "CreateUnitSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -10298,6 +13044,13 @@
       "UpdateUnitSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "unitId": {
             "type": "string",
             "minLength": 2
@@ -10324,6 +13077,9 @@
       "ListUnitsSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string"
           },
@@ -10337,6 +13093,11 @@
       "CreateCustomerSchema": {
         "type": "object",
         "properties": {
+          "duplicateOverrideReason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 300
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -10356,6 +13117,25 @@
           },
           "mobile": {
             "type": "string"
+          },
+          "additionalPhones": {
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 30
+            }
+          },
+          "whatsApp": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "email": {
             "type": "string",
@@ -10399,6 +13179,7 @@
             ]
           },
           "sharedForBranchIds": {
+            "maxItems": 100,
             "type": "array",
             "items": {
               "type": "string"
@@ -10419,6 +13200,14 @@
       "UpdateCustomerSchema": {
         "type": "object",
         "properties": {
+          "duplicateOverrideReason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 300
+          },
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -10434,6 +13223,25 @@
           },
           "mobile": {
             "type": "string"
+          },
+          "additionalPhones": {
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 30
+            }
+          },
+          "whatsApp": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "email": {
             "type": "string",
@@ -10473,6 +13281,7 @@
             ]
           },
           "sharedForBranchIds": {
+            "maxItems": 100,
             "type": "array",
             "items": {
               "type": "string"
@@ -10497,9 +13306,6 @@
           "branchId": {
             "type": "string"
           },
-          "search": {
-            "type": "string"
-          },
           "limit": {
             "default": 50,
             "type": "integer",
@@ -10515,6 +13321,11 @@
       "CreateVendorSchema": {
         "type": "object",
         "properties": {
+          "duplicateOverrideReason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 300
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -10534,6 +13345,25 @@
           },
           "mobile": {
             "type": "string"
+          },
+          "additionalPhones": {
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 30
+            }
+          },
+          "whatsApp": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "email": {
             "type": "string",
@@ -10573,6 +13403,7 @@
             ]
           },
           "sharedForBranchIds": {
+            "maxItems": 100,
             "type": "array",
             "items": {
               "type": "string"
@@ -10591,6 +13422,14 @@
       "UpdateVendorSchema": {
         "type": "object",
         "properties": {
+          "duplicateOverrideReason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 300
+          },
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -10606,6 +13445,25 @@
           },
           "mobile": {
             "type": "string"
+          },
+          "additionalPhones": {
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 30
+            }
+          },
+          "whatsApp": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "email": {
             "type": "string",
@@ -10642,6 +13500,7 @@
             ]
           },
           "sharedForBranchIds": {
+            "maxItems": 100,
             "type": "array",
             "items": {
               "type": "string"
@@ -10664,9 +13523,6 @@
             "minLength": 2
           },
           "branchId": {
-            "type": "string"
-          },
-          "search": {
             "type": "string"
           },
           "limit": {
@@ -10694,9 +13550,6 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 150
-          },
-          "sku": {
-            "type": "string"
           },
           "categoryId": {
             "type": [
@@ -10738,10 +13591,26 @@
           },
           "expiryDate": {
             "type": "string"
+          },
+          "damagedQuantity": {
+            "type": "number",
+            "minimum": 0
+          },
+          "damageReason": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "serialNumbers": {
+            "maxItems": 500,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
           }
         },
         "required": [
-          "itemName",
           "quantity",
           "unit",
           "unitPrice"
@@ -10779,11 +13648,14 @@
               "null"
             ]
           },
-          "vendorName": {
-            "type": "string"
-          },
           "payee": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "recurringTemplateId": {
+            "type": "string",
+            "minLength": 2
           },
           "invoiceNumber": {
             "type": "string"
@@ -10793,6 +13665,7 @@
           },
           "lines": {
             "minItems": 1,
+            "maxItems": 200,
             "type": "array",
             "items": {
               "type": "object",
@@ -10807,9 +13680,6 @@
                   "type": "string",
                   "minLength": 1,
                   "maxLength": 150
-                },
-                "sku": {
-                  "type": "string"
                 },
                 "categoryId": {
                   "type": [
@@ -10851,10 +13721,26 @@
                 },
                 "expiryDate": {
                   "type": "string"
+                },
+                "damagedQuantity": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "damageReason": {
+                  "type": "string",
+                  "maxLength": 300
+                },
+                "serialNumbers": {
+                  "maxItems": 500,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  }
                 }
               },
               "required": [
-                "itemName",
                 "quantity",
                 "unit",
                 "unitPrice"
@@ -10881,6 +13767,38 @@
           "notes": {
             "type": "string",
             "maxLength": 1000
+          },
+          "payeeType": {
+            "type": "string",
+            "enum": [
+              "vendor",
+              "employee",
+              "other"
+            ]
+          },
+          "payeeMembershipId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "expenseCategoryId": {
+            "type": "string"
+          },
+          "billDiscountAmount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "billDiscountPercent": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "attachmentPaths": {
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 500
+            }
           }
         },
         "required": [
@@ -10907,6 +13825,12 @@
             ]
           },
           "vendorId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "payeeMembershipId": {
             "type": "string"
           },
           "limit": {
@@ -10943,6 +13867,15 @@
           },
           "unit": {
             "type": "string"
+          },
+          "serialNumbers": {
+            "maxItems": 500,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
           }
         },
         "required": [
@@ -11001,27 +13934,25 @@
               "null"
             ]
           },
-          "customerSnapshot": {
+          "walkInCustomer": {
             "type": "object",
             "properties": {
               "name": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "maxLength": 200
               },
               "mobile": {
-                "type": "string"
-              },
-              "email": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 20
               },
               "taxNumber": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 30
               },
               "billingAddress": {
-                "type": "string"
-              },
-              "shippingAddress": {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500
               }
             },
             "required": [
@@ -11031,6 +13962,7 @@
           },
           "items": {
             "minItems": 1,
+            "maxItems": 200,
             "type": "array",
             "items": {
               "type": "object",
@@ -11054,6 +13986,15 @@
                 },
                 "unit": {
                   "type": "string"
+                },
+                "serialNumbers": {
+                  "maxItems": 500,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  }
                 }
               },
               "required": [
@@ -11096,9 +14037,116 @@
         ],
         "additionalProperties": false
       },
+      "UpdateDraftBillSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "billId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "customerId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "walkInCustomer": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "mobile": {
+                "type": "string",
+                "maxLength": 20
+              },
+              "taxNumber": {
+                "type": "string",
+                "maxLength": 30
+              },
+              "billingAddress": {
+                "type": "string",
+                "maxLength": 500
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "additionalProperties": false
+          },
+          "items": {
+            "minItems": 1,
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "productId": {
+                  "type": "string",
+                  "minLength": 2
+                },
+                "quantity": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unitPriceOverride": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "discountValue": {
+                  "default": 0,
+                  "type": "number",
+                  "minimum": 0
+                },
+                "unit": {
+                  "type": "string"
+                },
+                "serialNumbers": {
+                  "maxItems": 500,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  }
+                }
+              },
+              "required": [
+                "productId",
+                "quantity"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "discountTotal": {
+            "type": "number",
+            "minimum": 0
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "billId"
+        ],
+        "additionalProperties": false
+      },
       "FinalizeBillSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -11139,6 +14187,12 @@
           "customerId": {
             "type": "string"
           },
+          "status": {
+            "type": "string"
+          },
+          "createdBy": {
+            "type": "string"
+          },
           "limit": {
             "default": 50,
             "type": "integer",
@@ -11170,21 +14224,49 @@
             "type": "string",
             "minLength": 2
           },
-          "customerId": {
-            "type": [
-              "string",
-              "null"
-            ]
+          "lines": {
+            "minItems": 1,
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "lineId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10
+                },
+                "quantity": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              },
+              "required": [
+                "lineId",
+                "quantity"
+              ],
+              "additionalProperties": false
+            }
           },
-          "customerName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 100
-          },
-          "customerPhone": {
-            "type": "string",
-            "minLength": 4,
-            "maxLength": 30
+          "recipient": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "phone": {
+                "type": "string",
+                "minLength": 4,
+                "maxLength": 30
+              }
+            },
+            "required": [
+              "name",
+              "phone"
+            ],
+            "additionalProperties": false
           },
           "address": {
             "type": "object",
@@ -11220,9 +14302,6 @@
               "string",
               "null"
             ]
-          },
-          "riderName": {
-            "type": "string"
           },
           "partner": {
             "default": "internal",
@@ -11266,8 +14345,6 @@
         },
         "required": [
           "billId",
-          "customerName",
-          "customerPhone",
           "address",
           "partner",
           "deliveryFee"
@@ -11277,6 +14354,9 @@
       "UpdateDeliveryStatusSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -11300,11 +14380,23 @@
           "riderMembershipId": {
             "type": "string"
           },
-          "riderName": {
-            "type": "string"
-          },
           "codCollected": {
             "type": "boolean"
+          },
+          "collectedAmount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "cash",
+              "card",
+              "upi",
+              "bank_transfer",
+              "cheque",
+              "other"
+            ]
           },
           "notes": {
             "type": "string",
@@ -11357,6 +14449,20 @@
           "productId": {
             "type": "string",
             "minLength": 2
+          },
+          "sourceLineId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "serialNumbers": {
+            "maxItems": 500,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
           },
           "quantity": {
             "type": "number",
@@ -11415,17 +14521,9 @@
             "type": "string",
             "minLength": 2
           },
-          "partyId": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "partyName": {
-            "type": "string"
-          },
           "items": {
             "minItems": 1,
+            "maxItems": 200,
             "type": "array",
             "items": {
               "type": "object",
@@ -11433,6 +14531,20 @@
                 "productId": {
                   "type": "string",
                   "minLength": 2
+                },
+                "sourceLineId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10
+                },
+                "serialNumbers": {
+                  "maxItems": 500,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  }
                 },
                 "quantity": {
                   "type": "number",
@@ -11546,7 +14658,9 @@
             "type": "string",
             "enum": [
               "customer",
-              "vendor"
+              "vendor",
+              "employee",
+              "other"
             ]
           },
           "partyId": {
@@ -11599,14 +14713,76 @@
           "notes": {
             "type": "string",
             "maxLength": 500
+          },
+          "gateway": {
+            "type": "object",
+            "properties": {
+              "externalReference": {
+                "type": "string",
+                "maxLength": 128
+              },
+              "gatewayProvider": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "gatewayStatus": {
+                "type": "string",
+                "enum": [
+                  "initiated",
+                  "authorized",
+                  "captured",
+                  "failed",
+                  "refunded"
+                ]
+              },
+              "cardBrand": {
+                "type": "string",
+                "maxLength": 20
+              },
+              "cardLast4": {
+                "type": "string",
+                "pattern": "^d{4}$"
+              }
+            },
+            "additionalProperties": false
           }
         },
         "required": [
           "direction",
           "partyType",
-          "partyName",
           "amount",
           "method"
+        ],
+        "additionalProperties": false
+      },
+      "VoidPaymentSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "paymentId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "paymentId",
+          "reason"
         ],
         "additionalProperties": false
       },
@@ -11671,6 +14847,29 @@
             "type": "string",
             "minLength": 2,
             "maxLength": 500
+          },
+          "reasonCode": {
+            "type": "string",
+            "enum": [
+              "damaged",
+              "expired",
+              "lost_theft",
+              "sample",
+              "internal_use",
+              "damaged_on_receipt",
+              "count_correction",
+              "opening_stock",
+              "other"
+            ]
+          },
+          "serialNumbers": {
+            "maxItems": 500,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            }
           }
         },
         "required": [
@@ -11835,6 +15034,9 @@
       "CreateBranchSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "idempotencyKey": {
             "type": "string",
             "minLength": 8,
@@ -12132,6 +15334,9 @@
       "ListBranchesSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string"
           },
@@ -12174,6 +15379,13 @@
       "SwitchBranchContextSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "targetBranchId": {
             "type": "string",
             "minLength": 2
@@ -12187,6 +15399,9 @@
       "UpdateSharingPoliciesSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string"
           },
@@ -12389,6 +15604,13 @@
       "GetPlatformOverviewReportSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "from": {
             "type": "string",
             "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
@@ -12436,6 +15658,9 @@
       "CreateTaskSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "idempotencyKey": {
             "type": "string"
           },
@@ -12504,6 +15729,9 @@
       "UpdateTaskSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "taskId": {
             "type": "string",
             "minLength": 3
@@ -12563,6 +15791,9 @@
       "AssignTaskSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "taskId": {
             "type": "string",
             "minLength": 3
@@ -12584,6 +15815,9 @@
       "UpdateTaskStatusSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "taskId": {
             "type": "string",
             "minLength": 3
@@ -12610,6 +15844,9 @@
       "ListTasksSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string"
           },
@@ -12649,6 +15886,9 @@
       "DeleteTaskSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "taskId": {
             "type": "string",
             "minLength": 3
@@ -12715,6 +15955,9 @@
       "GetLatestLocationsSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string"
           },
@@ -12731,6 +15974,9 @@
       "GetLocationHistorySchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string"
           },
@@ -12763,6 +16009,13 @@
       "ListNotificationsSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "limit": {
             "default": 50,
             "type": "integer",
@@ -12779,6 +16032,13 @@
       "MarkNotificationReadSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "notificationId": {
             "type": "string",
             "minLength": 3
@@ -12792,6 +16052,9 @@
       "ReconcileBranchCountsSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -12806,6 +16069,13 @@
       "GetPlatformUsageSummarySchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "startDate": {
             "type": "string",
             "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
@@ -12820,6 +16090,13 @@
       "GetOrganizationsUsageSchema": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
           "startDate": {
             "type": "string",
             "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
@@ -12852,6 +16129,9 @@
       "GetBranchesUsageSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -12912,6 +16192,9 @@
       "CalculateDryRunStatementSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -12933,6 +16216,9 @@
       "GetUsageLimitsSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string"
           }
@@ -12943,6 +16229,11 @@
         "type": "object",
         "properties": {
           "dailyLimit": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "weeklyLimit": {
             "type": "integer",
             "minimum": 0,
             "maximum": 9007199254740991
@@ -12969,7 +16260,6 @@
             "type": "string",
             "enum": [
               "warn_only",
-              "soft_throttle",
               "hard_block"
             ]
           },
@@ -12989,6 +16279,9 @@
       "UpdateUsageLimitsSchema": {
         "type": "object",
         "properties": {
+          "branchId": {
+            "type": "string"
+          },
           "organizationId": {
             "type": "string",
             "minLength": 2
@@ -13002,6 +16295,11 @@
               "type": "object",
               "properties": {
                 "dailyLimit": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "weeklyLimit": {
                   "type": "integer",
                   "minimum": 0,
                   "maximum": 9007199254740991
@@ -13028,7 +16326,6 @@
                   "type": "string",
                   "enum": [
                     "warn_only",
-                    "soft_throttle",
                     "hard_block"
                   ]
                 },
@@ -13053,257 +16350,226 @@
         ],
         "additionalProperties": false
       },
-      "GetProductSchema": {
+      "DocumentDecisionSchema": {
         "type": "object",
-        "required": [
-          "organizationId"
-        ],
         "properties": {
           "organizationId": {
             "type": "string",
-            "minLength": 2,
-            "description": "Organization ID"
-          },
-          "productId": {
-            "type": "string",
-            "description": "Product document ID"
-          },
-          "customerId": {
-            "type": "string",
-            "description": "Customer document ID"
-          },
-          "vendorId": {
-            "type": "string",
-            "description": "Vendor document ID"
-          },
-          "billId": {
-            "type": "string",
-            "description": "Bill document ID"
-          },
-          "outflowId": {
-            "type": "string",
-            "description": "Outflow document ID"
-          },
-          "deliveryId": {
-            "type": "string",
-            "description": "Delivery document ID"
+            "minLength": 2
           },
           "branchId": {
+            "type": "string"
+          },
+          "documentType": {
             "type": "string",
-            "description": "Optional operating branch"
+            "enum": [
+              "bill",
+              "outflow",
+              "return",
+              "stock_adjustment"
+            ]
+          },
+          "documentId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "reject"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
           }
         },
-        "description": "Input for GetProduct"
+        "required": [
+          "documentType",
+          "documentId",
+          "decision"
+        ],
+        "additionalProperties": false
       },
-      "GetCustomerSchema": {
+      "VoidDocumentSchema": {
         "type": "object",
-        "required": [
-          "organizationId"
-        ],
         "properties": {
           "organizationId": {
             "type": "string",
-            "minLength": 2,
-            "description": "Organization ID"
-          },
-          "productId": {
-            "type": "string",
-            "description": "Product document ID"
-          },
-          "customerId": {
-            "type": "string",
-            "description": "Customer document ID"
-          },
-          "vendorId": {
-            "type": "string",
-            "description": "Vendor document ID"
-          },
-          "billId": {
-            "type": "string",
-            "description": "Bill document ID"
-          },
-          "outflowId": {
-            "type": "string",
-            "description": "Outflow document ID"
-          },
-          "deliveryId": {
-            "type": "string",
-            "description": "Delivery document ID"
+            "minLength": 2
           },
           "branchId": {
+            "type": "string"
+          },
+          "documentId": {
             "type": "string",
-            "description": "Optional operating branch"
+            "minLength": 2
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
           }
         },
-        "description": "Input for GetCustomer"
+        "required": [
+          "documentId",
+          "reason"
+        ],
+        "additionalProperties": false
       },
-      "GetVendorSchema": {
+      "PartyStatementSchema": {
         "type": "object",
-        "required": [
-          "organizationId"
-        ],
         "properties": {
           "organizationId": {
             "type": "string",
-            "minLength": 2,
-            "description": "Organization ID"
-          },
-          "productId": {
-            "type": "string",
-            "description": "Product document ID"
-          },
-          "customerId": {
-            "type": "string",
-            "description": "Customer document ID"
-          },
-          "vendorId": {
-            "type": "string",
-            "description": "Vendor document ID"
-          },
-          "billId": {
-            "type": "string",
-            "description": "Bill document ID"
-          },
-          "outflowId": {
-            "type": "string",
-            "description": "Outflow document ID"
-          },
-          "deliveryId": {
-            "type": "string",
-            "description": "Delivery document ID"
+            "minLength": 2
           },
           "branchId": {
+            "type": "string"
+          },
+          "partyType": {
             "type": "string",
-            "description": "Optional operating branch"
+            "enum": [
+              "customer",
+              "vendor"
+            ]
+          },
+          "partyId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "from": {
+            "type": "string",
+            "pattern": "^d{4}-d{2}-d{2}(T.*)?$"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^d{4}-d{2}-d{2}(T.*)?$"
           }
         },
-        "description": "Input for GetVendor"
+        "required": [
+          "partyType",
+          "partyId"
+        ],
+        "additionalProperties": false
       },
-      "GetOutflowSchema": {
+      "OutflowSummarySchema": {
         "type": "object",
-        "required": [
-          "organizationId"
-        ],
         "properties": {
           "organizationId": {
             "type": "string",
-            "minLength": 2,
-            "description": "Organization ID"
-          },
-          "productId": {
-            "type": "string",
-            "description": "Product document ID"
-          },
-          "customerId": {
-            "type": "string",
-            "description": "Customer document ID"
-          },
-          "vendorId": {
-            "type": "string",
-            "description": "Vendor document ID"
-          },
-          "billId": {
-            "type": "string",
-            "description": "Bill document ID"
-          },
-          "outflowId": {
-            "type": "string",
-            "description": "Outflow document ID"
-          },
-          "deliveryId": {
-            "type": "string",
-            "description": "Delivery document ID"
+            "minLength": 2
           },
           "branchId": {
+            "type": "string"
+          },
+          "from": {
             "type": "string",
-            "description": "Optional operating branch"
+            "pattern": "^d{4}-d{2}-d{2}(T.*)?$"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^d{4}-d{2}-d{2}(T.*)?$"
+          },
+          "groupBy": {
+            "default": "day",
+            "type": "string",
+            "enum": [
+              "day",
+              "category",
+              "employee",
+              "vendor",
+              "branch"
+            ]
           }
         },
-        "description": "Input for GetOutflow"
+        "additionalProperties": false
       },
-      "GetBillSchema": {
+      "PriceHistorySchema": {
         "type": "object",
-        "required": [
-          "organizationId"
-        ],
         "properties": {
           "organizationId": {
             "type": "string",
-            "minLength": 2,
-            "description": "Organization ID"
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
           },
           "productId": {
             "type": "string",
-            "description": "Product document ID"
-          },
-          "customerId": {
-            "type": "string",
-            "description": "Customer document ID"
+            "minLength": 2
           },
           "vendorId": {
-            "type": "string",
-            "description": "Vendor document ID"
+            "type": "string"
           },
-          "billId": {
-            "type": "string",
-            "description": "Bill document ID"
-          },
-          "outflowId": {
-            "type": "string",
-            "description": "Outflow document ID"
-          },
-          "deliveryId": {
-            "type": "string",
-            "description": "Delivery document ID"
-          },
-          "branchId": {
-            "type": "string",
-            "description": "Optional operating branch"
+          "limit": {
+            "default": 50,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
           }
         },
-        "description": "Input for GetBill"
+        "required": [
+          "productId"
+        ],
+        "additionalProperties": false
       },
-      "GetDeliverySchema": {
+      "EntityHistorySchema": {
         "type": "object",
-        "required": [
-          "organizationId"
-        ],
         "properties": {
           "organizationId": {
             "type": "string",
-            "minLength": 2,
-            "description": "Organization ID"
-          },
-          "productId": {
-            "type": "string",
-            "description": "Product document ID"
-          },
-          "customerId": {
-            "type": "string",
-            "description": "Customer document ID"
-          },
-          "vendorId": {
-            "type": "string",
-            "description": "Vendor document ID"
-          },
-          "billId": {
-            "type": "string",
-            "description": "Bill document ID"
-          },
-          "outflowId": {
-            "type": "string",
-            "description": "Outflow document ID"
-          },
-          "deliveryId": {
-            "type": "string",
-            "description": "Delivery document ID"
+            "minLength": 2
           },
           "branchId": {
+            "type": "string"
+          },
+          "entityType": {
             "type": "string",
-            "description": "Optional operating branch"
+            "enum": [
+              "product",
+              "customer",
+              "vendor",
+              "bill",
+              "outflow",
+              "employee",
+              "organization",
+              "team",
+              "return",
+              "stock",
+              "payment",
+              "delivery",
+              "role",
+              "department",
+              "job_role",
+              "unit",
+              "category",
+              "recurring_expense"
+            ]
+          },
+          "entityId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "limit": {
+            "default": 50,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
           }
         },
-        "description": "Input for GetDelivery"
+        "additionalProperties": false
       },
       "GetDefaultBranchSchema": {
         "type": "object",
@@ -13476,30 +16742,6 @@
               "vendor"
             ],
             "description": "Party type to reconcile"
-          }
-        }
-      },
-      "RecordClientMetricSchema": {
-        "type": "object",
-        "required": [
-          "organizationId",
-          "metricType"
-        ],
-        "properties": {
-          "organizationId": {
-            "type": "string",
-            "minLength": 2
-          },
-          "branchId": {
-            "type": "string"
-          },
-          "metricType": {
-            "type": "string",
-            "description": "Client-side metric type"
-          },
-          "value": {
-            "type": "number",
-            "description": "Metric value"
           }
         }
       },
@@ -14925,16 +18167,47 @@
         "auditLogs",
         "notifications"
       ]
+    },
+    {
+      "exportName": "subscriptionAndUsageSweep",
+      "logicalName": "scheduled.subscriptionAndUsageSweep",
+      "triggerType": "schedule",
+      "description": "Firestore document write event trigger. Fired internally by Firestore — not callable via HTTP.",
+      "collectionsRead": [
+        "organizations",
+        "subscriptionPlans",
+        "usageCounterShards",
+        "memberships"
+      ],
+      "collectionsWritten": [
+        "organizations",
+        "notifications",
+        "idempotencyRecords",
+        "auditLogs"
+      ]
+    },
+    {
+      "exportName": "onStorageObjectFinalized",
+      "logicalName": "storage.onObjectFinalized",
+      "triggerType": "storage_trigger",
+      "description": "Firestore document write event trigger. Fired internally by Firestore — not callable via HTTP.",
+      "collectionsRead": [
+        "organizations",
+        "subscriptionPlans"
+      ],
+      "collectionsWritten": [
+        "usageCounterShards"
+      ]
     }
   ],
   "x-meta": {
     "projectId": "trado-x",
     "region": "asia-south1",
-    "callableCount": 101,
-    "triggerCount": 4,
-    "totalExports": 105,
+    "callableCount": 115,
+    "triggerCount": 6,
+    "totalExports": 121,
     "zodSchemasResolved": true,
-    "resolvedSchemaCount": 90,
-    "operationsWithExamples": 101
+    "resolvedSchemaCount": 111,
+    "operationsWithExamples": 111
   }
 }

@@ -8,12 +8,15 @@
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db, auth } from "../services/firebase.js";
+import { uniqueKeyRef } from "../services/uniqueKeys.js";
 import {
   CreateOrganizationSchema,
   UpdateOrganizationSchema,
   DeactivateOrganizationSchema,
   ListOrganizationsSchema,
+  SetSubscriptionSchema,
 } from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
 import {
   CreateOrganizationResponse,
 } from "../types/api.js";
@@ -22,15 +25,59 @@ import {
   UserDoc,
   MembershipDoc,
   BranchDoc,
-  BranchCodeLockDoc,
   MembershipBranchDoc,
   OrganizationSharingPolicies,
 } from "../types/models.js";
-import { EntityStatus, IdempotencyStatus } from "../constants/enums.js";
+import { EntityStatus, IdempotencyStatus, SubscriptionStatus, GateReason, SalesChannel, BusinessType } from "../constants/enums.js";
+import {
+  buildSubscriptionFields,
+  evaluateSubscription,
+  addDaysYmd,
+  localDateInTimezone,
+  endOfDayInTimezone,
+  DEFAULT_ORG_TIMEZONE,
+} from "../services/subscription.js";
+import { diffChanges, createAuditLog, addAuditLogToBatch } from "../services/audit.js";
+import { invalidatePlanCache } from "../services/contextResolver.js";
+import { fetchPage } from "../services/pagination.js";
+
+/**
+ * Field-level write policy for organizationsUpdate.
+ *   superAdmin: identity, entitlements and anything affecting billing (plan/subscription
+ *               are changed only through organizationsSetSubscription)
+ *   owner:      tax id, bank, website, contact, logo/images, address, display name, approvals
+ *   admin:      none (decision D-07) — Admins operate the business but do not edit the legal profile
+ */
+export const ORGANIZATION_FIELD_POLICY: Record<"superAdmin" | "owner" | "admin", ReadonlySet<string>> = {
+  superAdmin: new Set([
+    "name", "businessType", "businessCategory", "moduleToggles", "salesChannels", "timezone",
+    "displayName", "logoUrl", "imageUrls", "taxNumber", "website", "contactEmail", "contactPhone", "contacts",
+    "address", "bankDetails", "settings",
+  ]),
+  owner: new Set([
+    "displayName", "logoUrl", "imageUrls", "taxNumber", "website", "contactEmail", "contactPhone", "contacts",
+    "address", "bankDetails", "settings",
+  ]),
+  admin: new Set(),
+};
+
+/** Default sales channels by business type when none are supplied at creation. */
+function defaultSalesChannels(type: BusinessType): SalesChannel[] {
+  switch (type) {
+    case BusinessType.WHOLESALE_ONLY:
+    case BusinessType.DISTRIBUTOR:
+    case BusinessType.MANUFACTURER_B2B:
+      return [SalesChannel.B2B, SalesChannel.ORDER_TAKING];
+    case BusinessType.WHOLESALE_RETAIL:
+    case BusinessType.GENERAL_TRADING:
+      return [SalesChannel.POS, SalesChannel.B2B];
+    default:
+      return [SalesChannel.POS];
+  }
+}
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { compensateAuthUser } from "../services/compensation.js";
 import { setPrimaryOrganizationClaim, setPrimaryBranchClaim } from "../services/claims.js";
-import { createAuditLog } from "../services/audit.js";
 import { queueWelcomeNotification } from "../services/notificationSender.js";
 
 export const organizationsCreate = onCall({ region: "asia-south1" }, async (request): Promise<CreateOrganizationResponse> => {
@@ -42,11 +89,7 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
   }
 
   // 1. Validate Input
-  const parsed = CreateOrganizationSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(CreateOrganizationSchema, request.data);
 
   // 2. Idempotency Check & Reservation (with lease expiry & side-effect recovery)
   const idempotency = await reserveIdempotency({
@@ -146,7 +189,18 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
       moduleToggles: {},
       defaultBranchId: "main-branch",
       branchCount: 1,
+      activeEmployeeCount: 0,
+      salesChannels: input.salesChannels || defaultSalesChannels(input.businessType),
       sharingPolicies: defaultSharingPolicies,
+      ...(input.contacts ? { contacts: input.contacts } : {}),
+      ...buildSubscriptionFields({
+        status: input.subscription?.status,
+        startsAt: input.subscription?.startsAt,
+        expiresOn: input.subscription?.expiresOn,
+        durationDays: input.subscription?.durationDays,
+        graceDays: input.subscription?.graceDays,
+        timezone: input.timezone,
+      }),
       createdAt: now,
       createdBy: request.auth.uid,
     };
@@ -171,7 +225,6 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
       status: EntityStatus.ACTIVE,
       isPrimary: true,
       primaryBranchId: "main-branch",
-      assignedBranchIds: ["main-branch"],
       createdAt: now,
       createdBy: request.auth.uid,
     };
@@ -190,13 +243,8 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
     };
 
     // Code lock for default branch
-    const lockRef = db.collection("branchCodeLocks").doc(`${orgId}_${branchCode}`);
-    const lockDoc: BranchCodeLockDoc = {
-      organizationId: orgId,
-      branchCode,
-      branchId: "main-branch",
-      createdAt: now,
-    };
+    const lockRef = uniqueKeyRef(orgId, "branch_code", branchCode);
+    const lockDoc = { organizationId: orgId, kind: "branch_code", entityType: "branch", entityId: "main-branch", createdAt: now };
 
     // Join record mapping Owner membership to main-branch
     const membershipBranchRef = db.collection("membershipBranches").doc(`${membershipId}_main-branch`);
@@ -230,8 +278,7 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
     batch.set(lockRef, lockDoc);
     batch.set(membershipBranchRef, membershipBranchDoc);
 
-    const auditRef = db.collection("auditLogs").doc();
-    batch.set(auditRef, {
+    addAuditLogToBatch(batch, {
       organizationId: orgId,
       actorUid: request.auth.uid,
       action: "ORGANIZATION_CREATED",
@@ -242,7 +289,6 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
         planId: input.planId,
         ownerEmail: input.ownerEmail,
       },
-      createdAt: now,
     });
 
     if (idempotency.recordId) {
@@ -283,16 +329,11 @@ export const organizationsUpdate = onCall({ region: "asia-south1" }, async (requ
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = UpdateOrganizationSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdateOrganizationSchema, request.data);
 
   const isSuperAdmin = request.auth.token.isSuperAdmin === true;
-  let isOrgOwner = false;
+  let tier: "superAdmin" | "owner" | "admin" = "superAdmin";
 
-  // Authorization: Caller must be Super Admin or member of target org
   if (!isSuperAdmin) {
     const memDoc = await db.collection("memberships").doc(`${request.auth.uid}_${input.organizationId}`).get();
     if (!memDoc.exists) {
@@ -303,18 +344,11 @@ export const organizationsUpdate = onCall({ region: "asia-south1" }, async (requ
       throw new HttpsError("permission-denied", "Membership is inactive.");
     }
     if (memData.roleId === "role_org_owner") {
-      isOrgOwner = true;
+      tier = "owner";
     } else if (memData.roleId === "role_admin") {
-      isOrgOwner = false;
+      tier = "admin";
     } else {
       throw new HttpsError("permission-denied", "Insufficient permissions to update organization.");
-    }
-  }
-
-  // Restrict structural settings changes to Org Owner and Super Admin
-  if (!isSuperAdmin && !isOrgOwner) {
-    if (input.businessType !== undefined || input.businessCategory !== undefined || input.moduleToggles !== undefined) {
-      throw new HttpsError("permission-denied", "Only Organization Owner or Super Admin can modify structural settings (business type, category, or module toggles).");
     }
   }
 
@@ -323,16 +357,43 @@ export const organizationsUpdate = onCall({ region: "asia-south1" }, async (requ
   if (!orgDoc.exists) {
     throw new HttpsError("not-found", "Organization not found.");
   }
+  const existing = orgDoc.data() as OrganizationDoc;
+  if (!isSuperAdmin) {
+    const sub = evaluateSubscription(existing);
+    if (!sub.allowed) {
+      throw new HttpsError("failed-precondition", `[${sub.reason}] Organization subscription is ${sub.state}.`, { reason: sub.reason });
+    }
+  }
 
-  const updates: Partial<OrganizationDoc> = {
+  // Field-level write control: every supplied field must be editable by the caller's tier
+  const fields: Record<string, unknown> = { ...input };
+  delete fields.organizationId;
+  const requested = Object.keys(fields).filter((k) => (fields as Record<string, unknown>)[k] !== undefined);
+  const forbidden = requested.filter((f) => !ORGANIZATION_FIELD_POLICY[tier].has(f));
+  if (forbidden.length > 0) {
+    throw new HttpsError(
+      "permission-denied",
+      `[${GateReason.FIELD_NOT_EDITABLE}] Field(s) not editable by ${tier}: ${forbidden.join(", ")}.`,
+      { reason: GateReason.FIELD_NOT_EDITABLE, fields: forbidden }
+    );
+  }
+  if (requested.length === 0) {
+    throw new HttpsError("invalid-argument", "No updatable fields supplied.");
+  }
+
+  if (fields.contacts !== undefined && Array.isArray(fields.contacts)) {
+    const contactsList = fields.contacts as Array<{ isPrimary?: boolean; email?: string | null; phone?: string | null }>;
+    const primaryContacts = contactsList.filter((c) => c.isPrimary);
+    if (primaryContacts.length > 1) {
+      throw new HttpsError("invalid-argument", "At most one contact can be marked as primary.");
+    }
+  }
+
+  const updates: Record<string, unknown> = {
+    ...Object.fromEntries(requested.map((k) => [k, (fields as Record<string, unknown>)[k]])),
     updatedAt: new Date().toISOString(),
+    updatedBy: request.auth.uid,
   };
-
-  if (input.name) updates.name = input.name;
-  if (input.businessType) updates.businessType = input.businessType;
-  if (input.businessCategory) updates.businessCategory = input.businessCategory;
-  if (input.moduleToggles) updates.moduleToggles = input.moduleToggles;
-  if (input.logoUrl) updates.logoUrl = input.logoUrl;
 
   await orgRef.update(updates);
 
@@ -342,7 +403,8 @@ export const organizationsUpdate = onCall({ region: "asia-south1" }, async (requ
     action: "ORGANIZATION_UPDATED",
     entityType: "organization",
     entityId: input.organizationId,
-    details: updates as Record<string, unknown>,
+    details: { tier, fields: requested },
+    changes: diffChanges(existing as unknown as Record<string, unknown>, updates, requested),
   });
 
   return { success: true, message: "Organization updated successfully." };
@@ -353,19 +415,12 @@ export const organizationsDeactivate = onCall({ region: "asia-south1" }, async (
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = DeactivateOrganizationSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(DeactivateOrganizationSchema, request.data);
 
   const isSuperAdmin = request.auth.token.isSuperAdmin === true;
 
   if (!isSuperAdmin) {
-    const memDoc = await db.collection("memberships").doc(`${request.auth.uid}_${input.organizationId}`).get();
-    if (!memDoc.exists || (memDoc.data() as MembershipDoc).roleId !== "role_org_owner") {
-      throw new HttpsError("permission-denied", "Only Organization Owner or Super Admin can deactivate an organization.");
-    }
+    throw new HttpsError("permission-denied", `[${GateReason.FIELD_NOT_EDITABLE}] Organization status is managed by the platform Super Admin.`, { reason: GateReason.FIELD_NOT_EDITABLE });
   }
 
   const orgRef = db.collection("organizations").doc(input.organizationId);
@@ -391,23 +446,15 @@ export const organizationsList = onCall({ region: "asia-south1" }, async (reques
     throw new HttpsError("permission-denied", "Super Admin privileges required to list all organizations.");
   }
 
-  const parsed = ListOrganizationsSchema.safeParse(request.data);
-  const input = parsed.success ? parsed.data : { limit: 20 };
+  const input = parseInput(ListOrganizationsSchema, request.data);
 
-  let query = db.collection("organizations").orderBy("name").limit(input.limit || 20);
+  let query: FirebaseFirestore.Query = db.collection("organizations").orderBy("name");
 
   if (input.status) {
     query = query.where("status", "==", input.status);
   }
 
-  if (input.startAfterId) {
-    const startDoc = await db.collection("organizations").doc(input.startAfterId).get();
-    if (startDoc.exists) {
-      query = query.startAfter(startDoc);
-    }
-  }
-
-  const snapshot = await query.get();
+  const { snapshot, nextCursor } = await fetchPage(query, "organizations", input.startAfterId, input.limit || 20);
   const items = snapshot.docs.map((doc) => ({
     organizationId: doc.id,
     ...(doc.data() as OrganizationDoc),
@@ -416,6 +463,110 @@ export const organizationsList = onCall({ region: "asia-south1" }, async (reques
   return {
     items,
     count: items.length,
+    nextCursor,
     hasMore: items.length === (input.limit || 20),
+  };
+});
+
+/**
+ * organizationsSetSubscription (Super Admin only)
+ * Sets, renews, extends, suspends, reactivates, cancels or changes the plan of an
+ * organization's subscription. Downgrading below current usage preserves existing data;
+ * new branches/employees are then blocked by the plan-limit checks (reported as overLimit).
+ */
+export const organizationsSetSubscription = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+  if (request.auth.token.isSuperAdmin !== true) {
+    throw new HttpsError("permission-denied", "Super Admin privileges required to manage subscriptions.");
+  }
+  const input = parseInput(SetSubscriptionSchema, request.data);
+  const orgRef = db.collection("organizations").doc(input.organizationId);
+  const now = new Date().toISOString();
+
+  const result = await db.runTransaction(async (txn) => {
+    const snap = await txn.get(orgRef);
+    if (!snap.exists) throw new HttpsError("not-found", "Organization not found.");
+    const org = snap.data() as OrganizationDoc;
+    const tz = org.timezone || DEFAULT_ORG_TIMEZONE;
+    const updates: Record<string, unknown> = {};
+
+    let planDoc: FirebaseFirestore.DocumentSnapshot | null = null;
+    if (input.planId) {
+      planDoc = await txn.get(db.collection("subscriptionPlans").doc(input.planId));
+      if (!planDoc.exists) throw new HttpsError("not-found", `Subscription plan "${input.planId}" does not exist.`);
+    }
+
+    switch (input.action) {
+      case "set":
+      case "renew": {
+        Object.assign(updates, buildSubscriptionFields({
+          status: input.status || SubscriptionStatus.ACTIVE,
+          expiresOn: input.expiresOn,
+          durationDays: input.durationDays ?? 365,
+          graceDays: input.graceDays ?? org.graceDays,
+          timezone: tz,
+        }));
+        break;
+      }
+      case "extend": {
+        const days = input.extendDays || input.durationDays || 30;
+        const fromMs = Math.max(Date.now(), org.subscriptionExpiresAt ? Date.parse(org.subscriptionExpiresAt) : 0);
+        updates.subscriptionExpiresAt = endOfDayInTimezone(addDaysYmd(localDateInTimezone(fromMs, tz), days), tz);
+        updates.subscriptionStatus = SubscriptionStatus.ACTIVE;
+        break;
+      }
+      case "suspend":
+        updates.subscriptionStatus = SubscriptionStatus.SUSPENDED;
+        break;
+      case "cancel":
+        updates.subscriptionStatus = SubscriptionStatus.CANCELLED;
+        break;
+      case "reactivate":
+        updates.subscriptionStatus = SubscriptionStatus.ACTIVE;
+        if (input.expiresOn) updates.subscriptionExpiresAt = endOfDayInTimezone(input.expiresOn, tz);
+        break;
+      case "change_plan":
+        if (!input.planId) throw new HttpsError("invalid-argument", "planId is required for change_plan.");
+        break;
+    }
+    if (input.planId) updates.planId = input.planId;
+    if (input.graceDays !== undefined) updates.graceDays = input.graceDays;
+    updates.updatedAt = now;
+    updates.updatedBy = request.auth!.uid;
+    txn.update(orgRef, updates);
+
+    const plan = planDoc?.data();
+    const overLimit: string[] = [];
+    if (plan) {
+      const seats = (plan.seatLimits?.admin || 0) + (plan.seatLimits?.staff || 0);
+      if (typeof plan.branchLimit === "number" && (org.branchCount || 1) > plan.branchLimit) overLimit.push("branches");
+      if ((org.activeEmployeeCount || 0) > seats) overLimit.push("employees");
+    }
+    return { before: org, updates, overLimit };
+  });
+
+  if (input.planId) invalidatePlanCache(input.planId);
+  await createAuditLog({
+    organizationId: input.organizationId,
+    actorUid: request.auth.uid,
+    action: `SUBSCRIPTION_${input.action.toUpperCase()}`,
+    entityType: "organization",
+    entityId: input.organizationId,
+    details: { reason: input.reason || null, overLimit: result.overLimit },
+    changes: diffChanges(result.before as unknown as Record<string, unknown>, result.updates),
+  });
+
+  const after = { ...result.before, ...result.updates } as OrganizationDoc;
+  return {
+    organizationId: input.organizationId,
+    planId: after.planId,
+    subscriptionStatus: after.subscriptionStatus,
+    subscriptionStartsAt: after.subscriptionStartsAt,
+    subscriptionExpiresAt: after.subscriptionExpiresAt,
+    graceDays: after.graceDays || 0,
+    evaluation: evaluateSubscription(after),
+    overLimit: result.overLimit,
   };
 });

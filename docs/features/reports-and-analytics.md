@@ -2,108 +2,157 @@
 
 ---
 
-## 1. Purpose & Scope
-This module provides operational intelligence, real-time Firestore aggregations, financial P&L reporting, inventory valuation, and multi-format CSV exports for Trado:
-- **Revenue Analytics**: `reportsGetRevenue` aggregates sales volume and revenue by period.
-- **Profit & Loss**: `reportsGetProfitLoss` computes Net Profit by subtracting Weighted Average Cost (WAC) COGS and operational expenses from revenue.
-- **Stock Valuation**: `reportsGetStockValuation` values current branch or organization stock using WAC and cost price.
-- **Top Entities**: `reportsGetTopEntities` identifies top-selling products and highest-revenue customers.
-- **Staff Performance**: `reportsGetStaffActivity` breaks down sales performance by salesperson.
-- **CSV Data Export**: `reportsExportCsv` exports raw aggregated reports into compliant CSV format with optional branch scoping.
+## 1. Module Overview & Analytics Architecture
+
+The Reports & Analytics Engine provides operational intelligence, real-time Firestore aggregations, financial P&L reporting, inventory valuation, and multi-format CSV exports for Trado:
+- **Revenue Analytics (`reportsGetRevenue`)**: Aggregates sales volume, ticket size, and revenue across time intervals (`day`, `month`, `year`).
+- **Profit & Loss (`reportsGetProfitLoss`)**: Computes Net Profit by subtracting Weighted Average Cost (WAC) COGS and operational expenses from revenue.
+- **Stock Valuation (`reportsGetStockValuation`)**: Values current physical inventory using 4-decimal WAC rates, scoped by branch or across the entire organization.
+- **Top Entities (`reportsGetTopEntities`)**: Identifies highest-velocity products, top-revenue customers, or major suppliers.
+- **Staff Performance (`reportsGetStaffActivity`)**: Analyzes revenue generated and ticket count by salesperson.
+- **CSV Data Export (`reportsExportCsv`)**: Exports raw aggregated reports into RFC 4180-compliant CSV format with branch scoping.
+
+```mermaid
+flowchart TD
+    subgraph PrimarySources["Primary Financial Ledgers"]
+        Bills["bills collection\n(Sales Revenue & COGS)"]
+        Outflows["outflows collection\n(Operational Overhead Expenses)"]
+        Stock["stockBalances & products\n(Inventory Quantity & WAC)"]
+    end
+
+    subgraph AggregationEngine["Analytics & Valuation Computation"]
+        Revenue["Revenue Calculation\n(Gross Sales - Discounts + Taxes)"]
+        COGS["COGS Calculation\n(Σ Line Quantity × Item WAC)"]
+        Opex["Operating Expenses\n(Σ Outflows where kind == 'expense')"]
+        Valuation["Stock Valuation\n(Σ Branch Stock × Item WAC)"]
+    end
+
+    subgraph ReportOutputs["Actionable Intelligence"]
+        PL["Profit & Loss Report\n(Gross Profit = Rev - COGS, Net = GP - Opex)"]
+        Dashboard["Executive Dashboard & KPIs"]
+        CSV["CSV Exports (RFC 4180)"]
+    end
+
+    Bills --> Revenue
+    Bills --> COGS
+    Outflows --> Opex
+    Stock --> Valuation
+
+    Revenue --> PL
+    COGS --> PL
+    Opex --> PL
+    Valuation --> Dashboard
+    PL --> CSV
+```
 
 ---
 
-## 2. Actors & Permissions
-- **Organization Owner & Finance Director**: Possess `report:view` and `report:export`. Can access all financial reports, P&L, stock valuation, and CSV downloads across the organization.
-- **Branch Manager**: Possess `report:view`. Can generate reports scoped specifically to their assigned branch (`branchId`).
-- **Super Admin**: Possess `platform:report` or `report:view`. Can view cross-organization platform overviews (`reportsGetPlatformOverview`).
+## 2. Mathematical Formulas & Accounting Invariants
+
+### 2.1 Profit & Loss Mechanics
+$$\text{Gross Revenue} = \sum_{\text{finalized bills}} \text{bill.subTotal} - \text{bill.discountTotal}$$
+
+$$\text{COGS (Cost of Goods Sold)} = \sum_{\text{finalized bill items}} (\text{item.quantity} \times \text{product.weightedAvgCost})$$
+
+$$\text{Gross Profit} = \text{Gross Revenue} - \text{COGS}$$
+
+$$\text{Operating Expenses} = \sum_{\text{outflows (kind == 'expense')}} \text{outflow.totalAmount}$$
+
+$$\text{Net Profit} = \text{Gross Profit} - \text{Operating Expenses}$$
+
+### 2.2 Inventory Stock Valuation
+$$\text{Branch Inventory Valuation} = \sum_{p \in \text{products}} (\text{stockBalances}[p].\text{currentStock} \times \text{WAC}_p)$$
 
 ---
 
-## 3. Reporting Functions & Real Firestore Aggregations
+## 3. API Reference & Parameter Specifications
 
-Unlike mock reporting layers, Trado's reporting engine executes direct aggregations across Firestore collections:
+### 3.1 `reportsGetRevenue`
+Aggregates sales revenue and ticket count over a date range.
 
-### 3.1 Revenue Report (`reportsGetRevenue`)
-- Queries `bills` where `organizationId == orgId` and `status in ["active", "partial", "paid"]`.
-- When `branchId` is passed, filters strictly for that branch.
-- Computes:
-  - `totalRevenue`: Sum of `totalAmount`.
-  - `billCount`: Count of finalized bills.
-  - `averageBillValue`: $\frac{\text{totalRevenue}}{\text{billCount}}$.
-  - `breakdown`: Daily or monthly revenue series.
+#### Request Parameters
+```typescript
+interface GetRevenueReportRequest {
+  organizationId?: string;           // Optional (derived from token context)
+  branchId?: string;                 // Optional (scope to specific branch)
+  from?: string;                     // YYYY-MM-DD start date
+  to?: string;                       // YYYY-MM-DD end date
+  groupBy?: "day" | "month" | "year";// Default: "day"
+}
+```
 
-### 3.2 Profit & Loss Report (`reportsGetProfitLoss`)
-- Aggregates three distinct financial components over the selected date range:
-  1. **Total Revenue**: Sum of sales from finalized bills.
-  2. **Cost of Goods Sold (COGS)**: Sum of $(\text{quantity} \times \text{product.weightedAvgCost})$ for all sold line items.
-  3. **Gross Profit**: $\text{Revenue} - \text{COGS}$.
-  4. **Operating Expenses**: Sum of `totalAmount` from `outflows` where `kind == "expense"`.
-  5. **Net Profit**: $\text{Gross Profit} - \text{Operating Expenses}$.
-
-### 3.3 Stock Valuation Report (`reportsGetStockValuation`)
-- Reads all active products in the organization.
-- If `branchId` is supplied: reads `stockBalances` specifically for that branch to calculate branch valuation.
-- If `branchId` is omitted: values total organization stock using `products.currentStock`.
-- Formula:
-  $$\text{Stock Valuation} = \sum_{\text{products}} (\text{currentStock} \times (\text{weightedAvgCost} \parallel \text{costPrice}))$$
-
-### 3.4 Top Entities Report (`reportsGetTopEntities`)
-- When `entityType == "products"`: Aggregates total units sold and revenue per product.
-- When `entityType == "customers"`: Aggregates total spend and bill count per customer.
-- Supports configurable result limits (default: 10).
-
-### 3.5 Staff Sales Activity (`reportsGetStaffActivity`)
-- Groups finalized bills by `salespersonMembershipId`.
-- Computes bill count and total revenue generated per staff member.
-
-### 3.6 CSV Data Export (`reportsExportCsv`)
-- Formats reports into RFC 4180-compliant CSV files.
-- Supported report types:
-  1. `revenue`: Date, BillCount, TotalRevenue, BranchId.
-  2. `profit_loss`: Metric, Amount, BranchId.
-  3. `stock_valuation`: ProductCode, Name, Category, StockQuantity, ValuationRate, TotalValue, BranchId.
-  4. `top_products`: ProductId, Name, QuantitySold, TotalRevenue, BranchId.
-  5. `staff_sales`: StaffMembershipId, BillCount, TotalRevenue, BranchId.
+#### Success Response (200 OK)
+```json
+{
+  "totalRevenue": 245000.00,
+  "billCount": 182,
+  "averageBillValue": 1346.15,
+  "breakdown": [
+    { "period": "2026-11-01", "revenue": 14200.00, "count": 12 },
+    { "period": "2026-11-02", "revenue": 18500.00, "count": 15 }
+  ]
+}
+```
 
 ---
 
-## 4. Step-by-Step Happy Path Workflows
+### 3.2 `reportsGetProfitLoss`
+Computes financial profit and loss statement.
 
-### 4.1 Exporting Monthly Profit & Loss to CSV
-1. **Manager calls `reportsExportCsv`**:
-   - Payload:
-     ```json
-     {
-       "organizationId": "org_demo",
-       "reportType": "profit_loss",
-       "from": "2026-10-01",
-       "to": "2026-10-31",
-       "branchId": "main-branch"
-     }
-     ```
-2. **Backend Processing**:
-   - Computes revenue, COGS, gross profit, and expenses for `main-branch`.
-   - Generates CSV string:
-     ```csv
-     "Metric","Amount","BranchId"
-     "Total Revenue","12000","main-branch"
-     "Cost of Goods Sold (COGS)","8500","main-branch"
-     "Gross Profit","3500","main-branch"
-     "Operational Expenses","1500","main-branch"
-     "Net Profit","2000","main-branch"
-     ```
-   - Returns `{ filename: "profit_loss_main-branch_2026-10-01_2026-10-31.csv", csvContent: "..." }`.
+#### Request Parameters
+```typescript
+interface GetProfitLossReportRequest {
+  organizationId?: string;
+  branchId?: string;
+  from?: string;                     // YYYY-MM-DD
+  to?: string;                       // YYYY-MM-DD
+}
+```
 
----
-
-## 5. Branch-Scoping Policy
-- **When `branchId` is passed**: Every query (bills, outflows, stockBalances) restricts results to that operating branch.
-- **When `branchId` is omitted**: Reports aggregate data across the entire organization (all active branches).
+#### Success Response (200 OK)
+```json
+{
+  "revenue": 245000.00,
+  "cogs": 172000.00,
+  "grossProfit": 73000.00,
+  "operatingExpenses": 21500.00,
+  "netProfit": 51500.00,
+  "grossMarginPercent": 29.80,
+  "netMarginPercent": 21.02
+}
+```
 
 ---
 
-## 6. Local Testing & Verification
-- **Integration Tests**: Part 1 of `functions/scripts/test-phase3-integration.js`.
-  - Tests verify revenue aggregation, P&L (WAC COGS + expense deduction), stock valuation, top entities, staff sales, and CSV generation across all 5 report types.
+### 3.3 `reportsGetStockValuation`
+Computes total inventory asset valuation using WAC.
 
+#### Request Parameters
+```typescript
+interface GetStockValuationReportRequest {
+  organizationId?: string;
+  branchId?: string;                 // Optional: values specific branch; omitted: values whole org
+  categoryId?: string;               // Optional category filter
+}
+```
+
+#### Success Response (200 OK)
+```json
+{
+  "totalValuation": 485200.00,
+  "totalItemCount": 1240,
+  "distinctProductCount": 48
+}
+```
+
+---
+
+## 4. Manual Emulator Testing Commands
+
+```powershell
+# 1. Run Platform Analytics and Reporting Test Suite
+node functions/scripts/test-analytics-platform.cjs
+
+# 2. Run Retail POS Lifecycle and Financial Report Verification
+node functions/scripts/test-e2e-retail-lifecycle.cjs
+```

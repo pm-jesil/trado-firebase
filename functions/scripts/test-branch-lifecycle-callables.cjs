@@ -91,7 +91,7 @@ async function run() {
   const branch2Res = await callFunction("branchesCreate", {
     name: "Airport Outlet",
     code: "AIR1",
-    phone: "+919876543210",
+    contact: { phone: "+919876543210" },
     address: {
       line1: "Terminal 2 Departure",
       city: "Bengaluru",
@@ -119,7 +119,7 @@ async function run() {
   const updateBranchRes = await callFunction("branchesUpdate", {
     branchId: branch2Res.branchId,
     name: "Airport Express Outlet",
-    phone: "+919876543211",
+    contact: { phone: "+919876543211" },
   }, ownerToken);
   assert.ok(updateBranchRes.success, "branchesUpdate must succeed");
   console.log("✓ branchesUpdate succeeded for Owner");

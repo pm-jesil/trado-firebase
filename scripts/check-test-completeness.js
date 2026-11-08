@@ -22,52 +22,9 @@ const RULES_TEST_DIR = path.resolve(__dirname, "../functions/src/test/rules");
 
 // Canonical 43 concrete collection and subcollection paths from firestore.rules and docs/data-model.md
 // Exactly 41 root collections + 2 subcollections
-const CANONICAL_COLLECTIONS = [
-  "users",
-  "memberships",
-  "organizations",
-  "organizations/{organizationId}/branches", // subcollection 1
-  "users/{uid}/devices",                     // subcollection 2
-  "roles",
-  "departments",
-  "jobRoles",
-  "teams",
-  "subscriptionPlans",
-  "permissionCatalog",
-  "modules",
-  "taxRegimes",
-  "idempotencyRecords",
-  "auditLogs",
-  "notificationOutbox",
-  "products",
-  "categories",
-  "units",
-  "customers",
-  "vendors",
-  "outflows",
-  "bills",
-  "stockMovements",
-  "deliveries",
-  "returns",
-  "payments",
-  "documentCounters",
-  "tasks",
-  "dailySummaries",
-  "monthlySummaries",
-  "latestLocations",
-  "locationPings",
-  "notifications",
-  "barcodeLocks",
-  "branchCodeLocks",
-  "membershipBranches",
-  "stockBalances",
-  "organizationUsageDaily",
-  "branchUsageDaily",
-  "branchUsageMonthly",
-  "platformUsageSnapshots",
-  "usageRateCards",
-  "usageAllocationRuns",
-];
+// Collections come from the generated source inventory (one source of truth, no hand list)
+const CANONICAL_COLLECTIONS = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../tests/api/canonical-source-inventory.json"), "utf8"))
+  .concreteCollections.map((col) => col.path.replace(/\/\{[^}]+\}$/, "").replace("/{uid}/", "/{uid}/").replace(/^organizations\/\{organizationId\}\/branches$/, "organizations/{organizationId}/branches"));
 
 // Semantic test suite mapping
 const TEST_SUITES = [
@@ -105,6 +62,11 @@ const TEST_SUITES = [
     name: "Analytics & Platform Callables",
     file: "test-analytics-platform-callables.cjs",
     domain: "Reports & Usage",
+  },
+  {
+    name: "Governance, Lifecycle & Flagship Businesses",
+    file: "test-governance-flagship.cjs",
+    domain: "Gate Conformance, Subscriptions, Usage, Approvals, Flagship Scenarios",
   },
   {
     name: "Firestore Event Triggers",
@@ -202,6 +164,13 @@ function hasTriggerExecution(triggerName, cleanedCode) {
   if (triggerName === "onDeliveryWritten") {
     return cleanedCode.includes("deliveries") && (cleanedCode.includes("onDeliveryWritten") || cleanedCode.includes("delivery_assigned"));
   }
+  if (triggerName === "onStorageObjectFinalized") {
+    return (cleanedCode.includes("onStorageObjectFinalized") || cleanedCode.includes("handleStorageObjectFinalized")) && cleanedCode.includes("storageUploadBytes");
+  }
+  if (triggerName === "subscriptionAndUsageSweep") {
+    // Scheduled job: the suite must execute the job core and assert its stored side effects
+    return cleanedCode.includes("runSubscriptionAndUsageSweep") && cleanedCode.includes("subscriptionStatus") && cleanedCode.includes("notifications");
+  }
   return false;
 }
 
@@ -212,7 +181,7 @@ function analyzeExportCoverage(exportsList, testFilesMap) {
   const coverageMap = {};
   for (const exp of exportsList) {
     coverageMap[exp] = [];
-    const isTrigger = exp.startsWith("on") && exp.endsWith("Written");
+    const isTrigger = (exp.startsWith("on") && (exp.endsWith("Written") || exp.endsWith("Finalized"))) || exp === "subscriptionAndUsageSweep";
 
     for (const [suiteName, content] of Object.entries(testFilesMap)) {
       // Compatibility wrappers must not count
@@ -251,7 +220,7 @@ function analyzeCollectionCoverage(collectionsList, testFilesMap) {
       // collection(..., "baseName"), doc(..., "baseName", ...),
       // .collection("baseName"), "baseName", or callable matching like permissionCatalogList
       const regex = new RegExp(
-        `(collection|doc)\\([^)]*["'\`]${baseName}["'\`]|\\.collection\\(["'\`]${baseName}["'\`]|["'\`]${baseName}\\/|["'\`]${col}["'\`]|${baseName}List`,
+        `(collection|doc)\\([^)]*["'\`]${baseName}["'\`]|\\.collection\\(["'\`]${baseName}["'\`]|["'\`]${baseName}\\/|["'\`]${col}["'\`]|\\/${baseName}\\/|${baseName}List`,
         "g"
       );
       if (regex.test(cleaned)) {
@@ -409,12 +378,12 @@ function runSelfTest() {
     console.log("✓ Test 8: Stale manifest entry correctly detected");
   }
 
-  // Fixture 9: Verify canonical collection count equals exactly 44 (42 root + 2 subcollections)
-  if (CANONICAL_COLLECTIONS.length !== 44) {
-    console.error(`FAIL: Test 9 (canonical collections count) expected 44, got ${CANONICAL_COLLECTIONS.length}`);
+  // Fixture 9: the canonical collection list is the generated inventory (no hard-coded count)
+  if (CANONICAL_COLLECTIONS.length === 0) {
+    console.error("FAIL: Test 9 canonical collection list (generated inventory) is empty");
     passed = false;
   } else {
-    console.log("✓ Test 9: Canonical collections count confirmed at exactly 44 (42 root + 2 subcollections)");
+    console.log(`✓ Test 9: ${CANONICAL_COLLECTIONS.length} canonical collections read from the generated inventory`);
   }
 
   if (passed) {

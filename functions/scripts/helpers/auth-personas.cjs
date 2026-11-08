@@ -59,8 +59,11 @@ async function getSuperAdminPersona() {
 /**
  * Provision a new organization and return the Owner persona.
  */
-async function createTenantOwnerPersona(superAdminToken, orgPrefix = "TestOrg") {
+async function createTenantOwnerPersona(superAdminToken, orgPrefix = "TestOrg", options = {}) {
   let resolvedToken = superAdminToken;
+  // Default plan includes every module so functional suites exercise their module; plan-gating
+  // suites pass { planId } explicitly.
+  const planId = options.planId || (typeof superAdminToken === "object" && superAdminToken && superAdminToken.planId) || "plan_growth";
   if (typeof superAdminToken === "object" && superAdminToken && !superAdminToken.idToken) {
     orgPrefix = superAdminToken.orgPrefix || superAdminToken.businessName || "TestOrg";
     resolvedToken = null;
@@ -85,7 +88,7 @@ async function createTenantOwnerPersona(superAdminToken, orgPrefix = "TestOrg") 
     country: "IN",
     currency: "INR",
     taxRegimeCode: "IN_GST",
-    planId: "plan_starter",
+    planId,
     defaultBranchName: "Main Store",
     defaultBranchCode: "MAIN",
     ownerEmail,
@@ -134,9 +137,9 @@ async function createEmployeePersona(ownerToken, organizationId, options = {}, m
     email,
     initialPassword: password,
     roleId,
-    primaryBranchId: branchId,
-    assignedBranchIds,
-    permissions,
+    defaultBranchId: branchId,
+    branchIds: assignedBranchIds,
+    permissionOverrides: permissions,
   }, ownerToken);
 
   const idToken = await getIdToken(email, password);

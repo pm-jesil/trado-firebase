@@ -122,57 +122,8 @@ async function runBranchDeepE2ESuite() {
     isActive: true,
   });
 
-  // Pre-seed system roles
-  await db.collection("roles").doc("role_org_owner").set({
-    name: "Organization Owner",
-    code: "org_owner",
-    permissions: ["*"],
-    isSystem: true,
-  });
-
-  await db.collection("roles").doc("role_admin").set({
-    name: "Administrator",
-    code: "admin",
-    permissions: [
-      "org:view",
-      "employee:create",
-      "employee:view",
-      "product:create",
-      "product:view",
-      "inventory:view",
-      "inventory:adjust",
-      "outflow:create",
-      "outflow:view",
-      "payment:create",
-      "payment:view",
-      "bill:create",
-      "bill:finalize",
-      "bill:view",
-      "return:create",
-      "return:view",
-      "branch:create",
-      "branch:view",
-      "branch:update",
-      "branch:switch",
-    ],
-    isSystem: true,
-  });
-
-  await db.collection("roles").doc("role_employee").set({
-    name: "Standard Employee",
-    code: "employee",
-    permissions: [
-      "org:view",
-      "product:view",
-      "inventory:view",
-      "bill:create",
-      "bill:finalize",
-      "bill:view",
-      "return:create",
-      "payment:create",
-    ],
-    isSystem: true,
-  });
+  // Canonical system roles. Suites must never overwrite shared system roles/plans.
+  await (await import("../lib/scripts/seed-emulator.js")).seedReferenceData(db);
 
   // Pre-seed Super Admin
   const superAdminEmail = `superadmin_${runId}@trado.local`;
@@ -518,11 +469,9 @@ async function runBranchDeepE2ESuite() {
       branchId: branchA1Id,
       kind: "purchase",
       vendorId: vendor1Id,
-      vendorName: "Kerala Spice Suppliers",
       lines: [
         {
           productId: product1Id,
-          itemName: "Premium Cardamom 500g",
           quantity: 50,
           unit: "box",
           unitPrice: 500,
@@ -553,11 +502,9 @@ async function runBranchDeepE2ESuite() {
       branchId: branchA2Id,
       kind: "purchase",
       vendorId: vendor1Id,
-      vendorName: "Kerala Spice Suppliers",
       lines: [
         {
           productId: product1Id,
-          itemName: "Premium Cardamom 500g",
           quantity: 30,
           unit: "box",
           unitPrice: 500,
@@ -596,16 +543,11 @@ async function runBranchDeepE2ESuite() {
           productId: product1Id,
           quantity: 40,
           unit: "box",
-          unitPrice: 850,
+          unitPriceOverride: 850,
         },
       ],
-      paymentStatus: "paid",
-      payments: [
-        {
-          method: "cash",
-          amount: 40 * 850,
-        },
-      ],
+      paidAmount: 40 * 850 - 500, // 500 left open for the scenario 14 payment
+      paymentMethod: "cash",
       idempotencyKey: `sale_a1_${runId}`,
     }, ownerAToken);
 
@@ -666,8 +608,6 @@ async function runBranchDeepE2ESuite() {
       organizationId: orgAId,
       branchId: branchA1Id,
       billId: bill1Id,
-      customerName: "Alpha Retail Walk-in Customer",
-      customerPhone: "9876543201",
       address: {
         line1: "42 MG Road",
         city: "Kochi",
@@ -694,7 +634,6 @@ async function runBranchDeepE2ESuite() {
       direction: "in",
       partyType: "customer",
       partyId: customer1Id,
-      partyName: "Alpha Retail Walk-in Customer",
       amount: 500,
       method: "upi",
       referenceId: bill1Id,

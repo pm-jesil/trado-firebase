@@ -121,7 +121,7 @@ This document records the foundational product and technical architecture decisi
 - **Date**: 2026-11-05
 - **Context**: Relying on client-supplied `organizationId` and `branchId` in JSON request bodies creates severe security vulnerabilities, including tenant spoofing, cross-tenant data leaks, and unauthorized cross-branch stock modifications. Furthermore, Super Admins need platform management capabilities without possessing fake memberships in tenant organizations.
 - **Decision**:
-  - **Server-Derived Context (`services/tenantContext.ts`)**: For all operational tenant callables (`bills`, `products`, `customers`, `vendors`, `outflows`, `deliveries`, `returns`, `payments`, `stock`), `organizationId` and `branchId` are derived server-side from the verified caller's Firebase Auth token (`request.auth.token.primaryOrganizationId`) or active Firestore `memberships` records.
+  - **Server-Derived Context (originally `services/tenantContext.ts`, now the single gate `services/contextResolver.ts`)**: For all operational tenant callables (`bills`, `products`, `customers`, `vendors`, `outflows`, `deliveries`, `returns`, `payments`, `stock`), `organizationId` and `branchId` are derived server-side from the verified caller's Firebase Auth token (`request.auth.token.primaryOrganizationId`) or active Firestore `memberships` records.
   - **Client Omission & Forgery Prevention**: Flutter clients do not need to send `organizationId` or `branchId` in request bodies. If a client does provide an `organizationId`, it is strictly verified against the caller's active membership; mismatches are rejected immediately with `permission-denied`.
   - **Super Admin Platform Isolation**: Super Admin (`isSuperAdmin: true`) is strictly platform-scoped. Super Admin possesses no tenant organization, no branch, and no tenant memberships. Their context returns:
     * `organizations: []`
@@ -154,3 +154,19 @@ This document records the foundational product and technical architecture decisi
     * FCM token registration remains strictly canonical in `notificationsRegisterFcmToken`.
 
 
+
+## 2026-11-07 — Master flow, schema & gate audit
+
+Decisions D-01 … D-12 (usage enforcement, starter plan contents, strictness bound, read-metering strategy, expiry/grace, date type, organization field policy, data-scope defaults, approval defaults, variant model, seat definition, purchase cost basis) are recorded with their defaults in [the issue ledger](audit/issue-ledger.md#decisions-defaults-implemented-change-by-configuration). The former `verifyTenantAccess` / `resolveBranchContext` helpers in `services/tenantContext.ts` were removed: every callable now uses the single gate `resolveRequestContext` in `services/contextResolver.ts`.
+
+---
+
+## Decision 14: Organization Structured Contacts, Platform Financials, and Streamlined Entity History
+
+- **Date**: 2026-11-08
+- **Context**: Final production readiness audit identified enhancements for organization contact persons, platform-wide financial aggregation, and comprehensive audit history queryability without breaking tenant boundary guarantees.
+- **Decision**:
+  - **Structured Contacts (`OrganizationContact[]`)**: Added to `OrganizationDoc`, bounded to 20 items (registered in `duplication-allowlist.json` as `DUP-063`). Supported in `organizationsCreate` and `organizationsUpdate`. Enforced invariant: at most one contact may have `isPrimary: true`.
+  - **Platform-Wide Financial Aggregation**: `reportsGetPlatformOverview` aggregates revenue, outflows, and net cash flow across active organizations while strictly querying with `where("organizationId", "==", orgId)` per organization, preserving tenant query conformance.
+  - **Audit Trail Stream Querying**: `EntityHistorySchema` expands `entityType` enum to cover all 18 business entity types, with optional `entityId` and optional `entityType` allowing callers to query full-stream activity logs for an organization.
+  - **Strict Super Admin Platform Boundary**: Platform Super Admin is strictly isolated from executing tenant mutations directly through tenant callables (retaining `SUPER_ADMIN_TENANT_FORBIDDEN` invariant verified across all gated mutations). All tenant mutations must be executed within tenant user context.

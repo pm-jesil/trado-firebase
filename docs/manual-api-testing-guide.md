@@ -4,37 +4,40 @@
 
 ## Quick Start (5 minutes)
 
-### Prerequisites
+Execute these 5 commands across two PowerShell terminals:
 
-| Tool | Version | Check Command |
-|------|---------|---------------|
-| Node.js | 22+ | `node --version` |
-| Firebase CLI | 15+ | `npx firebase-tools --version` |
-| Browser | Chrome, Edge, or Firefox | — |
+```powershell
+# 1. Compile backend functions
+npm --prefix functions run build
 
-### Step 1: Build the Backend
+# 2. Start Firebase Emulators (Terminal 1)
+$env:FUNCTIONS_DISCOVERY_TIMEOUT = "60"
+firebase emulators:start --project trado-x
+
+# 3. Seed demo organizations & personas (Terminal 2)
+node functions/lib/scripts/seed-emulator.js --profile api-explorer-demo
+
+# 4. Generate OpenAPI specification (Terminal 2)
+node scripts/generate-openapi.js
+
+# 5. Launch Local API Explorer (Terminal 2)
+node tools/api-explorer/server.js
+# → Open browser to http://127.0.0.1:3939
+```
+
+### Detailed Step-by-Step Breakdown
+
+#### Step 1: Build the Backend
 
 ```powershell
 npm --prefix functions run build
 ```
 
-### Step 2: Generate the OpenAPI Spec
+#### Step 2: Start the Firebase Emulators (Terminal 1)
 
 ```powershell
-node scripts/generate-openapi.js
-```
-
-You should see output like:
-```
-[OK] Generated docs/openapi.json
-     101 callable operations, 4 triggers documented
-     90 Zod schemas resolved to JSON Schema
-```
-
-### Step 3: Start the Firebase Emulators
-
-```powershell
-npx firebase-tools emulators:start --project trado-x
+$env:FUNCTIONS_DISCOVERY_TIMEOUT = "60"
+firebase emulators:start --project trado-x
 ```
 
 Wait for:
@@ -43,13 +46,13 @@ Wait for:
 ```
 
 > [!TIP]
-> Leave this terminal open — the emulators must stay running.
+> Leave Terminal 1 open — the emulators must stay running.
 
-### Step 4: Seed Demo Data (New Terminal)
+#### Step 3: Seed Demo Organizations & Personas (Terminal 2)
 
+In a new terminal window:
 ```powershell
-# Recommended: Seed with the complete api-explorer-demo profile
-cmd.exe /c "set FIRESTORE_EMULATOR_HOST=127.0.0.1:8080&& set FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099&& set GCLOUD_PROJECT=trado-x&& node functions/lib/scripts/seed-emulator.js --profile api-explorer-demo"
+node functions/lib/scripts/seed-emulator.js --profile api-explorer-demo
 ```
 
 This provisions two realistic demo businesses and exports credentials to `.local/api-explorer-credentials.json`:
@@ -65,14 +68,28 @@ This provisions two realistic demo businesses and exports credentials to `.local
   * Cashier: `cashier@wholesale.trado.local` (Branch-locked to `main-branch`)
   * Branches: `main-branch` (`MAIN`), `branch_warehouse` (`WH01`)
 - **Default Test Password:** `TestPassword123!` for all personas.
+- **Detailed Persona Reference:** For the complete list of accounts, branch scopes, and negative personas, see [Testing Personas & Credentials](testing-personas-and-credentials.md).
 
-### Step 5: Start the API Explorer (New Terminal)
+#### Step 4: Generate OpenAPI Specification (Terminal 2)
+
+```powershell
+node scripts/generate-openapi.js
+```
+
+You should see output like:
+```
+[OK] Generated docs/openapi.json
+     101 callable operations, 4 triggers documented
+     90 Zod schemas resolved to JSON Schema
+```
+
+#### Step 5: Launch Local API Explorer (Terminal 2)
 
 ```powershell
 node tools/api-explorer/server.js
 ```
 
-### Step 6: Open the Explorer
+#### Step 6: Open the Explorer
 
 Open your browser to: **[http://127.0.0.1:3939](http://127.0.0.1:3939)**
 

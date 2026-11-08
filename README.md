@@ -22,6 +22,7 @@ For exhaustive system diagrams and deep architectural foundations, refer to:
 - 📘 **[Production Readiness & Release Gates](docs/production-readiness.md)**
 - 📑 **[Authoritative Callable & Trigger Inventory](docs/audit/callable-and-trigger-inventory.md)**
 - 📋 **[Master Issue & Findings Ledger](docs/audit/issue-ledger.md)**
+- 🔑 **[Local Testing Personas & Credentials Directory](docs/testing-personas-and-credentials.md)**
 
 ### Core Architectural Invariants
 
@@ -41,11 +42,11 @@ For exhaustive system diagrams and deep architectural foundations, refer to:
    - Inventory movements use Perpetual Weighted-Average Costing (WAC) with 4-decimal calculation precision and decimal-safe monetary rounding.
 
 4. **Anti-Embedding Principle**:
-   - Strict reference-by-ID architecture across all 44 collections. Foreign records store bare entity IDs (e.g. `billId`, `partyId`, `productId`).
+   - Strict reference-by-ID architecture across all 46 collections. Foreign records store bare entity IDs (e.g. `billId`, `partyId`, `productId`).
    - Deep nested documents and arbitrary JSON blobs are forbidden.
 
 5. **Write Boundary & Exactly-Once Semantics**:
-   - Direct client SDK writes are rejected by Firestore Security Rules across all 44 collections (`writesDenied()`).
+   - Direct client SDK writes are rejected by Firestore Security Rules across all 46 collections (`writesDenied()`).
    - Transactional business state (stock adjustments, customer/vendor balances, counter allocations) is modified exclusively via synchronous Cloud Functions HTTPS callables running in atomic transactions.
    - Background Firestore triggers (`onBillWritten`, `onOutflowWritten`, `onPaymentWritten`, `onDeliveryWritten`) provide telemetry, summary rollups, and push notifications without mutating core financial state.
 
@@ -55,12 +56,12 @@ For exhaustive system diagrams and deep architectural foundations, refer to:
 
 ```
 trado-firebase/
-├── firestore.rules               # Security rules covering 42 root collections + 2 subcollections (44 total)
+├── firestore.rules               # Security rules covering 45 root collections + 1 subcollection (46 total)
 ├── storage.rules                 # Cloud Storage bucket access rules
 ├── firestore.indexes.json        # Composite indexes for multi-tenant and branch queries
 ├── firebase.json                 # Emulator configuration, port allocations, and runtime targets
 ├── docs/                         # Canonical project documentation
-│   ├── api-reference.md          # Complete contract for all 105 Cloud Function exports
+│   ├── api-reference.md          # Complete contract for all 121 Cloud Function exports
 │   ├── architecture.md           # Deep architectural specification
 │   ├── data-model.md             # Concrete schema reference for all 44 collections
 │   ├── permissions-and-roles.md  # 4-layer permission hierarchy and role definitions
@@ -68,17 +69,17 @@ trado-firebase/
 │   ├── testing-guide.md          # Testing guide and automation architecture
 │   └── features/                 # 16 deep feature-by-feature implementation guides
 ├── scripts/                      # Static codebase integrity and test checkers
-│   ├── check-api-drift.js        # Verifies 105/105 export documentation parity
+│   ├── check-api-drift.js        # Verifies export documentation parity
 │   ├── check-duplicate-embedding.js # Audits AST and schemas against anti-embedding rules
 │   ├── check-schema-duplicates.js  # Verifies schema definitions and enum integrity
-│   ├── check-test-completeness.js  # Static AST test coverage audit (105 exports & 44 collections)
+│   ├── check-test-completeness.js  # Static AST test coverage audit (121 exports & 46 collections)
 │   └── check-markdown-links.js   # Verifies markdown link integrity across all documentation files
 └── functions/                    # Cloud Functions for Firebase codebase (Node.js 22, TypeScript)
     ├── package.json              # Canonical dependencies, build, and test scripts
     ├── tsconfig.json             # TypeScript compiler configuration
     ├── src/
-    │   ├── index.ts              # Canonical barrel exporting all 105 Cloud Functions
-    │   ├── callables/            # 101 HTTPS callable implementations across 7 modular domains
+    │   ├── index.ts              # Canonical barrel exporting all 121 Cloud Functions
+    │   ├── callables/            # 111 HTTPS callable implementations across 7 modular domains
     │   ├── triggers/             # 4 Firestore background event triggers
     │   ├── shared/               # RBAC engine, schemas, costing utility, context resolver
     │   └── test/
@@ -136,11 +137,34 @@ All development, debugging, and testing is designed to run completely inside the
    ```
 
 4. **Start Firebase Emulator Suite**:
-   On Windows, set the functions discovery timeout to accommodate cold startup of all 105 functions:
+   On Windows, set the functions discovery timeout to accommodate cold startup of all 116 functions:
    ```powershell
    $env:FUNCTIONS_DISCOVERY_TIMEOUT = "60"
    firebase emulators:start --project trado-x
    ```
+
+### 4.1 End-to-End Local Startup & API Explorer Quickstart
+
+For the fastest local onboarding experience (compile, run emulators, seed demo personas, generate OpenAPI spec, and explore all 111 callables in Swagger UI):
+
+```powershell
+# 1. Compile backend functions
+npm --prefix functions run build
+
+# 2. Start Firebase Emulators (Terminal 1)
+$env:FUNCTIONS_DISCOVERY_TIMEOUT = "60"
+firebase emulators:start --project trado-x
+
+# 3. Seed demo organizations & personas (Terminal 2)
+node functions/lib/scripts/seed-emulator.js --profile api-explorer-demo
+
+# 4. Generate OpenAPI specification (Terminal 2)
+node scripts/generate-openapi.js
+
+# 5. Launch Local API Explorer (Terminal 2)
+node tools/api-explorer/server.js
+# → Open browser to http://127.0.0.1:3939
+```
 
 ### Configured Emulator Ports
 
@@ -196,11 +220,11 @@ Run commands from the project root or functions folder:
 |---|---|:---:|---|
 | **Unit Tests** | `npm run test:unit --prefix functions` | ~25s | **127 unit tests** across 36 suites: Zod validation, tax formulas, WAC costing, decimal rounding, 4-layer RBAC, branch quota math, idempotency leases, usage meters, native Firestore Timestamp TTL, auth revocation, Super Admin platform isolation. |
 | **Rules Tests** | `npm run test:rules --prefix functions` | ~8s | **18 security rules tests** (12 Firestore + 6 Storage): Multi-tenant read isolation, branch scoping, direct client write denials across all 44 collections, avatar/logo upload rules. |
-| **Callable Contracts** | `npm run test:callables --prefix functions` | ~90s | **101 HTTPS callables** verified across 7 modular domain suites with persona authentication, positive CRUD, unauthorized callers, and schema validations. |
+| **Callable Contracts** | `npm run test:callables --prefix functions` | ~90s | **111 HTTPS callables** verified across 8 suites (incl. table-driven gate conformance) with persona authentication, positive CRUD, unauthorized callers, and schema validations. |
 | **Event Triggers** | `npm run test:triggers --prefix functions` | ~20s | **4 Firestore triggers** (`onBillWritten`, `onOutflowWritten`, `onPaymentWritten`, `onDeliveryWritten`) verified with real emulator writes, WAC updates, daily summary rollups, and in-app notifications. |
 | **E2E Business Flows** | `npm run test:e2e --prefix functions` | ~25s | **25 E2E business scenarios**: 10-step full ERP retail cycle (quotation → invoice → partial payment → sales return → ledger sync) + 15-scenario multi-branch isolation suite. |
 | **Simulation & Oracle** | `npm run test:simulation --prefix functions` | ~12s | **Dual-business simulation** (Single-branch retail + Multi-branch wholesale) with 100% mathematical parity against an independent GAAP Accounting Oracle. |
-| **Static Completeness** | `npm run test:static --prefix functions` | ~5s | **5 static checkers**: Anti-embedding AST verification, schema duplicate audit, API documentation drift checker (105/105), static test completeness checker (105 exports & 44 collections), and markdown link integrity checker (132 doc files). |
+| **Static Completeness** | `npm run test:static --prefix functions` | ~5s | **5 static checkers**: Anti-embedding AST verification, schema duplicate audit, API documentation drift checker (105/105), static test completeness checker (116 exports & 46 collections), and markdown link integrity checker (132 doc files). |
 | **All Tests Pipeline** | `npm run test:all --prefix functions` | ~3m | Executes the complete verification pipeline (`unit` → `rules` → `callables` → `triggers` → `e2e` → `simulation` → `static`). |
 
 ---
@@ -261,25 +285,23 @@ Trado includes a modern, browser-based, Swagger-style **API Explorer** (`http://
 ### 6.1 Quickstart Walkthrough (PowerShell)
 
 ```powershell
-# 1. Compile backend functions & build TypeScript
+# 1. Compile backend functions
 npm --prefix functions run build
 
 # 2. Start Firebase Emulators (Terminal 1)
 $env:FUNCTIONS_DISCOVERY_TIMEOUT = "60"
 firebase emulators:start --project trado-x
 
-# 3. Seed emulator with API Explorer demo data (Terminal 2)
-# Provisions Super Admin, Retail Org A, and Multi-Branch Wholesale Org B
+# 3. Seed demo organizations & personas (Terminal 2)
 node functions/lib/scripts/seed-emulator.js --profile api-explorer-demo
 
-# 4. Generate OpenAPI 3.0.3 contracts
+# 4. Generate OpenAPI specification (Terminal 2)
 node scripts/generate-openapi.js
 
-# 5. Start Local API Explorer (Terminal 2)
+# 5. Launch Local API Explorer (Terminal 2)
 node tools/api-explorer/server.js
+# → Open browser to http://127.0.0.1:3939
 ```
-
-Open your browser to: **[http://127.0.0.1:3939](http://127.0.0.1:3939)**
 
 ### 6.2 Configured Local Ports
 
@@ -294,7 +316,7 @@ Open your browser to: **[http://127.0.0.1:3939](http://127.0.0.1:3939)**
 
 ### 6.3 Demo Persona Credentials Quick Reference
 
-All personas share the default local password: **`TestPassword123!`**. Demo credentials are automatically saved to `.local/api-explorer-credentials.json` upon seeding.
+All personas share the default local password: **`TestPassword123!`**. Demo credentials are automatically saved to `.local/api-explorer-credentials.json` upon seeding. For the exhaustive list including negative testing accounts, see **[Local Testing Personas & Credentials Directory](docs/testing-personas-and-credentials.md)**.
 
 | Persona | Email | Organization Context | Branch Scope | Primary Role |
 |---|---|---|---|---|

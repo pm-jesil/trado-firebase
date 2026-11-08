@@ -101,9 +101,24 @@ void configureEmulators() {
 ```
 
 > [!NOTE]
-> On Flutter Web, `127.0.0.1` refers to your local machine browser environment. Ensure your local emulator suite is running via:
-> ```bash
-> firebase emulators:start --only auth,functions,firestore
+> On Flutter Web, `127.0.0.1` refers to your local machine browser environment. Start the local backend and seed personas via:
+> ```powershell
+> # 1. Compile backend functions
+> npm --prefix functions run build
+> 
+> # 2. Start Firebase Emulators (Terminal 1)
+> $env:FUNCTIONS_DISCOVERY_TIMEOUT = "60"
+> firebase emulators:start --project trado-x
+> 
+> # 3. Seed demo organizations & personas (Terminal 2)
+> node functions/lib/scripts/seed-emulator.js --profile api-explorer-demo
+> 
+> # 4. Generate OpenAPI specification (Terminal 2)
+> node scripts/generate-openapi.js
+> 
+> # 5. Launch Local API Explorer (Terminal 2)
+> node tools/api-explorer/server.js
+> # → Open browser to http://127.0.0.1:3939
 > ```
 
 ---
@@ -512,6 +527,55 @@ Future<AuthLoginResponse> login({
 - **Multi-Branch Managers / Owners**: Have `*` or access to multiple branches. They can switch `activeBranchId` in the app's local state and supply `branchId` in write payloads.
 
 ---
+
+
+### 3.6 `contextStatus` routing (subscription & organization state)
+
+`authMe.context.contextStatus` is the router key. New locked states return **zero tenant permissions**, an empty branch list, and a `subscription` summary (`state`, `planId`, `expiresAt`, `graceEndsAt`, `daysRemaining`):
+
+| `contextStatus` | Route |
+|---|---|
+| `ready` | Home (`primaryOrganization` + `primaryBranch` set) |
+| `platform` | Super Admin console |
+| `organization_selection_required` | Organization picker |
+| `branch_selection_required` | Branch picker |
+| `no_active_membership` | "No organization" screen |
+| `organization_inactive` | Locked tenant screen (organization deactivated by the platform) |
+| `subscription_expired` | Renewal screen (past expiry + grace) |
+| `subscription_suspended` | Suspended / cancelled screen |
+| `subscription_not_started` | "Subscription starts on …" screen |
+
+When `subscription.state == "grace"`, show a renewal banner; operations still work. Status is evaluated live on every call, so a renewal by the platform takes effect without re-login.
+
+### 3.7 Stable error reasons
+
+Every gate failure sets `FirebaseFunctionsException.details['reason']` (and prefixes the message with `[REASON]`). Branch on the reason, not the message:
+
+```dart
+final reason = (e.details is Map) ? (e.details as Map)['reason'] as String? : null;
+switch (reason) {
+  case 'SUBSCRIPTION_EXPIRED':
+  case 'SUBSCRIPTION_SUSPENDED':
+    router.go('/subscription');
+  case 'MODULE_NOT_IN_PLAN':
+    showUpgradePrompt();
+  case 'USAGE_LIMIT_EXCEEDED':
+    showLimitBanner(e.details); // metric, period, usage, limit
+  case 'PERMISSION_DENIED':
+  case 'FIELD_NOT_EDITABLE':
+    showAccessDenied();
+  default:
+    showError(e.message);
+}
+```
+
+Full list: [API reference — Gate, Error Reasons & Lifecycle Callables](api-reference.md#gate-error-reasons--lifecycle-callables-2026-11-07).
+
+### 3.8 Reads go through callables
+
+Direct Firestore SDK reads of business collections (products, customers, vendors, bills, outflows, payments, returns, deliveries, stock movements, daily/monthly summaries) are **denied by security rules**: use the `*List` / `*Get` / report callables, which apply data scope and hide cost/balance fields the user may not see (fields are omitted, not zeroed). Direct reads remain allowed for the organization, branches, roles, catalogs, stock balances, and the caller's own notifications, tasks and location.
+
+New callables relevant to the app: `billsApprove`, `billsVoid`, `outflowsApprove`, `outflowsVoid`, `teamsAssignMember`, `productsGetPriceHistory`, `auditGetEntityHistory`, `reportsGetPartyStatement`, `reportsGetOutflowSummary`. List responses of bills/outflows/payments/returns/deliveries include `scope` (`self` | `team` | `branch` | `organization`).
 
 ## 4. Calling Callables with `cloud_functions`
 

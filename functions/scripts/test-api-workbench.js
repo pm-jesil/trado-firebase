@@ -390,7 +390,6 @@ const tests = [
         lines: [
           {
             productId: context.prodId,
-            itemName: "Sparkling Water 500ml",
             quantity: 50,
             unit: "pcs",
             unitPrice: 30.00,
@@ -514,7 +513,6 @@ const tests = [
         direction: "in",
         partyType: "customer",
         partyId: context.custId,
-        partyName: "Grand Hotel",
         amount: 200.00,
         method: "cash",
         referenceId: context.billId,
@@ -545,8 +543,6 @@ const tests = [
         organizationId: context.orgId,
         returnType: "sales_return",
         referenceId: context.billId,
-        partyId: context.custId,
-        partyName: "Grand Hotel",
         refundMethod: "credit_note",
         items: [
           {

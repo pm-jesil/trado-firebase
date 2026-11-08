@@ -13,8 +13,11 @@
  */
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { parseInput } from "../validation/parseInput.js";
 import { db } from "../services/firebase.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
+import { DEFAULT_ORG_TIMEZONE } from "../services/subscription.js";
+import { AppPermissions } from "../constants/permissions.js";
 import {
   GetPlatformUsageSummarySchema,
   GetOrganizationsUsageSchema,
@@ -23,6 +26,7 @@ import {
   CalculateDryRunStatementSchema,
   GetUsageLimitsSchema,
   UpdateUsageLimitsSchema,
+  RecordClientMetricSchema,
 } from "../validation/schemas.js";
 import {
   createEmptyServiceCounts,
@@ -30,6 +34,9 @@ import {
   getActiveRateCard,
   generateDryRunUsageStatement,
   recordUsageMetrics,
+  getServerUsageSnapshot,
+  evaluateUsageLimits,
+  CLIENT_METRIC_KEYS,
   getEffectiveUsageLimits,
   updateOrganizationUsageLimits,
 } from "../services/usageMetering.js";
@@ -48,6 +55,7 @@ import { createAuditLog } from "../services/audit.js";
  */
 export const usageGetPlatformSummary = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: AppPermissions.PLATFORM_FINANCE_VIEW,
     allowPlatformSuperAdmin: true,
   });
 
@@ -55,14 +63,11 @@ export const usageGetPlatformSummary = onCall({ region: "asia-south1" }, async (
     throw new HttpsError("permission-denied", "Super Admin platform authorization required.");
   }
 
-  const parsed = GetPlatformUsageSummarySchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
+  const input = parseInput(GetPlatformUsageSummarySchema, request.data);
 
   const today = new Date().toISOString().slice(0, 10);
-  const startDate = parsed.data.startDate || `${today.slice(0, 7)}-01`;
-  const endDate = parsed.data.endDate || today;
+  const startDate = input.startDate || `${today.slice(0, 7)}-01`;
+  const endDate = input.endDate || today;
 
   const rateCard = await getActiveRateCard();
 
@@ -136,6 +141,7 @@ export const usageGetPlatformSummary = onCall({ region: "asia-south1" }, async (
  */
 export const usageGetOrganizations = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: AppPermissions.PLATFORM_FINANCE_VIEW,
     allowPlatformSuperAdmin: true,
   });
 
@@ -143,15 +149,12 @@ export const usageGetOrganizations = onCall({ region: "asia-south1" }, async (re
     throw new HttpsError("permission-denied", "Super Admin platform authorization required.");
   }
 
-  const parsed = GetOrganizationsUsageSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
+  const input = parseInput(GetOrganizationsUsageSchema, request.data);
 
   const today = new Date().toISOString().slice(0, 10);
-  const startDate = parsed.data.startDate || `${today.slice(0, 7)}-01`;
-  const endDate = parsed.data.endDate || today;
-  const limit = parsed.data.limit || 50;
+  const startDate = input.startDate || `${today.slice(0, 7)}-01`;
+  const endDate = input.endDate || today;
+  const limit = input.limit || 50;
   const rateCard = await getActiveRateCard();
 
   // 1. Fetch organizations
@@ -207,9 +210,9 @@ export const usageGetOrganizations = onCall({ region: "asia-south1" }, async (re
   }
 
   // Sort
-  if (parsed.data.sortBy === "cost") {
+  if (input.sortBy === "cost") {
     items.sort((a, b) => b.estimatedCost - a.estimatedCost);
-  } else if (parsed.data.sortBy === "name") {
+  } else if (input.sortBy === "name") {
     items.sort((a, b) => a.name.localeCompare(b.name));
   } else {
     items.sort((a, b) => b.totalOperations - a.totalOperations);
@@ -228,6 +231,7 @@ export const usageGetOrganizations = onCall({ region: "asia-south1" }, async (re
  */
 export const usageGetBranches = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: AppPermissions.PLATFORM_FINANCE_VIEW,
     allowPlatformSuperAdmin: true,
   });
 
@@ -235,12 +239,9 @@ export const usageGetBranches = onCall({ region: "asia-south1" }, async (request
     throw new HttpsError("permission-denied", "Super Admin platform authorization required.");
   }
 
-  const parsed = GetBranchesUsageSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
+  const input = parseInput(GetBranchesUsageSchema, request.data);
 
-  const orgId = parsed.data.organizationId;
+  const orgId = input.organizationId;
   const orgRef = db.collection("organizations").doc(orgId);
   const orgSnap = await orgRef.get();
   if (!orgSnap.exists) {
@@ -249,8 +250,8 @@ export const usageGetBranches = onCall({ region: "asia-south1" }, async (request
   const org = orgSnap.data() as OrganizationDoc;
 
   const today = new Date().toISOString().slice(0, 10);
-  const startDate = parsed.data.startDate || `${today.slice(0, 7)}-01`;
-  const endDate = parsed.data.endDate || today;
+  const startDate = input.startDate || `${today.slice(0, 7)}-01`;
+  const endDate = input.endDate || today;
   const rateCard = await getActiveRateCard();
 
   // Fetch branches under organizations/{orgId}/branches
@@ -324,6 +325,7 @@ export const usageGetBranches = onCall({ region: "asia-south1" }, async (request
  */
 export const usageGetDetail = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: AppPermissions.PLATFORM_FINANCE_VIEW,
     allowPlatformSuperAdmin: true,
   });
 
@@ -331,19 +333,16 @@ export const usageGetDetail = onCall({ region: "asia-south1" }, async (request) 
     throw new HttpsError("permission-denied", "Super Admin platform authorization required.");
   }
 
-  const parsed = GetUsageDetailSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
+  const input = parseInput(GetUsageDetailSchema, request.data);
 
   const today = new Date().toISOString().slice(0, 10);
-  const startDate = parsed.data.startDate || `${today.slice(0, 7)}-01`;
-  const endDate = parsed.data.endDate || today;
+  const startDate = input.startDate || `${today.slice(0, 7)}-01`;
+  const endDate = input.endDate || today;
   const rateCard = await getActiveRateCard();
 
   let query = db.collection("organizationUsageDaily").where("date", ">=", startDate).where("date", "<=", endDate);
-  if (parsed.data.organizationId) {
-    query = query.where("organizationId", "==", parsed.data.organizationId);
+  if (input.organizationId) {
+    query = query.where("organizationId", "==", input.organizationId);
   }
 
   const snap = await query.limit(100).get();
@@ -360,7 +359,7 @@ export const usageGetDetail = onCall({ region: "asia-south1" }, async (request) 
   });
 
   return {
-    filters: parsed.data,
+    filters: input,
     items,
   };
 });
@@ -371,6 +370,7 @@ export const usageGetDetail = onCall({ region: "asia-south1" }, async (request) 
  */
 export const usageCalculateDryRunStatement = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: AppPermissions.PLATFORM_FINANCE_VIEW,
     allowPlatformSuperAdmin: true,
   });
 
@@ -378,27 +378,24 @@ export const usageCalculateDryRunStatement = onCall({ region: "asia-south1" }, a
     throw new HttpsError("permission-denied", "Super Admin platform authorization required.");
   }
 
-  const parsed = CalculateDryRunStatementSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
+  const input = parseInput(CalculateDryRunStatementSchema, request.data);
 
-  const orgRef = db.collection("organizations").doc(parsed.data.organizationId);
+  const orgRef = db.collection("organizations").doc(input.organizationId);
   const orgSnap = await orgRef.get();
   if (!orgSnap.exists) {
-    throw new HttpsError("not-found", `Organization "${parsed.data.organizationId}" not found.`);
+    throw new HttpsError("not-found", `Organization "${input.organizationId}" not found.`);
   }
   const org = orgSnap.data() as OrganizationDoc;
 
   const statement = await generateDryRunUsageStatement({
-    organizationId: parsed.data.organizationId,
-    billingPeriod: parsed.data.billingPeriod,
-    rateCardVersion: parsed.data.rateCardVersion,
+    organizationId: input.organizationId,
+    billingPeriod: input.billingPeriod,
+    rateCardVersion: input.rateCardVersion,
   });
 
   return {
     ...statement,
-    organizationName: org.name || parsed.data.organizationId,
+    organizationName: org.name || input.organizationId,
     status: "draft_estimate",
     legalDisclaimer: "This statement is an internal diagnostic estimate of infrastructure resource consumption. It is NOT an invoice and no automated charge has occurred.",
     rateCardVersion: statement.currency === "INR" ? "v1.0.0" : "v1.0.0",
@@ -411,11 +408,23 @@ export const usageCalculateDryRunStatement = onCall({ region: "asia-south1" }, a
  * Internal or authenticated ingestion for telemetry operations (e.g. location pings, storage ops).
  */
 export const usageRecordClientMetric = onCall({ region: "asia-south1" }, async (request) => {
+  const input = parseInput(RecordClientMetricSchema, request.data);
   const context = await resolveRequestContext(request);
 
   const orgId = context.organizationId;
   const branchId = context.branchId;
-  const metrics = (request.data?.metrics || {}) as Partial<any>;
+  // Client-reported estimates: known keys only, non-negative, bounded (no self-decrement)
+  const raw: Record<string, unknown> = input.metrics;
+  const metrics: Record<string, number> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (!(CLIENT_METRIC_KEYS as readonly string[]).includes(key)) {
+      throw new HttpsError("invalid-argument", `Unknown metric "${key}".`);
+    }
+    if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 1_000_000) {
+      throw new HttpsError("invalid-argument", `Metric "${key}" must be a number between 0 and 1,000,000.`);
+    }
+    metrics[key] = Math.floor(value);
+  }
 
   await recordUsageMetrics({
     organizationId: orgId,
@@ -433,16 +442,14 @@ export const usageRecordClientMetric = onCall({ region: "asia-south1" }, async (
  */
 export const usageGetLimits = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: AppPermissions.ORG_VIEW,
     allowPlatformSuperAdmin: true,
   });
 
-  const parsed = GetUsageLimitsSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
+  const input = parseInput(GetUsageLimitsSchema, request.data);
 
   const targetOrgId = context.isSuperAdmin
-    ? (parsed.data.organizationId || context.organizationId)
+    ? (input.organizationId || context.organizationId)
     : context.organizationId;
 
   if (!targetOrgId) {
@@ -450,18 +457,37 @@ export const usageGetLimits = onCall({ region: "asia-south1" }, async (request) 
   }
 
   // Cross-tenant security check for non-Super Admin
-  if (!context.isSuperAdmin && parsed.data.organizationId && parsed.data.organizationId !== context.organizationId) {
+  if (!context.isSuperAdmin && input.organizationId && input.organizationId !== context.organizationId) {
     throw new HttpsError("permission-denied", "Cross-organization access rejected.");
   }
 
   // Privilege check: must be Super Admin, Owner, or Admin
-  const isOwnerOrAdmin = context.isSuperAdmin || context.membership?.isPrimary || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
+  const isOwnerOrAdmin = context.isSuperAdmin || context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
   if (!isOwnerOrAdmin) {
     throw new HttpsError("permission-denied", "Tenant Owner or Administrator role required to view usage limits.");
   }
 
   const limitsInfo = await getEffectiveUsageLimits(targetOrgId);
-  return limitsInfo;
+  const tz = context.organization.timezone || DEFAULT_ORG_TIMEZONE;
+  const serverObserved = await getServerUsageSnapshot(targetOrgId, tz, true);
+  const verdict = evaluateUsageLimits(limitsInfo.effectiveLimits, serverObserved);
+  return {
+    ...limitsInfo,
+    // Server-observed operations (measurementClass app_attributed), all three windows
+    serverObserved: {
+      measurementClass: "app_attributed",
+      day: serverObserved.keys.day,
+      week: serverObserved.keys.week,
+      month: serverObserved.keys.month,
+      daily: serverObserved.daily,
+      weekly: serverObserved.weekly,
+      monthly: serverObserved.monthly,
+    },
+    warnings: verdict.warnings,
+    blocked: verdict.blocked,
+    breaches: verdict.breaches,
+    disclaimer: "Operation counts observed by server code. Not a bill; direct client SDK reads are not included.",
+  };
 });
 
 /**
@@ -471,6 +497,7 @@ export const usageGetLimits = onCall({ region: "asia-south1" }, async (request) 
  */
 export const usageUpdateLimits = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
+    requiredPermission: AppPermissions.PLATFORM_SUBSCRIPTIONS_MANAGE,
     allowPlatformSuperAdmin: true,
   });
 
@@ -478,12 +505,9 @@ export const usageUpdateLimits = onCall({ region: "asia-south1" }, async (reques
     throw new HttpsError("permission-denied", "Super Admin platform authorization required.");
   }
 
-  const parsed = UpdateUsageLimitsSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
+  const input = parseInput(UpdateUsageLimitsSchema, request.data);
 
-  const { organizationId, limits } = parsed.data;
+  const { organizationId, limits } = input;
 
   await updateOrganizationUsageLimits(organizationId, limits as UsageLimitsConfig);
 

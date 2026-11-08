@@ -12,11 +12,19 @@ import {
   CreateCustomerSchema,
   UpdateCustomerSchema,
   ListCustomersSchema,
+  GetCustomerSchema,
 } from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
 import { CustomerDoc } from "../types/models.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
-import { createAuditLog } from "../services/audit.js";
-import { verifyTenantAccess, resolveBranchContext } from "../services/tenantContext.js";
+import { commitWithKeys, partyClaims, changedClaims, duplicateOverride } from "../services/uniqueKeys.js";
+import { createAuditLog, diffChanges } from "../services/audit.js";
+import { fetchPage } from "../services/pagination.js";
+import { resolveRequestContext } from "../services/contextResolver.js";
+import { redactCustomer } from "../services/redaction.js";
+import { AppPermissions } from "../constants/permissions.js";
+
+const CUSTOMER_READ = [AppPermissions.CUSTOMER_VIEW, AppPermissions.BILL_CREATE];
 
 async function validateBranchIds(organizationId: string, branchIds: string[]): Promise<void> {
   for (const bId of branchIds) {
@@ -32,14 +40,11 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = CreateCustomerSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(CreateCustomerSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
-  const callerBranchId = await resolveBranchContext(request.auth, orgId, input.branchId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.CUSTOMER_CREATE });
+  const orgId = ctx.organizationId;
+  const callerBranchId = ctx.branchId;
 
   const idempotency = await reserveIdempotency({
     scope: orgId,
@@ -95,6 +100,8 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
       customerCode,
       name: input.name.trim(),
       mobile: input.mobile?.trim() || null,
+      additionalPhones: input.additionalPhones || [],
+      whatsApp: input.whatsApp?.trim() || null,
       email: input.email?.trim().toLowerCase() || null,
       taxNumber: input.taxNumber?.trim() || null,
       billingAddress: input.billingAddress?.trim() || null,
@@ -112,7 +119,9 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
       createdBy: request.auth.uid,
     };
 
-    await customerRef.set(customerDoc);
+    await commitWithKeys(orgId, "customer", customerId, (batch) => batch.set(customerRef, customerDoc), {
+      claim: duplicateOverride(ctx, input.duplicateOverrideReason) ? [] : partyClaims("customer", customerDoc),
+    });
 
     const response = {
       customerId,
@@ -138,7 +147,7 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
       action: "CUSTOMER_CREATED",
       entityType: "customer",
       entityId: customerId,
-      details: { name: customerDoc.name, customerCode },
+      details: { duplicateOverrideReason: input.duplicateOverrideReason || null },
     });
 
     return response;
@@ -156,13 +165,13 @@ export const customersUpdate = onCall({ region: "asia-south1" }, async (request)
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = UpdateCustomerSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdateCustomerSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.CUSTOMER_UPDATE });
+  const orgId = ctx.organizationId;
+  if (input.creditLimit !== undefined && !ctx.can(AppPermissions.CUSTOMER_VIEW_BALANCE)) {
+    throw new HttpsError("permission-denied", "[FIELD_NOT_EDITABLE] creditLimit requires customer:view_balance.", { reason: "FIELD_NOT_EDITABLE", field: "creditLimit" });
+  }
 
   const customerRef = db.collection("customers").doc(input.customerId);
   const docSnap = await customerRef.get();
@@ -177,10 +186,13 @@ export const customersUpdate = onCall({ region: "asia-south1" }, async (request)
 
   const updates: Partial<CustomerDoc> = {
     updatedAt: new Date().toISOString(),
+    updatedBy: ctx.callerUid,
   };
 
   if (input.name) updates.name = input.name.trim();
   if (input.mobile !== undefined) updates.mobile = input.mobile?.trim() || null;
+  if (input.additionalPhones !== undefined) updates.additionalPhones = input.additionalPhones;
+  if (input.whatsApp !== undefined) updates.whatsApp = input.whatsApp?.trim() || null;
   if (input.email !== undefined) updates.email = input.email?.trim().toLowerCase() || null;
   if (input.taxNumber !== undefined) updates.taxNumber = input.taxNumber?.trim() || null;
   if (input.billingAddress !== undefined) updates.billingAddress = input.billingAddress?.trim() || null;
@@ -199,15 +211,20 @@ export const customersUpdate = onCall({ region: "asia-south1" }, async (request)
     }
   }
 
-  await customerRef.update(updates);
+  const before = partyClaims("customer", existing);
+  const after = partyClaims("customer", { ...existing, ...updates });
+  const keyChange = duplicateOverride(ctx, input.duplicateOverrideReason) ? { claim: [], release: changedClaims(before, after).release } : changedClaims(before, after);
+  await commitWithKeys(orgId, "customer", input.customerId, (batch) => batch.update(customerRef, updates), keyChange);
 
   await createAuditLog({
     organizationId: orgId,
-    actorUid: request.auth.uid,
+    branchId: ctx.branchId,
+    actorUid: ctx.callerUid,
+    actorMembershipId: ctx.membershipId,
     action: "CUSTOMER_UPDATED",
     entityType: "customer",
     entityId: input.customerId,
-    details: updates as Record<string, unknown>,
+    changes: diffChanges(existing as unknown as Record<string, unknown>, updates as Record<string, unknown>),
   });
 
   return { success: true, message: "Customer updated successfully." };
@@ -218,27 +235,22 @@ export const customersList = onCall({ region: "asia-south1" }, async (request) =
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = ListCustomersSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(ListCustomersSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, input.organizationId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: CUSTOMER_READ, operation: "read" });
+  const orgId = ctx.organizationId;
 
-  const query = db.collection("customers")
-    .where("organizationId", "==", orgId)
-    .limit(input.limit || 50);
-
-  const snapshot = await query.get();
+  const query = db.collection("customers").where("organizationId", "==", orgId);
+  const { snapshot, nextCursor } = await fetchPage(query, "customers", input.startAfterId, input.limit || 50);
   let items = snapshot.docs.map((doc) => ({
     customerId: doc.id,
     ...(doc.data() as CustomerDoc),
   }));
 
   // Enforce branch-level visibility in query scope
-  const targetBranchId = input.branchId || (request.auth.token?.primaryBranchId as string | undefined);
-  if (targetBranchId && request.auth.token?.isSuperAdmin !== true) {
+  // Branch-level visibility uses the gate-validated branch, never an unchecked client value
+  const targetBranchId = ctx.branchId;
+  if (!ctx.isSuperAdmin) {
     items = items.filter((c) => {
       if (!c.visibilityScope || c.visibilityScope === "all_branches") return true;
       if (c.visibilityScope === "branch_only" || c.visibilityScope === "selected_branches") {
@@ -248,7 +260,7 @@ export const customersList = onCall({ region: "asia-south1" }, async (request) =
     });
   }
 
-  return { items, count: items.length };
+  return { items: items.map((i) => redactCustomer(i, ctx)), count: items.length, nextCursor };
 });
 
 export const customersGet = onCall({ region: "asia-south1" }, async (request) => {
@@ -256,12 +268,10 @@ export const customersGet = onCall({ region: "asia-south1" }, async (request) =>
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const customerId = request.data?.customerId;
-  if (!customerId) {
-    throw new HttpsError("invalid-argument", "customerId is required.");
-  }
+  const { customerId } = parseInput(GetCustomerSchema, request.data);
 
-  const orgId = await verifyTenantAccess(request.auth, request.data?.organizationId);
+  const ctx = await resolveRequestContext(request, { requiredPermission: CUSTOMER_READ, operation: "read" });
+  const orgId = ctx.organizationId;
 
   const docSnap = await db.collection("customers").doc(customerId).get();
   if (!docSnap.exists) {
@@ -274,8 +284,8 @@ export const customersGet = onCall({ region: "asia-south1" }, async (request) =>
   }
 
   // Branch visibility validation
-  const callerBranchId = request.data?.branchId || (request.auth.token?.primaryBranchId as string | undefined);
-  if (callerBranchId && request.auth.token?.isSuperAdmin !== true) {
+  const callerBranchId = ctx.branchId;
+  if (!ctx.isSuperAdmin) {
     if (data.visibilityScope === "branch_only" || data.visibilityScope === "selected_branches") {
       if (!Array.isArray(data.sharedForBranchIds) || !data.sharedForBranchIds.includes(callerBranchId)) {
         throw new HttpsError("permission-denied", "Customer record is not shared with caller's branch.");
@@ -283,6 +293,6 @@ export const customersGet = onCall({ region: "asia-south1" }, async (request) =>
     }
   }
 
-  return { customerId: docSnap.id, ...data };
+  return redactCustomer({ customerId: docSnap.id, ...data }, ctx);
 });
 

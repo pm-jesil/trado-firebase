@@ -7,11 +7,11 @@
  * Never executes against live production environments.
  */
 
-import { initializeApp, getApps } from "firebase-admin/app";
-import { getFirestore, Firestore } from "firebase-admin/firestore";
-import { getAuth, Auth } from "firebase-admin/auth";
+import type { Firestore } from "firebase-admin/firestore";
+import type { Auth } from "firebase-admin/auth";
 import fs from "node:fs";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import {
   DEFAULT_MODULES,
   DEFAULT_TAX_REGIMES,
@@ -21,6 +21,11 @@ import {
 } from "../constants/catalogs.js";
 import { AppPermissions } from "../constants/permissions.js";
 import { BusinessType, BusinessCategory, EntityStatus } from "../constants/enums.js";
+import {
+  SeedOrgSpec, seedOrganizationFromSpec, seedBusinessData, personaCredentials,
+  WHOLESALE_HUB_SPEC, CYCLE_WORLD_SPEC, KITCHEN_MART_SPEC,
+} from "./seed-business-data.js";
+import { uniqueKeyId } from "../services/naturalKeys.js";
 
 export interface SafetyCheckResult {
   safe: boolean;
@@ -70,7 +75,7 @@ export function verifyEmulatorSafety(
   };
 }
 
-export type SeedProfile = "minimal" | "staff-demo" | "operations-demo" | "multi-branch-test" | "api-explorer-demo";
+export type SeedProfile = "minimal" | "staff-demo" | "operations-demo" | "multi-branch-test" | "api-explorer-demo" | "flagship-demo";
 
 interface CliOptions {
   checkOnly: boolean;
@@ -85,7 +90,7 @@ function parseCliArgs(args: string[]): CliOptions {
   const profileArg = args.find((a) => a.startsWith("--profile="));
   if (profileArg) {
     const p = profileArg.split("=")[1]?.toLowerCase();
-    if (p === "minimal" || p === "staff-demo" || p === "operations-demo" || p === "multi-branch-test" || p === "api-explorer-demo") {
+    if (p === "minimal" || p === "staff-demo" || p === "operations-demo" || p === "multi-branch-test" || p === "api-explorer-demo" || p === "flagship-demo") {
       profile = p;
     }
   }
@@ -183,6 +188,33 @@ async function ensureAuthUser(auth: Auth, email: string, displayName: string): P
   }
 }
 
+/** Apex Retail operations data (its structure and negative personas are provisioned below). */
+function apexOperationsSpec(isMultiBranch: boolean): SeedOrgSpec {
+  return {
+    organizationId: "org_apex_sample",
+    name: "Apex Wholesale Supplies",
+    businessType: BusinessType.WHOLESALE_RETAIL,
+    businessCategory: BusinessCategory.GENERAL,
+    planId: isMultiBranch ? "plan_growth" : "plan_starter",
+    branches: [{ branchId: "main-branch", name: "Main Branch", code: "MAIN" }],
+    owner: { email: "owner@apexwholesale.local", name: "Apex Owner" },
+    personas: [],
+    categories: [{ id: "cat_bakery_sample", name: "Bakery & Confectionery" }],
+    units: [{ id: "unit_pack_sample", name: "Pack", code: "pack" }],
+    products: [{ id: "prod_bread_sample", name: "Whole Wheat Bread 400g", categoryId: "cat_bakery_sample", baseUnit: "pack", barcode: "8901234567890", sellingPrice: 45, costPrice: 32, taxRatePercent: 5, hasExpiry: true, lowStockThreshold: 15 }],
+    customers: [{ id: "cust_citymart_sample", code: "CUST-000001", name: "City Mart Supermarket", mobile: "9876543210", email: "contact@citymart.local", taxNumber: "29ABCDE1234F1Z5", billingAddress: "42 Market Street, Bangalore", creditLimit: 50000 }],
+    vendors: [{ id: "vend_goldengrain_sample", code: "VEND-000001", name: "Golden Grain Mills", mobile: "9123456780", email: "orders@goldengrain.local", taxNumber: "29XYZAB5678C1Z2", address: "10 Industrial Area, Hubli" }],
+    openingStock: [
+      { productId: "prod_bread_sample", branchId: "main-branch", quantity: 100 },
+      ...(isMultiBranch ? [{ productId: "prod_bread_sample", branchId: "branch_warehouse", quantity: 50 }] : []),
+    ],
+    transactions: [
+      { as: "owner", fn: "outflowsCreate", step: "pur-golden-grain", data: { kind: "purchase", vendorId: "vend_goldengrain_sample", invoiceNumber: "GG-0001", paidAmount: 3360, lines: [{ productId: "prod_bread_sample", quantity: 100, unit: "pack", unitPrice: 32, taxPercent: 5 }] } },
+      { as: "cashier", fn: "billsCreate", step: "sale-city-mart", data: { salesMode: "b2b", customerId: "cust_citymart_sample", items: [{ productId: "prod_bread_sample", quantity: 2 }], paidAmount: 94.5 } },
+    ],
+  };
+}
+
 // 2. Demo Organization & Operating Personas
 export async function seedDemoOrganization(
   db: Firestore,
@@ -260,19 +292,13 @@ export async function seedDemoOrganization(
       code: "MAIN",
       isDefault: true,
       isActive: true,
-      status: EntityStatus.ACTIVE,
       gstin: "29ABCDE1234F1Z5",
       createdAt: now,
       createdBy: ownerUid,
     });
 
   // Lock for MAIN branch code
-  await db.collection("branchCodeLocks").doc(`${sampleOrgId}_MAIN`).set({
-    organizationId: sampleOrgId,
-    branchCode: "MAIN",
-    branchId: defaultBranchId,
-    createdAt: now,
-  });
+  await db.collection("uniqueKeys").doc(uniqueKeyId(sampleOrgId, "branch_code", "MAIN")).set({ organizationId: sampleOrgId, kind: "branch_code", entityType: "branch", entityId: defaultBranchId, createdAt: now });
 
   // 2e. Owner Membership & Branch Join
   const ownerMembershipId = `${ownerUid}_${sampleOrgId}`;
@@ -286,7 +312,6 @@ export async function seedDemoOrganization(
     status: EntityStatus.ACTIVE,
     isPrimary: true,
     primaryBranchId: defaultBranchId,
-    assignedBranchIds: isMultiBranch ? [defaultBranchId, secondaryBranchId] : [defaultBranchId],
     createdAt: now,
     createdBy: superAdminUid,
   });
@@ -317,18 +342,12 @@ export async function seedDemoOrganization(
         code: "WH01",
         isDefault: false,
         isActive: true,
-        status: EntityStatus.ACTIVE,
         gstin: "29ABCDE1234F1Z5",
         createdAt: now,
         createdBy: ownerUid,
       });
 
-    await db.collection("branchCodeLocks").doc(`${sampleOrgId}_WH01`).set({
-      organizationId: sampleOrgId,
-      branchCode: "WH01",
-      branchId: secondaryBranchId,
-      createdAt: now,
-    });
+    await db.collection("uniqueKeys").doc(uniqueKeyId(sampleOrgId, "branch_code", "WH01")).set({ organizationId: sampleOrgId, kind: "branch_code", entityType: "branch", entityId: secondaryBranchId, createdAt: now });
 
     await db.collection("membershipBranches").doc(`${ownerMembershipId}_${secondaryBranchId}`).set({
       membershipId: ownerMembershipId,
@@ -344,17 +363,20 @@ export async function seedDemoOrganization(
     console.log(`✓ Provisioned Secondary Branch: ${secondaryBranchId} (WH01)`);
   }
 
+  const apexUids: Record<string, string> = { owner: ownerUid };
+
   // 2f. Staff Members (if profile is staff-demo, operations-demo, or multi-branch-test)
   if (profile !== "minimal") {
     const staffPersonas = [
-      { email: "admin@apexwholesale.local", name: "Apex Admin", roleId: "role_org_admin" },
-      { email: "cashier@apexwholesale.local", name: "Apex Cashier", roleId: "role_cashier" },
-      { email: "rider@apexwholesale.local", name: "Apex Rider", roleId: "role_rider" },
-      { email: "manager@apexwholesale.local", name: "Apex Manager", roleId: "role_store_manager" },
+      { key: "admin", email: "admin@apexwholesale.local", name: "Apex Admin", roleId: "role_admin" },
+      { key: "cashier", email: "cashier@apexwholesale.local", name: "Apex Cashier", roleId: "role_cashier" },
+      { key: "rider", email: "rider@apexwholesale.local", name: "Apex Rider", roleId: "role_rider" },
+      { key: "manager", email: "manager@apexwholesale.local", name: "Apex Manager", roleId: "role_store_manager" },
     ];
 
     for (const s of staffPersonas) {
       const uid = await ensureAuthUser(auth, s.email, s.name);
+      apexUids[s.key] = uid;
       await auth.setCustomUserClaims(uid, {
         primaryOrganizationId: sampleOrgId,
         primaryBranchId: defaultBranchId,
@@ -380,7 +402,6 @@ export async function seedDemoOrganization(
         status: EntityStatus.ACTIVE,
         isPrimary: true,
         primaryBranchId: defaultBranchId,
-        assignedBranchIds: [defaultBranchId],
         createdAt: now,
         createdBy: ownerUid,
       });
@@ -426,7 +447,6 @@ export async function seedDemoOrganization(
       status: EntityStatus.ACTIVE,
       isPrimary: true,
       primaryBranchId: defaultBranchId,
-      assignedBranchIds: [defaultBranchId],
       createdAt: now,
       createdBy: ownerUid,
     });
@@ -457,7 +477,6 @@ export async function seedDemoOrganization(
       status: "deactivated", // Revoked membership
       isPrimary: true,
       primaryBranchId: defaultBranchId,
-      assignedBranchIds: [defaultBranchId],
       createdAt: now,
       createdBy: ownerUid,
     });
@@ -475,7 +494,6 @@ export async function seedDemoOrganization(
         code: "INACT",
         isDefault: false,
         isActive: false, // Inactive branch
-        status: "deactivated",
         createdAt: now,
         createdBy: ownerUid,
       });
@@ -521,590 +539,41 @@ export async function seedDemoOrganization(
       status: EntityStatus.ACTIVE,
       isPrimary: true,
       primaryBranchId: "main-branch",
-      assignedBranchIds: ["main-branch"],
       createdAt: now,
       createdBy: superAdminUid,
     });
-    console.log(`✓ Provisioned Negative Testing Entities (Inactive User, Deactivated Membership, Inactive Branch, Suspended Org).`);
-  }
-
-  // 2g. Operational Records (Products, Categories, Units, StockBalances, Customers, Vendors)
-  if (profile === "operations-demo" || profile === "multi-branch-test") {
-    // Category
-    const sampleCatId = "cat_bakery_sample";
-    await db.collection("categories").doc(sampleCatId).set({
-      organizationId: sampleOrgId,
-      name: "Bakery & Confectionery",
-      description: "Fresh bakery and bread products",
-      status: "active",
-      createdAt: now,
-      createdBy: ownerUid,
-    });
-
-    // Unit
-    const sampleUnitId = "unit_pack_sample";
-    await db.collection("units").doc(sampleUnitId).set({
-      organizationId: sampleOrgId,
-      name: "Pack",
-      code: "pack",
-      group: "count",
-      baseMultiplier: 1,
-      status: "active",
-      createdAt: now,
-      createdBy: ownerUid,
-    });
-
-    // Product
-    const sampleProdId = "prod_bread_sample";
-    const sampleBarcode = "8901234567890";
-    await db.collection("products").doc(sampleProdId).set({
-      organizationId: sampleOrgId,
-      name: "Whole Wheat Bread 400g",
-      categoryId: sampleCatId,
-      categoryNameSnapshot: "Bakery & Confectionery",
-      baseUnit: "pack",
-      barcode: sampleBarcode,
-      sellingPrice: 45,
-      costPrice: 32,
-      taxInclusive: false,
-      taxRatePercent: 5,
-      hasExpiry: true,
-      trackStock: true,
-      initialStock: 100,
-      currentStock: isMultiBranch ? 150 : 100,
-      lowStockThreshold: 15,
-      status: "active",
-      createdAt: now,
-      createdBy: ownerUid,
-    });
-
-    // Barcode Lock
-    await db.collection("barcodeLocks").doc(`${sampleOrgId}_${sampleBarcode}`).set({
-      organizationId: sampleOrgId,
-      productId: sampleProdId,
-      barcode: sampleBarcode,
-      createdAt: now,
-    });
-
-    // Default Branch StockBalance
-    await db
-      .collection("stockBalances")
-      .doc(`${sampleOrgId}_${defaultBranchId}_${sampleProdId}`)
-      .set({
-        organizationId: sampleOrgId,
-        branchId: defaultBranchId,
-        productId: sampleProdId,
-        currentStock: 100,
-        allocatedStock: 0,
-        availableStock: 100,
-        reorderPoint: 15,
-        lowStockThreshold: 15,
-        updatedAt: now,
-      });
-
-    // Secondary Branch StockBalance (multi-branch profile)
-    if (isMultiBranch) {
-      await db
-        .collection("stockBalances")
-        .doc(`${sampleOrgId}_${secondaryBranchId}_${sampleProdId}`)
-        .set({
-          organizationId: sampleOrgId,
-          branchId: secondaryBranchId,
-          productId: sampleProdId,
-          currentStock: 50,
-          allocatedStock: 0,
-          availableStock: 50,
-          reorderPoint: 20,
-          lowStockThreshold: 20,
-          updatedAt: now,
-        });
-    }
-
-    // Customer
-    const sampleCustId = "cust_citymart_sample";
-    await db.collection("customers").doc(sampleCustId).set({
-      organizationId: sampleOrgId,
-      customerCode: "CUST-000001",
-      name: "City Mart Supermarket",
-      mobile: "9876543210",
-      email: "contact@citymart.local",
-      taxNumber: "29ABCDE1234F1Z5",
-      billingAddress: "42 Market Street, Bangalore",
-      creditLimit: 50000,
-      currentBalance: 0,
-      visibilityScope: "all_branches",
-      status: "active",
-      createdAt: now,
-      createdBy: ownerUid,
-    });
-
-    // Vendor
-    const sampleVendId = "vend_goldengrain_sample";
-    await db.collection("vendors").doc(sampleVendId).set({
-      organizationId: sampleOrgId,
-      vendorCode: "VEND-000001",
-      name: "Golden Grain Mills",
-      mobile: "9123456780",
-      email: "orders@goldengrain.local",
-      taxNumber: "29XYZAB5678C1Z2",
-      address: "10 Industrial Area, Hubli",
-      currentBalance: 0,
-      visibilityScope: "all_branches",
-      status: "active",
-      createdAt: now,
-      createdBy: ownerUid,
-    });
-
-    // Sample Bill
-    await db.collection("bills").doc("bill_sample_001").set({
-      organizationId: sampleOrgId,
-      branchId: defaultBranchId,
-      billNumber: "INV-2026-0001",
-      customerId: sampleCustId,
-      customerNameSnapshot: "City Mart Supermarket",
-      customerMobileSnapshot: "9876543210",
-      status: "finalized",
-      paymentStatus: "paid",
-      subtotal: 90,
-      taxAmount: 4.5,
-      totalAmount: 94.5,
-      items: [
-        {
-          productId: sampleProdId,
-          productNameSnapshot: "Whole Wheat Bread 400g",
-          unitCodeSnapshot: "pack",
-          quantity: 2,
-          unitPrice: 45,
-          subtotal: 90,
-          taxRatePercentSnapshot: 5,
-          taxAmount: 4.5,
-          total: 94.5,
-        },
-      ],
-      createdAt: now,
-      createdBy: ownerUid,
-    });
-
-    // Sample Outflow (Purchase)
-    await db.collection("outflows").doc("outflow_sample_001").set({
-      organizationId: sampleOrgId,
-      branchId: defaultBranchId,
-      kind: "purchase",
-      documentNumber: "PO-2026-0001",
-      vendorId: sampleVendId,
-      vendorNameSnapshot: "Golden Grain Mills",
-      status: "finalized",
-      paymentStatus: "paid",
-      subtotal: 3200,
-      taxAmount: 160,
-      totalAmount: 3360,
-      items: [
-        {
-          productId: sampleProdId,
-          productNameSnapshot: "Whole Wheat Bread 400g",
-          unitCodeSnapshot: "pack",
-          quantity: 100,
-          unitCost: 32,
-          subtotal: 3200,
-          taxRatePercentSnapshot: 5,
-          taxAmount: 160,
-          total: 3360,
-        },
-      ],
-      createdAt: now,
-      createdBy: ownerUid,
-    });
-
-    console.log(`✓ Provisioned Operational Entities (Catalog, StockBalances, Customer, Vendor, Bill, Outflow).`);
-  }
-
-  // 2h. Organization B (Multi-Branch Wholesale Demo) — provisioned for api-explorer-demo
-  if (profile === "api-explorer-demo") {
-    const wholesaleOrgId = "org_wholesale_sample";
-    const wholesaleMainBranchId = "main-branch";
-    const wholesaleWarehouseBranchId = "branch_warehouse";
-
-    console.log(`\n--- Seeding Organization B: Multi-Branch Wholesale (${wholesaleOrgId}) ---`);
-
-    const wholesaleOwnerEmail = "owner@wholesale.trado.local";
-    const wholesaleOwnerUid = await ensureAuthUser(auth, wholesaleOwnerEmail, "Apex Wholesale Owner");
-    await auth.setCustomUserClaims(wholesaleOwnerUid, {
-      primaryOrganizationId: wholesaleOrgId,
-      primaryBranchId: wholesaleMainBranchId,
-    });
-    await db.collection("users").doc(wholesaleOwnerUid).set({
-      name: "Apex Wholesale Owner",
-      email: wholesaleOwnerEmail,
-      accountType: "admin",
-      isActive: true,
-      createdAt: now,
-      createdBy: superAdminUid,
-    });
-
-    await db.collection("organizations").doc(wholesaleOrgId).set({
-      name: "Apex Wholesale Hub",
-      businessType: BusinessType.WHOLESALE_ONLY,
-      businessCategory: BusinessCategory.GENERAL,
-      country: "IN",
-      currency: "INR",
-      taxRegimeCode: "IN_GST",
-      status: EntityStatus.ACTIVE,
-      planId: "plan_growth",
-      moduleToggles: { billing: true, inventory: true, sales: true, staff: true, reports: true },
-      defaultBranchId: wholesaleMainBranchId,
-      branchCount: 2,
-      sharingPolicies: {
-        customers: "all_branches",
-        vendors: "all_branches",
-        products: "all_branches",
-      },
-      createdAt: now,
-      createdBy: superAdminUid,
-    });
-
-    // Branches for Org B
-    await db.collection("organizations").doc(wholesaleOrgId).collection("branches").doc(wholesaleMainBranchId).set({
-      organizationId: wholesaleOrgId,
-      name: "Wholesale Main HQ",
+    await db.collection("organizations").doc(suspendedOrgId).collection("branches").doc("main-branch").set({
+      organizationId: suspendedOrgId,
+      name: "Main Branch",
       code: "MAIN",
       isDefault: true,
       isActive: true,
-      status: EntityStatus.ACTIVE,
-      gstin: "29ABCDE1234F1Z5",
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-    await db.collection("branchCodeLocks").doc(`${wholesaleOrgId}_MAIN`).set({
-      organizationId: wholesaleOrgId,
-      branchCode: "MAIN",
-      branchId: wholesaleMainBranchId,
-      createdAt: now,
-    });
-
-    await db.collection("organizations").doc(wholesaleOrgId).collection("branches").doc(wholesaleWarehouseBranchId).set({
-      organizationId: wholesaleOrgId,
-      name: "Central Warehouse WH01",
-      code: "WH01",
-      isDefault: false,
-      isActive: true,
-      status: EntityStatus.ACTIVE,
-      gstin: "29ABCDE1234F1Z5",
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-    await db.collection("branchCodeLocks").doc(`${wholesaleOrgId}_WH01`).set({
-      organizationId: wholesaleOrgId,
-      branchCode: "WH01",
-      branchId: wholesaleWarehouseBranchId,
-      createdAt: now,
-    });
-
-    // Owner Membership for Org B
-    const wholesaleOwnerMembershipId = `${wholesaleOwnerUid}_${wholesaleOrgId}`;
-    await db.collection("memberships").doc(wholesaleOwnerMembershipId).set({
-      userId: wholesaleOwnerUid,
-      organizationId: wholesaleOrgId,
-      roleId: "role_org_owner",
-      jobRoleIds: [],
-      reportingToIds: [],
-      permissions: {},
-      status: EntityStatus.ACTIVE,
-      isPrimary: true,
-      primaryBranchId: wholesaleMainBranchId,
-      assignedBranchIds: [wholesaleMainBranchId, wholesaleWarehouseBranchId],
       createdAt: now,
       createdBy: superAdminUid,
     });
-    await db.collection("membershipBranches").doc(`${wholesaleOwnerMembershipId}_${wholesaleMainBranchId}`).set({
-      membershipId: wholesaleOwnerMembershipId,
-      userId: wholesaleOwnerUid,
-      organizationId: wholesaleOrgId,
-      branchId: wholesaleMainBranchId,
-      status: EntityStatus.ACTIVE,
-      isDefaultForMembership: true,
-      permissions: {},
-      createdAt: now,
-      createdBy: superAdminUid,
-    });
-    await db.collection("membershipBranches").doc(`${wholesaleOwnerMembershipId}_${wholesaleWarehouseBranchId}`).set({
-      membershipId: wholesaleOwnerMembershipId,
-      userId: wholesaleOwnerUid,
-      organizationId: wholesaleOrgId,
-      branchId: wholesaleWarehouseBranchId,
-      status: EntityStatus.ACTIVE,
-      isDefaultForMembership: false,
-      permissions: {},
-      createdAt: now,
-      createdBy: superAdminUid,
-    });
+    // Seat counter = active non-owner memberships (staff personas + the inactive-user persona,
+    // whose membership stays active; the deactivated membership is not counted)
+    await db.collection("organizations").doc(sampleOrgId).update({ activeEmployeeCount: staffPersonas.length + 1 });
+    console.log(`✓ Provisioned Negative Testing Entities (Inactive User, Deactivated Membership, Inactive Branch, Suspended Org).`);
+  }
 
-    // Staff for Org B
-    const mgrEmail = "manager@wholesale.trado.local";
-    const mgrUid = await ensureAuthUser(auth, mgrEmail, "Wholesale Multi-Branch Manager");
-    await auth.setCustomUserClaims(mgrUid, {
-      primaryOrganizationId: wholesaleOrgId,
-      primaryBranchId: wholesaleMainBranchId,
-    });
-    await db.collection("users").doc(mgrUid).set({
-      name: "Wholesale Multi-Branch Manager",
-      email: mgrEmail,
-      accountType: "staff",
-      isActive: true,
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-    const mgrMemId = `${mgrUid}_${wholesaleOrgId}`;
-    await db.collection("memberships").doc(mgrMemId).set({
-      userId: mgrUid,
-      organizationId: wholesaleOrgId,
-      roleId: "role_store_manager",
-      jobRoleIds: [],
-      reportingToIds: [],
-      permissions: {},
-      status: EntityStatus.ACTIVE,
-      isPrimary: true,
-      primaryBranchId: wholesaleMainBranchId,
-      assignedBranchIds: [wholesaleMainBranchId, wholesaleWarehouseBranchId],
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-    await db.collection("membershipBranches").doc(`${mgrMemId}_${wholesaleMainBranchId}`).set({
-      membershipId: mgrMemId,
-      userId: mgrUid,
-      organizationId: wholesaleOrgId,
-      branchId: wholesaleMainBranchId,
-      status: EntityStatus.ACTIVE,
-      isDefaultForMembership: true,
-      permissions: {},
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-    await db.collection("membershipBranches").doc(`${mgrMemId}_${wholesaleWarehouseBranchId}`).set({
-      membershipId: mgrMemId,
-      userId: mgrUid,
-      organizationId: wholesaleOrgId,
-      branchId: wholesaleWarehouseBranchId,
-      status: EntityStatus.ACTIVE,
-      isDefaultForMembership: false,
-      permissions: {},
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
+  // 2g. Operational records: master data + opening stock + a purchase and a sale, created through
+  // the real callables (stock ledger, balances and party ledgers stay consistent)
+  if (profile === "operations-demo" || profile === "multi-branch-test") {
+    await seedBusinessData(db, apexOperationsSpec(isMultiBranch), apexUids);
+    console.log(`✓ Provisioned Operational Entities through the callables (catalog, opening stock, purchase, sale).`);
+  }
 
-    const cashierEmail = "cashier@wholesale.trado.local";
-    const cashierUid = await ensureAuthUser(auth, cashierEmail, "Wholesale Cashier");
-    await auth.setCustomUserClaims(cashierUid, {
-      primaryOrganizationId: wholesaleOrgId,
-      primaryBranchId: wholesaleMainBranchId,
-    });
-    await db.collection("users").doc(cashierUid).set({
-      name: "Wholesale Cashier",
-      email: cashierEmail,
-      accountType: "staff",
-      isActive: true,
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-    const cashierMemId = `${cashierUid}_${wholesaleOrgId}`;
-    await db.collection("memberships").doc(cashierMemId).set({
-      userId: cashierUid,
-      organizationId: wholesaleOrgId,
-      roleId: "role_cashier",
-      jobRoleIds: [],
-      reportingToIds: [],
-      permissions: {},
-      status: EntityStatus.ACTIVE,
-      isPrimary: true,
-      primaryBranchId: wholesaleMainBranchId,
-      assignedBranchIds: [wholesaleMainBranchId],
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-    await db.collection("membershipBranches").doc(`${cashierMemId}_${wholesaleMainBranchId}`).set({
-      membershipId: cashierMemId,
-      userId: cashierUid,
-      organizationId: wholesaleOrgId,
-      branchId: wholesaleMainBranchId,
-      status: EntityStatus.ACTIVE,
-      isDefaultForMembership: true,
-      permissions: {},
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-
-    const riderEmail = "rider@wholesale.trado.local";
-    const riderUid = await ensureAuthUser(auth, riderEmail, "Wholesale Rider");
-    await auth.setCustomUserClaims(riderUid, {
-      primaryOrganizationId: wholesaleOrgId,
-      primaryBranchId: wholesaleMainBranchId,
-    });
-    await db.collection("users").doc(riderUid).set({
-      name: "Wholesale Rider",
-      email: riderEmail,
-      accountType: "staff",
-      isActive: true,
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-    const riderMemId = `${riderUid}_${wholesaleOrgId}`;
-    await db.collection("memberships").doc(riderMemId).set({
-      userId: riderUid,
-      organizationId: wholesaleOrgId,
-      roleId: "role_rider",
-      jobRoleIds: [],
-      reportingToIds: [],
-      permissions: {},
-      status: EntityStatus.ACTIVE,
-      isPrimary: true,
-      primaryBranchId: wholesaleMainBranchId,
-      assignedBranchIds: [wholesaleMainBranchId],
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-    await db.collection("membershipBranches").doc(`${riderMemId}_${wholesaleMainBranchId}`).set({
-      membershipId: riderMemId,
-      userId: riderUid,
-      organizationId: wholesaleOrgId,
-      branchId: wholesaleMainBranchId,
-      status: EntityStatus.ACTIVE,
-      isDefaultForMembership: true,
-      permissions: {},
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-
-    // Catalog & StockBalances for Org B
-    const catGrainsId = "cat_grains_sample";
-    await db.collection("categories").doc(catGrainsId).set({
-      organizationId: wholesaleOrgId,
-      name: "Grains & Cereals",
-      description: "Bulk grains and staple commodities",
-      status: "active",
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-
-    const unitSackId = "unit_sack_sample";
-    await db.collection("units").doc(unitSackId).set({
-      organizationId: wholesaleOrgId,
-      name: "Sack 25kg",
-      code: "sack",
-      group: "weight",
-      baseMultiplier: 25,
-      status: "active",
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-
-    const prodRiceId = "prod_rice_sack";
-    const barcodeRice = "8901234567899";
-    await db.collection("products").doc(prodRiceId).set({
-      organizationId: wholesaleOrgId,
-      name: "Whole Grain Basmati Rice 25kg",
-      categoryId: catGrainsId,
-      categoryNameSnapshot: "Grains & Cereals",
-      baseUnit: "sack",
-      barcode: barcodeRice,
-      sellingPrice: 1200,
-      costPrice: 950,
-      taxInclusive: false,
-      taxRatePercent: 5,
-      hasExpiry: true,
-      trackStock: true,
-      initialStock: 350,
-      currentStock: 350,
-      lowStockThreshold: 30,
-      status: "active",
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-    await db.collection("barcodeLocks").doc(`${wholesaleOrgId}_${barcodeRice}`).set({
-      organizationId: wholesaleOrgId,
-      productId: prodRiceId,
-      barcode: barcodeRice,
-      createdAt: now,
-    });
-
-    await db.collection("stockBalances").doc(`${wholesaleOrgId}_${wholesaleMainBranchId}_${prodRiceId}`).set({
-      organizationId: wholesaleOrgId,
-      branchId: wholesaleMainBranchId,
-      productId: prodRiceId,
-      currentStock: 100,
-      allocatedStock: 0,
-      availableStock: 100,
-      reorderPoint: 25,
-      lowStockThreshold: 25,
-      updatedAt: now,
-    });
-    await db.collection("stockBalances").doc(`${wholesaleOrgId}_${wholesaleWarehouseBranchId}_${prodRiceId}`).set({
-      organizationId: wholesaleOrgId,
-      branchId: wholesaleWarehouseBranchId,
-      productId: prodRiceId,
-      currentStock: 250,
-      allocatedStock: 0,
-      availableStock: 250,
-      reorderPoint: 50,
-      lowStockThreshold: 50,
-      updatedAt: now,
-    });
-
-    // Parties for Org B
-    const custAllId = "cust_wholesale_all";
-    await db.collection("customers").doc(custAllId).set({
-      organizationId: wholesaleOrgId,
-      customerCode: "CUST-000001",
-      name: "Apex Bulk Mart",
-      mobile: "9876543201",
-      email: "contact@bulkmart.local",
-      taxNumber: "29ABCDE1234F1Z5",
-      billingAddress: "100 Highway Junction, Bangalore",
-      creditLimit: 200000,
-      currentBalance: 0,
-      visibilityScope: "all_branches",
-      status: "active",
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-
-    const custWhOnlyId = "cust_warehouse_only";
-    await db.collection("customers").doc(custWhOnlyId).set({
-      organizationId: wholesaleOrgId,
-      customerCode: "CUST-000002",
-      name: "Metro Logistics Depot",
-      mobile: "9876543202",
-      email: "depot@metrologistics.local",
-      taxNumber: "29ABCDE1234F1Z6",
-      billingAddress: "Warehouse Zone 3, Hubli",
-      creditLimit: 150000,
-      currentBalance: 0,
-      visibilityScope: "branch_only",
-      sharedForBranchIds: [wholesaleWarehouseBranchId],
-      status: "active",
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-
-    const vendBulkId = "vend_bulk_grain";
-    await db.collection("vendors").doc(vendBulkId).set({
-      organizationId: wholesaleOrgId,
-      vendorCode: "VEND-000001",
-      name: "National Grain Producers",
-      mobile: "9123456701",
-      email: "supply@nationalgrain.local",
-      taxNumber: "29XYZAB5678C1Z3",
-      address: "Agricultural Estate, Punjab",
-      currentBalance: 0,
-      visibilityScope: "all_branches",
-      status: "active",
-      createdAt: now,
-      createdBy: wholesaleOwnerUid,
-    });
-
-    console.log(`✓ Provisioned Organization B: Wholesale Hub, 2 Branches, Stock Balances, Branch-scoped Customers.`);
+  // 2h. Organization B (multi-branch wholesale) and the flagship businesses (bicycle, kitchenware)
+  const extraSpecs: SeedOrgSpec[] = profile === "api-explorer-demo" ? [WHOLESALE_HUB_SPEC, CYCLE_WORLD_SPEC, KITCHEN_MART_SPEC]
+    : profile === "flagship-demo" ? [CYCLE_WORLD_SPEC, KITCHEN_MART_SPEC] : [];
+  const demoPassword = process.env.TRADO_EMULATOR_DEMO_PASSWORD || "TestPassword123!";
+  for (const spec of extraSpecs) {
+    await seedOrganizationFromSpec(db, auth, spec, demoPassword, superAdminUid);
+    console.log(`✓ Provisioned ${spec.name} (${spec.organizationId}): ${spec.personas.length + 1} personas, ${(spec.products || []).length} products, ${(spec.transactions || []).length} transactions`);
   }
 
   // 2i. Generate and save local credentials file
-  const demoPassword = process.env.TRADO_EMULATOR_DEMO_PASSWORD || "TestPassword123!";
   const credentials = [
     {
       persona: "Super Admin",
@@ -1178,54 +647,7 @@ export async function seedDemoOrganization(
       scope: "tenant",
       description: "Dispatch and delivery updates for orders."
     },
-    {
-      persona: "Wholesale Owner",
-      label: "Wholesale Owner",
-      role: "Organization Owner",
-      email: "owner@wholesale.trado.local",
-      password: demoPassword,
-      organizationName: "Apex Wholesale Hub",
-      organizationId: "org_wholesale_sample",
-      branches: ["main-branch", "branch_warehouse"],
-      scope: "tenant",
-      description: "Full owner access across all branches of Wholesale demo."
-    },
-    {
-      persona: "Wholesale Manager",
-      label: "Wholesale Manager",
-      role: "Store Manager",
-      email: "manager@wholesale.trado.local",
-      password: demoPassword,
-      organizationName: "Apex Wholesale Hub",
-      organizationId: "org_wholesale_sample",
-      branches: ["main-branch", "branch_warehouse"],
-      scope: "tenant",
-      description: "Multi-branch manager with access to both Main HQ and Central Warehouse."
-    },
-    {
-      persona: "Wholesale Cashier",
-      label: "Wholesale Cashier",
-      role: "Cashier",
-      email: "cashier@wholesale.trado.local",
-      password: demoPassword,
-      organizationName: "Apex Wholesale Hub",
-      organizationId: "org_wholesale_sample",
-      branches: ["main-branch"],
-      scope: "tenant",
-      description: "Cashier restricted strictly to Wholesale Main branch."
-    },
-    {
-      persona: "Wholesale Rider",
-      label: "Wholesale Rider",
-      role: "Delivery Rider",
-      email: "rider@wholesale.trado.local",
-      password: demoPassword,
-      organizationName: "Apex Wholesale Hub",
-      organizationId: "org_wholesale_sample",
-      branches: ["main-branch"],
-      scope: "tenant",
-      description: "Delivery rider for wholesale orders."
-    }
+    ...extraSpecs.flatMap((spec) => personaCredentials(spec, demoPassword)),
   ];
 
   try {
@@ -1263,8 +685,7 @@ export async function checkSeedState(db: Firestore, auth: Auth): Promise<boolean
     "membershipBranches",
     "products",
     "stockBalances",
-    "branchCodeLocks",
-    "barcodeLocks",
+    "uniqueKeys",
     "customers",
     "vendors",
     "bills",
@@ -1320,87 +741,69 @@ export async function checkSeedState(db: Firestore, auth: Auth): Promise<boolean
 // 4. Reset Seed Data
 export async function resetSeedData(db: Firestore, auth: Auth): Promise<void> {
   console.log("\n=== Resetting Seed Data ===");
-  const sampleOrgId = "org_apex_sample";
-  const wholesaleOrgId = "org_wholesale_sample";
-
-  // Delete known sample documents from Org A and Org B
-  const sampleDocs = [
-    { col: "bills", id: "bill_sample_001" },
-    { col: "outflows", id: "outflow_sample_001" },
-    { col: "customers", id: "cust_citymart_sample" },
-    { col: "vendors", id: "vend_goldengrain_sample" },
-    { col: "products", id: "prod_bread_sample" },
-    { col: "categories", id: "cat_bakery_sample" },
-    { col: "units", id: "unit_pack_sample" },
-    { col: "barcodeLocks", id: `${sampleOrgId}_8901234567890` },
-    { col: "branchCodeLocks", id: `${sampleOrgId}_MAIN` },
-    { col: "branchCodeLocks", id: `${sampleOrgId}_WH01` },
-    { col: "stockBalances", id: `${sampleOrgId}_main-branch_prod_bread_sample` },
-    { col: "stockBalances", id: `${sampleOrgId}_branch_warehouse_prod_bread_sample` },
-    // Org B documents
-    { col: "customers", id: "cust_wholesale_all" },
-    { col: "customers", id: "cust_warehouse_only" },
-    { col: "vendors", id: "vend_bulk_grain" },
-    { col: "products", id: "prod_rice_sack" },
-    { col: "categories", id: "cat_grains_sample" },
-    { col: "units", id: "unit_sack_sample" },
-    { col: "barcodeLocks", id: `${wholesaleOrgId}_8901234567899` },
-    { col: "branchCodeLocks", id: `${wholesaleOrgId}_MAIN` },
-    { col: "branchCodeLocks", id: `${wholesaleOrgId}_WH01` },
-    { col: "stockBalances", id: `${wholesaleOrgId}_main-branch_prod_rice_sack` },
-    { col: "stockBalances", id: `${wholesaleOrgId}_branch_warehouse_prod_rice_sack` },
-  ];
-
-  for (const d of sampleDocs) {
-    await db.collection(d.col).doc(d.id).delete();
-  }
-
-  // Delete subcollection branches for Org A, Org B, and Suspended Org
-  for (const orgId of [sampleOrgId, wholesaleOrgId, "org_suspended_sample"]) {
-    const branchesSnap = await db.collection("organizations").doc(orgId).collection("branches").get();
-    for (const b of branchesSnap.docs) {
-      await b.ref.delete();
+  // Every document of every seed organization (whatever created it), its idempotency records,
+  // branches and the organization itself. Non-seed organizations are never touched.
+  for (const orgId of SEED_ORGANIZATION_IDS) {
+    let deleted = 0;
+    for (const col of await db.listCollections()) {
+      const field = col.id === "idempotencyRecords" ? "scope" : "organizationId";
+      const snap = await col.where(field, "==", orgId).get();
+      for (let i = 0; i < snap.docs.length; i += 400) {
+        const batch = db.batch();
+        snap.docs.slice(i, i + 400).forEach((d) => batch.delete(d.ref));
+        await batch.commit();
+      }
+      deleted += snap.size;
     }
+    const branchesSnap = await db.collection("organizations").doc(orgId).collection("branches").get();
+    for (const br of branchesSnap.docs) await br.ref.delete();
     await db.collection("organizations").doc(orgId).delete();
+    console.log(`✓ Deleted ${orgId} and ${deleted} organization-scoped documents`);
   }
 
-  // Delete seed users and memberships
-  const seedEmails = [
-    "superadmin@trado.local",
-    "owner@apexwholesale.local",
-    "admin@apexwholesale.local",
-    "cashier@apexwholesale.local",
-    "rider@apexwholesale.local",
-    "manager@apexwholesale.local",
-    "inactive@apexwholesale.local",
-    "deactivated_member@apexwholesale.local",
-    "suspended_org_user@apexwholesale.local",
-    "owner@wholesale.trado.local",
-    "manager@wholesale.trado.local",
-    "cashier@wholesale.trado.local",
-    "rider@wholesale.trado.local",
-  ];
-
-  for (const email of seedEmails) {
+  // Seed users (auth + profile + devices); memberships went with their organization above
+  for (const email of seedEmails()) {
     try {
       const user = await auth.getUserByEmail(email);
+      const devices = await db.collection("users").doc(user.uid).collection("devices").get();
+      for (const d of devices.docs) await d.ref.delete();
       await db.collection("users").doc(user.uid).delete();
-      const mSnap = await db.collection("memberships").where("userId", "==", user.uid).get();
-      for (const m of mSnap.docs) {
-        await m.ref.delete();
-      }
-      const mbSnap = await db.collection("membershipBranches").where("userId", "==", user.uid).get();
-      for (const mb of mbSnap.docs) {
-        await mb.ref.delete();
-      }
       await auth.deleteUser(user.uid);
-      console.log(`✓ Deleted user and memberships for ${email}`);
     } catch {
       // Ignored if user does not exist
     }
   }
-
   console.log("✓ Seed data reset completed successfully.\n");
+}
+
+/** Organizations owned by the seed (deterministic ids). */
+const SEED_ORGANIZATION_IDS = ["org_apex_sample", "org_suspended_sample", ...[WHOLESALE_HUB_SPEC, CYCLE_WORLD_SPEC, KITCHEN_MART_SPEC].map((spec) => spec.organizationId)];
+
+function seedEmails(): string[] {
+  const apex = ["superadmin@trado.local", "owner@apexwholesale.local", "admin@apexwholesale.local", "cashier@apexwholesale.local",
+    "rider@apexwholesale.local", "manager@apexwholesale.local", "inactive@apexwholesale.local",
+    "deactivated_member@apexwholesale.local", "suspended_org_user@apexwholesale.local"];
+  const specs = [WHOLESALE_HUB_SPEC, CYCLE_WORLD_SPEC, KITCHEN_MART_SPEC].flatMap((spec) => [spec.owner.email, ...spec.personas.map((pp) => pp.email)]);
+  return [...apex, ...specs];
+}
+
+/**
+ * Fails closed: the seed's organizations must pass the dynamic data checks (no dangling or
+ * cross-tenant reference, no unregistered copy, every cache reconciles, dates consistent).
+ */
+function verifySeededData(): boolean {
+  const checker = path.resolve(__dirname, "..", "..", "scripts", "check-data-duplication.cjs");
+  let ok = true;
+  for (const orgId of SEED_ORGANIZATION_IDS) {
+    const r = spawnSync(process.execPath, [checker, "--org", orgId], { encoding: "utf8", env: process.env });
+    const summary = (r.stdout || "").trim().split("\n").pop();
+    console.log(`  data check ${orgId}: ${summary}`);
+    if (r.status !== 0) {
+      ok = false;
+      console.error(r.stdout);
+    }
+  }
+  return ok;
 }
 
 // Main execution entry point
@@ -1408,6 +811,13 @@ async function main() {
   const options = parseCliArgs(process.argv.slice(2));
 
   console.log("=== Trado Local Emulator Seed Tool ===");
+
+  // Default to local loopback Firebase Emulator ports if not explicitly defined in shell
+  if (!process.env.FIRESTORE_EMULATOR_HOST && !process.env.FIREBASE_AUTH_EMULATOR_HOST) {
+    process.env.FIRESTORE_EMULATOR_HOST = "127.0.0.1:8080";
+    process.env.FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099";
+    process.env.GCLOUD_PROJECT = process.env.GCLOUD_PROJECT || "trado-x";
+  }
 
   const safety = verifyEmulatorSafety(process.env);
   if (!safety.safe) {
@@ -1421,12 +831,10 @@ async function main() {
   console.log(`Connected to Auth emulator:      ${safety.authHost}`);
   console.log(`Target Project ID:               ${safety.projectId}`);
 
-  if (getApps().length === 0) {
-    initializeApp({ projectId: "trado-x" });
-  }
-
-  const db = getFirestore();
-  const auth = getAuth();
+  // One Admin app and Firestore instance shared with the callables the seed runs in-process
+  // (loaded only after the emulator safety check above)
+  process.env.GCLOUD_PROJECT = process.env.GCLOUD_PROJECT || "trado-x";
+  const { db, auth } = await import("../services/firebase.js");
 
   if (options.resetOnly) {
     await resetSeedData(db, auth);
@@ -1444,6 +852,10 @@ async function main() {
 
   if (options.seedDemo) {
     await seedDemoOrganization(db, auth, options.profile);
+    if (!verifySeededData()) {
+      console.error("\n[FAILED] Seeded data violates the zero-duplication / reference-integrity checks.\n");
+      process.exit(1);
+    }
   }
 
   console.log("\n[SUCCESS] Local emulator seed execution complete!\n");

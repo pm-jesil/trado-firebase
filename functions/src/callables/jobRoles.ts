@@ -3,9 +3,18 @@
  */
 
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { nameKey } from "../services/naturalKeys.js";
+import { commitWithKeys, changedClaims } from "../services/uniqueKeys.js";
+import { resolveCatalogWriteAccess } from "../services/contextResolver.js";
+import { AppPermissions } from "../constants/permissions.js";
 import { db } from "../services/firebase.js";
-import { CreateJobRoleSchema, UpdateJobRoleSchema } from "../validation/schemas.js";
-import { JobRoleDoc, MembershipDoc } from "../types/models.js";
+import {
+  CreateJobRoleSchema,
+  UpdateJobRoleSchema,
+  ContextOnlySchema,
+} from "../validation/schemas.js";
+import { parseInput } from "../validation/parseInput.js";
+import { JobRoleDoc } from "../types/models.js";
 import { createAuditLog } from "../services/audit.js";
 
 export const jobRolesCreate = onCall({ region: "asia-south1" }, async (request) => {
@@ -13,24 +22,9 @@ export const jobRolesCreate = onCall({ region: "asia-south1" }, async (request) 
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = CreateJobRoleSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(CreateJobRoleSchema, request.data);
 
-  const isSuperAdmin = request.auth.token.isSuperAdmin === true;
-
-  if (input.organizationId) {
-    if (!isSuperAdmin) {
-      const callerMem = await db.collection("memberships").doc(`${request.auth.uid}_${input.organizationId}`).get();
-      if (!callerMem.exists || (callerMem.data() as MembershipDoc).status !== "active") {
-        throw new HttpsError("permission-denied", "Caller is not an active member of this organization.");
-      }
-    }
-  } else if (!isSuperAdmin) {
-    throw new HttpsError("permission-denied", "Super Admin privileges required to create global job roles.");
-  }
+  await resolveCatalogWriteAccess(request, input.organizationId, AppPermissions.JOB_ROLE_MANAGE);
 
   const jobRoleRef = db.collection("jobRoles").doc();
   const jobRoleDoc: JobRoleDoc = {
@@ -41,7 +35,10 @@ export const jobRolesCreate = onCall({ region: "asia-south1" }, async (request) 
     createdBy: request.auth.uid,
   };
 
-  await jobRoleRef.set(jobRoleDoc);
+  // Unique name per organization ("global" for platform catalog entries)
+  await commitWithKeys(jobRoleDoc.organizationId || "global", "job_role", jobRoleRef.id, (batch) => batch.set(jobRoleRef, jobRoleDoc), {
+    claim: [{ kind: "job_role_name", key: nameKey(jobRoleDoc.name) }],
+  });
 
   await createAuditLog({
     organizationId: input.organizationId,
@@ -60,11 +57,7 @@ export const jobRolesUpdate = onCall({ region: "asia-south1" }, async (request) 
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const parsed = UpdateJobRoleSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError("invalid-argument", `Validation failed: ${parsed.error.message}`);
-  }
-  const input = parsed.data;
+  const input = parseInput(UpdateJobRoleSchema, request.data);
 
   const jobRoleRef = db.collection("jobRoles").doc(input.jobRoleId);
   const jobRoleDoc = await jobRoleRef.get();
@@ -74,6 +67,8 @@ export const jobRolesUpdate = onCall({ region: "asia-south1" }, async (request) 
 
   const jobRoleData = jobRoleDoc.data() as JobRoleDoc;
   const isSuperAdmin = request.auth.token.isSuperAdmin === true;
+  // Org records: tenant gate on the record's own organization (blocks cross-tenant edits)
+  await resolveCatalogWriteAccess(request, jobRoleData.organizationId, AppPermissions.JOB_ROLE_MANAGE);
 
   if (jobRoleData.isSystem && !isSuperAdmin) {
     throw new HttpsError("permission-denied", "Cannot modify system-level job roles.");
@@ -85,7 +80,10 @@ export const jobRolesUpdate = onCall({ region: "asia-south1" }, async (request) 
 
   if (input.name) updates.name = input.name;
 
-  await jobRoleRef.update(updates);
+  const nameChange = updates.name !== undefined && updates.name !== jobRoleData.name
+    ? changedClaims([{ kind: "job_role_name", key: nameKey(jobRoleData.name) }], [{ kind: "job_role_name", key: nameKey(updates.name as string) }])
+    : { claim: [], release: [] };
+  await commitWithKeys(jobRoleData.organizationId || "global", "job_role", input.jobRoleId, (batch) => batch.update(jobRoleRef, updates), nameChange);
 
   await createAuditLog({
     organizationId: jobRoleData.organizationId,
@@ -100,11 +98,11 @@ export const jobRolesUpdate = onCall({ region: "asia-south1" }, async (request) 
 });
 
 export const jobRolesList = onCall({ region: "asia-south1" }, async (request) => {
+  const { organizationId } = parseInput(ContextOnlySchema, request.data);
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
 
-  const organizationId = request.data?.organizationId as string | undefined;
 
   const systemQuery = await db.collection("jobRoles").where("isSystem", "==", true).get();
   const systemJobRoles = systemQuery.docs.map((d) => ({ jobRoleId: d.id, ...(d.data() as JobRoleDoc) }));
