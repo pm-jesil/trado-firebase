@@ -67,7 +67,7 @@ sequenceDiagram
     
     Note over GW,DB: Atomic Multi-Document Firestore Transaction
     GW->>DB: Check phone uniqueness (uniqueKeys/orgId_customer_phone_{phone})
-    GW->>DB: Check tax ID uniqueness (uniqueKeys/orgId_customer_tax_{taxNumber})
+    GW->>DB: Check tax ID uniqueness (uniqueKeys/orgId_customer_tax_{taxId})
     GW->>DB: Reserve sequential customer code (CUST-000001)
     
     GW->>DB: Write customers/{customerId} (outstandingBalance: 0, totalSpend: 0)
@@ -95,7 +95,7 @@ interface CreateCustomerRequest {
   additionalPhones?: string[];       // Array of up to 5 additional contact phone numbers
   whatsApp?: string | null;          // Dedicated WhatsApp phone number
   email?: string;                    // Valid email address
-  taxNumber?: string;                // GSTIN / VAT / Tax ID
+  taxId?: string;                    // GSTIN / VAT / Tax ID
   billingAddress?: string;           // Max 500 characters
   shippingAddress?: string;          // Max 500 characters
   priceGroup?: string;               // "retail" | "wholesale" | "distributor"
@@ -138,7 +138,7 @@ interface CreateVendorRequest {
   additionalPhones?: string[];       // Array of up to 5 additional phone numbers
   whatsApp?: string | null;          // Dedicated WhatsApp number
   email?: string;                    // Vendor billing/orders email
-  taxNumber?: string;                // Vendor GSTIN / Tax identifier
+  taxId?: string;                    // Vendor GSTIN / Tax identifier
   address?: string;                  // Physical warehouse / corporate address
   contactPerson?: string;            // Contact manager name
   paymentTermsDays?: number;         // Payment terms (e.g. Net 15, Net 30)

@@ -68,6 +68,7 @@ try {
 const SCHEMA_ALIAS_MAP = {
   AdjustStockSchema: "StockAdjustSchema",
   CreateBillSchema: "CreateBillSchema",
+  PreviewBillSchema: "PreviewBillSchema",
   FinalizeBillSchema: "FinalizeBillSchema",
   ListBillsSchema: "ListBillsSchema",
   CreateOutflowSchema: "CreateOutflowSchema",
@@ -88,6 +89,9 @@ const SCHEMA_ALIAS_MAP = {
   ReportDateRangeSchema: "GetRevenueReportSchema",
   ReportProfitLossSchema: "GetProfitLossReportSchema",
   ReportStockValuationSchema: "GetStockValuationReportSchema",
+  ReportTopEntitiesSchema: "GetTopEntitiesReportSchema",
+  ReportStaffActivitySchema: "GetStaffReportSchema",
+  ReportPlatformOverviewSchema: "GetPlatformOverviewReportSchema",
   ReportExportCsvSchema: "ExportReportSchema",
   RecordPingSchema: "RecordLocationPingSchema",
   GetLatestLocationSchema: "GetLatestLocationsSchema",
@@ -98,8 +102,20 @@ const SCHEMA_ALIAS_MAP = {
   UsageDetailQuerySchema: "GetUsageDetailSchema",
   UsageDryRunStatementSchema: "CalculateDryRunStatementSchema",
   RecordClientMetricSchema: "RecordClientMetricSchema",
+  GetDefaultBranchSchema: "ContextOnlySchema",
+  RecurringExpenseCreateSchema: "CreateRecurringExpenseSchema",
+  RecurringExpenseUpdateSchema: "UpdateRecurringExpenseSchema",
+  GetOrganizationSchema: "GetOrganizationSchema",
+  GetEmployeeSchema: "GetEmployeeSchema",
+  PreviewPlanImpactSchema: "PreviewPlanImpactSchema",
   FirestoreDocumentSnapshot: null,
 };
+
+for (const [alias, real] of Object.entries(SCHEMA_ALIAS_MAP)) {
+  if (real && componentSchemas[real] && !componentSchemas[alias]) {
+    componentSchemas[alias] = componentSchemas[real];
+  }
+}
 
 // ── Synthetic schemas for callables with inline Zod in source ────
 const getByIdSchema = {
@@ -567,6 +583,66 @@ componentSchemas["BillFinalizedResponse"] = {
         status: { type: "string", example: "active" },
         billNumber: { type: "string" },
         originalQuotationNumber: { type: "string" },
+      },
+    },
+  },
+};
+
+componentSchemas["BillPreviewResponse"] = {
+  type: "object",
+  required: ["result"],
+  properties: {
+    result: {
+      type: "object",
+      required: ["items", "subTotal", "taxTotal", "discountTotal", "totalAmount", "roundOff", "currency", "warnings"],
+      properties: {
+        items: { type: "array", items: { type: "object" } },
+        subTotal: { type: "number", example: 100 },
+        taxTotal: { type: "number", example: 18 },
+        discountTotal: { type: "number", example: 10 },
+        totalAmount: { type: "number", example: 108 },
+        roundOff: { type: "number", example: 0 },
+        currency: { type: "string", example: "INR" },
+        taxSnapshot: { type: "object" },
+        warnings: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              type: { type: "string", enum: ["stock_shortfall", "discount_ceiling", "non_discountable"] },
+              lineId: { type: "string" },
+              productId: { type: "string" },
+              message: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+componentSchemas["PlanImpactPreviewResponse"] = {
+  type: "object",
+  required: ["result"],
+  properties: {
+    result: {
+      type: "object",
+      required: ["planId", "totalOrganizationsOnPlan", "impactedCount", "impactedOrganizations"],
+      properties: {
+        planId: { type: "string" },
+        totalOrganizationsOnPlan: { type: "integer", example: 5 },
+        impactedCount: { type: "integer", example: 1 },
+        impactedOrganizations: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              organizationId: { type: "string" },
+              organizationName: { type: "string" },
+              violations: { type: "array", items: { type: "object" } },
+            },
+          },
+        },
       },
     },
   },
@@ -1497,6 +1573,96 @@ const OPERATION_EXAMPLES = {
       },
     },
   },
+  billsUpdateDraft: {
+    data: {
+      organizationId: "org_apex_sample",
+      branchId: "main-branch",
+      billId: "bill_sample_draft_01",
+      notes: "Updated delivery instructions",
+    },
+  },
+  documentsDecide: {
+    data: {
+      organizationId: "org_apex_sample",
+      branchId: "main-branch",
+      documentType: "bill",
+      documentId: "bill_sample_pending_01",
+      decision: "approve",
+      notes: "Credit limit verified and approved",
+    },
+  },
+  paymentsVoid: {
+    data: {
+      organizationId: "org_apex_sample",
+      branchId: "main-branch",
+      paymentId: "pay_sample_01",
+      reason: "Cheque bounced / reversal requested",
+    },
+  },
+  recurringExpensesCreate: {
+    data: {
+      organizationId: "org_apex_sample",
+      branchId: "main-branch",
+      name: "Office Monthly Rent",
+      payee: "Landlord Realty Inc",
+      payeeType: "other",
+      frequency: "monthly",
+      dayOfMonth: 1,
+      startOn: "2026-01-01",
+      lines: [
+        {
+          itemName: "Branch Premises Rent",
+          quantity: 1,
+          unitPrice: 25000,
+        },
+      ],
+    },
+  },
+  recurringExpensesUpdate: {
+    data: {
+      organizationId: "org_apex_sample",
+      branchId: "main-branch",
+      templateId: "rec_exp_sample_01",
+      isActive: true,
+    },
+  },
+  recurringExpensesList: {
+    data: {
+      organizationId: "org_apex_sample",
+      branchId: "main-branch",
+      limit: 20,
+    },
+  },
+  organizationsGet: {
+    data: {
+      organizationId: "org_apex_sample",
+    },
+  },
+  employeesGet: {
+    data: {
+      organizationId: "org_apex_sample",
+      branchId: "main-branch",
+      membershipId: "alice_org_apex_sample",
+    },
+  },
+  plansPreviewImpact: {
+    data: {
+      planId: "plan_growth",
+      branchLimit: 2,
+    },
+  },
+  billsPreview: {
+    data: {
+      organizationId: "org_apex_sample",
+      branchId: "main-branch",
+      items: [
+        {
+          productId: "prod_sample_01",
+          quantity: 2,
+        },
+      ],
+    },
+  },
 };
 
 // ── Operation Metadata Classification ────────────────────────────
@@ -1549,12 +1715,16 @@ function getOperationMeta(exportName) {
     n.includes("get") ||
     exportName === "healthCheck" ||
     exportName === "authLogin" ||
-    exportName === "authMe"
+    exportName === "authMe" ||
+    exportName === "billsPreview" ||
+    exportName === "plansPreviewImpact"
   ) {
     let resp = "StandardItemsListResponse";
     if (exportName === "healthCheck") resp = "HealthCheckResponse";
     else if (exportName === "authLogin") resp = "AuthLoginResponse";
     else if (exportName === "authMe") resp = "AuthMeResponse";
+    else if (exportName === "billsPreview") resp = "BillPreviewResponse";
+    else if (exportName === "plansPreviewImpact") resp = "PlanImpactPreviewResponse";
     else if (
       [
         "permissionCatalogList",
@@ -1696,12 +1866,74 @@ function classifyOperation(name) {
   return "ACTION";
 }
 
+// ── Response schemas: the handler's TypeScript return type, per callable ──
+// (scripts/lib/source-truth.js getResponseTypes). Descriptions: the declaring property's comment, else
+// scripts/field-glossary.json. The cached idempotent replay (Record<string, unknown>) is the same response.
+const RESPONSE_TYPES = require("./lib/source-truth.js").getResponseTypes();
+const { describe: describeField } = require("./lib/field-descriptions.js");
+
+function leafSchema(leaf) {
+  // A map (Record<string, X>): any key, each value of type X.
+  const map = leaf.type.match(/^Record<string, ([^<>]+)>( \| null| \| undefined)*$/);
+  if (map) {
+    const value = leafSchema({ ...leaf, type: map[1] });
+    return { type: "object", additionalProperties: value, ...(value.description ? { description: value.description } : {}), "x-ts-type": leaf.type };
+  }
+  const parts = leaf.type.split(" | ").map((p) => p.trim());
+  const nullable = parts.includes("null") || parts.includes("undefined");
+  const real = parts.filter((p) => p !== "null" && p !== "undefined");
+  const literals = real.filter((p) => /^".*"$/.test(p)).map((p) => p.slice(1, -1));
+  let schema;
+  if (literals.length && literals.length === real.length) schema = { type: "string", enum: literals };
+  else if (real.every((p) => p === "string" || /^".*"$/.test(p))) schema = { type: "string" };
+  else if (real.every((p) => p === "number" || /^-?\d/.test(p))) schema = { type: "number" };
+  else if (real.every((p) => ["boolean", "true", "false"].includes(p))) schema = { type: "boolean" };
+  else schema = {};
+  if (nullable) schema.nullable = true;
+  const description = describeField(leaf);
+  if (description) schema.description = description;
+  schema["x-ts-type"] = leaf.type;
+  return schema;
+}
+
+function responseSchemaOf(exportName) {
+  const typed = RESPONSE_TYPES[exportName];
+  const leaves = typed ? typed.leaves.filter((l) => l.path) : [];
+  if (!leaves.length) return null;
+  const root = { type: "object", properties: {} };
+  for (const leaf of leaves) {
+    let node = root;
+    const segs = leaf.path.split(".");
+    segs.forEach((seg, i) => {
+      const isArray = seg.endsWith("[]");
+      const key = seg.replace(/\[\]$/, "");
+      let child;
+      if (key === "*") child = node.additionalProperties = node.additionalProperties || {};
+      else {
+        node.properties = node.properties || {};
+        child = node.properties[key] = node.properties[key] || {};
+      }
+      if (isArray) {
+        child.type = "array";
+        child = child.items = child.items || {};
+      }
+      if (i === segs.length - 1) Object.assign(child, leafSchema(leaf));
+      else if (!child.type) { child.type = "object"; child.properties = child.properties || {}; }
+      node = child;
+    });
+  }
+  return { type: "object", required: ["result"], properties: { result: root }, "x-ts-type": typed.type };
+}
+
 for (const ep of callables) {
   const opPath = `/api/callables/${ep.exportName}`;
   const tagName = DOMAIN_TAGS[ep.domain] || ep.domain;
   const resolvedName = resolveSchemaName(ep.inputSchema);
   const meta = getOperationMeta(ep.exportName);
   const badge = classifyOperation(ep.exportName);
+  const typedResponse = responseSchemaOf(ep.exportName);
+  const responseName = typedResponse ? `${ep.exportName[0].toUpperCase()}${ep.exportName.slice(1)}Response` : meta.responseSchema;
+  if (typedResponse) componentSchemas[responseName] = typedResponse;
 
   const requestBodyContent = {};
   const example = OPERATION_EXAMPLES[ep.exportName] || { data: {} };
@@ -1740,10 +1972,10 @@ for (const ep of callables) {
     },
     responses: {
       200: {
-        description: `Successful callable response (${meta.responseSchema})`,
+        description: `Successful callable response (${responseName})`,
         content: {
           "application/json": {
-            schema: { $ref: `#/components/schemas/${meta.responseSchema}` },
+            schema: { $ref: `#/components/schemas/${responseName}` },
           },
         },
       },
@@ -1924,11 +2156,62 @@ if (args.includes("--check")) {
   const docsDir = path.dirname(OUTPUT_PATH);
   if (!fs.existsSync(docsDir)) fs.mkdirSync(docsDir, { recursive: true });
   fs.writeFileSync(OUTPUT_PATH, outputJson + "\n", "utf8");
+
+  // ── Generate docs/generated/permissions.json and docs/generated/error-reasons.json
+  const genDir = path.join(ROOT, "docs", "generated");
+  if (!fs.existsSync(genDir)) fs.mkdirSync(genDir, { recursive: true });
+
+  const permsModule = require(path.join(ROOT, "functions", "lib", "constants", "permissions.js"));
+  const catalogsModule = require(path.join(ROOT, "functions", "lib", "constants", "catalogs.js"));
+  const enumsModule = require(path.join(ROOT, "functions", "lib", "constants", "enums.js"));
+
+  const appPerms = permsModule.AppPermissions || {};
+  const defaultRoles = catalogsModule.DEFAULT_SYSTEM_ROLES || [];
+  const gateReasons = enumsModule.GateReason || {};
+
+  const permissionsList = Object.entries(appPerms).map(([key, code]) => {
+    const isPlatform = code.startsWith("platform:");
+    const mod = isPlatform ? "platform" : code.split(":")[0];
+    const allowedRoles = defaultRoles
+      .filter((r) => r.permissions.includes(code) || r.permissions.includes("*"))
+      .map((r) => r.id);
+    return {
+      name: key,
+      code,
+      module: mod,
+      isPlatform,
+      allowedRoles,
+    };
+  });
+
+  const permissionsJson = {
+    generatedAt: new Date().toISOString(),
+    totalPermissions: permissionsList.length,
+    permissions: permissionsList,
+  };
+  fs.writeFileSync(path.join(genDir, "permissions.json"), JSON.stringify(permissionsJson, null, 2) + "\n", "utf8");
+
+  const errorReasonsList = Object.entries(gateReasons).map(([code, reasonCode]) => ({
+    code: reasonCode,
+    category: reasonCode.includes("SUBSCRIPTION") ? "subscription" :
+      reasonCode.includes("BRANCH") ? "branch" :
+      reasonCode.includes("MODULE") ? "module" :
+      reasonCode.includes("LIMIT") ? "quota" : "security_gate",
+    description: `Security gate rejection reason code: ${reasonCode}`,
+  }));
+
+  const errorReasonsJson = {
+    generatedAt: new Date().toISOString(),
+    totalReasons: errorReasonsList.length,
+    reasons: errorReasonsList,
+  };
+  fs.writeFileSync(path.join(genDir, "error-reasons.json"), JSON.stringify(errorReasonsJson, null, 2) + "\n", "utf8");
+
   const typedCount = callables.filter((ep) => {
     const r = resolveSchemaName(ep.inputSchema);
     return r && componentSchemas[r];
   }).length;
-  console.log(`[OK] Generated docs/openapi.json`);
+  console.log(`[OK] Generated docs/openapi.json, docs/generated/permissions.json, docs/generated/error-reasons.json`);
   console.log(`     ${callables.length} callable operations, ${triggers.length} triggers documented`);
   console.log(`     ${Object.keys(zodSchemas).length} Zod schemas resolved to JSON Schema`);
   console.log(`     ${typedCount}/${callables.length} callables have typed input schemas`);

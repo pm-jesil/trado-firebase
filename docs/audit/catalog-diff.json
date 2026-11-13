@@ -1,0 +1,899 @@
+{
+  "generatedAt": "2026-11-12T21:10:05.686Z",
+  "totalReferenceFields": 148,
+  "presentCount": 85,
+  "deferredCount": 3,
+  "removedCount": 12,
+  "missingCount": 48,
+  "ratio": "85/148",
+  "fields": [
+    {
+      "entity": "organization",
+      "path": "name",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "legalName",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "businessType",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "businessCategory",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "country",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "currency",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "taxRegimeCode",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "taxId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "pan",
+      "status": "DEFERRED",
+      "reason": "Country-specific PAN handled under taxId / statutory identifiers (DEF-01)."
+    },
+    {
+      "entity": "organization",
+      "path": "registrationNumber",
+      "status": "DEFERRED",
+      "reason": "Corporate registration (CIN/CR/UEN) deferred to enterprise compliance suite (DEF-02)."
+    },
+    {
+      "entity": "organization",
+      "path": "website",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "email",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "organization",
+      "path": "phone",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "organization",
+      "path": "contactPerson",
+      "status": "DEFERRED",
+      "reason": "Consolidated into contacts: OrganizationContact[] directory (DEF-03)."
+    },
+    {
+      "entity": "organization",
+      "path": "contacts",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "addresses",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "bankAccounts",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "logo",
+      "status": "REMOVED",
+      "reason": "D-15: Stored field name is 'image' of type ImageRef (no URL inside)."
+    },
+    {
+      "entity": "organization",
+      "path": "status",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "ownerStatus",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "organization",
+      "path": "planId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "branch",
+      "path": "name",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "branch",
+      "path": "code",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "branch",
+      "path": "type",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "branch",
+      "path": "address",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "branch",
+      "path": "phone",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "branch",
+      "path": "email",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "branch",
+      "path": "managerId",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "branch",
+      "path": "taxId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "branch",
+      "path": "isMain",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "branch",
+      "path": "status",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "user",
+      "path": "uid",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "user",
+      "path": "email",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "user",
+      "path": "phone",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "user",
+      "path": "displayName",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "user",
+      "path": "photoUrl",
+      "status": "REMOVED",
+      "reason": "D-15: URLs are never stored. Computed display URL imageUrl used at read time."
+    },
+    {
+      "entity": "user",
+      "path": "avatarUrl",
+      "status": "REMOVED",
+      "reason": "D-15: Duplicate avatarUrl removed. Stored field is image: ImageRef."
+    },
+    {
+      "entity": "user",
+      "path": "role",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "user",
+      "path": "jobTitle",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "user",
+      "path": "department",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "user",
+      "path": "branchId",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "user",
+      "path": "status",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "user",
+      "path": "permissions",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "user",
+      "path": "joinedAt",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "customer",
+      "path": "name",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "customer",
+      "path": "phone",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "customer",
+      "path": "whatsApp",
+      "status": "REMOVED",
+      "reason": "D-7: Canonical field naming registry enforces single 'phone' field. Duplicate channel alias eliminated."
+    },
+    {
+      "entity": "customer",
+      "path": "email",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "customer",
+      "path": "taxNumber",
+      "status": "REMOVED",
+      "reason": "D-7: Canonical naming registry enforces 'taxId'. Duplicate taxNumber alias eliminated."
+    },
+    {
+      "entity": "customer",
+      "path": "taxId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "customer",
+      "path": "billingAddress",
+      "status": "REMOVED",
+      "reason": "D-7: Consolidated into typed 'addresses: Address[]' array."
+    },
+    {
+      "entity": "customer",
+      "path": "shippingAddress",
+      "status": "REMOVED",
+      "reason": "D-7: Consolidated into typed 'addresses: Address[]' array."
+    },
+    {
+      "entity": "customer",
+      "path": "creditLimit",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "customer",
+      "path": "paymentTerms",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "customer",
+      "path": "outstandingBalance",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "customer",
+      "path": "status",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "vendor",
+      "path": "name",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "vendor",
+      "path": "phone",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "vendor",
+      "path": "whatsApp",
+      "status": "REMOVED",
+      "reason": "D-7: Canonical field naming registry enforces single 'phone' field. Duplicate channel alias eliminated."
+    },
+    {
+      "entity": "vendor",
+      "path": "email",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "vendor",
+      "path": "taxNumber",
+      "status": "REMOVED",
+      "reason": "D-7: Canonical naming registry enforces 'taxId'. Duplicate taxNumber alias eliminated."
+    },
+    {
+      "entity": "vendor",
+      "path": "taxId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "vendor",
+      "path": "billingAddress",
+      "status": "REMOVED",
+      "reason": "D-7: Consolidated into typed 'addresses: Address[]' array."
+    },
+    {
+      "entity": "vendor",
+      "path": "shippingAddress",
+      "status": "REMOVED",
+      "reason": "D-7: Consolidated into typed 'addresses: Address[]' array."
+    },
+    {
+      "entity": "vendor",
+      "path": "creditLimit",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "vendor",
+      "path": "paymentTerms",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "vendor",
+      "path": "outstandingPayable",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "vendor",
+      "path": "status",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "product",
+      "path": "name",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "sku",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "barcode",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "sellingPrice",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "costPrice",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "mrp",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "wholesalePrice",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "baseUnit",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "categoryId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "taxRatePercent",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "taxInclusive",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "trackStock",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "lowStockThreshold",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "product",
+      "path": "image",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "product",
+      "path": "status",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "bill",
+      "path": "billNumber",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "bill",
+      "path": "billDate",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "bill",
+      "path": "customerId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "bill",
+      "path": "customerSnapshot",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "bill",
+      "path": "lines",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "bill",
+      "path": "subTotal",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "bill",
+      "path": "discountAmount",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "bill",
+      "path": "taxAmount",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "bill",
+      "path": "totalAmount",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "bill",
+      "path": "paidAmount",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "bill",
+      "path": "balanceAmount",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "bill",
+      "path": "paymentStatus",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "bill",
+      "path": "status",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "outflow",
+      "path": "voucherNumber",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "outflow",
+      "path": "kind",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "outflow",
+      "path": "category",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "outflow",
+      "path": "partyId",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "outflow",
+      "path": "partyType",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "outflow",
+      "path": "partySnapshot",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "outflow",
+      "path": "amount",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "outflow",
+      "path": "paidAmount",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "outflow",
+      "path": "paymentStatus",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "outflow",
+      "path": "docDate",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "outflow",
+      "path": "status",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "payment",
+      "path": "receiptNumber",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "payment",
+      "path": "direction",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "payment",
+      "path": "partyId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "payment",
+      "path": "partyType",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "payment",
+      "path": "amount",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "payment",
+      "path": "paymentMode",
+      "status": "REMOVED",
+      "reason": "D-7: Canonical enum is PaymentMethod. Duplicate mode alias eliminated."
+    },
+    {
+      "entity": "payment",
+      "path": "paymentMethod",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "payment",
+      "path": "referenceNumber",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "payment",
+      "path": "allocations",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "payment",
+      "path": "status",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "return",
+      "path": "returnNumber",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "return",
+      "path": "type",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "return",
+      "path": "sourceBillId",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "return",
+      "path": "partyId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "return",
+      "path": "lines",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "return",
+      "path": "refundAmount",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "return",
+      "path": "disposition",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "return",
+      "path": "status",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "delivery",
+      "path": "deliveryNumber",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "delivery",
+      "path": "billId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "delivery",
+      "path": "partner",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "delivery",
+      "path": "trackingNumber",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "delivery",
+      "path": "destinationAddress",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "delivery",
+      "path": "lines",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "delivery",
+      "path": "status",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "stockBalance",
+      "path": "productId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "stockBalance",
+      "path": "branchId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "stockBalance",
+      "path": "currentStock",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "stockBalance",
+      "path": "allocatedStock",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "stockMovement",
+      "path": "productId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "stockMovement",
+      "path": "branchId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "stockMovement",
+      "path": "type",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "stockMovement",
+      "path": "quantity",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "stockMovement",
+      "path": "balanceAfter",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "stockMovement",
+      "path": "referenceId",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "subscriptionPlan",
+      "path": "name",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "subscriptionPlan",
+      "path": "code",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    },
+    {
+      "entity": "subscriptionPlan",
+      "path": "price",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "subscriptionPlan",
+      "path": "branchLimit",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "subscriptionPlan",
+      "path": "seatLimits",
+      "status": "PRESENT",
+      "reason": "Active in models and verified by tests."
+    },
+    {
+      "entity": "subscriptionPlan",
+      "path": "modules",
+      "status": "MISSING",
+      "reason": "Not in the current catalog and no deferral or contract-change record exists."
+    }
+  ]
+}

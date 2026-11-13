@@ -3,11 +3,41 @@
  */
 
 import { z } from "zod";
+import {
+  AddressSchema,
+  BankAccountSchema,
+  ContactPersonSchema,
+} from "./sharedSchemas.js";
+export {
+  AddressSchema,
+  AddressArraySchema,
+  BankAccountSchema,
+  BankAccountArraySchema,
+  ContactPersonSchema,
+  ContactPersonArraySchema,
+  TaxIdentitySchema,
+  NotesSchema,
+  PartyCoreSchema,
+} from "./sharedSchemas.js";
 
 /** Cap on owned line arrays (bills.items, outflows.lines, returns.items): keeps documents far below 1 MiB. */
 export const MAX_DOCUMENT_LINES = 200;
 
 /** Request-context fields every callable may send (read by the gate; derived from the token when absent). */
+/**
+ * `_meta` (prompt 66 §3.2, docs/guides/client-meta.md): optional on every callable, removed by the
+ * wrapper before the handler's schema runs. Untrusted (D-26): analytics and flags only.
+ * `deviceId` is the app's random install id kept in secure storage, never a hardware identifier.
+ */
+export const ClientMetaSchema = z.strictObject({
+  deviceId: z.string().trim().min(8).max(128).regex(/^[A-Za-z0-9._:-]+$/, "letters, digits and . _ : - only").optional(),
+  appVersion: z.string().trim().min(1).max(40).optional(),
+  platform: z.enum(["android", "ios", "web"]).optional(),
+  clientRequestId: z.string().trim().min(1).max(128).optional(),
+  clientTime: z.string().trim().datetime({ offset: true }).optional(),
+  locale: z.string().trim().min(2).max(35).optional(),
+});
+
 export const ContextFields = {
   organizationId: z.string().trim().min(2).optional(),
   branchId: z.string().trim().optional(),
@@ -67,6 +97,26 @@ export const AuthMeSchema = z.strictObject({
 });
 export type AuthMeInput = z.infer<typeof AuthMeSchema>;
 
+export const ImageRefSchema = z.strictObject({
+  path: z.string().trim().min(5).max(500),
+  contentType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+  width: z.number().int().min(1).max(10000),
+  height: z.number().int().min(1).max(10000),
+  sizeBytes: z.number().int().min(1).max(10 * 1024 * 1024),
+  updatedAt: z.string().trim(),
+  thumbnailPath: z.string().trim().min(5).max(500).optional(),
+  /** D-15: `url` is NOT stored; rejected if present. The display URL is computed at read time. */
+});
+
+export const PersonNameSchema = z.string().trim().min(2).max(100);
+
+export const ContactSchema = z.strictObject({
+  name: PersonNameSchema.optional(),
+  email: z.string().trim().email().toLowerCase().max(254).optional(),
+  phone: z.string().trim().min(5).max(30).optional(),
+  altPhone: z.string().trim().min(5).max(30).optional(),
+});
+
 export const OrganizationContactSchema = z.strictObject({
   id: z.string().trim().min(2).max(64),
   name: z.string().trim().min(2).max(100),
@@ -77,8 +127,8 @@ export const OrganizationContactSchema = z.strictObject({
   isPrimary: z.boolean().default(false),
   notifyBy: z.enum(["email", "sms", "both", "none"]).optional(),
   isActive: z.boolean().default(true),
-  createdAt: z.string().trim().optional(),
-  updatedAt: z.string().trim().optional(),
+  createdAt: z.string().trim().datetime({ offset: true }).optional(),
+  updatedAt: z.string().trim().datetime({ offset: true }).optional(),
   createdBy: z.string().trim().optional(),
   updatedBy: z.string().trim().optional(),
 });
@@ -89,37 +139,54 @@ export const CreateOrganizationSchema = z.strictObject({
   branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
   name: z.string().trim().min(2).max(100),
+  legalName: z.string().trim().min(2).max(120).optional(),
   businessType: z.nativeEnum(BusinessType),
   businessCategory: z.nativeEnum(BusinessCategory),
   country: z.string().trim().length(2).toUpperCase(),
   currency: z.string().trim().length(3).toUpperCase(),
   taxRegimeCode: z.string().trim().min(2).max(32),
   planId: z.string().trim().min(2).max(64),
-  ownerEmail: z.string().trim().email().toLowerCase(),
-  ownerName: z.string().trim().min(2).max(100),
+  createOwner: z.boolean().default(true).optional(),
+  confirmLinkExistingUser: z.boolean().optional(),
+  ownerEmail: z.string().trim().email().toLowerCase().optional(),
+  ownerName: PersonNameSchema.optional(),
   ownerPhone: z.string().trim().optional(),
+  credentialMode: z.enum(["temporaryPassword", "invite"]).default("temporaryPassword").optional(),
   initialPassword: z.string().min(8).max(128).optional(),
+  financialYearStartMonth: z.number().int().min(1).max(12).optional(),
+  taxId: z.string().trim().max(30).optional(),
+  website: z.string().trim().url().optional(),
+  addresses: z.array(AddressSchema).max(20).optional(),
+  bankAccounts: z.array(BankAccountSchema).max(10).optional(),
+  image: ImageRefSchema.optional(),
+  uploadId: z.string().trim().optional(),
   defaultBranchName: z.string().trim().min(2).max(100).optional(),
   defaultBranchCode: z.string().trim().min(2).max(20).regex(/^[A-Za-z0-9_-]+$/).optional(),
   salesChannels: z.array(z.nativeEnum(SalesChannel)).min(1).max(4).optional(),
   timezone: z.string().trim().min(3).max(64).optional(), // IANA, default Asia/Kolkata
+  contact: ContactSchema.optional(),
   contacts: z.array(OrganizationContactSchema).max(20).optional(),
   subscription: z.strictObject({
     status: z.nativeEnum(SubscriptionStatus).optional(), // default trial
-    startsAt: z.string().trim().optional(), // ISO instant, default now
+    startsAt: z.string().trim().datetime({ offset: true }).optional(), // ISO instant, default now
     expiresOn: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), // date in org timezone
     durationDays: z.number().int().min(1).max(3660).optional(), // default 30
     graceDays: z.number().int().min(0).max(90).optional(),
   }).optional(),
-});
-
-const OrganizationAddressSchema = z.strictObject({
-  line1: z.string().trim().max(200).optional(),
-  line2: z.string().trim().max(200).optional(),
-  city: z.string().trim().max(100).optional(),
-  state: z.string().trim().max(100).optional(),
-  pincode: z.string().trim().max(20).optional(),
-  country: z.string().trim().max(2).optional(),
+}).superRefine((data, ctx) => {
+  const willCreateOwner = data.createOwner !== false;
+  if (willCreateOwner) {
+    if (!data.ownerEmail) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "ownerEmail is required when createOwner is true", path: ["ownerEmail"] });
+    }
+    if (!data.ownerName) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "ownerName is required when createOwner is true", path: ["ownerName"] });
+    }
+  } else {
+    if (data.ownerEmail || data.ownerName || data.ownerPhone || data.initialPassword) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Owner fields must not be provided when createOwner is false", path: ["createOwner"] });
+    }
+  }
 });
 
 /**
@@ -130,29 +197,28 @@ export const UpdateOrganizationSchema = z.strictObject({
   branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2),
   // Super Admin only (identity, entitlements, billing-affecting)
+  showCostToTenant: z.boolean().optional(), // D-25
   name: z.string().trim().min(2).max(100).optional(),
+  legalName: z.string().trim().min(2).max(120).optional(),
   businessType: z.nativeEnum(BusinessType).optional(),
   businessCategory: z.nativeEnum(BusinessCategory).optional(),
+  financialYearStartMonth: z.number().int().min(1).max(12).optional(),
   moduleToggles: z.record(z.string(), z.boolean()).optional(),
   salesChannels: z.array(z.nativeEnum(SalesChannel)).min(1).max(4).optional(),
   timezone: z.string().trim().min(3).max(64).optional(),
   // Owner-editable profile and operational settings
   displayName: z.string().trim().min(2).max(100).optional(),
-  logoUrl: z.string().url().optional(),
-  imageUrls: z.array(z.string().url()).max(10).optional(),
-  taxNumber: z.string().trim().max(30).nullable().optional(),
+  image: ImageRefSchema.optional(),
+  uploadId: z.string().trim().optional(),
+  /** D-15: `logoUrl` and `imageUrls` removed — use `uploadId` or `image: ImageRef` to set the org logo. */
+  taxId: z.string().trim().max(30).nullable().optional(),
   website: z.string().url().nullable().optional(),
   contactEmail: z.string().trim().email().nullable().optional(),
   contactPhone: z.string().trim().max(20).nullable().optional(),
+  contact: ContactSchema.optional(),
   contacts: z.array(OrganizationContactSchema).max(20).optional(),
-  address: OrganizationAddressSchema.optional(),
-  bankDetails: z.strictObject({
-    accountName: z.string().trim().max(100).optional(),
-    bankName: z.string().trim().max(100).optional(),
-    accountNumber: z.string().trim().regex(/^[0-9]{6,20}$/).optional(),
-    ifsc: z.string().trim().max(15).optional(),
-    upiId: z.string().trim().max(60).optional(),
-  }).nullable().optional(),
+  addresses: z.array(AddressSchema).max(20).optional(),
+  bankAccounts: z.array(BankAccountSchema).max(10).optional(),
   settings: z.strictObject({
     approvals: z.strictObject({
       enabled: z.boolean(),
@@ -201,20 +267,41 @@ export const ListOrganizationsSchema = z.strictObject({
   limit: z.number().int().min(1).max(100).default(20).optional(),
   startAfterId: z.string().trim().optional(),
   status: z.nativeEnum(EntityStatus).optional(),
+  planId: z.string().trim().optional(),
+});
+
+export const ReactivateOrganizationSchema = z.strictObject({
+  organizationId: z.string().trim().min(2),
+  reason: z.string().trim().max(500).optional(),
+});
+
+export const PreviewDeactivationImpactSchema = z.strictObject({
+  organizationId: z.string().trim().min(2),
+});
+
+export const GetSubscriptionHistorySchema = z.strictObject({
+  organizationId: z.string().trim().min(2),
+  limit: z.number().int().min(1).max(100).default(50).optional(),
+});
+
+export const GetOrganizationSchema = z.strictObject({
+  organizationId: z.string().trim().min(2).optional(),
 });
 
 export const CreateEmployeeSchema = z.strictObject({
   branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(),
   email: z.string().trim().email().toLowerCase(),
   name: z.string().trim().min(2).max(100),
   phone: z.string().trim().optional(),
+  image: ImageRefSchema.optional(),
+  uploadId: z.string().trim().optional(),
   initialPassword: z.string().min(8).max(128).optional(),
   roleId: z.string().trim().min(2).default("role_employee").optional(),
-  departmentId: z.string().trim().optional(),
+  departmentId: z.string().trim().nullable().optional(),
   jobRoleIds: z.array(z.string().trim()).max(20).default([]).optional(),
-  teamId: z.string().trim().optional(),
+  teamId: z.string().trim().nullable().optional(),
   reportingToIds: z.array(z.string().trim()).max(10).default([]).optional(),
   permissionOverrides: z.record(z.string(), z.boolean()).default({}).optional(),
   branchIds: z.array(z.string().trim()).max(100).optional(),
@@ -223,10 +310,12 @@ export const CreateEmployeeSchema = z.strictObject({
 
 export const UpdateEmployeeSchema = z.strictObject({
   branchId: ContextFields.branchId,
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(),
   membershipId: z.string().trim().min(2),
   name: z.string().trim().min(2).max(100).optional(),
   phone: z.string().trim().optional(),
+  image: ImageRefSchema.optional(),
+  uploadId: z.string().trim().optional(),
   roleId: z.string().trim().optional(),
   departmentId: z.string().trim().nullable().optional(),
   jobRoleIds: z.array(z.string().trim()).max(20).optional(),
@@ -242,17 +331,23 @@ export const UpdateEmployeeSchema = z.strictObject({
 
 export const DeactivateEmployeeSchema = z.strictObject({
   branchId: ContextFields.branchId,
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(),
   membershipId: z.string().trim().min(2),
   reason: z.string().trim().max(500).optional(),
 });
 
 export const ListEmployeesSchema = z.strictObject({
   branchId: ContextFields.branchId,
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
   status: z.nativeEnum(EntityStatus).optional(),
+});
+
+export const GetEmployeeSchema = z.strictObject({
+  branchId: ContextFields.branchId,
+  organizationId: z.string().trim().min(2).optional(),
+  membershipId: z.string().trim().min(2),
 });
 
 export const CreateRoleSchema = z.strictObject({
@@ -295,6 +390,8 @@ export const CreateJobRoleSchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().nullable().optional(),
   name: z.string().trim().min(2).max(100),
+  /** Machine-readable slug; auto-derived from name when omitted. e.g. "Warehouse Manager" → "warehouse_manager" */
+  code: z.string().trim().min(2).max(60).regex(/^[a-z][a-z0-9_]*$/, "code must be lowercase letters, digits and underscores").optional(),
 });
 
 export const UpdateJobRoleSchema = z.strictObject({
@@ -307,7 +404,7 @@ export const UpdateJobRoleSchema = z.strictObject({
 export const CreateTeamSchema = z.strictObject({
   branchId: ContextFields.branchId,
   idempotencyKey: z.string().min(8).max(128).optional(),
-  organizationId: z.string().trim().min(2),
+  organizationId: z.string().trim().min(2).optional(),
   name: z.string().trim().min(2).max(100),
   description: z.string().trim().max(500).optional(),
   leaderMembershipId: z.string().trim().min(2).optional(),
@@ -358,6 +455,64 @@ export const UpdatePlanSchema = z.strictObject({
   branchLimit: z.number().int().positive().optional(),
   moduleFlags: z.record(z.string(), z.boolean()).optional(),
   isActive: z.boolean().optional(),
+});
+
+export const PreviewPlanImpactSchema = z.strictObject({
+  planId: z.string().trim().min(2).optional(),
+  organizationId: z.string().trim().min(2).optional(),
+  targetPlanId: z.string().trim().min(2).optional(),
+  branchLimit: z.number().int().positive().optional(),
+  seatLimits: z.strictObject({
+    admin: z.number().int().nonnegative().optional(),
+    staff: z.number().int().nonnegative().optional(),
+  }).optional(),
+  monthlyDocumentVolumeLimit: z.number().int().nonnegative().optional(),
+  moduleFlags: z.record(z.string(), z.boolean()).optional(),
+});
+
+export const GetPlanSchema = z.strictObject({
+  planId: z.string().trim().min(2),
+});
+
+export const ArchivePlanSchema = z.strictObject({
+  planId: z.string().trim().min(2),
+  reason: z.string().trim().max(500).optional(),
+});
+
+export const DeletePlanSchema = z.strictObject({
+  planId: z.string().trim().min(2),
+});
+
+export const ListPlatformUsersSchema = z.strictObject({
+  organizationId: z.string().trim().optional(),
+  roleId: z.string().trim().optional(),
+  jobRoleId: z.string().trim().optional(),
+  status: z.string().trim().optional(),
+  branchId: z.string().trim().optional(),
+  q: z.string().trim().max(100).optional(),
+  limit: z.number().int().min(1).max(100).default(20).optional(),
+  cursor: z.string().trim().optional(),
+});
+
+export const GetPlatformUserSchema = z.strictObject({
+  userId: z.string().trim().min(2),
+});
+
+export const ListAuditLogsSchema = z.strictObject({
+  organizationId: z.string().trim().optional(),
+  actorUserId: z.string().trim().optional(),
+  entityType: z.string().trim().optional(),
+  entityId: z.string().trim().optional(),
+  action: z.string().trim().optional(),
+  outcome: z.enum(["success", "denied", "failed", "all"]).default("all").optional(),
+  category: z.enum(["mutation", "read_sensitive", "export", "auth", "file", "security", "admin", "system"]).optional(),
+  deviceId: z.string().trim().min(1).max(128).optional(),
+  requestId: z.string().trim().min(1).max(64).optional(),
+  includeTotal: z.boolean().optional(), // a count() costs reads: only when asked
+  from: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}/, "from date must be YYYY-MM-DD").optional(),
+  to: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}/, "to date must be YYYY-MM-DD").optional(),
+  limit: z.number().int().min(1).max(100).default(50).optional(),
+  cursor: z.string().trim().optional(),
 });
 
 export const RegisterFcmTokenSchema = z.strictObject({
@@ -543,20 +698,31 @@ export const CreateCustomerSchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(), // Derived server-side from active context
+  partyType: z.enum(["organization", "person"]).default("organization").optional(),
   name: z.string().trim().min(1).max(100),
-  mobile: z.string().trim().optional(),
+  legalName: z.string().trim().min(2).max(120).optional(),
+  phone: z.string().trim().optional(),
   additionalPhones: z.array(z.string().trim().max(30)).max(5).optional(),
-  whatsApp: z.string().trim().max(30).nullable().optional(),
   email: z.string().trim().email().toLowerCase().optional(),
-  taxNumber: z.string().trim().max(50).optional(),
-  billingAddress: z.string().trim().max(500).optional(),
-  shippingAddress: z.string().trim().max(500).optional(),
+  image: ImageRefSchema.optional(),
+  uploadId: z.string().trim().optional(),
+  taxId: z.string().trim().max(50).optional(),
+  addresses: z.array(AddressSchema).max(20).optional(),
+  bankAccounts: z.array(BankAccountSchema).max(10).optional(),
+  contacts: z.array(ContactPersonSchema).max(20).optional(),
   priceGroup: z.string().trim().default("retail").optional(),
   creditLimit: z.number().min(0).default(0),
   creditPeriodDays: z.number().int().min(0).default(30),
   visibilityScope: z.enum(["all_branches", "selected_branches", "branch_only"]).default("all_branches").optional(),
   sharedForBranchIds: z.array(z.string().trim()).max(100).optional(),
   isDefault: z.boolean().default(false).optional(),
+}).superRefine((data, ctx) => {
+  if (!data.phone && !data.email) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "At least one contact method (phone or email) is required.", path: ["phone"] });
+  }
+  if (data.partyType === "person" && data.legalName) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "legalName is not applicable for individual persons.", path: ["legalName"] });
+  }
 });
 
 export const UpdateCustomerSchema = z.strictObject({
@@ -564,25 +730,34 @@ export const UpdateCustomerSchema = z.strictObject({
   branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   customerId: z.string().trim().min(2),
+  partyType: z.enum(["organization", "person"]).optional(),
   name: z.string().trim().min(1).max(100).optional(),
-  mobile: z.string().trim().optional(),
+  legalName: z.string().trim().min(2).max(120).nullable().optional(),
+  phone: z.string().trim().optional(),
   additionalPhones: z.array(z.string().trim().max(30)).max(5).optional(),
-  whatsApp: z.string().trim().max(30).nullable().optional(),
   email: z.string().trim().email().toLowerCase().optional(),
-  taxNumber: z.string().trim().max(50).optional(),
-  billingAddress: z.string().trim().max(500).optional(),
-  shippingAddress: z.string().trim().max(500).optional(),
+  image: ImageRefSchema.optional(),
+  uploadId: z.string().trim().optional(),
+  taxId: z.string().trim().max(50).optional(),
+  addresses: z.array(AddressSchema).max(20).optional(),
+  bankAccounts: z.array(BankAccountSchema).max(10).optional(),
+  contacts: z.array(ContactPersonSchema).max(20).optional(),
   priceGroup: z.string().trim().optional(),
   creditLimit: z.number().min(0).optional(),
   creditPeriodDays: z.number().int().min(0).optional(),
   visibilityScope: z.enum(["all_branches", "selected_branches", "branch_only"]).optional(),
   sharedForBranchIds: z.array(z.string().trim()).max(100).optional(),
   isActive: z.boolean().optional(),
+}).superRefine((data, ctx) => {
+  if (data.partyType === "person" && data.legalName) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "legalName is not applicable for individual persons.", path: ["legalName"] });
+  }
 });
 
 export const ListCustomersSchema = z.strictObject({
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(),
+  partyType: z.enum(["organization", "person"]).optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
 });
@@ -593,19 +768,30 @@ export const CreateVendorSchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   branchId: z.string().trim().optional(), // Derived server-side from active context
+  partyType: z.enum(["organization", "person"]).default("organization").optional(),
   name: z.string().trim().min(1).max(100),
-  mobile: z.string().trim().optional(),
+  legalName: z.string().trim().min(2).max(120).optional(),
+  phone: z.string().trim().optional(),
   additionalPhones: z.array(z.string().trim().max(30)).max(5).optional(),
-  whatsApp: z.string().trim().max(30).nullable().optional(),
   email: z.string().trim().email().toLowerCase().optional(),
-  taxNumber: z.string().trim().max(50).optional(),
-  address: z.string().trim().max(500).optional(),
-  contactPerson: z.string().trim().max(100).optional(),
+  image: ImageRefSchema.optional(),
+  uploadId: z.string().trim().optional(),
+  taxId: z.string().trim().max(50).optional(),
+  addresses: z.array(AddressSchema).max(20).optional(),
+  bankAccounts: z.array(BankAccountSchema).max(10).optional(),
+  contacts: z.array(ContactPersonSchema).max(20).optional(),
   paymentTermsDays: z.number().int().min(0).default(0).optional(),
   creditLimit: z.number().min(0).default(0).optional(),
   visibilityScope: z.enum(["all_branches", "selected_branches", "branch_only"]).default("all_branches").optional(),
   sharedForBranchIds: z.array(z.string().trim()).max(100).optional(),
   isDefault: z.boolean().default(false).optional(),
+}).superRefine((data, ctx) => {
+  if (!data.phone && !data.email) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "At least one contact method (phone or email) is required.", path: ["phone"] });
+  }
+  if (data.partyType === "person" && data.legalName) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "legalName is not applicable for individual persons.", path: ["legalName"] });
+  }
 });
 
 export const UpdateVendorSchema = z.strictObject({
@@ -613,19 +799,27 @@ export const UpdateVendorSchema = z.strictObject({
   branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   vendorId: z.string().trim().min(2),
+  partyType: z.enum(["organization", "person"]).optional(),
   name: z.string().trim().min(1).max(100).optional(),
-  mobile: z.string().trim().optional(),
+  legalName: z.string().trim().min(2).max(120).nullable().optional(),
+  phone: z.string().trim().optional(),
   additionalPhones: z.array(z.string().trim().max(30)).max(5).optional(),
-  whatsApp: z.string().trim().max(30).nullable().optional(),
   email: z.string().trim().email().toLowerCase().optional(),
-  taxNumber: z.string().trim().max(50).optional(),
-  address: z.string().trim().max(500).optional(),
-  contactPerson: z.string().trim().max(100).optional(),
+  image: ImageRefSchema.optional(),
+  uploadId: z.string().trim().optional(),
+  taxId: z.string().trim().max(50).optional(),
+  addresses: z.array(AddressSchema).max(20).optional(),
+  bankAccounts: z.array(BankAccountSchema).max(10).optional(),
+  contacts: z.array(ContactPersonSchema).max(20).optional(),
   paymentTermsDays: z.number().int().min(0).optional(),
   creditLimit: z.number().min(0).optional(),
   visibilityScope: z.enum(["all_branches", "selected_branches", "branch_only"]).optional(),
   sharedForBranchIds: z.array(z.string().trim()).max(100).optional(),
   isActive: z.boolean().optional(),
+}).superRefine((data, ctx) => {
+  if (data.partyType === "person" && data.legalName) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "legalName is not applicable for individual persons.", path: ["legalName"] });
+  }
 });
 
 /** Vendors and customers are listed with one input shape. */
@@ -644,7 +838,7 @@ export const OutflowLineSchema = z.strictObject({
   taxPercent: z.number().min(0).max(100).default(0).optional(),
   addToStock: z.boolean().default(true).optional(),
   batch: z.string().trim().optional(),
-  expiryDate: z.string().trim().optional(),
+  expiryDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD").optional(),
   // Goods receipt: damaged-on-receipt units are billed by the vendor but never enter stock
   damagedQuantity: z.number().min(0).optional(),
   damageReason: z.string().trim().max(300).optional(),
@@ -715,8 +909,27 @@ export const CreateBillSchema = z.strictObject({
   // Walk-in party details (only without customerId; a registered customer is referenced by id)
   walkInCustomer: z.strictObject({
     name: z.string().trim().min(1).max(200),
-    mobile: z.string().trim().max(20).optional(),
-    taxNumber: z.string().trim().max(30).optional(),
+    phone: z.string().trim().max(20).optional(),
+    taxId: z.string().trim().max(30).optional(),
+    billingAddress: z.string().trim().max(500).optional(),
+  }).optional(),
+  items: z.array(BillItemSchema).min(1).max(MAX_DOCUMENT_LINES),
+  discountTotal: z.number().min(0).default(0).optional(),
+  paidAmount: z.number().min(0).default(0).optional(),
+  paymentMethod: z.nativeEnum(PaymentMethod).default(PaymentMethod.CASH).optional(),
+  notes: z.string().trim().max(1000).optional(),
+});
+
+export const PreviewBillSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  salesMode: z.nativeEnum(SalesMode).default(SalesMode.POS).optional(),
+  documentType: z.nativeEnum(DocumentType).default(DocumentType.INVOICE).optional(),
+  customerId: z.string().trim().nullable().optional(),
+  walkInCustomer: z.strictObject({
+    name: z.string().trim().min(1).max(200),
+    phone: z.string().trim().max(20).optional(),
+    taxId: z.string().trim().max(30).optional(),
     billingAddress: z.string().trim().max(500).optional(),
   }).optional(),
   items: z.array(BillItemSchema).min(1).max(MAX_DOCUMENT_LINES),
@@ -733,8 +946,8 @@ export const UpdateDraftBillSchema = z.strictObject({
   customerId: z.string().trim().nullable().optional(),
   walkInCustomer: z.strictObject({
     name: z.string().trim().min(1).max(200),
-    mobile: z.string().trim().max(20).optional(),
-    taxNumber: z.string().trim().max(30).optional(),
+    phone: z.string().trim().max(20).optional(),
+    taxId: z.string().trim().max(30).optional(),
     billingAddress: z.string().trim().max(500).optional(),
   }).optional(),
   items: z.array(BillItemSchema).min(1).max(MAX_DOCUMENT_LINES).optional(),
@@ -912,14 +1125,7 @@ export const ListStockMovementsSchema = z.strictObject({
 // Branch Validation Schemas
 // ============================================================
 
-export const BranchAddressSchema = z.strictObject({
-  line1: z.string().trim().min(1).max(200),
-  line2: z.string().trim().max(200).optional(),
-  city: z.string().trim().min(1).max(100),
-  state: z.string().trim().min(1).max(100),
-  postalCode: z.string().trim().min(1).max(20),
-  country: z.string().trim().length(2).toUpperCase(),
-});
+export const BranchAddressSchema = AddressSchema;
 
 export const BranchContactSchema = z.strictObject({
   phone: z.string().trim().nullable().optional(),
@@ -928,7 +1134,7 @@ export const BranchContactSchema = z.strictObject({
 });
 
 export const BranchSettingsSchema = z.strictObject({
-  taxNumber: z.string().trim().nullable().optional(),
+  taxId: z.string().trim().nullable().optional(),
   allowNegativeStock: z.boolean().default(false).optional(),
   defaultSalesMode: z.nativeEnum(SalesMode).default(SalesMode.POS).optional(),
   moduleOverrides: z.record(z.string(), z.boolean()).default({}).optional(),
@@ -1016,6 +1222,9 @@ export const GetProfitLossReportSchema = z.strictObject({
   branchId: z.string().trim().optional(),
   from: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "from date must be YYYY-MM-DD").optional(),
   to: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "to date must be YYYY-MM-DD").optional(),
+  periodType: z.enum(["day", "week", "month", "year", "custom"]).default("custom").optional(),
+  periodValue: z.string().trim().optional(),
+  comparePreviousPeriod: z.boolean().default(false).optional(),
 });
 
 export const GetStockValuationReportSchema = z.strictObject({
@@ -1159,6 +1368,18 @@ export const ReconcileBranchCountsSchema = z.strictObject({
   repair: z.boolean().default(false).optional(),
 });
 
+export const ReconcileStockSchema = z.strictObject({
+  organizationId: z.string().trim().min(2).optional(),
+  productId: z.string().trim().optional(),
+  repair: z.boolean().default(false).optional(),
+});
+
+export const ReconcilePartySchema = z.strictObject({
+  organizationId: z.string().trim().min(2).optional(),
+  partyType: z.enum(["customer", "vendor"]),
+  partyId: z.string().trim().optional(),
+});
+
 // Super Admin Usage Metering Schemas
 export const GetPlatformUsageSummarySchema = z.strictObject({
   organizationId: ContextFields.organizationId,
@@ -1300,4 +1521,105 @@ export const EntityHistorySchema = z.strictObject({
   ]).optional(),
   entityId: z.string().trim().min(2).optional(),
   limit: z.number().int().min(1).max(200).default(50).optional(),
+});
+
+const CalendarDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD");
+
+export const CreateRecurringExpenseSchema = z.strictObject({
+  ...ContextFields,
+  idempotencyKey: z.string().min(8).max(128).optional(),
+  name: z.string().trim().min(2).max(120),
+  vendorId: z.string().trim().min(2).optional(),
+  payee: z.string().trim().min(1).max(200).optional(),
+  payeeType: z.enum(["vendor", "employee", "other"]).optional(),
+  payeeMembershipId: z.string().trim().min(2).optional(),
+  expenseCategoryId: z.string().trim().max(60).optional(),
+  lines: z.array(OutflowLineSchema).min(1).max(20),
+  frequency: z.enum(["monthly", "weekly"]),
+  dayOfMonth: z.number().int().min(1).max(28).optional(), // monthly (1–28: exists every month)
+  weekday: z.number().int().min(1).max(7).optional(), // weekly, ISO 1 = Monday
+  startOn: CalendarDate,
+  endOn: CalendarDate.optional(),
+}).refine((d) => !d.endOn || d.endOn >= d.startOn, { path: ["endOn"], message: "endOn must not be before startOn" });
+export const RecurringExpenseCreateSchema = CreateRecurringExpenseSchema;
+
+export const UpdateRecurringExpenseSchema = z.strictObject({
+  ...ContextFields,
+  templateId: z.string().trim().min(2),
+  name: z.string().trim().min(2).max(120).optional(),
+  lines: z.array(OutflowLineSchema).min(1).max(20).optional(),
+  endOn: CalendarDate.nullable().optional(),
+  isActive: z.boolean().optional(),
+});
+export const RecurringExpenseUpdateSchema = UpdateRecurringExpenseSchema;
+
+export const ListRecurringExpensesSchema = z.strictObject({
+  ...ContextFields,
+  isActive: z.boolean().optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+  startAfterId: z.string().trim().optional(),
+});
+export const PaginationQuerySchema = ListRecurringExpensesSchema;
+
+// ── Image Pipeline Schemas (N-06 / N-07) ─────────────────────────
+export const CreateImageUploadSessionSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  purpose: z.enum(["org_logo", "user_photo", "party_photo", "product_image"]),
+  entityType: z.enum(["organization", "user", "customer", "vendor", "product"]),
+  entityId: z.string().trim().optional(),
+  contentType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+  sizeBytes: z.number().int().min(1).max(5 * 1024 * 1024),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const AttachImageSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  uploadId: z.string().trim().min(5).max(100),
+  entityType: z.enum(["organization", "user", "customer", "vendor", "product"]),
+  entityId: z.string().trim().min(2),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const RemoveImageSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  entityType: z.enum(["organization", "user", "customer", "vendor", "product"]),
+  entityId: z.string().trim().min(2),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+// ── Super Admin User Provisioning & Ownership Transfer (N-02 / N-03 / D-1) ──
+export const ProvisionUserSchema = z.strictObject({
+  organizationId: z.string().trim().min(2),
+  role: z.enum(["owner", "admin"]),
+  user: z.strictObject({
+    name: PersonNameSchema,
+    email: z.string().trim().email().toLowerCase(),
+    phone: z.string().trim().min(5).max(30),
+    jobTitle: z.string().trim().max(100).optional(),
+    image: ImageRefSchema.optional(),
+    uploadId: z.string().trim().optional(),
+  }),
+  credentialMode: z.enum(["temporaryPassword", "invite"]).default("temporaryPassword").optional(),
+  reason: z.string().trim().min(5).max(300),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const TransferOwnershipSchema = z.strictObject({
+  organizationId: z.string().trim().min(2),
+  newOwnerUserId: z.string().trim().min(2),
+  previousOwnerAction: z.enum(["demote_to_admin", "deactivate"]),
+  reason: z.string().trim().min(5).max(300),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+// ── Self Profile Update (N-09.1) ─────────────────────────────────
+export const UpdateMeSchema = z.strictObject({
+  name: PersonNameSchema.optional(),
+  phone: z.string().trim().min(5).max(30).optional(),
+  image: ImageRefSchema.optional(),
+  uploadId: z.string().trim().optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
 });

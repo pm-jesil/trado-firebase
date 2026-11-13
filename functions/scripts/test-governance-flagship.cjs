@@ -22,8 +22,8 @@
 
 const assert = require("node:assert/strict");
 const { enforceLocalEmulatorSafety, verifyEmulatorHealth } = require("./helpers/emulator-helper.cjs");
-const { callFunction, assertCallableError, getIdToken } = require("./helpers/callable-client.cjs");
-const { getSuperAdminPersona, createTenantOwnerPersona, createEmployeePersona, db } = require("./helpers/auth-personas.cjs");
+const { callFunction, assertCallableError, getIdToken, recordTriggerObserved } = require("./helpers/callable-client.cjs");
+const { getSuperAdminPersona, createEmployeePersona, db } = require("./helpers/auth-personas.cjs");
 
 let passed = 0;
 function ok(msg) {
@@ -68,6 +68,7 @@ async function stockOf(orgId, productId, branchId = "main-branch") {
 // ---------------------------------------------------------------------------
 
 const F = "fake_doc_id";
+let gateUploadId = null; // a real upload session of the healthy org, created in gateConformance
 const GATED = [
   // [callable, payload(orgId), { mut, module }]
   ["auditGetEntityHistory", (o) => ({ organizationId: o, entityType: "product", entityId: F }), {}],
@@ -80,7 +81,7 @@ const GATED = [
   ["branchesUpdate", (o) => ({ organizationId: o, branchId: "nope-branch", name: "Nope" }), { mut: true }],
   ["branchesDeactivate", (o) => ({ organizationId: o, branchId: "nope-branch" }), { mut: true }],
   ["categoriesCreate", (o) => ({ organizationId: o, name: `Cat ${uniq()}` }), { mut: true }],
-  ["customersCreate", (o) => ({ organizationId: o, name: "Gate Customer" }), { mut: true }],
+  ["customersCreate", (o) => ({ organizationId: o, name: "Gate Customer", phone: "+919876543210" }), { mut: true }],
   ["customersGet", (o) => ({ organizationId: o, customerId: F }), {}],
   ["customersList", (o) => ({ organizationId: o }), {}],
   ["customersUpdate", (o) => ({ organizationId: o, customerId: F, name: "Cust X" }), { mut: true }],
@@ -137,10 +138,28 @@ const GATED = [
   ["teamsUpdate", (o) => ({ organizationId: o, teamId: F, name: "Team T" }), { mut: true }],
   ["unitsCreate", (o) => ({ organizationId: o, name: "Gate Unit", code: `u${Date.now() % 100000}` }), { mut: true }],
   ["usageGetLimits", (o) => ({ organizationId: o }), {}],
-  ["vendorsCreate", (o) => ({ organizationId: o, name: "Gate Vendor" }), { mut: true }],
+  ["vendorsCreate", (o) => ({ organizationId: o, name: "Gate Vendor", phone: "+919876543210" }), { mut: true }],
   ["vendorsGet", (o) => ({ organizationId: o, vendorId: F }), {}],
   ["vendorsList", (o) => ({ organizationId: o }), {}],
   ["vendorsUpdate", (o) => ({ organizationId: o, vendorId: F, name: "Vendor V" }), { mut: true }],
+  ["imagesCreateUploadSession", (o) => ({ organizationId: o, purpose: "org_logo", entityType: "organization", entityId: o, contentType: "image/jpeg", sizeBytes: 1000 }), {}],
+  // imagesAttach reads its upload session before the gate: a real session of the healthy org (set below)
+  ["imagesAttach", (o) => ({ organizationId: o, uploadId: gateUploadId, entityType: "organization", entityId: o }), {}],
+  ["imagesRemove", (o) => ({ organizationId: o, entityType: "product", entityId: F }), {}],
+  ["organizationsGet", (o) => ({ organizationId: o }), {}],
+  ["organizationsGetSubscriptionHistory", (o) => ({ organizationId: o }), {}],
+  ["branchesGetDefault", (o) => ({ organizationId: o }), { noPermission: true }],
+  ["branchesList", (o) => ({ organizationId: o }), { noPermission: true }],
+  ["branchesCreate", (o) => ({ organizationId: o, name: "Gate Branch", code: `G${Date.now() % 100000}` }), { mut: true }],
+  ["branchContextSwitch", (o) => ({ organizationId: o, targetBranchId: "main-branch" }), { noPermission: true }],
+  ["employeesGet", (o) => ({ organizationId: o, membershipId: `${F}_${o}` }), {}],
+  ["billsUpdateDraft", (o) => ({ organizationId: o, billId: F, notes: "gate" }), { mut: true }],
+  ["billsPreview", (o) => ({ organizationId: o, items: [{ productId: F, quantity: 1 }] }), {}],
+  ["recurringExpensesCreate", (o) => ({ organizationId: o, name: "Gate rent", payee: "Landlord", lines: [{ itemName: "Rent", quantity: 1, unit: "piece", unitPrice: 10 }], frequency: "monthly", dayOfMonth: 1, startOn: ymd(1) }), { mut: true }],
+  ["recurringExpensesUpdate", (o) => ({ organizationId: o, templateId: F, name: "Rent X" }), { mut: true }],
+  ["recurringExpensesList", (o) => ({ organizationId: o }), {}],
+  ["auditLogsList", (o) => ({ organizationId: o }), {}],
+  ["usageRecordClientMetric", (o) => ({ organizationId: o, metrics: {} }), { noPermission: true }],
 ];
 const PLATFORM = [
   ["usageGetPlatformSummary", () => ({})],
@@ -162,6 +181,7 @@ async function gateConformance(sa) {
   const leaver = await createEmployeePersona(healthy.idToken, healthy.organizationId, { roleCode: "admin" });
   await callFunction("employeesDeactivate", { organizationId: healthy.organizationId, membershipId: leaver.membershipId, reason: "left" }, healthy.idToken);
 
+  gateUploadId = (await callFunction("imagesCreateUploadSession", { organizationId: healthy.organizationId, purpose: "org_logo", entityType: "organization", entityId: healthy.organizationId, contentType: "image/jpeg", sizeBytes: 1000 }, healthy.idToken)).uploadId;
   let cases = 0;
   for (const [fn, payload, meta] of GATED) {
     const o = healthy.organizationId;
@@ -173,12 +193,13 @@ async function gateConformance(sa) {
         `${fn}: calibration payload rejected by validation: ${e.message}`);
     }
     await assertCallableError(callFunction(fn, payload(o), null), ["UNAUTHENTICATED"]);
-    await assertCallableError(callFunction(fn, payload(o), plain.idToken), ["PERMISSION_DENIED"]);
+    // noPermission: the gate is asked for no permission (any active member passes it), so no role denial exists.
+    if (!meta.noPermission) await assertCallableError(callFunction(fn, payload(o), plain.idToken), ["PERMISSION_DENIED"]);
     await assertCallableError(callFunction(fn, payload(expired.organizationId), expired.idToken), ["SUBSCRIPTION_EXPIRED"]);
     await assertCallableError(callFunction(fn, payload(suspended.organizationId), suspended.idToken), ["SUBSCRIPTION_SUSPENDED"]);
     await assertCallableError(callFunction(fn, payload(other.organizationId), healthy.idToken), ["TENANT_MISMATCH"]);
     await assertCallableError(callFunction(fn, payload(o), leaver.idToken), ["MEMBERSHIP_INACTIVE", "USER_INACTIVE"]);
-    cases += 6;
+    cases += meta.noPermission ? 5 : 6;
     if (meta.mut) {
       await assertCallableError(callFunction(fn, payload(o), sa.idToken), ["SUPER_ADMIN_TENANT_FORBIDDEN"]);
       cases++;
@@ -188,6 +209,11 @@ async function gateConformance(sa) {
       cases++;
     }
   }
+  // Org module toggle (in the plan, switched off by the organization) → MODULE_DISABLED
+  const toggled = await makeOrg(sa, "GateToggled");
+  await callFunction("organizationsUpdate", { organizationId: toggled.organizationId, moduleToggles: { tasks: false } }, sa.idToken); // moduleToggles: Super Admin field
+  await assertCallableError(callFunction("tasksList", { organizationId: toggled.organizationId }, toggled.idToken), ["MODULE_DISABLED"]);
+  cases++;
   for (const [fn, payload] of PLATFORM) {
     await assertCallableError(callFunction(fn, payload(healthy.organizationId), null), ["UNAUTHENTICATED"]);
     await assertCallableError(callFunction(fn, payload(healthy.organizationId), healthy.idToken), ["PERMISSION_DENIED"]);
@@ -248,7 +274,19 @@ async function seatsAndOrgFields(sa) {
     return { big, a };
   })();
   const o = admin.big.organizationId;
-  const ownerFields = { displayName: "Kitchen King", taxNumber: "29ABCDE1234F1Z5", website: "https://example.com", contactEmail: "a@b.co", contactPhone: "99999", address: { city: "Bengaluru" }, logoUrl: "https://example.com/l.png", imageUrls: ["https://example.com/1.png"], bankDetails: { bankName: "SBI", accountNumber: "1234567890", ifsc: "SBIN0001" }, settings: { approvals: { enabled: false } } };
+  const ownerFields = {
+    legalName: "Kitchen King Pvt Ltd",
+    taxId: "29ABCDE1234F1Z5",
+    website: "https://example.com",
+    contactEmail: "a@b.co",
+    contactPhone: "99999",
+    contact: { name: "Kitchen Contact", email: "contact@kitchen.local", phone: "+919876543210" },
+    contacts: [{ id: "c_support", name: "Support", email: "support@kitchen.local", phone: "+919876543211", isPrimary: true, type: "other" }],
+    addresses: [{ id: "a_billing", label: "billing", line1: "123 Main St", city: "Bengaluru", state: "Karnataka", postalCode: "560001", country: "IN" }],
+    bankAccounts: [{ id: "b_primary", accountHolderName: "Kitchen King", bankName: "SBI", accountNumber: "1234567890", routingCode: "SBIN0001" }],
+    image: { path: "organizations/fields_test/logo.png", contentType: "image/png", width: 100, height: 100, sizeBytes: 1024, updatedAt: new Date().toISOString() },
+    settings: { approvals: { enabled: false } },
+  };
   for (const [k, v] of Object.entries(ownerFields)) {
     await callFunction("organizationsUpdate", { organizationId: o, [k]: v }, admin.big.idToken);
     await assertCallableError(callFunction("organizationsUpdate", { organizationId: o, [k]: v }, admin.a.idToken), ["FIELD_NOT_EDITABLE"]);
@@ -487,8 +525,8 @@ async function voidReversal(sa) {
   console.log("\n[9] Void & reversal");
   const org = await makeOrg(sa, "Void");
   const prod = await callFunction("productsCreate", { name: "Bucket", sellingPrice: 100, costPrice: 50 }, org.idToken);
-  const vend = await callFunction("vendorsCreate", { name: "Plastic Co" }, org.idToken);
-  const cust = await callFunction("customersCreate", { name: "Shop A", creditLimit: 0 }, org.idToken);
+  const vend = await callFunction("vendorsCreate", { name: "Plastic Co", phone: "+919876543211" }, org.idToken);
+  const cust = await callFunction("customersCreate", { name: "Shop A", phone: "+919876543212", creditLimit: 0 }, org.idToken);
   const pur = await callFunction("outflowsCreate", { kind: "purchase", vendorId: vend.vendorId, invoiceNumber: "PC-1", lines: [{ productId: prod.productId, quantity: 10, unit: "piece", unitPrice: 50 }] }, org.idToken);
   await expectReason(callFunction("outflowsCreate", { kind: "purchase", vendorId: vend.vendorId, invoiceNumber: "PC-1", lines: [{ productId: prod.productId, quantity: 1, unit: "piece", unitPrice: 50 }] }, org.idToken), "already-exists", "duplicate vendor invoice number");
   const bill = await callFunction("billsCreate", { salesMode: "b2b", customerId: cust.customerId, items: [{ productId: prod.productId, quantity: 3 }], paidAmount: 100 }, org.idToken);
@@ -527,7 +565,7 @@ async function voidReversal(sa) {
   ok("quotation edited 2 → 5 units (total 200 → 500 in change history), finalized at 500; finalized invoice is immutable (void and reissue)");
 
   // Standalone paymentsVoid: create a payment, void it, verify reversal
-  const custPV = await callFunction("customersCreate", { name: "PV Test Shop" }, org.idToken);
+  const custPV = await callFunction("customersCreate", { name: "PV Test Shop", phone: "+919876543213" }, org.idToken);
   const prodPV = await callFunction("productsCreate", { name: "PV Widget", sellingPrice: 200, costPrice: 100, initialStock: 5 }, org.idToken);
   const billPV = await callFunction("billsCreate", { salesMode: "b2b", customerId: custPV.customerId, items: [{ productId: prodPV.productId, quantity: 2 }], paidAmount: 0 }, org.idToken);
   const payPV = await callFunction("paymentsCreate", { direction: "in", partyType: "customer", partyId: custPV.customerId, amount: 200, referenceId: billPV.billId, referenceModel: "bill" }, org.idToken);
@@ -554,8 +592,8 @@ async function bicycleWholesale(sa) {
   const bike24 = await callFunction("productsCreate", { name: "Hero Sprint 24in Blue", brand: "Hero", sellingPrice: 8500, costPrice: 6600, trackSerial: true, variantGroupId: groupId, variantAttributes: { size: "24in", colour: "blue" } }, t);
   const tube = await callFunction("productsCreate", { name: "Tube 26x1.95", sellingPrice: 150, costPrice: 90 }, t);
   const chain = await callFunction("productsCreate", { name: "Chain KMC Z410", sellingPrice: 400, costPrice: 250 }, t);
-  const vend = await callFunction("vendorsCreate", { name: "Ludhiana Cycles" }, t);
-  const cust = await callFunction("customersCreate", { name: "City Cycle Store", creditLimit: 100000 }, t);
+  const vend = await callFunction("vendorsCreate", { name: "Ludhiana Cycles", phone: "+919876543214" }, t);
+  const cust = await callFunction("customersCreate", { name: "City Cycle Store", phone: "+919876543215", creditLimit: 100000 }, t);
   const variants = await callFunction("productsList", {}, t);
   assert.equal(variants.items.filter((p) => p.variantGroupId === groupId).length, 2);
   ok("variants modelled as separate SKUs sharing variantGroupId (size/colour attributes)");
@@ -712,6 +750,7 @@ async function outflowAndSweep(sa) {
   assert.equal(notes.size, 1);
   assert.ok(r1.remindersSent >= 1 && r2.remindersSent === 0);
   ok(`sweep: 3-day expiry reminder sent once (run 1: ${r1.remindersSent}, run 2: ${r2.remindersSent})`);
+  recordTriggerObserved("subscriptionAndUsageSweep");
   const lapsedDoc = (await db.collection("organizations").doc(lapsed.organizationId).get()).data();
   assert.equal(lapsedDoc.subscriptionStatus, "expired");
   ok("sweep flips a lapsed trial to subscriptionStatus=expired (audited)");

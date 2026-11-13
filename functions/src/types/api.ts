@@ -30,7 +30,8 @@ export interface AuthUserContext {
   email: string;
   name: string;
   phone: string | null;
-  avatarUrl: string | null;
+  /** D-15: computed display URL for the user's image; derived from UserDoc.image.path at read time. Never stored. */
+  imageUrl: string | null;
   accountType: string;
   isActive: boolean;
   isSuperAdmin: boolean;
@@ -60,6 +61,13 @@ export interface AuthOrganizationContext {
 export interface AuthPrimaryOrganizationContext {
   organizationId: string;
   name?: string;
+  currency?: string;
+  currencyDecimals?: number;
+  timezone?: string;
+  country?: string;
+  taxRegimeCode?: string;
+  businessType?: string;
+  businessCategory?: string;
 }
 
 export interface AuthBranchContext {
@@ -105,6 +113,7 @@ export interface AuthLoginRequest {
 }
 
 export interface AuthLoginResponse {
+  /** D-18: single canonical response — `context` is the one source of truth. */
   context: AuthSessionContext;
   credentials: {
     idToken: string;
@@ -115,18 +124,6 @@ export interface AuthLoginResponse {
   idToken?: string;
   accessToken?: string;
   refreshToken?: string | null;
-  user?: AuthUserContext;
-  profile?: AuthUserContext;
-  role?: AuthRoleContext | null;
-  jobRoles?: AuthJobRoleContext[];
-  permissions?: string[];
-  platformPermissions?: string[];
-  organizations?: AuthOrganizationContext[];
-  primaryOrganization?: AuthPrimaryOrganizationContext | null;
-  branches?: AuthBranchContext[];
-  primaryBranch?: AuthPrimaryBranchContext | null;
-  device?: AuthDeviceContext | null;
-  contextStatus?: AuthContextStatus;
 }
 
 // Session Bootstrap (/auth/me equivalent)
@@ -137,6 +134,7 @@ export interface AuthMeRequest {
 }
 
 export interface AuthMeResponse {
+  /** D-18: single canonical response — `context` is the one source of truth. */
   context: AuthSessionContext;
   credentials: null;
 }
@@ -159,9 +157,12 @@ export interface CreateOrganizationRequest {
 
 export interface CreateOrganizationResponse {
   organizationId: string;
-  ownerUserId: string;
-  ownerMembershipId: string;
+  ownerUserId?: string | null;
+  ownerMembershipId?: string | null;
   status: string;
+  ownerStatus?: "pending" | "active";
+  temporaryPassword?: string;
+  userCreated?: boolean;
   message: string;
 }
 
@@ -171,7 +172,8 @@ export interface UpdateOrganizationRequest {
   businessType?: BusinessType;
   businessCategory?: BusinessCategory;
   moduleToggles?: Record<string, boolean>;
-  logoUrl?: string;
+  /** D-15: use `uploadId` or `image` (ImageRef without url) to set org logo; not a URL field. */
+  uploadId?: string;
 }
 
 export interface DeactivateOrganizationRequest {
@@ -450,7 +452,7 @@ export interface CreateCustomerRequest {
   name: string;
   mobile?: string;
   email?: string;
-  taxNumber?: string;
+  taxId?: string;
   billingAddress?: string;
   shippingAddress?: string;
   priceGroup?: string;
@@ -467,7 +469,7 @@ export interface UpdateCustomerRequest {
   name?: string;
   mobile?: string;
   email?: string;
-  taxNumber?: string;
+  taxId?: string;
   billingAddress?: string;
   shippingAddress?: string;
   priceGroup?: string;
@@ -494,7 +496,7 @@ export interface CreateVendorRequest {
   name: string;
   mobile?: string;
   email?: string;
-  taxNumber?: string;
+  taxId?: string;
   address?: string;
   contactPerson?: string;
   paymentTermsDays?: number;
@@ -510,7 +512,7 @@ export interface UpdateVendorRequest {
   name?: string;
   mobile?: string;
   email?: string;
-  taxNumber?: string;
+  taxId?: string;
   address?: string;
   contactPerson?: string;
   paymentTermsDays?: number;
@@ -576,7 +578,7 @@ export interface CreateBillRequest {
     name: string;
     mobile?: string;
     email?: string;
-    taxNumber?: string;
+    taxId?: string;
     billingAddress?: string;
     shippingAddress?: string;
   };
@@ -934,62 +936,10 @@ export interface GetOrganizationsUsageRequest {
   startAfterOrgId?: string;
 }
 
-export interface OrganizationUsageSummaryItem {
-  organizationId: string;
-  name: string;
-  planId: string;
-  branchCount: number;
-  totalOperations: number;
-  estimatedCost: number;
-  currency: string;
-  completenessPercent: number;
-  breakdown: {
-    firestoreReads: number;
-    firestoreWrites: number;
-    firestoreDeletes: number;
-    functionsInvocations: number;
-    locationPings: number;
-    fcmDispatches: number;
-  };
-}
-
-export interface GetOrganizationsUsageResponse {
-  timeframe: { startDate: string; endDate: string };
-  count: number;
-  items: OrganizationUsageSummaryItem[];
-}
-
 export interface GetBranchesUsageRequest {
   organizationId: string;
   startDate?: string;
   endDate?: string;
-}
-
-export interface BranchUsageSummaryItem {
-  branchId: string;
-  name: string;
-  code: string;
-  isActive: boolean;
-  isDefault: boolean;
-  totalOperations: number;
-  estimatedCost: number;
-  currency: string;
-  dataFreshness: string;
-  completenessPercent: number;
-  counts: {
-    firestoreReads: number;
-    firestoreWrites: number;
-    firestoreDeletes: number;
-    functionsInvocations: number;
-    locationPings: number;
-  };
-}
-
-export interface GetBranchesUsageResponse {
-  organizationId: string;
-  organizationName: string;
-  timeframe: { startDate: string; endDate: string };
-  branches: BranchUsageSummaryItem[];
 }
 
 export interface GetUsageDetailRequest {

@@ -2,12 +2,12 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "generatedAt": "2026-11-07T00:00:00Z",
   "projectId": "trado-x",
-  "totalExports": 121,
+  "totalExports": 140,
   "phases": {
     "phase1Count": 29,
     "phase2Count": 37,
     "branchReadinessCount": 8,
-    "phase3Count": 47
+    "phase3Count": 53
   },
   "endpoints": [
     {
@@ -313,7 +313,9 @@
       "requiredClaims": {},
       "activeContextDerivation": "body.organizationId_verified_via_memberships",
       "requiredPermissions": [
-        "employee:deactivate"
+        "employee:suspend",
+        "employee:delete",
+        "employee:update"
       ],
       "superAdminBypass": true,
       "inputSchema": "DeactivateEmployeeSchema",
@@ -3718,6 +3720,554 @@
       ],
       "sideEffects": [
         "Meters organization storage upload bytes and deletes object if hard block limit breached"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "organizationsGet",
+      "logicalName": "organizations.get",
+      "phase": 1,
+      "domain": "organizations",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "requiredPermissions": [
+        "org:view"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "GetOrganizationSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "organizations"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "employeesGet",
+      "logicalName": "employees.get",
+      "phase": 1,
+      "domain": "employees",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "requiredPermissions": [
+        "employee:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetEmployeeSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "memberships",
+        "users",
+        "membershipBranches"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "plansPreviewImpact",
+      "logicalName": "plans.previewImpact",
+      "phase": 1,
+      "domain": "plans",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "super_admin_only",
+      "requiredPermissions": [
+        "platform:plan:manage"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "PreviewPlanImpactSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "subscriptionPlans",
+        "organizations",
+        "organizations/branches"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "billsPreview",
+      "logicalName": "bills.preview",
+      "phase": 2,
+      "domain": "billing",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "requiredPermissions": [
+        "bill:view",
+        "bill:create",
+        "sale:view",
+        "sale:create"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "PreviewBillSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "products",
+        "stockBalances"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "organizationsReactivate",
+      "logicalName": "organizations.reactivate",
+      "phase": 1,
+      "domain": "organizations",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "super_admin_target_org",
+      "requiredPermissions": [
+        "platform:org:deactivate"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "ReactivateOrganizationSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "organizations"
+      ],
+      "firestoreCollectionsWritten": [
+        "organizations",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "auditLog"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "organizationsPreviewDeactivationImpact",
+      "logicalName": "organizations.previewDeactivationImpact",
+      "phase": 1,
+      "domain": "organizations",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "super_admin_target_org",
+      "requiredPermissions": [
+        "platform:org:deactivate"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "PreviewDeactivationImpactSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "organizations",
+        "users",
+        "bills",
+        "outflows",
+        "subscriptionPlans"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "organizationsGetSubscriptionHistory",
+      "logicalName": "organizations.getSubscriptionHistory",
+      "phase": 1,
+      "domain": "organizations",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "super_admin_target_org",
+      "requiredPermissions": [
+        "platform:org:view"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "GetSubscriptionHistorySchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "auditLogs",
+        "subscriptionPlans",
+        "users"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "plansGet",
+      "logicalName": "plans.get",
+      "phase": 1,
+      "domain": "plans",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "public_catalog_read",
+      "requiredPermissions": [],
+      "superAdminBypass": true,
+      "inputSchema": "GetPlanSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "subscriptionPlans"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "plansArchive",
+      "logicalName": "plans.archive",
+      "phase": 1,
+      "domain": "plans",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "super_admin_platform",
+      "requiredPermissions": [
+        "platform:plan:manage"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "ArchivePlanSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "subscriptionPlans"
+      ],
+      "firestoreCollectionsWritten": [
+        "subscriptionPlans",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "auditLog"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "plansDelete",
+      "logicalName": "plans.delete",
+      "phase": 1,
+      "domain": "plans",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "super_admin_platform",
+      "requiredPermissions": [
+        "platform:plan:manage"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "DeletePlanSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "subscriptionPlans",
+        "organizations"
+      ],
+      "firestoreCollectionsWritten": [
+        "subscriptionPlans",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "auditLog"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "platformUsersList",
+      "logicalName": "platformUsers.list",
+      "phase": 1,
+      "domain": "platformUsers",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "super_admin_platform",
+      "requiredPermissions": [
+        "platform:user:view"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "ListPlatformUsersSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "users",
+        "memberships",
+        "membershipBranches",
+        "organizations",
+        "roles"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "platformUsersGet",
+      "logicalName": "platformUsers.get",
+      "phase": 1,
+      "domain": "platformUsers",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "super_admin_platform",
+      "requiredPermissions": [
+        "platform:user:view"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "GetPlatformUserSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "users",
+        "memberships",
+        "membershipBranches",
+        "organizations",
+        "roles",
+        "subscriptionPlans"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "auditLogsList",
+      "logicalName": "auditLogs.list",
+      "phase": 3,
+      "domain": "audit",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "super_admin_platform",
+      "requiredPermissions": [
+        "platform:audit:view"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "ListAuditLogsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "auditLogs",
+        "users",
+        "organizations"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "usersUpdateMe",
+      "logicalName": "users.updateMe",
+      "phase": 3,
+      "domain": "users",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "caller",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "UpdateMeSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "users"
+      ],
+      "firestoreCollectionsWritten": [
+        "users",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "USER_PROFILE_UPDATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "imagesCreateUploadSession",
+      "logicalName": "images.createUploadSession",
+      "phase": 3,
+      "domain": "images",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "caller",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "CreateImageUploadSessionSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [],
+      "firestoreCollectionsWritten": [
+        "imageUploadSessions"
+      ],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "imagesAttach",
+      "logicalName": "images.attach",
+      "phase": 3,
+      "domain": "images",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "AttachImageSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "imageUploadSessions"
+      ],
+      "firestoreCollectionsWritten": [
+        "imageUploadSessions",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "IMAGE_ATTACHED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "imagesRemove",
+      "logicalName": "images.remove",
+      "phase": 3,
+      "domain": "images",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "RemoveImageSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [],
+      "firestoreCollectionsWritten": [
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "IMAGE_REMOVED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "organizationsProvisionUser",
+      "logicalName": "organizations.provisionUser",
+      "phase": 3,
+      "domain": "organizations",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "super_admin_platform",
+      "requiredPermissions": [
+        "platform:tenants:manage"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "ProvisionUserSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "organizations"
+      ],
+      "firestoreCollectionsWritten": [
+        "organizations",
+        "memberships",
+        "users",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "USER_PROVISIONED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "organizationsTransferOwnership",
+      "logicalName": "organizations.transferOwnership",
+      "phase": 3,
+      "domain": "organizations",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "dual_super_admin_or_owner",
+      "requiredPermissions": [],
+      "superAdminBypass": true,
+      "inputSchema": "TransferOwnershipSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "organizations",
+        "memberships"
+      ],
+      "firestoreCollectionsWritten": [
+        "organizations",
+        "memberships",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "OWNERSHIP_TRANSFERRED"
       ],
       "indexesRequired": [],
       "coveredInIntegrationTests": true,

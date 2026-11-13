@@ -12,7 +12,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { calculateTax } from "../../services/taxCalculation.js";
 import { Money } from "../../services/money.js";
-import { buildLogDoc, sanitizeAuditDetails } from "../../services/audit.js";
+import { redact } from "../../services/auditRecorder.js";
 
 describe("Business Core Services - Tax Calculation", () => {
   it("calculates standard India GST (18%) split into CGST (9%) and SGST (9%) for intra-state sales", () => {
@@ -216,21 +216,18 @@ describe("Business Core Services - Decimal-Safe Money & Precision Utility", () =
   });
 });
 
-describe("Business Core Services - Audit log hygiene", () => {
-  it("redacts camelCase secrets (initialPassword, fcmToken, refreshToken, accessToken)", () => {
-    const out = sanitizeAuditDetails({ initialPassword: "x", fcmToken: "t", refreshToken: "r", accessToken: "a", reason: "ok" });
-    assert.deepEqual(out, { initialPassword: "[REDACTED]", fcmToken: "[REDACTED]", refreshToken: "[REDACTED]", accessToken: "[REDACTED]", reason: "ok" });
+describe("Business Core Services - Audit redaction (D-27)", () => {
+  it("drops secrets (initialPassword, fcmToken, refreshToken, accessToken) and lists their paths", () => {
+    const redacted: string[] = [];
+    const out = redact({ initialPassword: "x", fcmToken: "t", refreshToken: "r", accessToken: "a", reason: "ok" }, redacted);
+    assert.deepEqual(out, { reason: "ok" });
+    assert.deepEqual(redacted, ["initialPassword", "fcmToken", "refreshToken", "accessToken"]);
   });
 
-  it("never copies entity attributes into details; keeps event facts and the changed fields", () => {
-    const doc = buildLogDoc({
-      organizationId: "org1", actorUid: "u1", action: "BILL_CREATED", entityType: "bill", entityId: "b1",
-      details: { billNumber: "INV-1", totalAmount: 100, name: "Tea", reason: "walk-in", approvalNote: null },
-      changes: [{ field: "sellingPrice", from: 10, to: 12 }],
-    });
-    assert.deepEqual(doc.details, { reason: "walk-in", approvalNote: null });
-    assert.deepEqual(doc.changedFields, ["sellingPrice"]);
-    const empty = buildLogDoc({ actorUid: "u1", action: "X", entityType: "bill", entityId: "b1", details: { name: "only" } });
-    assert.equal(empty.details, undefined);
+  it("keeps the last 4 digits of account numbers and masks tax ids, at any depth", () => {
+    const redacted: string[] = [];
+    const out = redact({ bankAccounts: [{ accountNumber: "50200012345678", bankName: "HDFC" }], taxId: "29ABCDE1234F1Z5" }, redacted);
+    assert.deepEqual(out, { bankAccounts: [{ accountNumber: "••••5678", bankName: "HDFC" }], taxId: "***" });
+    assert.deepEqual(redacted, ["bankAccounts[0].accountNumber", "taxId"]);
   });
 });

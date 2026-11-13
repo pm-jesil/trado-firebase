@@ -10,7 +10,8 @@
  * - `tasksDelete`: Removes task
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
@@ -26,6 +27,7 @@ import {
 import { parseInput } from "../validation/parseInput.js";
 import { TaskDoc } from "../types/models.js";
 import { createAndDispatchNotification } from "../services/notificationService.js";
+import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 
 /**
  * 1. tasksCreate
@@ -43,71 +45,100 @@ export const tasksCreate = onCall({ region: "asia-south1" }, async (request) => 
     throw new HttpsError("permission-denied", "Cross-organization access denied");
   }
 
-  const callerMembershipId = `${context.callerUid}_${orgId}`;
-  const isOwnerOrAdmin = context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
-  const canAssignOthers = isOwnerOrAdmin || context.effectivePermissions.includes(AppPermissions.TASK_ASSIGN);
-  const targetMembershipId = validated.assignedToMembershipId;
+  const idempotency = await reserveIdempotency({
+    scope: orgId,
+    actorUid: context.callerUid,
+    operation: "tasks.create",
+    clientKey: validated.idempotencyKey,
+    payload: request.data,
+  });
 
-  // Regular employees cannot assign tasks to other staff members
-  if (!canAssignOthers && targetMembershipId !== callerMembershipId) {
-    throw new HttpsError(
-      "permission-denied",
-      "Employees can only assign tasks to themselves. Admin or Owner permission required to assign to others."
-    );
-  }
-
-  // Verify target membership exists and belongs to the same organization
-  const targetMemberSnap = await db.collection("memberships").doc(targetMembershipId).get();
-  if (!targetMemberSnap.exists) {
-    throw new HttpsError("not-found", `Target assignee membership "${targetMembershipId}" not found`);
-  }
-  const targetMemberData = targetMemberSnap.data()!;
-  if (targetMemberData.organizationId !== orgId) {
-    throw new HttpsError("permission-denied", "Assignee belongs to a different organization");
-  }
-
-  const taskDoc: TaskDoc = {
-    organizationId: orgId,
-    title: validated.title,
-    description: validated.description || "",
-    assignedToMembershipId: targetMembershipId,
-    assignedByMembershipId: callerMembershipId,
-    status: "pending",
-    priority: validated.priority || "medium",
-    dueAt: validated.dueAt || undefined,
-    relatedEntityType: validated.relatedEntityType || null,
-    relatedEntityId: validated.relatedEntityId || null,
-    completedAt: null,
-    completedByMembershipId: null,
-    createdAt: new Date().toISOString(),
-    createdBy: context.callerUid,
-    updatedAt: new Date().toISOString(),
-  };
-
-  const ref = await db.collection("tasks").add(taskDoc);
-
-  // Send push & in-app notification to assignee if assigning to someone else
-  if (targetMembershipId !== callerMembershipId) {
-    try {
-      await createAndDispatchNotification({
-        organizationId: orgId,
-        userId: targetMemberData.userId,
-        membershipId: targetMembershipId,
-        type: "task_assigned",
-        title: "New Task Assigned",
-        body: `You have been assigned task: "${validated.title}"`,
-        relatedEntityType: "task",
-        relatedEntityId: ref.id,
-      });
-    } catch {
-      // Non-blocking notification dispatch
+  if (idempotency.isDuplicate) {
+    if (idempotency.isProcessing) {
+      throw new HttpsError("already-exists", "Operation in progress. Please retry shortly.");
     }
+    return idempotency.cachedResult;
   }
 
-  return {
-    taskId: ref.id,
-    ...taskDoc,
-  };
+  try {
+    const callerMembershipId = `${context.callerUid}_${orgId}`;
+    const isOwnerOrAdmin = context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
+    const canAssignOthers = isOwnerOrAdmin || context.effectivePermissions.includes(AppPermissions.TASK_ASSIGN);
+    const targetMembershipId = validated.assignedToMembershipId;
+
+    // Regular employees cannot assign tasks to other staff members
+    if (!canAssignOthers && targetMembershipId !== callerMembershipId) {
+      throw new HttpsError(
+        "permission-denied",
+        "Employees can only assign tasks to themselves. Admin or Owner permission required to assign to others."
+      );
+    }
+
+    // Verify target membership exists and belongs to the same organization
+    const targetMemberSnap = await db.collection("memberships").doc(targetMembershipId).get();
+    if (!targetMemberSnap.exists) {
+      throw new HttpsError("not-found", `Target assignee membership "${targetMembershipId}" not found`);
+    }
+    const targetMemberData = targetMemberSnap.data()!;
+    if (targetMemberData.organizationId !== orgId) {
+      throw new HttpsError("permission-denied", "Assignee belongs to a different organization");
+    }
+
+    const taskDoc: TaskDoc = {
+      organizationId: orgId,
+      title: validated.title,
+      description: validated.description || "",
+      assignedToMembershipId: targetMembershipId,
+      assignedByMembershipId: callerMembershipId,
+      status: "pending",
+      priority: validated.priority || "medium",
+      dueAt: validated.dueAt || undefined,
+      relatedEntityType: validated.relatedEntityType || null,
+      relatedEntityId: validated.relatedEntityId || null,
+      completedAt: null,
+      completedByMembershipId: null,
+      createdAt: new Date().toISOString(),
+      createdBy: context.callerUid,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const ref = await db.collection("tasks").add(taskDoc);
+
+    // Send push & in-app notification to assignee if assigning to someone else
+    if (targetMembershipId !== callerMembershipId) {
+      try {
+        await createAndDispatchNotification({
+          organizationId: orgId,
+          userId: targetMemberData.userId,
+          membershipId: targetMembershipId,
+          type: "task_assigned",
+          title: "New Task Assigned",
+          body: `You have been assigned task: "${validated.title}"`,
+          relatedEntityType: "task",
+          relatedEntityId: ref.id,
+        });
+      } catch {
+        // Non-blocking notification dispatch
+      }
+    }
+
+
+    const result = {
+      taskId: ref.id,
+      ...taskDoc,
+    };
+
+    if (idempotency.recordId) {
+      await finalizeIdempotencySuccess(idempotency.recordId, result);
+    }
+
+    return result;
+  } catch (err: unknown) {
+    if (idempotency.recordId) {
+      await finalizeIdempotencyFailure(idempotency.recordId, "CREATE_FAILED", (err as Error).message);
+    }
+    throw err;
+  }
 });
 
 /**
@@ -152,7 +183,8 @@ export const tasksUpdate = onCall({ region: "asia-south1" }, async (request) => 
   if (validated.dueAt !== undefined) updates.dueAt = validated.dueAt || undefined;
   if (validated.status !== undefined) updates.status = validated.status;
 
-  await taskRef.update(updates as any);
+  await taskRef.update(updates as Record<string, unknown>);
+
 
   return {
     taskId: validated.taskId,
@@ -213,6 +245,7 @@ export const tasksAssign = onCall({ region: "asia-south1" }, async (request) => 
     // Non-blocking
   }
 
+
   return {
     taskId: validated.taskId,
     assignedToMembershipId: validated.assignedToMembershipId,
@@ -265,7 +298,8 @@ export const tasksUpdateStatus = onCall({ region: "asia-south1" }, async (reques
     updates.completedByMembershipId = null;
   }
 
-  await taskRef.update(updates as any);
+  await taskRef.update(updates as Record<string, unknown>);
+
 
   return {
     taskId: validated.taskId,
@@ -357,6 +391,7 @@ export const tasksDelete = onCall({ region: "asia-south1" }, async (request) => 
   batch.delete(taskRef);
   notes.docs.forEach((n) => batch.delete(n.ref));
   await batch.commit();
+
 
   return {
     taskId: validated.taskId,

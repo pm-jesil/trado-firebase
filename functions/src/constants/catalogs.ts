@@ -164,6 +164,7 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
     description: "Manage day-to-day operations, employees, and reports",
     permissions: [
       AppPermissions.ORG_VIEW,
+      AppPermissions.USAGE_READ,
       AppPermissions.ORG_UPDATE,
       AppPermissions.EMPLOYEE_VIEW,
       AppPermissions.EMPLOYEE_CREATE,
@@ -247,7 +248,7 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
     description: "Baseline organization access for standard employees",
     permissions: [
       AppPermissions.ORG_VIEW,
-      AppPermissions.EMPLOYEE_VIEW,
+      AppPermissions.AUDIT_READ_OWN,
     ],
   },
   {
@@ -258,7 +259,6 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
     description: "Counter and B2B billing, customer payments and sales returns",
     permissions: [
       AppPermissions.ORG_VIEW,
-      AppPermissions.EMPLOYEE_VIEW,
       AppPermissions.BILL_CREATE,
       AppPermissions.BILL_VIEW,
       AppPermissions.BILL_PRINT,
@@ -300,7 +300,6 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
     description: "Records vendor purchases, receives stock, maintains catalog items",
     permissions: [
       AppPermissions.ORG_VIEW,
-      AppPermissions.EMPLOYEE_VIEW,
       AppPermissions.PURCHASE_CREATE,
       AppPermissions.PURCHASE_VIEW,
       AppPermissions.VENDOR_CREATE,

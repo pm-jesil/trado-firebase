@@ -1,0 +1,444 @@
+{
+  "version": "1.0.0",
+  "totalDocuments": 72,
+  "countsByClassification": {
+    "KEEP+UPDATE": 49,
+    "REWRITE": 2,
+    "ARCHIVE": 8,
+    "GENERATED": 13
+  },
+  "documents": [
+    {
+      "path": "README.md",
+      "title": "Trado Firebase Backend",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 436
+    },
+    {
+      "path": "functions/README.md",
+      "title": "Trado Firebase Backend — Cloud Functions & Domain Engine",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 93
+    },
+    {
+      "path": "docs/api-reference.md",
+      "title": "Trado API Reference",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 1183
+    },
+    {
+      "path": "docs/architecture.md",
+      "title": "Trado Architecture Overview",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 171
+    },
+    {
+      "path": "docs/audit/blast-radius-table.md",
+      "title": "Change-impact blast radius",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/callable-and-trigger-inventory.md",
+      "title": "Trado Backend: Comprehensive Callable & Trigger Inventory",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/catalog-diff.md",
+      "title": "Prompt-62 Reference Catalog (§4) Diff Ledger (Y-8)",
+      "classification": "ARCHIVE",
+      "lineCount": 157
+    },
+    {
+      "path": "docs/audit/coverage.md",
+      "title": "Computed coverage",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/current-repository-baseline.md",
+      "title": "Trado Firebase Backend — Current Repository Baseline Census",
+      "classification": "ARCHIVE",
+      "lineCount": 197
+    },
+    {
+      "path": "docs/audit/document-ledger.md",
+      "title": "Trado Platform Document Verification Ledger (Y-14 / D-20)",
+      "classification": "ARCHIVE",
+      "lineCount": 168
+    },
+    {
+      "path": "docs/audit/documentation-inventory-and-deduplication.md",
+      "title": "Trado Documentation Inventory & Deduplication Report",
+      "classification": "ARCHIVE",
+      "lineCount": 83
+    },
+    {
+      "path": "docs/audit/documentation-verification-report.md",
+      "title": "Trado Firebase Backend — Documentation & Codebase Verification Report",
+      "classification": "ARCHIVE",
+      "lineCount": 249
+    },
+    {
+      "path": "docs/audit/issue-ledger.md",
+      "title": "Trado Firebase Backend — Master Issue Ledger",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 250
+    },
+    {
+      "path": "docs/audit/metering-audit-inventory.md",
+      "title": "Metering, audit and request-context inventory (prompt 66, Part 1)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/open-items.md",
+      "title": "Open-items register",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/phase-reports-archive.md",
+      "title": "Phase reports (prompts 58–64)",
+      "classification": "ARCHIVE",
+      "lineCount": 221
+    },
+    {
+      "path": "docs/audit/roundtrip-results.md",
+      "title": "Maximal round-trip proof",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/test-coverage-matrix.md",
+      "title": "Trado Backend: Comprehensive Test Coverage Matrix",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 166
+    },
+    {
+      "path": "docs/audit/test-file-refactor.md",
+      "title": "Trado Backend: Test File Inventory & Refactor Documentation",
+      "classification": "ARCHIVE",
+      "lineCount": 75
+    },
+    {
+      "path": "docs/audit/test-refactor-verification-report.md",
+      "title": "Trado Firebase Backend: Test Architecture, Feature Coverage, Repository Hygiene & Verification Audit Report",
+      "classification": "ARCHIVE",
+      "lineCount": 266
+    },
+    {
+      "path": "docs/audit-baseline.md",
+      "title": "Trado Firebase Backend — Baseline Audit Inventory",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 167
+    },
+    {
+      "path": "docs/current-regression-report.md",
+      "title": "Trado Firebase Backend — Current Regression Test Report",
+      "classification": "REWRITE",
+      "lineCount": 250
+    },
+    {
+      "path": "docs/data-model.md",
+      "title": "Trado Data Model & Schema Specification",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 925
+    },
+    {
+      "path": "docs/decisions-log.md",
+      "title": "Trado Architectural Decisions Log",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 235
+    },
+    {
+      "path": "docs/feature-audit-matrix.md",
+      "title": "Trado Firebase Backend — Feature Audit Matrix",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 60
+    },
+    {
+      "path": "docs/features/customers-and-vendors.md",
+      "title": "Feature Guide: Customers & Vendors (Parties, Scopes & Ledgers)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 192
+    },
+    {
+      "path": "docs/features/deliveries.md",
+      "title": "Feature Guide: Deliveries & Dispatch Management",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 185
+    },
+    {
+      "path": "docs/features/employee-location-and-privacy.md",
+      "title": "Feature Guide: Employee Live Location Tracking & Privacy",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 83
+    },
+    {
+      "path": "docs/features/inventory-stock-and-costing.md",
+      "title": "Feature Guide: Inventory, Stock & Costing Engine",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 160
+    },
+    {
+      "path": "docs/features/notifications.md",
+      "title": "Feature Guide: Notifications & Automated Triggers",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 79
+    },
+    {
+      "path": "docs/features/offline-sync.md",
+      "title": "Feature Guide: Offline-Sync Contract & Resilience",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 80
+    },
+    {
+      "path": "docs/features/organizations-subscriptions-and-branches.md",
+      "title": "Feature Guide: Organizations, Subscriptions & Branches",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 355
+    },
+    {
+      "path": "docs/features/payments-and-party-ledgers.md",
+      "title": "Feature Guide: Payments & Party Ledgers",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 209
+    },
+    {
+      "path": "docs/features/platform-usage-and-cost-estimates.md",
+      "title": "Feature Guide: Platform Usage Metering & Cost Estimates",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 36
+    },
+    {
+      "path": "docs/features/products-categories-units-and-barcodes.md",
+      "title": "Feature Guide: Products, Categories, Units & Barcodes",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 199
+    },
+    {
+      "path": "docs/features/purchases-and-expenses.md",
+      "title": "Feature Guide: Purchases & Expenses (Unified Outflows Engine)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 221
+    },
+    {
+      "path": "docs/features/reports-and-analytics.md",
+      "title": "Feature Guide: Reports & Analytics Engine",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 159
+    },
+    {
+      "path": "docs/features/returns-waste-and-stock-adjustments.md",
+      "title": "Feature Guide: Returns, Waste & Stock Adjustments",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 155
+    },
+    {
+      "path": "docs/features/sales-billing-and-quotations.md",
+      "title": "Feature Guide: Sales, Billing & Quotations Engine",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 271
+    },
+    {
+      "path": "docs/features/tasks-and-employee-operations.md",
+      "title": "Feature Guide: Tasks & Employee Field Operations",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 92
+    },
+    {
+      "path": "docs/features/users-memberships-and-permissions.md",
+      "title": "Feature Guide: Users, Memberships & RBAC Permissions",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 328
+    },
+    {
+      "path": "docs/flutter-client-integration.md",
+      "title": "Trado Firebase Backend — Flutter Web Client Integration Guide",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 835
+    },
+    {
+      "path": "docs/generated/contract-changes.md",
+      "title": "Trado API Contract Changes & Naming Consolidations (D-7)",
+      "classification": "GENERATED",
+      "lineCount": 20
+    },
+    {
+      "path": "docs/generated/gate-permission-matrix.md",
+      "title": "Gate & Permission Matrix",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/guides/audit-trail.md",
+      "title": "Audit trail",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 74
+    },
+    {
+      "path": "docs/guides/client-meta.md",
+      "title": "Client `_meta` contract",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 52
+    },
+    {
+      "path": "docs/guides/cost-tracking.md",
+      "title": "Cost tracking",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 57
+    },
+    {
+      "path": "docs/local-development-seed-guide.md",
+      "title": "Trado Local Development & Safe Emulator Seed Guide",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 218
+    },
+    {
+      "path": "docs/manual-api-testing-guide.md",
+      "title": "Manual API Testing Guide — Trado Firebase Backend",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 304
+    },
+    {
+      "path": "docs/permissions-and-roles.md",
+      "title": "Trado Permissions, Roles & Privilege Matrix",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 262
+    },
+    {
+      "path": "docs/process/verification.md",
+      "title": "Verification process",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 75
+    },
+    {
+      "path": "docs/production-readiness.md",
+      "title": "Trado — cloud readiness and the cloud-only checklist",
+      "classification": "REWRITE",
+      "lineCount": 78
+    },
+    {
+      "path": "docs/README.md",
+      "title": "Trado Repository Documentation Map",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/reference/api-audit.md",
+      "title": "API Audit Ledger",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 296
+    },
+    {
+      "path": "docs/reference/api-cost-profile.md",
+      "title": "API cost profile",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/reference/audit-actions.md",
+      "title": "Audit actions",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/reference/entity-fields.md",
+      "title": "Stored field catalog",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/reference/rate-card.md",
+      "title": "Rate card",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/repository-cleanup-manifest.md",
+      "title": "Trado Firebase Backend — Repository Cleanup & Hygiene Manifest",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 81
+    },
+    {
+      "path": "docs/schema-and-source-of-truth-audit.md",
+      "title": "Trado Firebase Backend — Schema & Source-of-Truth Audit",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 325
+    },
+    {
+      "path": "docs/security-and-permissions.md",
+      "title": "Trado Security, Rules & Permissions Model",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 204
+    },
+    {
+      "path": "docs/testing-guide.md",
+      "title": "Trado Backend Testing Guide",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 182
+    },
+    {
+      "path": "docs/testing-personas-and-credentials.md",
+      "title": "Trado Firebase Backend — Local Emulator Test Personas & Credentials",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 151
+    },
+    {
+      "path": "docs/workflows/customers-vendors-and-sharing.md",
+      "title": "Workflow Runbook: Customers, Vendors & Branch Sharing Policies",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 93
+    },
+    {
+      "path": "docs/workflows/deliveries-returns-and-waste.md",
+      "title": "Workflow Runbook: Deliveries, Returns & Waste Management",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 122
+    },
+    {
+      "path": "docs/workflows/employee-and-branch-access.md",
+      "title": "Workflow Runbook: Employee Provisioning & Branch Access Management",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 123
+    },
+    {
+      "path": "docs/workflows/inventory-and-costing.md",
+      "title": "Workflow Runbook: Inventory Tracking, Costing & Stock Reconciliation",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 105
+    },
+    {
+      "path": "docs/workflows/organization-and-onboarding.md",
+      "title": "Workflow Runbook: Organization Creation & Onboarding",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 114
+    },
+    {
+      "path": "docs/workflows/purchases-and-expenses.md",
+      "title": "Workflow Runbook: Purchases & Expenses (Unified Outflows)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 109
+    },
+    {
+      "path": "docs/workflows/reports-tasks-locations-notifications.md",
+      "title": "Workflow Runbook: Reports, Tasks, Live Location & Notifications",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 119
+    },
+    {
+      "path": "docs/workflows/sales-and-billing.md",
+      "title": "Workflow Runbook: Sales, Billing & Invoicing Lifecycle",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 120
+    },
+    {
+      "path": "docs/workflows/subscriptions-usage-and-platform-admin.md",
+      "title": "Workflow Runbook: Subscriptions, Usage Metering & Platform Administration",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 113
+    }
+  ]
+}

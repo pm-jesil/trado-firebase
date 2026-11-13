@@ -48,7 +48,7 @@ Direct source enumeration from `functions/src/index.ts` and underlying callable 
 ### Summary by Invocation Type
 - **HTTPS Callable Functions (`onCall`)**: **98**
 - **Event-Driven Firestore Triggers (`onDocumentWritten`)**: **4**
-- **Scheduled Functions (`onSchedule`)**: **0** (Usage metering and summary calculation are implemented on-demand via callables; no unverified cloud schedulers).
+- **Scheduled Functions (`onSchedule`)**: **1** (`subscriptionAndUsageSweep`, functions/src/triggers/scheduled.ts; its Cloud Scheduler job is created by `firebase deploy`).
 - **Total Exports**: **102**
 
 ### Detailed Export Inventory

@@ -1,5 +1,7 @@
 # Trado Firebase Backend — Current Repository Baseline Census
 
+> Status: archived (2026-11-13). Point-in-time report of an earlier prompt; its counts and completeness statements are not current and are not evidence. Current, computed figures: [coverage.md](coverage.md) and the verification run records under .local/verification-runs.
+
 > **Document Type**: Phase A Read-Only Baseline & System Census  
 > **Date**: October 29, 2026  
 > **Workspace**: `C:\Users\jesil.p\Project\FireBase\trado-firebase`  

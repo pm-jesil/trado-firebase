@@ -1,0 +1,42 @@
+{
+  "concurrency": {
+    "parallelRequests": 50,
+    "mode": "exact",
+    "rejected": 0,
+    "recordedCalls": 50,
+    "recordedReads": 50,
+    "exact": true
+  },
+  "kill": {
+    "mode": "batched",
+    "callsBeforeKill": 40,
+    "recordedAfterKill": 0,
+    "lostCalls": 40,
+    "statedBound": "up to METER_FLUSH_CALLS calls or METER_FLUSH_SECONDS of calls per rollup document per instance (SIGTERM flushes first; a hard kill does not)",
+    "withinBound": true
+  },
+  "overhead": {
+    "calls": 200,
+    "mix": "2 document reads + 1 write per call",
+    "extraReadsPerRequest": 0,
+    "extraWritesPerRequest": {
+      "exact": 2,
+      "batched": "≤ 2 per (organization, day) and (organization, user, day) document per flush; with METER_FLUSH_CALLS = 100 that is ≤ 0.02 per request for a single user"
+    },
+    "latencyMs": {
+      "off": {
+        "p50": 27.99,
+        "p95": 41
+      },
+      "on": {
+        "p50": 36.46,
+        "p95": 48.75
+      }
+    },
+    "addedLatencyMs": {
+      "p50": 8.47,
+      "p95": 7.75
+    }
+  },
+  "measuredAt": "2026-11-13T16:47:53.175Z"
+}

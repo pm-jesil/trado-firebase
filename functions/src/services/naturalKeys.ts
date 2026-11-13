@@ -39,3 +39,17 @@ export function lockSegment(value: string): string {
 export function uniqueKeyId(organizationId: string, kind: string, key: string): string {
   return `${organizationId}_${kind}_${lockSegment(key)}`;
 }
+
+/**
+ * Machine-readable code slug from a human name: Unicode-normalised, lower-case, spaces → underscore,
+ * non-word characters stripped. e.g. "Warehouse Manager" → "warehouse_manager".
+ * Used for the `code` field on job roles, departments, teams, etc.
+ */
+export function codeSlug(name: string): string {
+  return name
+    .normalize("NFKC")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^\w]/g, "");
+}

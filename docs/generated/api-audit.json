@@ -1,0 +1,2831 @@
+{
+  "summary": {
+    "total": 134,
+    "pass": 70,
+    "warn": 64,
+    "fail": 0
+  },
+  "checks": {
+    "A": "exported_from_index",
+    "B": "auth_gate",
+    "C": "input_validation",
+    "D": "strict_schema",
+    "E": "audit_log",
+    "F": "no_any_writes",
+    "G": "response_shape",
+    "H": "usage_metering",
+    "I": "idempotency",
+    "J": "test_coverage",
+    "K": "documented"
+  },
+  "callables": [
+    {
+      "callable": "authLogin",
+      "file": "authLogin.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Auth"
+    },
+    {
+      "callable": "authMe",
+      "file": "authMe.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Auth"
+    },
+    {
+      "callable": "usersUpdateMe",
+      "file": "users.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Auth"
+    },
+    {
+      "callable": "organizationsCreate",
+      "file": "organizations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Organizations"
+    },
+    {
+      "callable": "organizationsUpdate",
+      "file": "organizations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Organizations"
+    },
+    {
+      "callable": "organizationsDeactivate",
+      "file": "organizations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Organizations"
+    },
+    {
+      "callable": "organizationsList",
+      "file": "organizations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Organizations"
+    },
+    {
+      "callable": "organizationsReactivate",
+      "file": "organizations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Organizations"
+    },
+    {
+      "callable": "organizationsPreviewDeactivationImpact",
+      "file": "organizations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Organizations"
+    },
+    {
+      "callable": "organizationsGetSubscriptionHistory",
+      "file": "organizations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Organizations"
+    },
+    {
+      "callable": "organizationsSetSubscription",
+      "file": "organizations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Organizations"
+    },
+    {
+      "callable": "organizationsGet",
+      "file": "organizations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Organizations"
+    },
+    {
+      "callable": "organizationsProvisionUser",
+      "file": "organizations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Organizations"
+    },
+    {
+      "callable": "organizationsTransferOwnership",
+      "file": "organizations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Organizations"
+    },
+    {
+      "callable": "branchesGetDefault",
+      "file": "branches.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Branches"
+    },
+    {
+      "callable": "branchesList",
+      "file": "branches.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Branches"
+    },
+    {
+      "callable": "branchesCreate",
+      "file": "branches.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Branches"
+    },
+    {
+      "callable": "branchesUpdate",
+      "file": "branches.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Branches"
+    },
+    {
+      "callable": "branchesDeactivate",
+      "file": "branches.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Branches"
+    },
+    {
+      "callable": "branchContextSwitch",
+      "file": "branches.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Branches"
+    },
+    {
+      "callable": "sharingPoliciesUpdate",
+      "file": "branches.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Branches"
+    },
+    {
+      "callable": "employeesCreate",
+      "file": "employees.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Employees"
+    },
+    {
+      "callable": "employeesUpdate",
+      "file": "employees.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Employees"
+    },
+    {
+      "callable": "employeesDeactivate",
+      "file": "employees.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Employees"
+    },
+    {
+      "callable": "employeesList",
+      "file": "employees.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Employees"
+    },
+    {
+      "callable": "employeesGet",
+      "file": "employees.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Employees"
+    },
+    {
+      "callable": "platformUsersList",
+      "file": "platformUsers.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Platform Users"
+    },
+    {
+      "callable": "platformUsersGet",
+      "file": "platformUsers.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Platform Users"
+    },
+    {
+      "callable": "plansCreate",
+      "file": "plans.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Plans"
+    },
+    {
+      "callable": "plansUpdate",
+      "file": "plans.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Plans"
+    },
+    {
+      "callable": "plansList",
+      "file": "plans.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Plans"
+    },
+    {
+      "callable": "plansPreviewImpact",
+      "file": "plans.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Plans"
+    },
+    {
+      "callable": "plansGet",
+      "file": "plans.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Plans"
+    },
+    {
+      "callable": "plansArchive",
+      "file": "plans.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Plans"
+    },
+    {
+      "callable": "plansDelete",
+      "file": "plans.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Plans"
+    },
+    {
+      "callable": "permissionCatalogList",
+      "file": "catalogs.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Catalog"
+    },
+    {
+      "callable": "modulesList",
+      "file": "catalogs.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Catalog"
+    },
+    {
+      "callable": "taxRegimesList",
+      "file": "catalogs.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Catalog"
+    },
+    {
+      "callable": "rolesCreate",
+      "file": "roles.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "rolesUpdate",
+      "file": "roles.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "rolesList",
+      "file": "roles.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Catalog"
+    },
+    {
+      "callable": "jobRolesCreate",
+      "file": "jobRoles.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "jobRolesUpdate",
+      "file": "jobRoles.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "jobRolesList",
+      "file": "jobRoles.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Catalog"
+    },
+    {
+      "callable": "departmentsCreate",
+      "file": "departments.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "departmentsUpdate",
+      "file": "departments.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "departmentsList",
+      "file": "departments.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Catalog"
+    },
+    {
+      "callable": "teamsCreate",
+      "file": "teams.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "teamsUpdate",
+      "file": "teams.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "teamsAssignMember",
+      "file": "teams.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "teamsList",
+      "file": "teams.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Catalog"
+    },
+    {
+      "callable": "categoriesCreate",
+      "file": "categories.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "categoriesUpdate",
+      "file": "categories.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "categoriesList",
+      "file": "categories.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Catalog"
+    },
+    {
+      "callable": "unitsCreate",
+      "file": "units.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "unitsUpdate",
+      "file": "units.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Catalog"
+    },
+    {
+      "callable": "unitsList",
+      "file": "units.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Catalog"
+    },
+    {
+      "callable": "productsCreate",
+      "file": "products.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Products"
+    },
+    {
+      "callable": "productsUpdate",
+      "file": "products.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Products"
+    },
+    {
+      "callable": "productsList",
+      "file": "products.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Products"
+    },
+    {
+      "callable": "productsGet",
+      "file": "products.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Products"
+    },
+    {
+      "callable": "productsGetPriceHistory",
+      "file": "products.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Products"
+    },
+    {
+      "callable": "customersCreate",
+      "file": "customers.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Customers"
+    },
+    {
+      "callable": "customersUpdate",
+      "file": "customers.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Customers"
+    },
+    {
+      "callable": "customersList",
+      "file": "customers.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Customers"
+    },
+    {
+      "callable": "customersGet",
+      "file": "customers.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Customers"
+    },
+    {
+      "callable": "vendorsCreate",
+      "file": "vendors.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Vendors"
+    },
+    {
+      "callable": "vendorsUpdate",
+      "file": "vendors.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Vendors"
+    },
+    {
+      "callable": "vendorsList",
+      "file": "vendors.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Vendors"
+    },
+    {
+      "callable": "vendorsGet",
+      "file": "vendors.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Vendors"
+    },
+    {
+      "callable": "billsUpdateDraft",
+      "file": "bills.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Bills"
+    },
+    {
+      "callable": "billsCreate",
+      "file": "bills.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Bills"
+    },
+    {
+      "callable": "billsList",
+      "file": "bills.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Bills"
+    },
+    {
+      "callable": "billsGet",
+      "file": "bills.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Bills"
+    },
+    {
+      "callable": "billsFinalize",
+      "file": "bills.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Bills"
+    },
+    {
+      "callable": "billsVoid",
+      "file": "bills.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Bills"
+    },
+    {
+      "callable": "billsPreview",
+      "file": "bills.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Bills"
+    },
+    {
+      "callable": "outflowsCreate",
+      "file": "outflows.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Outflows"
+    },
+    {
+      "callable": "outflowsList",
+      "file": "outflows.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Outflows"
+    },
+    {
+      "callable": "outflowsGet",
+      "file": "outflows.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Outflows"
+    },
+    {
+      "callable": "outflowsVoid",
+      "file": "outflows.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Outflows"
+    },
+    {
+      "callable": "paymentsCreate",
+      "file": "payments.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Payments"
+    },
+    {
+      "callable": "paymentsVoid",
+      "file": "payments.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Payments"
+    },
+    {
+      "callable": "paymentsList",
+      "file": "payments.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Payments"
+    },
+    {
+      "callable": "returnsCreate",
+      "file": "returns.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Returns"
+    },
+    {
+      "callable": "returnsList",
+      "file": "returns.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Returns"
+    },
+    {
+      "callable": "deliveriesCreate",
+      "file": "deliveries.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Deliveries"
+    },
+    {
+      "callable": "deliveriesUpdateStatus",
+      "file": "deliveries.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Deliveries"
+    },
+    {
+      "callable": "deliveriesList",
+      "file": "deliveries.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Deliveries"
+    },
+    {
+      "callable": "deliveriesGet",
+      "file": "deliveries.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Deliveries"
+    },
+    {
+      "callable": "stockAdjust",
+      "file": "stock.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Stock"
+    },
+    {
+      "callable": "stockMovementsList",
+      "file": "stock.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Stock"
+    },
+    {
+      "callable": "tasksCreate",
+      "file": "tasks.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Tasks"
+    },
+    {
+      "callable": "tasksUpdate",
+      "file": "tasks.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Tasks"
+    },
+    {
+      "callable": "tasksAssign",
+      "file": "tasks.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Tasks"
+    },
+    {
+      "callable": "tasksUpdateStatus",
+      "file": "tasks.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Tasks"
+    },
+    {
+      "callable": "tasksList",
+      "file": "tasks.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Tasks"
+    },
+    {
+      "callable": "tasksDelete",
+      "file": "tasks.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Tasks"
+    },
+    {
+      "callable": "recurringExpensesCreate",
+      "file": "recurringExpenses.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Recurring Expenses"
+    },
+    {
+      "callable": "recurringExpensesUpdate",
+      "file": "recurringExpenses.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Recurring Expenses"
+    },
+    {
+      "callable": "recurringExpensesList",
+      "file": "recurringExpenses.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Recurring Expenses"
+    },
+    {
+      "callable": "imagesCreateUploadSession",
+      "file": "images.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Images"
+    },
+    {
+      "callable": "imagesAttach",
+      "file": "images.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Images"
+    },
+    {
+      "callable": "imagesRemove",
+      "file": "images.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Images"
+    },
+    {
+      "callable": "documentsDecide",
+      "file": "approvals.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Approvals"
+    },
+    {
+      "callable": "auditGetEntityHistory",
+      "file": "history.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "History"
+    },
+    {
+      "callable": "auditLogsList",
+      "file": "history.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "History"
+    },
+    {
+      "callable": "notificationsRegisterFcmToken",
+      "file": "notifications.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Notifications"
+    },
+    {
+      "callable": "notificationsList",
+      "file": "notifications.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Notifications"
+    },
+    {
+      "callable": "notificationsMarkRead",
+      "file": "notifications.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Notifications"
+    },
+    {
+      "callable": "locationsRecordPing",
+      "file": "locations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Locations"
+    },
+    {
+      "callable": "locationsGetLatest",
+      "file": "locations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Locations"
+    },
+    {
+      "callable": "locationsGetHistory",
+      "file": "locations.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Locations"
+    },
+    {
+      "callable": "reportsGetRevenue",
+      "file": "reports.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Reports"
+    },
+    {
+      "callable": "reportsGetProfitLoss",
+      "file": "reports.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Reports"
+    },
+    {
+      "callable": "reportsGetStockValuation",
+      "file": "reports.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Reports"
+    },
+    {
+      "callable": "reportsGetTopEntities",
+      "file": "reports.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Reports"
+    },
+    {
+      "callable": "reportsGetStaffActivity",
+      "file": "reports.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Reports"
+    },
+    {
+      "callable": "reportsGetPlatformOverview",
+      "file": "reports.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Reports"
+    },
+    {
+      "callable": "reportsExportCsv",
+      "file": "reports.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Reports"
+    },
+    {
+      "callable": "reportsGetPartyStatement",
+      "file": "reports.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Reports"
+    },
+    {
+      "callable": "reportsGetOutflowSummary",
+      "file": "reports.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Reports"
+    },
+    {
+      "callable": "usageGetPlatformSummary",
+      "file": "usage.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Usage"
+    },
+    {
+      "callable": "usageGetOrganizations",
+      "file": "usage.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Usage"
+    },
+    {
+      "callable": "usageGetBranches",
+      "file": "usage.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Usage"
+    },
+    {
+      "callable": "usageGetDetail",
+      "file": "usage.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Usage"
+    },
+    {
+      "callable": "usageCalculateDryRunStatement",
+      "file": "usage.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Usage"
+    },
+    {
+      "callable": "usageRecordClientMetric",
+      "file": "usage.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Usage"
+    },
+    {
+      "callable": "usageGetLimits",
+      "file": "usage.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Usage"
+    },
+    {
+      "callable": "usageUpdateLimits",
+      "file": "usage.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Usage"
+    },
+    {
+      "callable": "reconcileStockBalances",
+      "file": "reconciliation.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Reconciliation"
+    },
+    {
+      "callable": "reconcilePartyLedgers",
+      "file": "reconciliation.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Reconciliation"
+    },
+    {
+      "callable": "reconcileBranchCounts",
+      "file": "reconciliation.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": false,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [
+        "E: No createAuditLog() call for mutation"
+      ],
+      "status": "WARN",
+      "group": "Reconciliation"
+    },
+    {
+      "callable": "healthCheck",
+      "file": "healthCheck.ts",
+      "checks": {
+        "A_exported": true,
+        "B_gate": true,
+        "C_schema": true,
+        "D_strict": true,
+        "E_audit": true,
+        "F_no_any": true,
+        "G_response": true,
+        "H_metering": true,
+        "I_idempotent": true,
+        "J_tested": true,
+        "K_documented": true
+      },
+      "issues": [],
+      "status": "PASS",
+      "group": "Health"
+    }
+  ]
+}

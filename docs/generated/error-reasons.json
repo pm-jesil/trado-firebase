@@ -1,0 +1,111 @@
+{
+  "generatedAt": "2026-11-13T10:04:05.668Z",
+  "totalReasons": 21,
+  "reasons": [
+    {
+      "code": "UNAUTHENTICATED",
+      "category": "security_gate",
+      "description": "Security gate rejection reason code: UNAUTHENTICATED"
+    },
+    {
+      "code": "USER_INACTIVE",
+      "category": "security_gate",
+      "description": "Security gate rejection reason code: USER_INACTIVE"
+    },
+    {
+      "code": "NO_MEMBERSHIP",
+      "category": "security_gate",
+      "description": "Security gate rejection reason code: NO_MEMBERSHIP"
+    },
+    {
+      "code": "MEMBERSHIP_INACTIVE",
+      "category": "security_gate",
+      "description": "Security gate rejection reason code: MEMBERSHIP_INACTIVE"
+    },
+    {
+      "code": "ORG_NOT_FOUND",
+      "category": "security_gate",
+      "description": "Security gate rejection reason code: ORG_NOT_FOUND"
+    },
+    {
+      "code": "ORG_INACTIVE",
+      "category": "security_gate",
+      "description": "Security gate rejection reason code: ORG_INACTIVE"
+    },
+    {
+      "code": "SUBSCRIPTION_NOT_STARTED",
+      "category": "subscription",
+      "description": "Security gate rejection reason code: SUBSCRIPTION_NOT_STARTED"
+    },
+    {
+      "code": "SUBSCRIPTION_EXPIRED",
+      "category": "subscription",
+      "description": "Security gate rejection reason code: SUBSCRIPTION_EXPIRED"
+    },
+    {
+      "code": "SUBSCRIPTION_SUSPENDED",
+      "category": "subscription",
+      "description": "Security gate rejection reason code: SUBSCRIPTION_SUSPENDED"
+    },
+    {
+      "code": "SUBSCRIPTION_CANCELLED",
+      "category": "subscription",
+      "description": "Security gate rejection reason code: SUBSCRIPTION_CANCELLED"
+    },
+    {
+      "code": "MODULE_NOT_IN_PLAN",
+      "category": "module",
+      "description": "Security gate rejection reason code: MODULE_NOT_IN_PLAN"
+    },
+    {
+      "code": "MODULE_DISABLED",
+      "category": "module",
+      "description": "Security gate rejection reason code: MODULE_DISABLED"
+    },
+    {
+      "code": "PERMISSION_DENIED",
+      "category": "security_gate",
+      "description": "Security gate rejection reason code: PERMISSION_DENIED"
+    },
+    {
+      "code": "TENANT_MISMATCH",
+      "category": "security_gate",
+      "description": "Security gate rejection reason code: TENANT_MISMATCH"
+    },
+    {
+      "code": "BRANCH_NOT_FOUND",
+      "category": "branch",
+      "description": "Security gate rejection reason code: BRANCH_NOT_FOUND"
+    },
+    {
+      "code": "BRANCH_INACTIVE",
+      "category": "branch",
+      "description": "Security gate rejection reason code: BRANCH_INACTIVE"
+    },
+    {
+      "code": "BRANCH_NOT_ASSIGNED",
+      "category": "branch",
+      "description": "Security gate rejection reason code: BRANCH_NOT_ASSIGNED"
+    },
+    {
+      "code": "SUPER_ADMIN_TENANT_FORBIDDEN",
+      "category": "security_gate",
+      "description": "Security gate rejection reason code: SUPER_ADMIN_TENANT_FORBIDDEN"
+    },
+    {
+      "code": "USAGE_LIMIT_EXCEEDED",
+      "category": "quota",
+      "description": "Security gate rejection reason code: USAGE_LIMIT_EXCEEDED"
+    },
+    {
+      "code": "PLAN_LIMIT_REACHED",
+      "category": "quota",
+      "description": "Security gate rejection reason code: PLAN_LIMIT_REACHED"
+    },
+    {
+      "code": "FIELD_NOT_EDITABLE",
+      "category": "security_gate",
+      "description": "Security gate rejection reason code: FIELD_NOT_EDITABLE"
+    }
+  ]
+}

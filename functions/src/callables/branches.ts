@@ -9,7 +9,8 @@
  * - sharingPoliciesUpdate: Tenant-level data sharing policy configuration.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import { uniqueKeyRef } from "../services/uniqueKeys.js";
 import {
@@ -34,8 +35,7 @@ import { AppPermissions } from "../constants/permissions.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { setPrimaryBranchClaim } from "../services/claims.js";
-import { createAuditLog } from "../services/audit.js";
-import { reserveIdempotency } from "../services/idempotency.js";
+import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 
 /**
  * 1. branchesGetDefault
@@ -131,7 +131,7 @@ export const branchesCreate = onCall({ region: "asia-south1" }, async (request) 
     actorUid: context.callerUid,
     operation: "branches.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
 
   if (idempotency.isDuplicate) {
@@ -239,16 +239,6 @@ export const branchesCreate = onCall({ region: "asia-south1" }, async (request) 
       }
     });
 
-    await createAuditLog({
-      organizationId: orgId,
-      branchId,
-      actorUid: context.callerUid,
-      actorMembershipId: `${context.callerUid}_${orgId}`,
-      action: "branch.created",
-      entityType: "branch",
-      entityId: branchId,
-      details: { name: branchDoc.name, code: branchDoc.code },
-    });
 
     const response = {
       success: true,
@@ -256,10 +246,13 @@ export const branchesCreate = onCall({ region: "asia-south1" }, async (request) 
       branch: branchDoc,
     };
 
+    await finalizeIdempotencySuccess(idempotency.recordId, response);
     return response;
-  } catch (err: any) {
+  } catch (err) {
+    // A failed attempt releases the key, so the client may retry (otherwise the lease blocks it).
+    await finalizeIdempotencyFailure(idempotency.recordId, "BRANCH_CREATE_FAILED", err instanceof Error ? err.message : String(err));
     if (err instanceof HttpsError) throw err;
-    throw new HttpsError("internal", err?.message || "Failed to create branch.");
+    throw new HttpsError("internal", (err instanceof Error ? err.message : undefined) || "Failed to create branch.");
   }
 });
 
@@ -384,16 +377,6 @@ export const branchesUpdate = onCall({ region: "asia-south1" }, async (request) 
     await branchRef.update(updates);
   }
 
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: input.branchId,
-    actorUid: context.callerUid,
-    actorMembershipId: `${context.callerUid}_${orgId}`,
-    action: "branch.updated",
-    entityType: "branch",
-    entityId: input.branchId,
-    details: updates as Record<string, unknown>,
-  });
 
   return {
     success: true,
@@ -473,16 +456,6 @@ export const branchesDeactivate = onCall({ region: "asia-south1" }, async (reque
     await mbDoc.ref.update({ status: EntityStatus.INACTIVE, updatedAt: now });
   }
 
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: input.branchId,
-    actorUid: context.callerUid,
-    actorMembershipId: `${context.callerUid}_${orgId}`,
-    action: "branch.deactivated",
-    entityType: "branch",
-    entityId: input.branchId,
-    details: { reason: input.reason || "Manual deactivation" },
-  });
 
   return {
     success: true,
@@ -531,16 +504,6 @@ export const branchContextSwitch = onCall({ region: "asia-south1" }, async (requ
   const memRef = db.collection("memberships").doc(`${context.callerUid}_${orgId}`);
   await memRef.update({ primaryBranchId: targetBranchId, updatedAt: new Date().toISOString() });
 
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: targetBranchId,
-    actorUid: context.callerUid,
-    actorMembershipId: `${context.callerUid}_${orgId}`,
-    action: "branch.context_switched",
-    entityType: "user",
-    entityId: context.callerUid,
-    details: { previousBranchId: context.branchId, newBranchId: targetBranchId },
-  });
 
   return {
     success: true,
@@ -586,16 +549,6 @@ export const sharingPoliciesUpdate = onCall({ region: "asia-south1" }, async (re
     updatedAt: new Date().toISOString(),
   });
 
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: context.branchId,
-    actorUid: context.callerUid,
-    actorMembershipId: `${context.callerUid}_${orgId}`,
-    action: "organization.sharing_policies_updated",
-    entityType: "organization",
-    entityId: orgId,
-    details: updatedPolicies as unknown as Record<string, unknown>,
-  });
 
   return {
     success: true,

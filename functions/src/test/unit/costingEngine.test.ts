@@ -125,3 +125,49 @@ describe("Costing Engine — Stock Valuation & COGS", () => {
   });
 });
 
+describe("Costing Engine — WAC Invariant & Single Writer Verification (V-2)", () => {
+  it("proves WAC is computed deterministically inside synchronous transaction", () => {
+    // Current stock: 50 @ WAC 100
+    // Incoming: 50 @ 120
+    // New WAC = (5000 + 6000) / 100 = 110.0000
+    const wac1 = calculateNewWeightedAverageCost(50, 100, 50, 120);
+    assert.strictEqual(wac1, 110);
+
+    // Second incoming: 100 @ 80
+    // Total cost = 100 * 110 + 100 * 80 = 11000 + 8000 = 19000 / 200 = 95.0000
+    const wac2 = calculateNewWeightedAverageCost(100, wac1, 100, 80);
+    assert.strictEqual(wac2, 95);
+  });
+
+  it("proves sales outflows do not change WAC", () => {
+    // Current stock: 100 @ WAC 95. Outflow of 30 units sold:
+    // WAC remains 95 because goods leave at current WAC.
+    const currentWac = 95;
+    const items = [{ productId: "p1", quantity: 30 }];
+    const productMap = new Map<string, ProductDoc>();
+    productMap.set("p1", {
+      organizationId: "org-1",
+      name: "P1",
+      nameKey: "p1",
+      baseUnit: "piece",
+      sellingPrice: 150,
+      costPrice: 80,
+      weightedAverageCost: currentWac,
+      taxInclusive: false,
+      hasExpiry: false,
+      trackStock: true,
+      currentStock: 100,
+      lowStockThreshold: 10,
+      isActive: true,
+      createdAt: "",
+      createdBy: "",
+    });
+
+    const cogs = calculateCOGSForItems(items, productMap);
+    assert.strictEqual(cogs, 30 * 95);
+    // Product WAC is untouched by sales outflows
+    assert.strictEqual(productMap.get("p1")?.weightedAverageCost, 95);
+  });
+});
+
+

@@ -1,0 +1,1625 @@
+{
+  "generatedAt": "2026-11-12T22:34:46.353Z",
+  "total": 177,
+  "counts": {
+    "PARTIAL": 96,
+    "DONE": 8,
+    "DEFERRED": 6,
+    "HANDED TO 66": 4,
+    "NOT DONE": 63
+  },
+  "items": [
+    {
+      "id": "D-01",
+      "source": "P-60",
+      "title": "Canonical Phone E.164 normalization",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-02",
+      "source": "P-60",
+      "title": "Email lowercasing & trimming",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-03",
+      "source": "P-60",
+      "title": "Single name field for party entities",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-04",
+      "source": "P-60",
+      "title": "Statutory tax identifier as taxId",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-05",
+      "source": "P-60",
+      "title": "Store path references, compute URLs at read time",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-06",
+      "source": "P-62",
+      "title": "Strict zod parsing on all callable inputs",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-07",
+      "source": "P-62",
+      "title": "Zero backward-compatibility aliases in pre-release",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-08",
+      "source": "P-62",
+      "title": "Sequential document numbering via documentCounters",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-09",
+      "source": "P-62",
+      "title": "Double-entry party balance updates via atomic transactions",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-10",
+      "source": "P-62",
+      "title": "Negative inventory prevention via StockBalanceDoc",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-11",
+      "source": "P-63",
+      "title": "Organization multi-branch isolation & context switching",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-12",
+      "source": "P-63",
+      "title": "Super Admin platform privilege separation",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-13",
+      "source": "P-63",
+      "title": "Natural key reservation locks in uniqueKeys collection",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-14",
+      "source": "P-63",
+      "title": "Usage metering shard architecture",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-15",
+      "source": "P-64",
+      "title": "Single stored field image: ImageRef (no URL inside)",
+      "status": "DONE",
+      "evidence": [
+        "removed field names still stored — functions/scripts/check-raw-field-census.cjs:74",
+        "removedFieldNames — functions/scripts/test-schema-contract-sweep.cjs:333"
+      ],
+      "owner": "prompt 64",
+      "next": ""
+    },
+    {
+      "id": "D-16",
+      "source": "P-64",
+      "title": "Zero `as any` on write or response paths",
+      "status": "DONE",
+      "evidence": [
+        "check:no-any-writes — functions/scripts/check-no-any-writes.js:2"
+      ],
+      "owner": "prompt 64",
+      "next": ""
+    },
+    {
+      "id": "D-17",
+      "source": "P-64",
+      "title": "Guards never narrowed; explicit documented exclusions",
+      "status": "DONE",
+      "evidence": [
+        "writeGuardScope(__filename — functions/scripts/check-same-doc-duplicates.cjs:365",
+        "seeded violations detected by the guard — functions/scripts/test-same-doc-duplicates-defects.cjs:41"
+      ],
+      "owner": "prompt 64",
+      "next": ""
+    },
+    {
+      "id": "D-18",
+      "source": "P-64",
+      "title": "One uniform response convention",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "D-19",
+      "source": "P-65",
+      "title": "Skipped is not passed (Change-impact testing)",
+      "status": "DONE",
+      "evidence": [
+        "FAIL is not carried forward — scripts/test-verify-selftest.cjs:166"
+      ],
+      "owner": "prompt 65",
+      "next": ""
+    },
+    {
+      "id": "D-20",
+      "source": "P-65",
+      "title": "Coverage is a computed ratio citing [cov:C-n]",
+      "status": "DONE",
+      "evidence": [
+        "[cov:(C- — scripts/check-doc-banned-words.js:72",
+        "Seeded defects detected — scripts/test-coverage-engine-defects.cjs:131"
+      ],
+      "owner": "prompt 65",
+      "next": ""
+    },
+    {
+      "id": "X-01",
+      "source": "P-64",
+      "title": "Image triple stored three times in users document",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "X-02",
+      "source": "P-64",
+      "title": "Maximal payload incomplete in round-trip tests",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "X-03",
+      "source": "P-64",
+      "title": "Allowlist in check-no-any-writes hid 13 any write casts",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "X-04",
+      "source": "P-64",
+      "title": "Duplicate fields guard scanned only 16 of 47 collections",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "X-05",
+      "source": "P-64",
+      "title": "API ledger had 5 WARN for missing idempotency",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "X-06",
+      "source": "P-64",
+      "title": "Rules test count discrepancy (52 -> 49)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "X-07",
+      "source": "P-64",
+      "title": "Cloud Scheduler manual binding myth in docs",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "X-08",
+      "source": "P-64",
+      "title": "Missing documents ledger accounting for 135 docs",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "Y-01",
+      "source": "P-65",
+      "title": "Field catalog dynamic generation (all 47 collections / 44 Docs)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 65",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "Y-02",
+      "source": "P-65",
+      "title": "Duplicate guard full 47 collections & 5 seeded defect test",
+      "status": "DONE",
+      "evidence": [
+        "seeded violations detected by the guard — functions/scripts/test-same-doc-duplicates-defects.cjs:41"
+      ],
+      "owner": "prompt 65",
+      "next": ""
+    },
+    {
+      "id": "Y-03",
+      "source": "P-65",
+      "title": "Eliminate all 13 as any write path entries",
+      "status": "DONE",
+      "evidence": [
+        "check:no-any-writes — functions/scripts/check-no-any-writes.js:2"
+      ],
+      "owner": "prompt 65",
+      "next": ""
+    },
+    {
+      "id": "Y-04",
+      "source": "P-65",
+      "title": "Zero stored URLs evidence & single hydration function",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 65",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "Y-05",
+      "source": "P-65",
+      "title": "Maximal roundtrip proof for all create/update operations",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 65",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "Y-06",
+      "source": "P-65",
+      "title": "Consistent test and document figures",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 65",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "Y-07",
+      "source": "P-65",
+      "title": "Idempotency for 5 creates (zero WARN in API ledger)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 65",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "Y-08",
+      "source": "P-65",
+      "title": "Removed fields diff (148 fields: 47 present, 89 deferred, 12 removed)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 65",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "Y-09",
+      "source": "P-65",
+      "title": "Cloud punch-list corrected with owners and timeline",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 65",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "Y-10",
+      "source": "P-65",
+      "title": "Image decision in imagePolicy.ts and naming-registry.json",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 65",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "Y-11",
+      "source": "P-65",
+      "title": "Change-Impact Test System built and self-tested",
+      "status": "DONE",
+      "evidence": [
+        "function computeC1 — scripts/coverage-engine.js:89"
+      ],
+      "owner": "prompt 65",
+      "next": ""
+    },
+    {
+      "id": "Y-12",
+      "source": "P-65",
+      "title": "Handed over items documented for Prompt 66",
+      "status": "DEFERRED (Y-12)",
+      "evidence": [],
+      "owner": "prompt 65",
+      "next": "Documented in Part 3.12: flat firestoreWrites: 1, storageUploadBytes two writers."
+    },
+    {
+      "id": "Y-13",
+      "source": "P-65",
+      "title": "Open items register generated with status counts",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 65",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "Y-14",
+      "source": "P-65",
+      "title": "Document ledger per-file accounting for all 135 files",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "prompt 65",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "HANDOFF-01",
+      "source": "P-65",
+      "title": "Gate meters 1 write or 1 read per call, not per document",
+      "status": "HANDED TO 66",
+      "evidence": [],
+      "owner": "prompt 66",
+      "next": ""
+    },
+    {
+      "id": "HANDOFF-02",
+      "source": "P-65",
+      "title": "Two writers of storageUploadBytes",
+      "status": "HANDED TO 66",
+      "evidence": [],
+      "owner": "prompt 66",
+      "next": ""
+    },
+    {
+      "id": "HANDOFF-03",
+      "source": "P-65",
+      "title": "changeHistory vs auditLogs.changes",
+      "status": "HANDED TO 66",
+      "evidence": [],
+      "owner": "prompt 66",
+      "next": ""
+    },
+    {
+      "id": "HANDOFF-04",
+      "source": "P-65",
+      "title": "auditLogs.timestamp is an ISO string",
+      "status": "HANDED TO 66",
+      "evidence": [],
+      "owner": "prompt 66",
+      "next": ""
+    },
+    {
+      "id": "CLOUD-01",
+      "source": "P-60",
+      "title": "Google Cloud KMS multi-region key rotation",
+      "status": "DEFERRED (CLOUD-01)",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "Requires active GCP billing and live KMS project keyrings. Cloud console item."
+    },
+    {
+      "id": "CLOUD-02",
+      "source": "P-60",
+      "title": "VPC Service Controls and egress NAT",
+      "status": "DEFERRED (CLOUD-02)",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "Requires GCP VPC network configuration in production console."
+    },
+    {
+      "id": "CLOUD-03",
+      "source": "P-60",
+      "title": "Cloud Tasks queue provisioning for SMS/Email dispatch",
+      "status": "DEFERRED (CLOUD-03)",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "Queues provisioned automatically on first cloud deploy via gcloud tasks."
+    },
+    {
+      "id": "CLOUD-04",
+      "source": "P-62",
+      "title": "Custom domain SSL certificate provisioning",
+      "status": "DEFERRED (CLOUD-04)",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "Firebase Hosting / API Gateway DNS records CNAME setup by devops."
+    },
+    {
+      "id": "CLOUD-05",
+      "source": "P-63",
+      "title": "Cloud Monitoring alerting policies & paging",
+      "status": "DEFERRED (CLOUD-05)",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "Alert policies bound to Opsgenie / PagerDuty webhook endpoints."
+    },
+    {
+      "id": "ISSUE-01",
+      "source": "P-ledger",
+      "title": "Subgroup count/math discrepancy in prior reports",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-02",
+      "source": "P-ledger",
+      "title": "Duplicate root `devices` row in `docs/data-model.md`",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-03",
+      "source": "P-ledger",
+      "title": "Phantom trigger names in conversational history",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-04",
+      "source": "P-ledger",
+      "title": "Super Admin privilege escalation via Firestore profile",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-05",
+      "source": "P-ledger",
+      "title": "Multi-organization switching product deferral",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-06",
+      "source": "P-ledger",
+      "title": "In-flight ID token revocation / inactive tenant access",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-07",
+      "source": "P-ledger",
+      "title": "Client context forgery in operational business APIs",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-08",
+      "source": "P-ledger",
+      "title": "TOCTOU concurrency and idempotent trigger side-effects",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-09",
+      "source": "P-ledger",
+      "title": "Negative test personas missing in emulator seed tool",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-10",
+      "source": "P-ledger",
+      "title": "Static completeness checker test coverage verification",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-11",
+      "source": "P-ledger",
+      "title": "Cloud-only feature boundary specification",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-12",
+      "source": "P-ledger",
+      "title": "Core business callables had no permission or plan-module check",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-13",
+      "source": "P-ledger",
+      "title": "Super Admin could perform tenant mutations",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-14",
+      "source": "P-ledger",
+      "title": "`employeesUpdate` / `employeesDeactivate` open to any member, cross-tenant",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-15",
+      "source": "P-ledger",
+      "title": "Department / job-role update without any membership check",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-16",
+      "source": "P-ledger",
+      "title": "`paymentsCreate` updated referenced documents of other tenants; overpayment allowed",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-17",
+      "source": "P-ledger",
+      "title": "`membership.isPrimary` treated as Owner/Admin",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-18",
+      "source": "P-ledger",
+      "title": "Direct client reads bypassed every callable control",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-19",
+      "source": "P-ledger",
+      "title": "Cross-branch leak in customer/vendor lists",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-20",
+      "source": "P-ledger",
+      "title": "No subscription dates/status; expiry never enforced",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-21",
+      "source": "P-ledger",
+      "title": "Usage limits never enforced; server never metered itself; client could decrement usage",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-22",
+      "source": "P-ledger",
+      "title": "Stock lost on documents with the same product on two lines",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-23",
+      "source": "P-ledger",
+      "title": "Write-offs missing from P&L",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-24",
+      "source": "P-ledger",
+      "title": "No unit conversion (box ↔ piece)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-25",
+      "source": "P-ledger",
+      "title": "No bill/outflow lifecycle (approve/void/cancel)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-26",
+      "source": "P-ledger",
+      "title": "No maker–checker",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-27",
+      "source": "P-ledger",
+      "title": "No data scope (self/team/branch/org)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-28",
+      "source": "P-ledger",
+      "title": "No field-level write/read control",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-29",
+      "source": "P-ledger",
+      "title": "Seat limit race and reactivation bypass",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-30",
+      "source": "P-ledger",
+      "title": "`billsCreate` / `productsUpdate` broke when organizationId was derived",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-31",
+      "source": "P-ledger",
+      "title": "Test suites overwrote shared system roles and plans",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-32",
+      "source": "P-ledger",
+      "title": "No vendor/customer statement, day-wise purchases, total-outflow, price or change history",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-33",
+      "source": "P-ledger",
+      "title": "Sales orders deducted stock immediately; delivery could not complete a sale",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-34",
+      "source": "P-ledger",
+      "title": "Business-type catalog incomplete; no sales channels",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "backend",
+      "next": "tests named in the ledger: §4"
+    },
+    {
+      "id": "ISSUE-35",
+      "source": "P-ledger",
+      "title": "Serial/IMEI registry and uniqueness",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "backend",
+      "next": "tests named in the ledger: §10, §12"
+    },
+    {
+      "id": "ISSUE-36",
+      "source": "P-ledger",
+      "title": "Direct client reads security conflict (B-1)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-37",
+      "source": "P-ledger",
+      "title": "Gate metadata & schema drift in OpenAPI and docs (B-2)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-38",
+      "source": "P-ledger",
+      "title": "Missing POS pricing preview callable (B-3)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-39",
+      "source": "P-ledger",
+      "title": "Incomplete session context & missing single org fetch (B-4)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-40",
+      "source": "P-ledger",
+      "title": "Employee get missing & update overwriting omitted fields (B-5)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-41",
+      "source": "P-ledger",
+      "title": "Default role templates leaked staff directory visibility (B-6)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-42",
+      "source": "P-ledger",
+      "title": "Missing plan impact preview callable (B-7)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-43",
+      "source": "P-ledger",
+      "title": "Multi-country seed data missing (B-9)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-44",
+      "source": "P-ledger",
+      "title": "Missing Super Admin platform callables (P-1)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-45",
+      "source": "P-ledger",
+      "title": "Rules client read leak on tenant catalogs & private plans (P-2)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-46",
+      "source": "P-ledger",
+      "title": "Decimal tie drift & sign asymmetry in commercial rounding (P-3)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-47",
+      "source": "P-ledger",
+      "title": "Missing specialized seed personas in emulator tool (P-5)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-48",
+      "source": "P-ledger",
+      "title": "Organization creation with optional owner (N-01)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-49",
+      "source": "P-ledger",
+      "title": "Owner & admin provisioning, credential handling, idempotency (N-02)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-50",
+      "source": "P-ledger",
+      "title": "Pending organization owner & ownership transfer (N-03)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-51",
+      "source": "P-ledger",
+      "title": "Required contact validation and normalization (N-04)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-52",
+      "source": "P-ledger",
+      "title": "Unified platform image pipeline (N-06)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-53",
+      "source": "P-ledger",
+      "title": "Storage security rules, quotas, byte accounting (N-07)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-54",
+      "source": "P-ledger",
+      "title": "Customer & vendor partyType distinction (N-08)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "backend",
+      "next": "tests named in the ledger: `functions/src/callables/customers.ts`, `functions/src/callables/vendors.ts`, `functions/src/validation/schemas.ts`"
+    },
+    {
+      "id": "ISSUE-55",
+      "source": "P-ledger",
+      "title": "User self-service profile update callable (N-09)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-56",
+      "source": "P-ledger",
+      "title": "Country default configurations and generated policy artifacts (N-10)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-57",
+      "source": "P-ledger",
+      "title": "Usage limits burst timeout on local Windows emulator (C-15)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-58",
+      "source": "P-ledger",
+      "title": "Global audit log reference finding in data duplication check (C-12)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-65",
+      "source": "P-ledger",
+      "title": "Elimination of Tripled & Stored URL Image Fields (D-15)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-66",
+      "source": "P-ledger",
+      "title": "Elimination of `as any` Casts on Write Paths (D-16)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-67",
+      "source": "P-ledger",
+      "title": "Party Schema Normalization & Flat Aliases Removal (D-7)",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-68",
+      "source": "P-ledger",
+      "title": "Bank Account Branch Name Schema Duplication",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-69",
+      "source": "P-ledger",
+      "title": "134-Callable Full Audit Ledger Generation & Gap Closure",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-70",
+      "source": "P-ledger",
+      "title": "Central Server-Side Metering Invariant & Automatic Write Accounting",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-71",
+      "source": "P-ledger",
+      "title": "Audit Log Compliance History with Deleted Entities",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "ISSUE-72",
+      "source": "P-ledger",
+      "title": "Same-Doc Duplicate Symmetric Registration for Square Images & Actor Stamps",
+      "status": "PARTIAL",
+      "evidence": [],
+      "owner": "backend",
+      "next": "claimed closed; attach evidence (test name + file) in EVIDENCE"
+    },
+    {
+      "id": "N-01",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "N-02",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "N-03",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "N-04",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "N-05",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "N-06",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "N-07",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "N-08",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "N-09",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "N-10",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "N-11",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-01",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-02",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-03",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-04",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-05",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-06",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-07",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-08",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-09",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-10",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-11",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-12",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-13",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-14",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-15",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-16",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-17",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "C-18",
+      "source": "P-60",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 60",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-01",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-02",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-03",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-04",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-05",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-06",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-07",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-08",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-09",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-10",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-11",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-12",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-13",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "V-14",
+      "source": "P-62",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 62",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-01",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-02",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-03",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-04",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-05",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-06",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-07",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-08",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-09",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-10",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-11",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "W-12",
+      "source": "P-63",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 63",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "X-09",
+      "source": "P-64",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "X-10",
+      "source": "P-64",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "X-11",
+      "source": "P-64",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "X-12",
+      "source": "P-64",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "find the item's definition in its prompt and register it"
+    },
+    {
+      "id": "X-13",
+      "source": "P-64",
+      "title": "(no record of this item in the register)",
+      "status": "NOT DONE",
+      "evidence": [],
+      "owner": "prompt 64",
+      "next": "find the item's definition in its prompt and register it"
+    }
+  ]
+}

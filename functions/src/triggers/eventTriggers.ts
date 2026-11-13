@@ -10,9 +10,9 @@
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import { db } from "../services/firebase.js";
 import { recordBillSummary, recordOutflowSummary } from "../services/summaryService.js";
-import { calculateNewWeightedAverageCost } from "../services/costingEngine.js";
 import { createAndDispatchNotification } from "../services/notificationService.js";
 import { BillDoc, OutflowDoc, PaymentDoc, DeliveryDoc, ProductDoc } from "../types/models.js";
+import { withTriggerContext, organizationOfDocumentEvent } from "../services/systemContext.js";
 import { BillStatus, OutflowKind, OutflowStatus, DocumentType } from "../constants/enums.js";
 
 /**
@@ -20,7 +20,7 @@ import { BillStatus, OutflowKind, OutflowStatus, DocumentType } from "../constan
  */
 export const onBillWritten = onDocumentWritten(
   { document: "bills/{billId}", region: "asia-south1" },
-  async (event) => {
+  withTriggerContext("onBillWritten", organizationOfDocumentEvent, async (event) => {
     const after = event.data?.after;
     if (!after || !after.exists) return; // Deleted
 
@@ -99,7 +99,7 @@ export const onBillWritten = onDocumentWritten(
           // Non-blocking
         }
       }
-    }
+    })
 );
 
 /**
@@ -107,7 +107,7 @@ export const onBillWritten = onDocumentWritten(
  */
 export const onOutflowWritten = onDocumentWritten(
   { document: "outflows/{outflowId}", region: "asia-south1" },
-  async (event) => {
+  withTriggerContext("onOutflowWritten", organizationOfDocumentEvent, async (event) => {
     const after = event.data?.after;
     if (!after || !after.exists) return;
 
@@ -144,42 +144,10 @@ export const onOutflowWritten = onDocumentWritten(
       } catch {
         // Non-blocking
       }
-
-      // If purchase with items, update Weighted-Average Cost on products
-      if (outflow.kind === OutflowKind.PURCHASE && Array.isArray(outflow.lines)) {
-        for (const line of outflow.lines) {
-          if (!line.productId || !line.quantity || !line.unitPrice) continue;
-          try {
-            const prodRef = db.collection("products").doc(line.productId);
-            const prodSnap = await prodRef.get();
-            if (prodSnap.exists) {
-              const prod = prodSnap.data() as ProductDoc;
-              // Authoritative WAC is already committed atomically during outflowsCreate transaction.
-              // As an idempotent safety fallback, only recalculate if product has no existing WAC recorded.
-              if (prod.weightedAverageCost === undefined || prod.weightedAverageCost === null) {
-                const currentStock = prod.currentStock || 0;
-                const previousStock = Math.max(0, currentStock - line.quantity);
-                const currentWac = prod.costPrice ?? 0;
-                const newWac = calculateNewWeightedAverageCost(
-                  previousStock,
-                  currentWac,
-                  line.quantity,
-                  line.unitPrice
-                );
-
-                await prodRef.update({
-                  weightedAverageCost: newWac,
-                  updatedAt: new Date().toISOString(),
-                });
-              }
-            }
-          } catch {
-            // Non-blocking
-          }
-        }
-      }
+      // Note: Authoritative WAC is computed strictly synchronously in the outflowsCreate/outflowsApprove
+      // transaction (single writer). No background trigger updates WAC to guarantee zero concurrency race.
     }
-  }
+  })
 );
 
 /**
@@ -187,7 +155,7 @@ export const onOutflowWritten = onDocumentWritten(
  */
 export const onPaymentWritten = onDocumentWritten(
   { document: "payments/{paymentId}", region: "asia-south1" },
-  async (event) => {
+  withTriggerContext("onPaymentWritten", organizationOfDocumentEvent, async (event) => {
     const after = event.data?.after;
     if (!after || !after.exists) return;
     const before = event.data?.before;
@@ -219,7 +187,7 @@ export const onPaymentWritten = onDocumentWritten(
         // Non-blocking
       }
     }
-  }
+  })
 );
 
 /**
@@ -227,7 +195,7 @@ export const onPaymentWritten = onDocumentWritten(
  */
 export const onDeliveryWritten = onDocumentWritten(
   { document: "deliveries/{deliveryId}", region: "asia-south1" },
-  async (event) => {
+  withTriggerContext("onDeliveryWritten", organizationOfDocumentEvent, async (event) => {
     const after = event.data?.after;
     if (!after || !after.exists) return;
 
@@ -256,5 +224,5 @@ export const onDeliveryWritten = onDocumentWritten(
         // Non-blocking
       }
     }
-  }
+  })
 );

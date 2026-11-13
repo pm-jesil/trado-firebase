@@ -4,7 +4,8 @@
  *   Dispatches any pending welcome notification in the outbox.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import {
   RegisterFcmTokenSchema,
@@ -12,7 +13,7 @@ import {
   MarkNotificationReadSchema,
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
-import { DeviceDoc } from "../types/models.js";
+import { DeviceDoc, NotificationDoc } from "../types/models.js";
 import { dispatchPendingWelcomeNotifications } from "../services/notificationSender.js";
 
 export const notificationsRegisterFcmToken = onCall({ region: "asia-south1" }, async (request) => {
@@ -75,11 +76,11 @@ export const notificationsList = onCall({ region: "asia-south1" }, async (reques
   const snap = await query.limit(limit).get();
   const notifications = snap.docs.map((d) => ({
     notificationId: d.id,
-    ...d.data(),
+    ...(d.data() as NotificationDoc),
   }));
 
   // Sort descending by creation date
-  notifications.sort((a: any, b: any) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+  notifications.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
 
   return {
     items: notifications,

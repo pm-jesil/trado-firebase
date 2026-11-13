@@ -12,58 +12,20 @@
  * reference the template (outflows.recurringTemplateId); the template is never copied into them.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { z } from "zod";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import { parseInput } from "../validation/parseInput.js";
-import { ContextFields, OutflowLineSchema } from "../validation/schemas.js";
+import { CreateRecurringExpenseSchema, UpdateRecurringExpenseSchema, ListRecurringExpensesSchema } from "../validation/schemas.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { AppPermissions } from "../constants/permissions.js";
-import { createAuditLog, diffChanges } from "../services/audit.js";
 import { fetchPage } from "../services/pagination.js";
 import { DEFAULT_ORG_TIMEZONE, localDateInTimezone, addDaysYmd } from "../services/subscription.js";
-import { OrganizationDoc } from "../types/models.js";
-
-const CalendarDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD");
-
-export const CreateRecurringExpenseSchema = z.strictObject({
-  ...ContextFields,
-  name: z.string().trim().min(2).max(120),
-  vendorId: z.string().trim().min(2).optional(),
-  payee: z.string().trim().min(1).max(200).optional(),
-  payeeType: z.enum(["vendor", "employee", "other"]).optional(),
-  payeeMembershipId: z.string().trim().min(2).optional(),
-  expenseCategoryId: z.string().trim().max(60).optional(),
-  lines: z.array(OutflowLineSchema).min(1).max(20),
-  frequency: z.enum(["monthly", "weekly"]),
-  dayOfMonth: z.number().int().min(1).max(28).optional(), // monthly (1–28: exists every month)
-  weekday: z.number().int().min(1).max(7).optional(), // weekly, ISO 1 = Monday
-  startOn: CalendarDate,
-  endOn: CalendarDate.optional(),
-});
-
-export const UpdateRecurringExpenseSchema = z.strictObject({
-  ...ContextFields,
-  templateId: z.string().trim().min(2),
-  name: z.string().trim().min(2).max(120).optional(),
-  lines: z.array(OutflowLineSchema).min(1).max(20).optional(),
-  endOn: CalendarDate.nullable().optional(),
-  isActive: z.boolean().optional(),
-});
-
-export const ListRecurringExpensesSchema = z.strictObject({
-  ...ContextFields,
-  isActive: z.boolean().optional(),
-  limit: z.number().int().min(1).max(100).optional(),
-  startAfterId: z.string().trim().optional(),
-});
-
-type Template = z.infer<typeof CreateRecurringExpenseSchema> & {
-  organizationId: string; nextRunOn: string; lastGeneratedPeriod?: string; isActive: boolean; createdBy: string; createdByMembershipId: string | null;
-};
+import { reserveIdempotency, finalizeIdempotencySuccess, finalizeIdempotencyFailure } from "../services/idempotency.js";
+import { OrganizationDoc, RecurringExpenseDoc } from "../types/models.js";
 
 /** First run date on/after `from` for the template's schedule. */
-export function nextRunOn(t: Pick<Template, "frequency" | "dayOfMonth" | "weekday">, from: string): string {
+export function nextRunOn(t: Pick<RecurringExpenseDoc, "frequency" | "dayOfMonth" | "weekday">, from: string): string {
   if (t.frequency === "monthly") {
     const day = String(t.dayOfMonth || 1).padStart(2, "0");
     const candidate = `${from.slice(0, 7)}-${day}`;
@@ -78,7 +40,7 @@ export function nextRunOn(t: Pick<Template, "frequency" | "dayOfMonth" | "weekda
 }
 
 /** Period key of a run date: YYYY-MM (monthly) or the run date itself (weekly). */
-export function periodKey(t: Pick<Template, "frequency">, runOn: string): string {
+export function periodKey(t: Pick<RecurringExpenseDoc, "frequency">, runOn: string): string {
   return t.frequency === "monthly" ? runOn.slice(0, 7) : runOn;
 }
 
@@ -88,20 +50,42 @@ export const recurringExpensesCreate = onCall({ region: "asia-south1" }, async (
   if (input.frequency === "monthly" && !input.dayOfMonth) throw new HttpsError("invalid-argument", "dayOfMonth is required for monthly templates.");
   if (input.frequency === "weekly" && !input.weekday) throw new HttpsError("invalid-argument", "weekday is required for weekly templates.");
   if (input.lines.some((l) => l.productId)) throw new HttpsError("invalid-argument", "Recurring expenses use non-catalog lines (itemName), not products.");
-  const now = new Date().toISOString();
-  const ref = db.collection("recurringExpenses").doc();
-  const doc: Template = {
-    ...input,
-    organizationId: ctx.organizationId,
-    branchId: ctx.branchId,
-    nextRunOn: nextRunOn(input, input.startOn),
-    isActive: true,
-    createdBy: ctx.callerUid,
-    createdByMembershipId: ctx.membershipId,
-  };
-  await ref.set({ ...doc, createdAt: now, updatedAt: now });
-  await createAuditLog({ organizationId: ctx.organizationId, branchId: ctx.branchId, actorUid: ctx.callerUid, actorMembershipId: ctx.membershipId, action: "RECURRING_EXPENSE_CREATED", entityType: "recurring_expense", entityId: ref.id });
-  return { templateId: ref.id, nextRunOn: doc.nextRunOn };
+
+  const idempotency = await reserveIdempotency({
+    scope: ctx.organizationId,
+    actorUid: ctx.callerUid,
+    operation: "recurringExpenses.create",
+    clientKey: input.idempotencyKey,
+    payload: request.data,
+  });
+  if (idempotency.isDuplicate) {
+    if (idempotency.isProcessing) throw new HttpsError("already-exists", "Operation in progress. Please retry shortly.");
+    return idempotency.cachedResult;
+  }
+
+  try {
+    const now = new Date().toISOString();
+    const ref = db.collection("recurringExpenses").doc();
+    const { idempotencyKey: _key, organizationId: _org, branchId: _branch, ...fields } = input;
+    const doc: RecurringExpenseDoc = {
+      ...fields,
+      organizationId: ctx.organizationId,
+      branchId: ctx.branchId,
+      nextRunOn: nextRunOn(input, input.startOn),
+      isActive: true,
+      createdBy: ctx.callerUid,
+      createdByMembershipId: ctx.membershipId,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await ref.set(doc);
+    const result = { templateId: ref.id, nextRunOn: doc.nextRunOn };
+    await finalizeIdempotencySuccess(idempotency.recordId, result);
+    return result;
+  } catch (err) {
+    await finalizeIdempotencyFailure(idempotency.recordId, "CREATE_RECURRING_EXPENSE_FAILED", err instanceof Error ? err.message : String(err));
+    throw err;
+  }
 });
 
 export const recurringExpensesUpdate = onCall({ region: "asia-south1" }, async (request) => {
@@ -114,7 +98,6 @@ export const recurringExpensesUpdate = onCall({ region: "asia-south1" }, async (
   for (const k of ["name", "lines", "endOn", "isActive"] as const) if (input[k] !== undefined) updates[k] = input[k];
   if (!Object.keys(updates).length) throw new HttpsError("invalid-argument", "No updatable fields provided.");
   await ref.update({ ...updates, updatedAt: new Date().toISOString(), updatedBy: ctx.callerUid });
-  await createAuditLog({ organizationId: ctx.organizationId, branchId: ctx.branchId, actorUid: ctx.callerUid, actorMembershipId: ctx.membershipId, action: "RECURRING_EXPENSE_UPDATED", entityType: "recurring_expense", entityId: ref.id, changes: diffChanges(snap.data(), updates) });
   return { templateId: ref.id, updated: Object.keys(updates) };
 });
 
@@ -139,7 +122,7 @@ export async function generateDueRecurringExpenses(nowMs: number = Date.now()): 
   let generated = 0;
   let skipped = 0;
   for (const tSnap of templates.docs) {
-    const t = tSnap.data() as Template;
+    const t = tSnap.data() as RecurringExpenseDoc;
     const org = (await db.collection("organizations").doc(t.organizationId).get()).data() as OrganizationDoc | undefined;
     if (!org) continue;
     const today = localDateInTimezone(nowMs, org.timezone || DEFAULT_ORG_TIMEZONE);

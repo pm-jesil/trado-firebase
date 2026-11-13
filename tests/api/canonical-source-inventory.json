@@ -1,21 +1,20 @@
 {
-  "generatedAt": "2026-11-08T04:45:01.056Z",
   "projectId": "trado-x",
   "region": "asia-south1",
-  "totalExports": 121,
+  "totalExports": 140,
   "summary": {
-    "callableCount": 115,
+    "callableCount": 134,
     "triggerCount": 6,
-    "concreteCollectionsCount": 46,
+    "concreteCollectionsCount": 48,
     "categoryCounts": {
       "PUBLIC_AUTH_ADAPTER": 2,
-      "CALLER_IDENTITY": 4,
+      "CALLER_IDENTITY": 5,
       "CONTEXT_SELECTION": 1,
       "ORGANIZATION_ONBOARDING": 4,
-      "PLATFORM_SUPER_ADMIN": 10,
-      "REFERENCE_DATA": 4,
-      "DERIVED_TENANT_OPERATION": 48,
-      "FILTER_OPTIONAL_TENANT": 42
+      "PLATFORM_SUPER_ADMIN": 21,
+      "REFERENCE_DATA": 5,
+      "DERIVED_TENANT_OPERATION": 51,
+      "FILTER_OPTIONAL_TENANT": 45
     },
     "subgroupCounts": {
       "DERIVED_TENANT_OPERATION": {
@@ -23,10 +22,11 @@
         "Catalog & Parties": 10,
         "Transactions & Operations": 14,
         "Stock & Reconciliation": 4,
-        "Tasks & Telemetry": 7
+        "Tasks & Telemetry": 7,
+        "Media & Assets": 3
       },
       "FILTER_OPTIONAL_TENANT": {
-        "Entities & Catalog Lists": 28,
+        "Entities & Catalog Lists": 31,
         "Reports & Telemetry": 11,
         "Usage & Quotas": 3
       }
@@ -170,6 +170,11 @@
       "domain": "System Infrastructure"
     },
     {
+      "path": "imageUploadSessions/{id}",
+      "type": "root",
+      "domain": "System Infrastructure"
+    },
+    {
       "path": "jobRoles/{id}",
       "type": "root",
       "domain": "Tenant & RBAC"
@@ -243,6 +248,11 @@
       "path": "permissionCatalog/{id}",
       "type": "root",
       "domain": "Tenant & RBAC"
+    },
+    {
+      "path": "platformCostReconciliation/{id}",
+      "type": "root",
+      "domain": "Analytics & Usage Metering"
     },
     {
       "path": "products/{id}",
@@ -347,6 +357,7 @@
       "description": "Caller Identity Bootstrap & Personal Notifications",
       "items": [
         "authMe",
+        "usersUpdateMe",
         "notificationsRegisterFcmToken",
         "notificationsList",
         "notificationsMarkRead"
@@ -371,9 +382,20 @@
       "description": "Platform Super Admin Governance",
       "items": [
         "organizationsDeactivate",
+        "organizationsReactivate",
+        "organizationsPreviewDeactivationImpact",
+        "organizationsGetSubscriptionHistory",
+        "organizationsProvisionUser",
+        "organizationsTransferOwnership",
         "branchesDeactivate",
         "plansCreate",
         "plansUpdate",
+        "plansArchive",
+        "plansDelete",
+        "plansPreviewImpact",
+        "platformUsersList",
+        "platformUsersGet",
+        "auditLogsList",
         "reportsGetPlatformOverview",
         "usageGetPlatformSummary",
         "usageGetOrganizations",
@@ -386,6 +408,7 @@
       "description": "System Reference & Catalog Data",
       "items": [
         "plansList",
+        "plansGet",
         "permissionCatalogList",
         "modulesList",
         "taxRegimesList"
@@ -451,6 +474,11 @@
           "tasksDelete",
           "locationsRecordPing",
           "usageRecordClientMetric"
+        ],
+        "Media & Assets": [
+          "imagesCreateUploadSession",
+          "imagesAttach",
+          "imagesRemove"
         ]
       }
     },
@@ -459,9 +487,11 @@
       "subgroups": {
         "Entities & Catalog Lists": [
           "organizationsList",
+          "organizationsGet",
           "branchesGetDefault",
           "branchesList",
           "employeesList",
+          "employeesGet",
           "rolesList",
           "departmentsList",
           "jobRolesList",
@@ -478,6 +508,7 @@
           "outflowsGet",
           "billsList",
           "billsGet",
+          "billsPreview",
           "deliveriesList",
           "deliveriesGet",
           "returnsList",

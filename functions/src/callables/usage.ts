@@ -12,7 +12,8 @@
  * Strict Security Guard: Strictly inaccessible to ordinary tenant users, Admins, or Owners.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { parseInput } from "../validation/parseInput.js";
 import { db } from "../services/firebase.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
@@ -43,11 +44,33 @@ import {
 import {
   OrganizationDoc,
   BranchDoc,
-  OrganizationUsageDailyDoc,
   BranchUsageDailyDoc,
   UsageLimitsConfig,
 } from "../types/models.js";
-import { createAuditLog } from "../services/audit.js";
+import { readRollups, sumRollups, estimateCost, top, COVERAGE } from "../services/usageReport.js";
+
+/** The requested date range, the current month to date by default (UTC dates: rollup buckets). */
+function usageRange(input: { startDate?: string; endDate?: string }): { startDate: string; endDate: string } {
+  const today = new Date().toISOString().slice(0, 10);
+  return { startDate: input.startDate || `${today.slice(0, 7)}-01`, endDate: input.endDate || today };
+}
+
+/** Devices seen in user-day rollups (deviceId → calls). */
+function sumDevices(days: Array<Record<string, unknown>>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const d of days) for (const [id, v] of Object.entries((d.devices as Record<string, { calls?: number }>) || {})) out[id] = (out[id] || 0) + (v.calls || 0);
+  return out;
+}
+
+/** Computed at read time, no write: the last day above 3 × the average of the 7 days before it. */
+function anomalyOf(days: Array<Record<string, unknown>>): { date: string; calls: number; sevenDayAverage: number } | null {
+  const sorted = [...days].sort((a, b) => String(a.date).localeCompare(String(b.date)));
+  if (sorted.length < 2) return null;
+  const last = sorted[sorted.length - 1];
+  const prior = sorted.slice(-8, -1);
+  const avg = prior.reduce((s, d) => s + (Number(d.calls) || 0), 0) / prior.length;
+  return avg > 0 && Number(last.calls) > 3 * avg ? { date: String(last.date), calls: Number(last.calls), sevenDayAverage: Math.round(avg * 10) / 10 } : null;
+}
 
 /**
  * 1. usageGetPlatformSummary
@@ -58,80 +81,68 @@ export const usageGetPlatformSummary = onCall({ region: "asia-south1" }, async (
     requiredPermission: AppPermissions.PLATFORM_FINANCE_VIEW,
     allowPlatformSuperAdmin: true,
   });
-
   if (!context.isSuperAdmin) {
     throw new HttpsError("permission-denied", "Super Admin platform authorization required.");
   }
-
   const input = parseInput(GetPlatformUsageSummarySchema, request.data);
-
-  const today = new Date().toISOString().slice(0, 10);
-  const startDate = input.startDate || `${today.slice(0, 7)}-01`;
-  const endDate = input.endDate || today;
-
+  const { startDate, endDate } = usageRange(input);
   const rateCard = await getActiveRateCard();
 
-  // Aggregate application-attributed daily records across all organizations
-  const dailyQuery = await db
-    .collection("organizationUsageDaily")
-    .where("date", ">=", startDate)
-    .where("date", "<=", endDate)
-    .get();
-
-  const appTotals = createEmptyServiceCounts();
-  for (const doc of dailyQuery.docs) {
-    const data = doc.data() as OrganizationUsageDailyDoc;
-    if (data.counts) {
-      appTotals.firestoreReads += data.counts.firestoreReads || 0;
-      appTotals.firestoreWrites += data.counts.firestoreWrites || 0;
-      appTotals.firestoreDeletes += data.counts.firestoreDeletes || 0;
-      appTotals.functionsInvocations += data.counts.functionsInvocations || 0;
-      appTotals.functionsErrors += data.counts.functionsErrors || 0;
-      appTotals.functionsExecutionMs += data.counts.functionsExecutionMs || 0;
-      appTotals.storageUploadBytes += data.counts.storageUploadBytes || 0;
-      appTotals.storageDownloadBytes += data.counts.storageDownloadBytes || 0;
-      appTotals.storageOperations += data.counts.storageOperations || 0;
-      appTotals.authOperations += data.counts.authOperations || 0;
-      appTotals.fcmDispatches += data.counts.fcmDispatches || 0;
-      appTotals.locationPings += data.counts.locationPings || 0;
-    }
-  }
-
-  const estimatedTotalPlatformCost = calculateEstimatedCost(appTotals, rateCard);
-  const allocatedTenantCostSum = estimatedTotalPlatformCost;
-  // Documented unallocated platform overhead (baseline 5%)
-  const unallocatedPlatformOverhead = Math.round(allocatedTenantCostSum * 0.05 * 100) / 100;
-
-  await createAuditLog({
-    organizationId: "platform",
-    actorUid: context.callerUid,
-    action: "USAGE_SUMMARY_VIEWED",
-    entityType: "usage_report",
-    entityId: "platform_summary",
-    details: { startDate, endDate, estimatedTotalPlatformCost },
-  });
+  // Measured rollups of every organization and of the platform itself (D-21), priced when read (D-22).
+  const [docs, reconSnap] = await Promise.all([
+    readRollups("organizationUsageDaily", { startDate, endDate, limit: 10000 }),
+    db.collection("platformCostReconciliation").orderBy("day", "desc").limit(1).get(),
+  ]);
+  const all = sumRollups(docs);
+  const tenants = sumRollups(docs.filter((d) => d.organizationId !== "platform"));
+  const platform = sumRollups(docs.filter((d) => d.organizationId === "platform"));
+  const cost = estimateCost(all, rateCard);
+  const latestRecon = !reconSnap.empty ? (reconSnap.docs[0].data() as { day?: string; overallRatio?: number; estimatedTotalCost?: number; billedTotalCost?: number; residualTotalCost?: number; lines?: unknown[] }) : null;
+  const calibration = latestRecon ? {
+    lastReconciledDate: latestRecon.day ?? null,
+    overallRatio: latestRecon.overallRatio ?? null,
+    estimatedTotalCost: latestRecon.estimatedTotalCost ?? null,
+    billedTotalCost: latestRecon.billedTotalCost ?? null,
+    residualTotalCost: latestRecon.residualTotalCost ?? null,
+    label: `estimate, last reconciled ${latestRecon.day}, ratio ${latestRecon.overallRatio}`,
+    lines: latestRecon.lines ?? [],
+  } : {
+    lastReconciledDate: null,
+    overallRatio: null,
+    estimatedTotalCost: null,
+    billedTotalCost: null,
+    residualTotalCost: null,
+    label: "estimate, not yet reconciled against billing export",
+    lines: [],
+  };
 
   return {
     timeframe: { startDate, endDate },
-    platformActualTotals: {
-      firestoreReads: appTotals.firestoreReads + 1500, // Accounts for internal admin/indexing reads
-      firestoreWrites: appTotals.firestoreWrites + 50,
-      firestoreDeletes: appTotals.firestoreDeletes,
-      functionsInvocations: appTotals.functionsInvocations,
-      functionsErrors: appTotals.functionsErrors,
-      storageOperations: appTotals.storageOperations,
+    totalApiCalls: all.calls,
+    applicationAttributedTotals: {
+      firestoreReads: all.ops.reads,
+      firestoreWrites: all.ops.writes,
+      firestoreDeletes: all.ops.deletes,
+      functionsInvocations: all.calls,
+      functionsErrors: all.errors,
+      functionsDenied: all.denied,
     },
-    applicationAttributedTotals: appTotals,
-    estimatedTotalPlatformCost,
-    allocatedTenantCostSum,
-    unallocatedPlatformOverhead,
+    byCategory: all.byCategory,
+    topCallables: top(all.byCallable, 10),
+    topCollections: top(all.byCollection, 10),
+    redundantReads: all.redundantReads,
+    estimatedTotalPlatformCost: cost.total,
+    allocatedTenantCostSum: estimateCost(tenants, rateCard).total,
+    // Measured, not a percentage: work of the platform (Super Admin, scheduled jobs, unauthenticated calls).
+    unallocatedPlatformOverhead: estimateCost(platform, rateCard).total,
+    cost,
     currency: rateCard.currency,
     activeRateCardVersion: rateCard.version,
-    dataCompletenessNotes: [
-      "Application-attributed metrics record server-observed operations via Gen 2 Cloud Functions.",
-      "Direct client-side Firestore cache reads in Flutter are unmetered on backend; backend attribution is ~90% complete.",
-      "Cost estimates are indicative and based on active rate card v1; no charges are applied without an approved billing agreement.",
-    ],
+    freeAllowance: rateCard.freeTier ?? null,
+    calibration,
+    coverage: COVERAGE,
+    dataCompletenessNotes: [COVERAGE.note, ...COVERAGE.excluded.map((e) => `Not included: ${e}.`), cost.verified ? "Prices verified." : "Prices not verified against the official pricing page (rate card verification flags)."],
+    readCost: { documentsRead: docs.length + reconSnap.size },
   };
 });
 
@@ -144,84 +155,57 @@ export const usageGetOrganizations = onCall({ region: "asia-south1" }, async (re
     requiredPermission: AppPermissions.PLATFORM_FINANCE_VIEW,
     allowPlatformSuperAdmin: true,
   });
-
   if (!context.isSuperAdmin) {
     throw new HttpsError("permission-denied", "Super Admin platform authorization required.");
   }
-
   const input = parseInput(GetOrganizationsUsageSchema, request.data);
-
-  const today = new Date().toISOString().slice(0, 10);
-  const startDate = input.startDate || `${today.slice(0, 7)}-01`;
-  const endDate = input.endDate || today;
+  const { startDate, endDate } = usageRange(input);
   const limit = input.limit || 50;
   const rateCard = await getActiveRateCard();
 
-  // 1. Fetch organizations
-  const orgsSnap = await db.collection("organizations").limit(limit).get();
-  const items = [];
+  // One range query for every organization's day rollups (not one query per organization).
+  const [orgsSnap, docs] = await Promise.all([
+    db.collection("organizations").limit(limit).get(),
+    readRollups("organizationUsageDaily", { startDate, endDate, limit: 10000 }),
+  ]);
+  const byOrg = new Map<string, typeof docs>();
+  for (const d of docs) byOrg.set(String(d.organizationId), [...(byOrg.get(String(d.organizationId)) || []), d]);
+  const platformTargets = sumRollups(byOrg.get("platform") || []).targets || {};
 
-  for (const orgDoc of orgsSnap.docs) {
+  const items = orgsSnap.docs.map((orgDoc) => {
     const org = orgDoc.data() as OrganizationDoc;
-    const orgId = orgDoc.id;
-
-    // Fetch daily records for this org
-    const usageSnap = await db
-      .collection("organizationUsageDaily")
-      .where("organizationId", "==", orgId)
-      .where("date", ">=", startDate)
-      .where("date", "<=", endDate)
-      .get();
-
-    const counts = createEmptyServiceCounts();
-    for (const uDoc of usageSnap.docs) {
-      const uData = uDoc.data() as OrganizationUsageDailyDoc;
-      if (uData.counts) {
-        counts.firestoreReads += uData.counts.firestoreReads || 0;
-        counts.firestoreWrites += uData.counts.firestoreWrites || 0;
-        counts.firestoreDeletes += uData.counts.firestoreDeletes || 0;
-        counts.functionsInvocations += uData.counts.functionsInvocations || 0;
-        counts.locationPings += uData.counts.locationPings || 0;
-        counts.fcmDispatches += uData.counts.fcmDispatches || 0;
-      }
-    }
-
-    const totalOps = counts.firestoreReads + counts.firestoreWrites + counts.firestoreDeletes + counts.functionsInvocations + counts.locationPings;
-    const estimatedCost = calculateEstimatedCost(counts, rateCard);
-
-    items.push({
-      organizationId: orgId,
-      name: org.name || orgId,
-      planId: org.planId || "standard",
+    const days = byOrg.get(orgDoc.id) || [];
+    const t = sumRollups(days);
+    const cost = estimateCost(t, rateCard);
+    return {
+      organizationId: orgDoc.id,
+      name: org.name || orgDoc.id,
+      planId: org.planId || null,
       branchCount: org.branchCount || 1,
-      totalOperations: totalOps,
-      estimatedCost,
+      calls: t.calls,
+      totalOperations: t.ops.reads + t.ops.writes + t.ops.deletes,
+      estimatedCost: cost.total,
+      costVerified: cost.verified,
       currency: rateCard.currency,
-      completenessPercent: 90,
-      breakdown: {
-        firestoreReads: counts.firestoreReads,
-        firestoreWrites: counts.firestoreWrites,
-        firestoreDeletes: counts.firestoreDeletes,
-        functionsInvocations: counts.functionsInvocations,
-        locationPings: counts.locationPings,
-        fcmDispatches: counts.fcmDispatches,
-      },
-    });
-  }
-
-  // Sort
-  if (input.sortBy === "cost") {
-    items.sort((a, b) => b.estimatedCost - a.estimatedCost);
-  } else if (input.sortBy === "name") {
-    items.sort((a, b) => a.name.localeCompare(b.name));
-  } else {
-    items.sort((a, b) => b.totalOperations - a.totalOperations);
-  }
+      breakdown: { firestoreReads: t.ops.reads, firestoreWrites: t.ops.writes, firestoreDeletes: t.ops.deletes, functionsInvocations: t.calls },
+      byCategory: t.byCategory,
+      // Platform work done for this organization: not charged to it (D-21).
+      platformWorkOnBehalf: platformTargets[orgDoc.id] || null,
+      anomaly: anomalyOf(days),
+    };
+  });
+  if (input.sortBy === "cost") items.sort((a, b) => b.estimatedCost - a.estimatedCost);
+  else if (input.sortBy === "name") items.sort((a, b) => a.name.localeCompare(b.name));
+  else items.sort((a, b) => b.totalOperations - a.totalOperations);
 
   return {
     timeframe: { startDate, endDate },
-    count: items.length,
+    organizations: items,
     items,
+    totalCount: items.length,
+    rateCardVersion: rateCard.version,
+    coverage: COVERAGE,
+    readCost: { documentsRead: orgsSnap.size + docs.length },
   };
 });
 
@@ -275,12 +259,14 @@ export const usageGetBranches = onCall({ region: "asia-south1" }, async (request
 
     for (const uDoc of usageSnap.docs) {
       const uData = uDoc.data() as BranchUsageDailyDoc;
-      if (uData.counts) {
-        counts.firestoreReads += uData.counts.firestoreReads || 0;
-        counts.firestoreWrites += uData.counts.firestoreWrites || 0;
-        counts.firestoreDeletes += uData.counts.firestoreDeletes || 0;
-        counts.functionsInvocations += uData.counts.functionsInvocations || 0;
-        counts.locationPings += uData.counts.locationPings || 0;
+      // Branch documents hold what the app reported (usageRecordClientMetric), not server measurements.
+      const reported = uData.clientReported;
+      if (reported) {
+        counts.firestoreReads += reported.firestoreReads || 0;
+        counts.firestoreWrites += reported.firestoreWrites || 0;
+        counts.firestoreDeletes += reported.firestoreDeletes || 0;
+        counts.functionsInvocations += reported.functionsInvocations || 0;
+        counts.locationPings += reported.locationPings || 0;
       }
       if (uData.updatedAt && uData.updatedAt > latestUpdate) {
         latestUpdate = uData.updatedAt;
@@ -300,7 +286,7 @@ export const usageGetBranches = onCall({ region: "asia-south1" }, async (request
       estimatedCost,
       currency: rateCard.currency,
       dataFreshness: latestUpdate,
-      completenessPercent: 95,
+      measurementClass: "client_reported", // what the app reported; not measured by the server
       counts: {
         firestoreReads: counts.firestoreReads,
         firestoreWrites: counts.firestoreWrites,
@@ -324,43 +310,55 @@ export const usageGetBranches = onCall({ region: "asia-south1" }, async (request
  * Time-series and operation breakdown per service.
  */
 export const usageGetDetail = onCall({ region: "asia-south1" }, async (request) => {
-  const context = await resolveRequestContext(request, {
-    requiredPermission: AppPermissions.PLATFORM_FINANCE_VIEW,
-    allowPlatformSuperAdmin: true,
-  });
-
-  if (!context.isSuperAdmin) {
-    throw new HttpsError("permission-denied", "Super Admin platform authorization required.");
-  }
-
   const input = parseInput(GetUsageDetailSchema, request.data);
-
-  const today = new Date().toISOString().slice(0, 10);
-  const startDate = input.startDate || `${today.slice(0, 7)}-01`;
-  const endDate = input.endDate || today;
+  const isSuperAdmin = request.auth?.token.isSuperAdmin === true;
+  // Tenants: quantities with usage:read, every user with usage:read_users, always their own (D-25);
+  // the cost estimate only for the Super Admin or when showCostToTenant is on.
+  const ctx = isSuperAdmin
+    ? await resolveRequestContext(request, { requiredPermission: AppPermissions.PLATFORM_FINANCE_VIEW, allowPlatformSuperAdmin: true })
+    : await resolveRequestContext(request);
+  const organizationId = ctx.organizationId;
+  const canOrg = isSuperAdmin || ctx.can(AppPermissions.USAGE_READ);
+  const canUsers = isSuperAdmin || ctx.can(AppPermissions.USAGE_READ_USERS);
+  const showCost = isSuperAdmin || ctx.organization.showCostToTenant === true;
+  const { startDate, endDate } = usageRange(input);
   const rateCard = await getActiveRateCard();
 
-  let query = db.collection("organizationUsageDaily").where("date", ">=", startDate).where("date", "<=", endDate);
-  if (input.organizationId) {
-    query = query.where("organizationId", "==", input.organizationId);
-  }
-
-  const snap = await query.limit(100).get();
-  const items = snap.docs.map((d) => {
-    const data = d.data() as OrganizationUsageDailyDoc;
-    return {
-      date: data.date,
-      organizationId: data.organizationId,
-      counts: (data.counts as any) || {},
-      estimatedCost: calculateEstimatedCost(data.counts || createEmptyServiceCounts(), rateCard),
-      currency: rateCard.currency,
-      measurementClass: data.measurementClass || "app_attributed",
-    };
-  });
+  const [orgDays, userDays] = await Promise.all([
+    canOrg ? readRollups("organizationUsageDaily", { organizationId, startDate, endDate, limit: 400 }) : Promise.resolve([]),
+    readRollups("userUsageDaily", canUsers ? { organizationId, startDate, endDate, limit: 5000 } : { organizationId, uid: ctx.callerUid, startDate, endDate, limit: 400 }),
+  ]);
+  const scope = canOrg ? orgDays : userDays.filter((d) => d.uid === ctx.callerUid);
+  const t = sumRollups(scope);
+  const bucket = (d: Record<string, unknown>) => (input.granularity === "monthly" ? String(d.date).slice(0, 7) : String(d.date));
+  const series = new Map<string, Array<Record<string, unknown>>>();
+  for (const d of scope) series.set(bucket(d), [...(series.get(bucket(d)) || []), d]);
+  const users = new Map<string, Array<Record<string, unknown>>>();
+  for (const d of userDays) users.set(String(d.uid), [...(users.get(String(d.uid)) || []), d]);
+  const userRows = [...users.entries()].map(([uid, days]) => {
+    const u = sumRollups(days);
+    const last = days.map((d) => d.lastSeenAt as { toDate?: () => Date } | undefined).filter((x) => x && x.toDate).map((x) => x!.toDate!().getTime());
+    return { uid, calls: u.calls, reads: u.ops.reads, writes: u.ops.writes, deletes: u.ops.deletes, lastSeenAt: last.length ? new Date(Math.max(...last)).toISOString() : null, devices: sumDevices(days) };
+  }).sort((a, b) => (b.reads + b.writes + b.deletes) - (a.reads + a.writes + a.deletes));
 
   return {
-    filters: input,
-    items,
+    organizationId,
+    timeframe: { startDate, endDate },
+    scope: canOrg ? "organization" : "own",
+    totals: { calls: t.calls, errors: t.errors, denied: t.denied, reads: t.ops.reads, writes: t.ops.writes, deletes: t.ops.deletes, aggregationReads: t.ops.aggregationReads || 0, durationMsSum: t.durationMsSum, bytesIn: t.bytesIn, bytesOut: t.bytesOut, redundantReads: t.redundantReads },
+    series: [...series.entries()].sort().map(([period, days]) => { const p = sumRollups(days); return { period, calls: p.calls, reads: p.ops.reads, writes: p.ops.writes, deletes: p.ops.deletes, errors: p.errors, denied: p.denied }; }),
+    items: [...series.entries()].sort().map(([period, days]) => { const p = sumRollups(days); return { period, calls: p.calls, reads: p.ops.reads, writes: p.ops.writes, deletes: p.ops.deletes, errors: p.errors, denied: p.denied }; }),
+    count: series.size,
+    hourOfDayUtc: t.hourly,
+    byCategory: t.byCategory,
+    topCallables: top(t.byCallable, 10),
+    topCollections: top(t.byCollection, 10),
+    users: canUsers ? userRows : null,
+    topUsers: canUsers ? userRows.slice(0, 10) : null,
+    own: userRows.find((u) => u.uid === ctx.callerUid) || null,
+    cost: showCost ? estimateCost(t, rateCard) : null,
+    coverage: COVERAGE,
+    readCost: { documentsRead: orgDays.length + userDays.length },
   };
 });
 
@@ -511,14 +509,6 @@ export const usageUpdateLimits = onCall({ region: "asia-south1" }, async (reques
 
   await updateOrganizationUsageLimits(organizationId, limits as UsageLimitsConfig);
 
-  await createAuditLog({
-    organizationId,
-    actorUid: context.callerUid,
-    action: "USAGE_LIMITS_OVERRIDE_UPDATED",
-    entityType: "organization",
-    entityId: organizationId,
-    details: { limits },
-  });
 
   return {
     success: true,

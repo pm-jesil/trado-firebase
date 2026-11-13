@@ -1,0 +1,1214 @@
+{
+  "generatedAt": "2026-11-13T10:04:05.664Z",
+  "totalPermissions": 117,
+  "permissions": [
+    {
+      "name": "ALL",
+      "code": "*",
+      "module": "*",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_ALL",
+      "code": "platform:*",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_DASHBOARD",
+      "code": "platform:dashboard",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_FINANCE_VIEW",
+      "code": "platform:finance:view",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_FINANCE_MANAGE",
+      "code": "platform:finance:manage",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_TENANTS_VIEW",
+      "code": "platform:tenants:view",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_TENANTS_MANAGE",
+      "code": "platform:tenants:manage",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_SUBSCRIPTIONS_VIEW",
+      "code": "platform:subscriptions:view",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_SUBSCRIPTIONS_MANAGE",
+      "code": "platform:subscriptions:manage",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_USERS_VIEW",
+      "code": "platform:users:view",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_USERS_MANAGE",
+      "code": "platform:users:manage",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_AUDIT_VIEW",
+      "code": "platform:audit:view",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ORG_VIEW",
+      "code": "org:view",
+      "module": "org",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_employee",
+        "role_cashier",
+        "role_rider",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "ORG_UPDATE",
+      "code": "org:update",
+      "module": "org",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "ORG_SETTINGS",
+      "code": "org:settings",
+      "module": "org",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ORG_CREATE",
+      "code": "org:create",
+      "module": "org",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ORG_MODULES",
+      "code": "org:modules",
+      "module": "org",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ORG_DELETE",
+      "code": "org:delete",
+      "module": "org",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "BRANCH_CREATE",
+      "code": "branch:create",
+      "module": "branch",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "BRANCH_VIEW",
+      "code": "branch:view",
+      "module": "branch",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "BRANCH_UPDATE",
+      "code": "branch:update",
+      "module": "branch",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "BRANCH_DEACTIVATE",
+      "code": "branch:deactivate",
+      "module": "branch",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "BRANCH_MANAGE",
+      "code": "branch:manage",
+      "module": "branch",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "BRANCH_ASSIGN",
+      "code": "branch:assign",
+      "module": "branch",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "EMPLOYEE_VIEW",
+      "code": "employee:view",
+      "module": "employee",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "EMPLOYEE_CREATE",
+      "code": "employee:create",
+      "module": "employee",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "EMPLOYEE_UPDATE",
+      "code": "employee:update",
+      "module": "employee",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "EMPLOYEE_DELETE",
+      "code": "employee:delete",
+      "module": "employee",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "EMPLOYEE_SUSPEND",
+      "code": "employee:suspend",
+      "module": "employee",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "EMPLOYEE_RESET_PASSWORD",
+      "code": "employee:reset_password",
+      "module": "employee",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "EMPLOYEE_PERMISSION_UPDATE",
+      "code": "employee:permission_update",
+      "module": "employee",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "EMPLOYEE_MANAGE_SENSITIVE",
+      "code": "employee:manage_sensitive",
+      "module": "employee",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ROLE_VIEW",
+      "code": "role:view",
+      "module": "role",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "ROLE_CREATE",
+      "code": "role:create",
+      "module": "role",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ROLE_UPDATE",
+      "code": "role:update",
+      "module": "role",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ROLE_DELETE",
+      "code": "role:delete",
+      "module": "role",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ROLE_ASSIGN",
+      "code": "role:assign",
+      "module": "role",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "DEPARTMENT_MANAGE",
+      "code": "department:manage",
+      "module": "department",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "JOB_ROLE_MANAGE",
+      "code": "job_role:manage",
+      "module": "job_role",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "TEAM_MANAGE",
+      "code": "team:manage",
+      "module": "team",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "AUDIT_VIEW",
+      "code": "audit:view",
+      "module": "audit",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "AUDIT_READ_OWN",
+      "code": "audit:read_own",
+      "module": "audit",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_employee"
+      ]
+    },
+    {
+      "name": "USAGE_READ",
+      "code": "usage:read",
+      "module": "usage",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "USAGE_READ_USERS",
+      "code": "usage:read_users",
+      "module": "usage",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "BILL_CREATE",
+      "code": "bill:create",
+      "module": "bill",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "BILL_VIEW",
+      "code": "bill:view",
+      "module": "bill",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "BILL_VIEW_ALL",
+      "code": "bill:view_all",
+      "module": "bill",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "BILL_UPDATE",
+      "code": "bill:update",
+      "module": "bill",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "BILL_PRINT",
+      "code": "bill:print",
+      "module": "bill",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "BILL_DISCOUNT",
+      "code": "bill:discount",
+      "module": "bill",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "BILL_VOID",
+      "code": "bill:void",
+      "module": "bill",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "BILL_RETURN",
+      "code": "bill:return",
+      "module": "bill",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "BILL_APPROVE",
+      "code": "bill:approve",
+      "module": "bill",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "SALE_CREATE",
+      "code": "sale:create",
+      "module": "sale",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "SALE_VIEW",
+      "code": "sale:view",
+      "module": "sale",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "INVENTORY_VIEW",
+      "code": "inventory:view",
+      "module": "inventory",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "INVENTORY_ADJUST",
+      "code": "inventory:adjust",
+      "module": "inventory",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "INVENTORY_MANAGE",
+      "code": "inventory:manage",
+      "module": "inventory",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "EXPENSE_CREATE",
+      "code": "expense:create",
+      "module": "expense",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "EXPENSE_VIEW",
+      "code": "expense:view",
+      "module": "expense",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "EXPENSE_APPROVE",
+      "code": "expense:approve",
+      "module": "expense",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PURCHASE_CREATE",
+      "code": "purchase:create",
+      "module": "purchase",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PURCHASE_VIEW",
+      "code": "purchase:view",
+      "module": "purchase",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PURCHASE_APPROVE",
+      "code": "purchase:approve",
+      "module": "purchase",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PURCHASE_VOID",
+      "code": "purchase:void",
+      "module": "purchase",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "EXPENSE_VOID",
+      "code": "expense:void",
+      "module": "expense",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "EXPENSE_VIEW_SENSITIVE",
+      "code": "expense:view_sensitive",
+      "module": "expense",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "CUSTOMER_CREATE",
+      "code": "customer:create",
+      "module": "customer",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "CUSTOMER_VIEW",
+      "code": "customer:view",
+      "module": "customer",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "CUSTOMER_UPDATE",
+      "code": "customer:update",
+      "module": "customer",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "CUSTOMER_DELETE",
+      "code": "customer:delete",
+      "module": "customer",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "CUSTOMER_VIEW_BALANCE",
+      "code": "customer:view_balance",
+      "module": "customer",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "VENDOR_CREATE",
+      "code": "vendor:create",
+      "module": "vendor",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "VENDOR_VIEW",
+      "code": "vendor:view",
+      "module": "vendor",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "VENDOR_UPDATE",
+      "code": "vendor:update",
+      "module": "vendor",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "VENDOR_DELETE",
+      "code": "vendor:delete",
+      "module": "vendor",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "VENDOR_VIEW_BALANCE",
+      "code": "vendor:view_balance",
+      "module": "vendor",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "PRODUCT_CREATE",
+      "code": "product:create",
+      "module": "product",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PRODUCT_VIEW",
+      "code": "product:view",
+      "module": "product",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PRODUCT_UPDATE",
+      "code": "product:update",
+      "module": "product",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PRODUCT_DELETE",
+      "code": "product:delete",
+      "module": "product",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PRODUCT_VIEW_COST",
+      "code": "product:view_cost",
+      "module": "product",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "CATEGORY_MANAGE",
+      "code": "category:manage",
+      "module": "category",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "CATEGORY_VIEW",
+      "code": "category:view",
+      "module": "category",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "UNIT_MANAGE",
+      "code": "unit:manage",
+      "module": "unit",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "UNIT_VIEW",
+      "code": "unit:view",
+      "module": "unit",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "STOCK_VIEW",
+      "code": "stock:view",
+      "module": "stock",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "STOCK_ADJUST",
+      "code": "stock:adjust",
+      "module": "stock",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "STOCK_TRANSFER",
+      "code": "stock:transfer",
+      "module": "stock",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "STOCK_APPROVE",
+      "code": "stock:approve",
+      "module": "stock",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "OUTFLOW_CREATE",
+      "code": "outflow:create",
+      "module": "outflow",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "OUTFLOW_VIEW",
+      "code": "outflow:view",
+      "module": "outflow",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "OUTFLOW_APPROVE",
+      "code": "outflow:approve",
+      "module": "outflow",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "OUTFLOW_VOID",
+      "code": "outflow:void",
+      "module": "outflow",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PAYMENT_CREATE",
+      "code": "payment:create",
+      "module": "payment",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PAYMENT_VIEW",
+      "code": "payment:view",
+      "module": "payment",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PAYMENT_VOID",
+      "code": "payment:void",
+      "module": "payment",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "DELIVERY_CREATE",
+      "code": "delivery:create",
+      "module": "delivery",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "DELIVERY_VIEW",
+      "code": "delivery:view",
+      "module": "delivery",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_rider",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "DELIVERY_UPDATE",
+      "code": "delivery:update",
+      "module": "delivery",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_rider",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "DELIVERY_ASSIGN",
+      "code": "delivery:assign",
+      "module": "delivery",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "RETURN_CREATE",
+      "code": "return:create",
+      "module": "return",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "RETURN_VIEW",
+      "code": "return:view",
+      "module": "return",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "RETURN_APPROVE",
+      "code": "return:approve",
+      "module": "return",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "REPORT_VIEW",
+      "code": "report:view",
+      "module": "report",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "REPORT_PROFIT",
+      "code": "report:profit",
+      "module": "report",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "REPORT_EXPORT",
+      "code": "report:export",
+      "module": "report",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "TASK_CREATE",
+      "code": "task:create",
+      "module": "task",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "TASK_VIEW",
+      "code": "task:view",
+      "module": "task",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_rider",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "TASK_UPDATE",
+      "code": "task:update",
+      "module": "task",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_rider",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "TASK_DELETE",
+      "code": "task:delete",
+      "module": "task",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "TASK_ASSIGN",
+      "code": "task:assign",
+      "module": "task",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "LOCATION_PING",
+      "code": "location:ping",
+      "module": "location",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_rider"
+      ]
+    },
+    {
+      "name": "LOCATION_VIEW_OWN",
+      "code": "location:view_own",
+      "module": "location",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_rider"
+      ]
+    },
+    {
+      "name": "LOCATION_VIEW_ALL",
+      "code": "location:view_all",
+      "module": "location",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin"
+      ]
+    },
+    {
+      "name": "LOCATION_MANAGE",
+      "code": "location:manage",
+      "module": "location",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "NOTIFICATION_VIEW",
+      "code": "notification:view",
+      "module": "notification",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_cashier",
+        "role_rider",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    }
+  ]
+}

@@ -178,6 +178,17 @@ Seeded organizations created before subscriptions existed have no subscription f
 
 The bicycle wholesale ("Cycle World") and kitchenware wholesale ("Kitchen Mart") businesses are created fresh, with their own Owner credentials, by `node functions/scripts/test-governance-flagship.cjs` (sections 10–11). They are not yet part of a `seed-emulator` profile (open item ISSUE-34/R-16).
 
+### Specialized & Negative Testing Personas Matrix
+
+| Persona | Email Address | Default Password | Organization & Context | Test Scenario / Verification Focus |
+|---|---|---|---|---|
+| **Inactive Branch Staff** | `inactive_branch_emp@apexwholesale.local` | `TestPassword123!` | `org_apex_sample` (`branch_inactive`) | Rejection on inactive branch writes / `BRANCH_INACTIVE` error reason |
+| **Expired Subscription Owner** | `expired_owner@apexwholesale.local` | `TestPassword123!` | `org_expired_subscription` (`main-branch`) | Rejection on tenant operations with `SUBSCRIPTION_EXPIRED` |
+| **Multi-Organization User** | `multi_org_user@apexwholesale.local` | `TestPassword123!` | `org_apex_sample` (Admin) + `org_wholesale_sample` (Cashier) | Validates cross-org role switching, context isolation, and multi-tenant claims |
+| **Suspended Org User** | `suspended_org_user@apexwholesale.local` | `TestPassword123!` | `org_suspended_sample` | Fails closed with `ORGANIZATION_DEACTIVATED` |
+| **Globally Inactive User** | `inactive@apexwholesale.local` | `TestPassword123!` | `org_apex_sample` | Fails closed with `USER_INACTIVE` |
+| **Deactivated Member** | `deactivated_member@apexwholesale.local` | `TestPassword123!` | `org_apex_sample` | Fails closed with `MEMBERSHIP_INACTIVE` |
+
 ## 5. Seed Reset & Database Cleanup
 
 ### Resetting Seed-Owned Fixtures (`--reset-seed-data`)

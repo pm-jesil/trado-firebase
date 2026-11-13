@@ -348,7 +348,7 @@ const tests = [
       const res = await invokeCallable("customersCreate", {
         organizationId: context.orgId,
         name: "Grand Hotel",
-        mobile: "+919876500001",
+        phone: "+919876500001",
         creditLimit: 50000,
         creditPeriodDays: 30,
         idempotencyKey: `cust_${Math.random()}`,
@@ -365,7 +365,7 @@ const tests = [
       const res = await invokeCallable("vendorsCreate", {
         organizationId: context.orgId,
         name: "Beverage Supply Co",
-        mobile: "+919876500002",
+        phone: "+919876500002",
         idempotencyKey: `vend_${Math.random()}`,
       }, context.ownerToken);
       assert.equal(res.ok, true);

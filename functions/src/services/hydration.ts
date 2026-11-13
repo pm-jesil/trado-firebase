@@ -22,8 +22,8 @@ type Doc = Record<string, unknown>;
 
 /** Display projection per kind (never the whole document). */
 const PROJECTION: Record<Exclude<IncludedKind, "members">, { collection: string; fields: string[] }> = {
-  customers: { collection: "customers", fields: ["name", "customerCode", "mobile", "taxNumber", "billingAddress", "outstandingBalance", "creditLimit", "isActive"] },
-  vendors: { collection: "vendors", fields: ["name", "vendorCode", "mobile", "taxNumber", "outstandingPayable", "creditLimit", "isActive"] },
+  customers: { collection: "customers", fields: ["name", "customerCode", "mobile", "taxId", "billingAddress", "outstandingBalance", "creditLimit", "isActive"] },
+  vendors: { collection: "vendors", fields: ["name", "vendorCode", "mobile", "taxId", "outstandingPayable", "creditLimit", "isActive"] },
   products: { collection: "products", fields: ["name", "sku", "barcode", "baseUnit", "brand", "taxCode", "isActive"] },
   bills: { collection: "bills", fields: ["billNumber", "documentType", "salesMode", "status", "customerId", "totalAmount", "createdAt"] },
   outflows: { collection: "outflows", fields: ["outflowNumber", "kind", "status", "vendorId", "invoiceNumber", "totalAmount", "createdAt"] },

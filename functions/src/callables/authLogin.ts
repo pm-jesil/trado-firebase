@@ -6,7 +6,8 @@
  * Returns canonical AuthSessionContext + transport credentials (idToken, expiresInSeconds).
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { parseInput } from "../validation/parseInput.js";
 import { AuthLoginResponse } from "../types/api.js";
 import { AuthLoginSchema } from "../validation/schemas.js";
@@ -48,9 +49,15 @@ export const authLogin = onCall({ region: "asia-south1" }, async (request): Prom
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, returnSecureToken: true }),
     });
-    authData = (await res.json()) as any;
-  } catch (err: any) {
-    throw new HttpsError("internal", `Auth emulator service unavailable: ${err.message}`);
+    authData = (await res.json()) as {
+      idToken?: string;
+      refreshToken?: string;
+      expiresIn?: string;
+      localId?: string;
+      error?: { message?: string };
+    };
+  } catch (err: unknown) {
+    throw new HttpsError("internal", `Auth emulator service unavailable: ${(err as Error).message}`);
   }
 
   if (!authData.idToken || !authData.localId) {
@@ -64,6 +71,7 @@ export const authLogin = onCall({ region: "asia-south1" }, async (request): Prom
   });
 
   return {
+    /** D-18: single canonical response — `context` is the one source of truth; no mirrored top-level keys. */
     context,
     credentials: {
       idToken: authData.idToken,
@@ -74,17 +82,5 @@ export const authLogin = onCall({ region: "asia-south1" }, async (request): Prom
     idToken: authData.idToken,
     accessToken: authData.idToken,
     refreshToken: authData.refreshToken || null,
-    user: context.user,
-    profile: context.user,
-    role: context.role,
-    jobRoles: context.jobRoles,
-    permissions: context.permissions,
-    platformPermissions: context.platformPermissions,
-    organizations: context.organizations,
-    primaryOrganization: context.primaryOrganization,
-    branches: context.branches,
-    primaryBranch: context.primaryBranch,
-    device: context.device,
-    contextStatus: context.contextStatus,
   };
 });

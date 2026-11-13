@@ -1,0 +1,127 @@
+{
+  "$comment": "Change-Impact Test System configuration (scripts/verify-impact.js). Every ignored entry needs a reason; the count is printed by verify:plan and verify:status.",
+  "canaryCount": 3,
+  "workers": "auto",
+  "ignored": [
+    {
+      "glob": ".git/**",
+      "reason": "version-control metadata; the impact system never depends on git"
+    },
+    {
+      "glob": "**/node_modules/**",
+      "reason": "installed packages; covered by package-lock.json (global invalidator)"
+    },
+    {
+      "glob": "functions/lib/**",
+      "reason": "build output; mapped back to functions/src through the source map path"
+    },
+    {
+      "glob": ".local/**",
+      "reason": "local baseline, traces and credentials"
+    },
+    {
+      "glob": "scratch/**",
+      "reason": "git-ignored scratch scripts, not part of any check"
+    },
+    {
+      "glob": ".firebase/**",
+      "reason": "firebase-tools cache"
+    },
+    {
+      "glob": "**/*.log",
+      "reason": "emulator and debug logs"
+    },
+    {
+      "glob": ".claude/**",
+      "reason": "AI tooling, git-ignored"
+    },
+    {
+      "glob": ".agents/**",
+      "reason": "AI tooling, git-ignored"
+    },
+    {
+      "glob": ".cursor/**",
+      "reason": "AI tooling, git-ignored"
+    },
+    {
+      "glob": "skills-lock.json",
+      "reason": "AI tooling, git-ignored"
+    },
+    {
+      "glob": "CLAUDE.md",
+      "reason": "AI tooling, git-ignored"
+    },
+    {
+      "glob": "AGENTS.md",
+      "reason": "AI tooling, git-ignored"
+    },
+    {
+      "glob": ".gitignore",
+      "reason": "affects git only; the impact system hashes content, not git state"
+    },
+    {
+      "glob": "docs/audit/coverage.json",
+      "reason": "output of coverage:compute"
+    },
+    {
+      "glob": "docs/audit/coverage.md",
+      "reason": "output of coverage:compute"
+    },
+    {
+      "glob": "docs/audit/blast-radius-table.md",
+      "reason": "output of verify:full / verify:selftest"
+    },
+    {
+      "glob": "docs/audit/roundtrip-results.json",
+      "reason": "output of the maximal round-trip proof"
+    },
+    {
+      "glob": "docs/audit/roundtrip-results.md",
+      "reason": "output of the maximal round-trip proof"
+    },
+    {
+      "glob": "docs/audit/schema-sweep-results.json",
+      "reason": "output of the schema contract sweep"
+    },
+    {
+      "glob": "docs/generated/raw-field-census.json",
+      "reason": "output of static:check-raw-field-census"
+    },
+    {
+      "glob": "docs/generated/rules-coverage.json",
+      "reason": "output of the rules units"
+    },
+    {
+      "glob": "docs/generated/guard-scopes/**",
+      "reason": "outputs of the per-collection guards"
+    },
+    {
+      "glob": "docs/generated/field-catalog.json",
+      "reason": "output of coverage:compute (scripts/generate-field-catalog.js)"
+    },
+    {
+      "glob": "docs/reference/entity-fields.md",
+      "reason": "output of coverage:compute (scripts/generate-field-catalog.js)"
+    },
+    {
+      "glob": "functions/scripts/helpers/runtime-callable-traces.jsonl",
+      "reason": "legacy append-only trace log of earlier runs; no longer written or read"
+    }
+  ],
+  "globalInvalidators": [
+    "package.json",
+    "functions/package.json",
+    "functions/package-lock.json",
+    "functions/tsconfig.json",
+    "functions/tsconfig.dev.json",
+    "firebase.json",
+    ".firebaserc",
+    "verify/impact.config.json",
+    "scripts/verify-impact.js",
+    "scripts/lib/fs-trace-hook.js",
+    "functions/scripts/helpers/callable-client.cjs",
+    "functions/scripts/helpers/emulator-helper.cjs",
+    "functions/scripts/helpers/auth-personas.cjs",
+    "scripts/test-verify-selftest.cjs"
+  ]
+}

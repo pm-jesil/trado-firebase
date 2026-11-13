@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "description": "Cross-language contact normalization test vectors (libphonenumber-js / Dart phone_numbers_parser parity).",
+  "emailVectors": [
+    { "input": "user@example.com", "expected": "user@example.com", "isValid": true, "note": "Standard valid email" },
+    { "input": "  User.Name+Tag@Example.COM  ", "expected": "user.name+tag@example.com", "isValid": true, "note": "Trim and lowercase with plus tag" },
+    { "input": "first_last.123@sub.domain.co.in", "expected": "first_last.123@sub.domain.co.in", "isValid": true, "note": "Multi-level subdomain with special chars" },
+    { "input": "admin@trado.local", "expected": "admin@trado.local", "isValid": true, "note": "Local development domain" },
+    { "input": "not-an-email", "expected": null, "isValid": false, "note": "Missing at sign and domain" },
+    { "input": "user@", "expected": null, "isValid": false, "note": "Missing domain" },
+    { "input": "user@domain", "expected": null, "isValid": false, "note": "Missing TLD" },
+    { "input": "user name@domain.com", "expected": null, "isValid": false, "note": "Internal whitespace" },
+    { "input": "", "expected": null, "isValid": false, "note": "Empty string" }
+  ],
+  "phoneVectors": [
+    { "input": "9876543210", "region": "IN", "expected": "+919876543210", "isValid": true, "note": "India 10-digit national number" },
+    { "input": "+91 98765 43210", "region": "IN", "expected": "+919876543210", "isValid": true, "note": "India formatted international" },
+    { "input": "09876543210", "region": "IN", "expected": "+919876543210", "isValid": true, "note": "India with leading trunk prefix 0" },
+    { "input": "+91-98765-43210", "region": "IN", "expected": "+919876543210", "isValid": true, "note": "India with hyphens" },
+    { "input": "050 123 4567", "region": "AE", "expected": "+971501234567", "isValid": true, "note": "UAE national mobile with 0 trunk" },
+    { "input": "+971 50 123 4567", "region": "AE", "expected": "+971501234567", "isValid": true, "note": "UAE formatted international" },
+    { "input": "9123 4567", "region": "OM", "expected": "+96891234567", "isValid": true, "note": "Oman 8-digit mobile" },
+    { "+968 9123 4567": "+96891234567", "input": "+968 9123 4567", "region": "OM", "expected": "+96891234567", "isValid": true, "note": "Oman international format" },
+    { "input": "3912 3456", "region": "BH", "expected": "+97339123456", "isValid": true, "note": "Bahrain 8-digit mobile" },
+    { "input": "8123 4567", "region": "SG", "expected": "+6581234567", "isValid": true, "note": "Singapore 8-digit mobile" },
+    { "input": "(212) 555-1234", "region": "US", "expected": "+12125551234", "isValid": true, "note": "US standard national with area code" },
+    { "input": "+1 212 555 1234", "region": "US", "expected": "+12125551234", "isValid": true, "note": "US international format" },
+    { "input": "1234", "region": "IN", "expected": null, "isValid": false, "note": "Too short for any valid phone" },
+    { "input": "abcdefghij", "region": "IN", "expected": null, "isValid": false, "note": "Non-numeric characters" },
+    { "input": "9876543210123456789", "region": "IN", "expected": null, "isValid": false, "note": "Exceeds maximum E.164 length" },
+    { "input": "", "region": "IN", "expected": null, "isValid": false, "note": "Empty string" }
+  ]
+}

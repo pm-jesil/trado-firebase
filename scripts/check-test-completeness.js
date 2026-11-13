@@ -1,4 +1,5 @@
 /**
+ * @guard-scope: artifacts tests/api/api-manifest.json against functions/scripts/test-*
  * Trado Backend — Static Test Completeness Checker
  * 
  * Verifies that:

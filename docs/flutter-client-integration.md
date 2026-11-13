@@ -575,7 +575,7 @@ Full list: [API reference — Gate, Error Reasons & Lifecycle Callables](api-ref
 
 Direct Firestore SDK reads of business collections (products, customers, vendors, bills, outflows, payments, returns, deliveries, stock movements, daily/monthly summaries) are **denied by security rules**: use the `*List` / `*Get` / report callables, which apply data scope and hide cost/balance fields the user may not see (fields are omitted, not zeroed). Direct reads remain allowed for the organization, branches, roles, catalogs, stock balances, and the caller's own notifications, tasks and location.
 
-New callables relevant to the app: `billsApprove`, `billsVoid`, `outflowsApprove`, `outflowsVoid`, `teamsAssignMember`, `productsGetPriceHistory`, `auditGetEntityHistory`, `reportsGetPartyStatement`, `reportsGetOutflowSummary`. List responses of bills/outflows/payments/returns/deliveries include `scope` (`self` | `team` | `branch` | `organization`).
+New callables relevant to the app: `documentsDecide`, `billsVoid`, `outflowsVoid`, `teamsAssignMember`, `productsGetPriceHistory`, `auditGetEntityHistory`, `reportsGetPartyStatement`, `reportsGetOutflowSummary`. List responses of bills/outflows/payments/returns/deliveries include `scope` (`self` | `team` | `branch` | `organization`).
 
 ## 4. Calling Callables with `cloud_functions`
 

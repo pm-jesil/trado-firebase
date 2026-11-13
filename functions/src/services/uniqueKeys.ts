@@ -76,10 +76,10 @@ export function asDuplicateIfRace(err: unknown, kind: UniqueKeyKind, key: string
 }
 
 /** Phone and tax-id claims of a customer or vendor (normalized). */
-export function partyClaims(party: "customer" | "vendor", doc: { mobile?: string | null; taxNumber?: string | null }): KeyClaim[] {
+export function partyClaims(party: "customer" | "vendor", doc: { mobile?: string | null; phone?: string | null; taxId?: string | null }): KeyClaim[] {
   return [
-    { kind: party === "customer" ? "customer_phone" : "vendor_phone", key: phoneKey(doc.mobile) },
-    { kind: party === "customer" ? "customer_tax" : "vendor_tax", key: taxIdKey(doc.taxNumber) },
+    { kind: party === "customer" ? "customer_phone" : "vendor_phone", key: phoneKey(doc.mobile || doc.phone) },
+    { kind: party === "customer" ? "customer_tax" : "vendor_tax", key: taxIdKey(doc.taxId) },
   ];
 }
 

@@ -22,7 +22,7 @@ functions/scripts/
 ├── test-billing-procurement-callables.cjs # 9 Callables: Outflows, Bills, Finalize, Returns
 ├── test-operations-tasks-callables.cjs # 16 Callables: Tasks, Live Locations, Notifications, Deliveries
 ├── test-analytics-platform-callables.cjs # 18 Callables: Reports, Usage Metering, Rate Cards, Branch Counts
-├── test-event-triggers.cjs             # 4 Triggers: onBillWritten, onOutflowWritten, onPaymentWritten, onDeliveryWritten
+├── test-event-triggers.cjs             # Event Triggers: onBillWritten, onOutflowWritten, onPaymentWritten, onDeliveryWritten
 ├── test-retail-lifecycle.e2e.js        # 10-Step Connected ERP Retail Lifecycle E2E
 └── test-multibranch-isolation.e2e.js   # 15-Scenario Branch Topology & Isolation Deep E2E
 ```
@@ -117,16 +117,16 @@ npm run test:unit --prefix functions
 # 2. Security Rules Tests (Firestore & Storage emulator, 18 tests)
 npm run test:rules --prefix functions
 
-# 3. All 101 HTTPS Callables Integration Suite
+# 3. All 134 HTTPS Callables Integration Suite
 npm run test:callables --prefix functions
 
-# 4. Background Firestore Event Triggers (4 triggers)
+# 4. Background Firestore Event Triggers (6 triggers)
 npm run test:triggers --prefix functions
 
 # 5. Connected End-to-End Scenarios (Retail Lifecycle & Multi-Branch Isolation)
 npm run test:e2e --prefix functions
 
-# 6. Static Test Completeness Audit (105 exports + 44 collections)
+# 6. Static Test Completeness Audit (140 exports + 47 collections)
 npm run test:completeness --prefix functions
 
 # 7. Complete Verification Suite (Executes unit + callables + triggers + e2e + completeness)

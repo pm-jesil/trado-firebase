@@ -82,7 +82,7 @@ export function calculateCOGSForItems(
 /**
  * Calculates stock valuation across a list of active products.
  */
-export function calculateStockValuation(products: ProductDoc[]): StockValuationResult {
+export function calculateStockValuation(products: (ProductDoc & { id?: string; productId?: string })[]): StockValuationResult {
   let totalValuation = 0;
   const items: StockValuationItem[] = [];
 
@@ -96,7 +96,7 @@ export function calculateStockValuation(products: ProductDoc[]): StockValuationR
     totalValuation += valuation;
 
     items.push({
-      productId: (product as any).id || (product as any).productId || "",
+      productId: product.id || product.productId || "",
       name: product.name,
       currentStock: stock,
       costPrice: product.costPrice || 0,

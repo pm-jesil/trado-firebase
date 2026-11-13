@@ -14,6 +14,7 @@ import { getStorage } from "firebase-admin/storage";
 import { db, adminApp } from "../services/firebase.js";
 import { OrganizationDoc, SubscriptionPlanDoc } from "../types/models.js";
 import { DEFAULT_ORG_TIMEZONE } from "../services/subscription.js";
+import { withTriggerContext } from "../services/systemContext.js";
 import { incrementServerUsage, getServerUsageSnapshot, evaluateUsageLimits, mergeUsageLimits } from "../services/usageMetering.js";
 
 const ORG_PATH = /^organizations\/([^/]+)\//;
@@ -42,6 +43,7 @@ export async function handleStorageObjectFinalized(data: { name?: string; size?:
   console.warn(`[usage] ${organizationId}: upload ${name} (${bytes} B) removed — storageUploadBytes limit reached`);
 }
 
-export const onStorageObjectFinalized = onObjectFinalized({ region: "asia-south1" }, async (event) => {
-  await handleStorageObjectFinalized(event.data);
-});
+export const onStorageObjectFinalized = onObjectFinalized({ region: "asia-south1" }, withTriggerContext("onStorageObjectFinalized",
+  (event) => (event.data.name || "").match(ORG_PATH)?.[1] ?? null,
+  async (event) => { await handleStorageObjectFinalized(event.data); },
+));

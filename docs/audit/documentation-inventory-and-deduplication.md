@@ -1,5 +1,7 @@
 # Trado Documentation Inventory & Deduplication Report
 
+> Status: archived (2026-11-13). Point-in-time report of an earlier prompt; its counts and completeness statements are not current and are not evidence. Current, computed figures: [coverage.md](coverage.md) and the verification run records under .local/verification-runs.
+
 > **Date**: October 29, 2026  
 > **Workspace**: `C:\Users\jesil.p\Project\FireBase\trado-firebase`  
 > **Status**: Completed, Consolidated & Cross-Linked

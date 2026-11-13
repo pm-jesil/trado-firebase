@@ -44,6 +44,7 @@ export const AppPermissions = {
   EMPLOYEE_SUSPEND: "employee:suspend",
   EMPLOYEE_RESET_PASSWORD: "employee:reset_password",
   EMPLOYEE_PERMISSION_UPDATE: "employee:permission_update",
+  EMPLOYEE_MANAGE_SENSITIVE: "employee:manage_sensitive",
   ROLE_VIEW: "role:view",
   ROLE_CREATE: "role:create",
   ROLE_UPDATE: "role:update",
@@ -53,6 +54,9 @@ export const AppPermissions = {
   JOB_ROLE_MANAGE: "job_role:manage",
   TEAM_MANAGE: "team:manage",
   AUDIT_VIEW: "audit:view",
+  AUDIT_READ_OWN: "audit:read_own", // a member's own activity only
+  USAGE_READ: "usage:read", // the organization's usage quantities (prompt 66 Part 7)
+  USAGE_READ_USERS: "usage:read_users", // usage per user (every member sees their own)
 
   // Billing & POS
   BILL_CREATE: "bill:create",

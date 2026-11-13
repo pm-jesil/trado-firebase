@@ -6,7 +6,8 @@
  * - productsGet: Retrieve single product by ID
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import { uniqueKeyRef } from "../services/uniqueKeys.js";
 import {
@@ -20,13 +21,13 @@ import { parseInput } from "../validation/parseInput.js";
 import { ProductDoc, StockMovementDoc, OutflowDoc, AuditLogDoc } from "../types/models.js";
 import { StockMovementType } from "../constants/enums.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
-import { createAuditLog, diffChanges } from "../services/audit.js";
 import { fetchPage } from "../services/pagination.js";
 import { nameKey } from "../services/naturalKeys.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { redactProduct, canViewCost } from "../services/redaction.js";
 import { hydrate } from "../services/hydration.js";
 import { AppPermissions } from "../constants/permissions.js";
+import { round4 } from "../services/money.js";
 
 const PRODUCT_MANAGE = [AppPermissions.PRODUCT_CREATE, AppPermissions.INVENTORY_MANAGE];
 const PRODUCT_EDIT = [AppPermissions.PRODUCT_UPDATE, AppPermissions.INVENTORY_MANAGE];
@@ -58,7 +59,7 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
     actorUid: callerUid,
     operation: "products.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
     recoveryChecker: async () => {
       const existing = await db.collection("products")
         .where("organizationId", "==", orgId)
@@ -198,7 +199,6 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
           branchId,
           productId,
           currentStock: initialStock,
-          lowStockThreshold: input.lowStockThreshold || 5,
           updatedAt: now,
           updatedBy: callerUid,
         });
@@ -214,14 +214,6 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
       }
     });
 
-    await createAuditLog({
-      organizationId: orgId,
-      actorUid: callerUid,
-      action: "PRODUCT_CREATED",
-      entityType: "product",
-      entityId: productId,
-      details: { name: productDoc.name, initialStock },
-    });
 
     return response;
   } catch (error) {
@@ -348,16 +340,6 @@ export const productsUpdate = onCall({ region: "asia-south1" }, async (request) 
     await productRef.update(updates);
   }
 
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: ctx.branchId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: "PRODUCT_UPDATED",
-    entityType: "product",
-    entityId: input.productId,
-    changes: diffChanges(existing as unknown as Record<string, unknown>, updates as Record<string, unknown>),
-  });
 
   return { success: true, message: "Product updated successfully." };
 });
@@ -468,7 +450,7 @@ export const productsGetPriceHistory = onCall({ region: "asia-south1" }, async (
         unit: line.unit,
         quantity: line.quantity,
         unitPrice: line.unitPrice,
-        baseUnitCost: Math.round((line.unitPrice / factor) * 10000) / 10000,
+        baseUnitCost: round4(line.unitPrice / factor),
         baseQuantity: line.baseQuantity ?? line.quantity * factor,
       });
     }
@@ -483,7 +465,7 @@ export const productsGetPriceHistory = onCall({ region: "asia-south1" }, async (
       last: costs[0],
       min: Math.min(...costs),
       max: Math.max(...costs),
-      average: Math.round((weighted / (totalQty || 1)) * 10000) / 10000,
+      average: round4(weighted / (totalQty || 1)),
       count: costs.length,
     }
     : null;
@@ -491,9 +473,9 @@ export const productsGetPriceHistory = onCall({ region: "asia-south1" }, async (
   const PRICE_FIELDS = new Set(["sellingPrice", "mrp", "wholesalePrice", ...(showCost ? ["costPrice"] : [])]);
   const priceChanges = changesSnap.docs
     .map((d) => d.data() as AuditLogDoc)
-    .flatMap((log) => (log.changes || [])
-      .filter((c) => PRICE_FIELDS.has(c.field))
-      .map((c) => ({ at: log.timestamp, actorUid: log.actorUid, field: c.field, from: c.from, to: c.to })))
+    .flatMap((log) => (log.changes?.fields || [])
+      .filter((c) => PRICE_FIELDS.has(c.path))
+      .map((c) => ({ at: log.occurredAt.toDate().toISOString(), actorUid: log.actorUid, field: c.path, from: c.before ?? null, to: c.after ?? null })))
     .sort((a, b) => b.at.localeCompare(a.at))
     .slice(0, limit);
 

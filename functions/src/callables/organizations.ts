@@ -6,7 +6,8 @@
  * - organizationsList: Super Admin only, paginated.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db, auth } from "../services/firebase.js";
 import { uniqueKeyRef } from "../services/uniqueKeys.js";
 import {
@@ -15,20 +16,29 @@ import {
   DeactivateOrganizationSchema,
   ListOrganizationsSchema,
   SetSubscriptionSchema,
+  GetOrganizationSchema,
+  ReactivateOrganizationSchema,
+  PreviewDeactivationImpactSchema,
+  GetSubscriptionHistorySchema,
+  ProvisionUserSchema,
+  TransferOwnershipSchema,
 } from "../validation/schemas.js";
+import { getCountryDefaults } from "../constants/countryDefaults.js";
+import { nameKey } from "../services/naturalKeys.js";
+import { provisionMembershipInternal, OWNER_ROLE_ID, ADMIN_ROLE_ID } from "../services/membershipProvisioning.js";
+import { attachUploadedImage, hydrateImageUrl } from "../services/imageEngine.js";
 import { parseInput } from "../validation/parseInput.js";
 import {
   CreateOrganizationResponse,
 } from "../types/api.js";
 import {
   OrganizationDoc,
-  UserDoc,
   MembershipDoc,
   BranchDoc,
-  MembershipBranchDoc,
   OrganizationSharingPolicies,
+  AuditLogDoc,
 } from "../types/models.js";
-import { EntityStatus, IdempotencyStatus, SubscriptionStatus, GateReason, SalesChannel, BusinessType } from "../constants/enums.js";
+import { EntityStatus, SubscriptionStatus, GateReason, SalesChannel, BusinessType } from "../constants/enums.js";
 import {
   buildSubscriptionFields,
   evaluateSubscription,
@@ -37,7 +47,8 @@ import {
   endOfDayInTimezone,
   DEFAULT_ORG_TIMEZONE,
 } from "../services/subscription.js";
-import { diffChanges, createAuditLog, addAuditLogToBatch } from "../services/audit.js";
+import { resolveRequestContext } from "../services/contextResolver.js";
+import { AppPermissions } from "../constants/permissions.js";
 import { invalidatePlanCache } from "../services/contextResolver.js";
 import { fetchPage } from "../services/pagination.js";
 
@@ -47,16 +58,19 @@ import { fetchPage } from "../services/pagination.js";
  *               are changed only through organizationsSetSubscription)
  *   owner:      tax id, bank, website, contact, logo/images, address, display name, approvals
  *   admin:      none (decision D-07) — Admins operate the business but do not edit the legal profile
+ *
+ * D-15: `logoUrl` and `imageUrls` are removed from all write paths. The image is set via
+ *        `uploadId` (processed by imageEngine) or `image: ImageRef` (typed, no url field).
  */
 export const ORGANIZATION_FIELD_POLICY: Record<"superAdmin" | "owner" | "admin", ReadonlySet<string>> = {
   superAdmin: new Set([
-    "name", "businessType", "businessCategory", "moduleToggles", "salesChannels", "timezone",
-    "displayName", "logoUrl", "imageUrls", "taxNumber", "website", "contactEmail", "contactPhone", "contacts",
-    "address", "bankDetails", "settings",
+    "name", "legalName", "businessType", "businessCategory", "financialYearStartMonth", "moduleToggles", "salesChannels", "timezone",
+    "image", "uploadId", "taxId", "website", "contactEmail", "contactPhone", "contact", "contacts",
+    "addresses", "bankAccounts", "settings", "showCostToTenant",
   ]),
   owner: new Set([
-    "displayName", "logoUrl", "imageUrls", "taxNumber", "website", "contactEmail", "contactPhone", "contacts",
-    "address", "bankDetails", "settings",
+    "legalName", "image", "uploadId", "taxId", "website", "contactEmail", "contactPhone", "contact", "contacts",
+    "addresses", "bankAccounts", "settings",
   ]),
   admin: new Set(),
 };
@@ -75,9 +89,7 @@ function defaultSalesChannels(type: BusinessType): SalesChannel[] {
       return [SalesChannel.POS];
   }
 }
-import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
-import { compensateAuthUser } from "../services/compensation.js";
-import { setPrimaryOrganizationClaim, setPrimaryBranchClaim } from "../services/claims.js";
+import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 import { queueWelcomeNotification } from "../services/notificationSender.js";
 
 export const organizationsCreate = onCall({ region: "asia-south1" }, async (request): Promise<CreateOrganizationResponse> => {
@@ -97,28 +109,31 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
     actorUid: request.auth.uid,
     operation: "organizations.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
     recoveryChecker: async () => {
-      try {
-        const existingOwnerAuth = await auth.getUserByEmail(input.ownerEmail);
-        const mems = await db.collection("memberships")
-          .where("userId", "==", existingOwnerAuth.uid)
-          .where("roleId", "==", "role_org_owner")
-          .limit(1)
-          .get();
-        if (!mems.empty) {
-          const mem = mems.docs[0];
-          const memData = mem.data() as MembershipDoc;
-          return {
-            organizationId: memData.organizationId,
-            ownerUserId: existingOwnerAuth.uid,
-            ownerMembershipId: mem.id,
-            status: "active",
-            message: "Organization and owner provisioned successfully.",
-          };
+      if (input.ownerEmail) {
+        try {
+          const existingOwnerAuth = await auth.getUserByEmail(input.ownerEmail);
+          const mems = await db.collection("memberships")
+            .where("userId", "==", existingOwnerAuth.uid)
+            .where("roleId", "==", OWNER_ROLE_ID)
+            .limit(1)
+            .get();
+          if (!mems.empty) {
+            const mem = mems.docs[0];
+            const memData = mem.data() as MembershipDoc;
+            return {
+              organizationId: memData.organizationId,
+              ownerUserId: existingOwnerAuth.uid,
+              ownerMembershipId: mem.id,
+              status: "active",
+              ownerStatus: "active",
+              message: "Organization and owner provisioned successfully.",
+            };
+          }
+        } catch {
+          // Owner not yet created
         }
-      } catch {
-        // Owner not yet created
       }
       return null;
     },
@@ -131,8 +146,6 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
     return idempotency.cachedResult as unknown as CreateOrganizationResponse;
   }
 
-  let createdAuthUid: string | null = null;
-
   try {
     // 3. Verify Plan exists
     const planDoc = await db.collection("subscriptionPlans").doc(input.planId).get();
@@ -140,30 +153,35 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
       throw new HttpsError("not-found", `Subscription plan "${input.planId}" does not exist.`);
     }
 
-    // 4. Create Firebase Auth user for Organization Owner
-    const password = input.initialPassword || Math.random().toString(36).slice(-10) + "Aa1!";
-    const authUser = await auth.createUser({
-      email: input.ownerEmail,
-      displayName: input.ownerName,
-      phoneNumber: input.ownerPhone || undefined,
-      password,
-    });
-    createdAuthUid = authUser.uid;
+    // 4. Derive Country Defaults (C-4, N-01)
+    const countryDef = getCountryDefaults(input.country);
+    const currency = input.currency || countryDef.currencyCode;
+    const taxRegimeCode = input.taxRegimeCode || countryDef.taxRegimeCode;
+    const timezone = input.timezone || countryDef.timezone;
+    const financialYearStartMonth = input.financialYearStartMonth || countryDef.financialYearStartMonth;
 
-    // 5. Coordinated Firestore Creation
+    // 5. Unique check on legalName / name (N-01)
+    const legalNameToCheck = input.legalName?.trim() || input.name.trim();
+    const legalKey = nameKey(legalNameToCheck);
+    const existingLegalSnap = await db.collection("organizations")
+      .where("legalNameKey", "==", legalKey)
+      .where("country", "==", input.country)
+      .limit(1)
+      .get();
+
+    if (!existingLegalSnap.empty) {
+      throw new HttpsError(
+        "already-exists",
+        `[ORGANIZATION_DUPLICATE] An organization with this legal name already exists in ${input.country}.`,
+        { reason: "ORGANIZATION_DUPLICATE", existingOrganizationId: existingLegalSnap.docs[0].id }
+      );
+    }
+
     const orgRef = db.collection("organizations").doc();
     const orgId = orgRef.id;
-
-    // Set custom claims primaryOrganizationId and primaryBranchId on newly created Owner
-    await setPrimaryOrganizationClaim(createdAuthUid, orgId);
-    await setPrimaryBranchClaim(createdAuthUid, "main-branch");
-
-    const userRef = db.collection("users").doc(createdAuthUid);
-    const membershipId = `${createdAuthUid}_${orgId}`;
-    const membershipRef = db.collection("memberships").doc(membershipId);
-
     const now = new Date().toISOString();
     const branchCode = (input.defaultBranchCode || "MAIN").toUpperCase().trim();
+    const willCreateOwner = input.createOwner !== false;
 
     const defaultSharingPolicies: OrganizationSharingPolicies = {
       products: "organization_shared",
@@ -177,21 +195,44 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
       deliveries: "organization_shared",
     };
 
-    const orgDocData: OrganizationDoc = {
+    let imageRef = input.image;
+    if (input.uploadId) {
+      imageRef = await attachUploadedImage({
+        uploadId: input.uploadId,
+        purpose: "org_logo",
+        entityType: "organization",
+        entityId: orgId,
+        callerUid: request.auth.uid,
+        scope: orgId,
+      });
+    }
+
+    const orgDocData: Omit<OrganizationDoc, "updatedAt" | "updatedBy"> = {
       name: input.name,
+      legalName: legalNameToCheck,
+      legalNameKey: legalKey,
       businessType: input.businessType,
       businessCategory: input.businessCategory,
       country: input.country,
-      currency: input.currency,
-      taxRegimeCode: input.taxRegimeCode,
+      currency,
+      currencyDecimals: countryDef.currencyDecimals,
+      taxRegimeCode,
+      financialYearStartMonth,
       status: EntityStatus.ACTIVE,
+      ownerStatus: willCreateOwner ? "active" : "pending",
       planId: input.planId,
       moduleToggles: {},
+      image: imageRef || undefined,
       defaultBranchId: "main-branch",
       branchCount: 1,
       activeEmployeeCount: 0,
       salesChannels: input.salesChannels || defaultSalesChannels(input.businessType),
       sharingPolicies: defaultSharingPolicies,
+      taxId: input.taxId || null,
+      website: input.website || null,
+      addresses: input.addresses || [],
+      bankAccounts: input.bankAccounts || [],
+      ...(input.contact && input.contact.name && input.contact.email && input.contact.phone ? { contact: { name: input.contact.name, email: input.contact.email, phone: input.contact.phone, altPhone: input.contact.altPhone } } : {}),
       ...(input.contacts ? { contacts: input.contacts } : {}),
       ...buildSubscriptionFields({
         status: input.subscription?.status,
@@ -199,37 +240,12 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
         expiresOn: input.subscription?.expiresOn,
         durationDays: input.subscription?.durationDays,
         graceDays: input.subscription?.graceDays,
-        timezone: input.timezone,
+        timezone,
       }),
       createdAt: now,
       createdBy: request.auth.uid,
     };
 
-    const userDocData: UserDoc = {
-      name: input.ownerName,
-      email: input.ownerEmail,
-      phone: input.ownerPhone || null,
-      accountType: "admin",
-      isActive: true,
-      createdAt: now,
-      createdBy: request.auth.uid,
-    };
-
-    const membershipDocData: MembershipDoc = {
-      userId: createdAuthUid,
-      organizationId: orgId,
-      roleId: "role_org_owner",
-      jobRoleIds: [],
-      reportingToIds: [],
-      permissions: {},
-      status: EntityStatus.ACTIVE,
-      isPrimary: true,
-      primaryBranchId: "main-branch",
-      createdAt: now,
-      createdBy: request.auth.uid,
-    };
-
-    // Branch-readiness: Provision default branch 'main-branch' under organizations/{orgId}/branches
     const branchRef = orgRef.collection("branches").doc("main-branch");
     const defaultBranchDoc: BranchDoc = {
       organizationId: orgId,
@@ -242,83 +258,64 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
       updatedAt: now,
     };
 
-    // Code lock for default branch
     const lockRef = uniqueKeyRef(orgId, "branch_code", branchCode);
     const lockDoc = { organizationId: orgId, kind: "branch_code", entityType: "branch", entityId: "main-branch", createdAt: now };
 
-    // Join record mapping Owner membership to main-branch
-    const membershipBranchRef = db.collection("membershipBranches").doc(`${membershipId}_main-branch`);
-    const membershipBranchDoc: MembershipBranchDoc = {
-      organizationId: orgId,
-      branchId: "main-branch",
-      membershipId,
-      userId: createdAuthUid,
-      status: EntityStatus.ACTIVE,
-      isDefaultForMembership: true,
-      permissions: {},
-      createdAt: now,
-      createdBy: request.auth.uid,
-      updatedAt: now,
-    };
-
-    const response: CreateOrganizationResponse = {
-      organizationId: orgId,
-      ownerUserId: createdAuthUid,
-      ownerMembershipId: membershipId,
-      status: "active",
-      message: "Organization and owner provisioned successfully.",
-    };
-
-    // Coordinated atomic batch: Org + User + Membership + Branch + CodeLock + MembershipBranch + Audit + Idempotency
     const batch = db.batch();
     batch.set(orgRef, orgDocData);
-    batch.set(userRef, userDocData);
-    batch.set(membershipRef, membershipDocData);
     batch.set(branchRef, defaultBranchDoc);
     batch.set(lockRef, lockDoc);
-    batch.set(membershipBranchRef, membershipBranchDoc);
 
-    addAuditLogToBatch(batch, {
-      organizationId: orgId,
-      actorUid: request.auth.uid,
-      action: "ORGANIZATION_CREATED",
-      entityType: "organization",
-      entityId: orgId,
-      details: {
-        name: input.name,
-        planId: input.planId,
-        ownerEmail: input.ownerEmail,
-      },
-    });
-
-    if (idempotency.recordId) {
-      const idempotencyRef = db.collection("idempotencyRecords").doc(idempotency.recordId);
-      batch.update(idempotencyRef, {
-        status: IdempotencyStatus.SUCCEEDED,
-        result: response as unknown as Record<string, unknown>,
-        updatedAt: now,
-      });
-    }
 
     await batch.commit();
 
-    // 6. Queue Welcome Notification
-    await queueWelcomeNotification(createdAuthUid, input.ownerName, input.name);
+    let ownerResult: Awaited<ReturnType<typeof provisionMembershipInternal>> | null = null;
+    if (willCreateOwner && input.ownerEmail && input.ownerName) {
+      ownerResult = await provisionMembershipInternal({
+        organizationId: orgId,
+        roleId: OWNER_ROLE_ID,
+        name: input.ownerName,
+        email: input.ownerEmail,
+        phone: input.ownerPhone,
+        credentialMode: input.credentialMode,
+        initialPassword: input.initialPassword,
+        confirmLinkExistingUser: input.confirmLinkExistingUser,
+        actorUid: request.auth.uid,
+      });
+
+      await orgRef.update({
+        ownerUserId: ownerResult.userId,
+        ownerStatus: "active",
+        updatedAt: new Date().toISOString(),
+      });
+
+      await queueWelcomeNotification(ownerResult.userId, input.ownerName, input.name);
+    }
+
+    const response: CreateOrganizationResponse = {
+      organizationId: orgId,
+      ownerUserId: ownerResult?.userId || null,
+      ownerMembershipId: ownerResult?.membershipId || null,
+      status: willCreateOwner ? "active" : "pending",
+      ownerStatus: willCreateOwner ? "active" : "pending",
+      temporaryPassword: ownerResult?.temporaryPassword,
+      userCreated: ownerResult?.userCreated,
+      message: willCreateOwner
+        ? "Organization and owner provisioned successfully."
+        : "Organization created successfully in owner-pending status.",
+    };
+
+    if (idempotency.recordId) {
+      // A password is never stored at rest: a replay returns the same organization without it.
+      const { temporaryPassword: _password, ...safeResult } = response;
+      await finalizeIdempotencySuccess(idempotency.recordId, safeResult);
+    }
 
     return response;
   } catch (error) {
-    // 9. Compensating Rollback of Auth User on Firestore Failure
-    if (createdAuthUid) {
-      const rollback = await compensateAuthUser(createdAuthUid, (error as Error).message);
-      if (!rollback.success) {
-        console.error(`[CRITICAL] Rollback incomplete for auth user ${createdAuthUid}:`, rollback.error);
-      }
-    }
-
     if (idempotency.recordId) {
       await finalizeIdempotencyFailure(idempotency.recordId, "PROVISIONING_FAILED", (error as Error).message);
     }
-
     if (error instanceof HttpsError) throw error;
     throw new HttpsError("internal", `Failed to provision organization: ${(error as Error).message}`);
   }
@@ -368,6 +365,20 @@ export const organizationsUpdate = onCall({ region: "asia-south1" }, async (requ
   // Field-level write control: every supplied field must be editable by the caller's tier
   const fields: Record<string, unknown> = { ...input };
   delete fields.organizationId;
+
+  if (fields.uploadId) {
+    const attachedImage = await attachUploadedImage({
+      uploadId: fields.uploadId as string,
+      purpose: "org_logo",
+      entityType: "organization",
+      entityId: input.organizationId,
+      callerUid: request.auth.uid,
+      scope: input.organizationId,
+    });
+    delete fields.uploadId;
+    fields.image = attachedImage;
+  }
+
   const requested = Object.keys(fields).filter((k) => (fields as Record<string, unknown>)[k] !== undefined);
   const forbidden = requested.filter((f) => !ORGANIZATION_FIELD_POLICY[tier].has(f));
   if (forbidden.length > 0) {
@@ -397,15 +408,6 @@ export const organizationsUpdate = onCall({ region: "asia-south1" }, async (requ
 
   await orgRef.update(updates);
 
-  await createAuditLog({
-    organizationId: input.organizationId,
-    actorUid: request.auth.uid,
-    action: "ORGANIZATION_UPDATED",
-    entityType: "organization",
-    entityId: input.organizationId,
-    details: { tier, fields: requested },
-    changes: diffChanges(existing as unknown as Record<string, unknown>, updates, requested),
-  });
 
   return { success: true, message: "Organization updated successfully." };
 });
@@ -429,14 +431,6 @@ export const organizationsDeactivate = onCall({ region: "asia-south1" }, async (
     updatedAt: new Date().toISOString(),
   });
 
-  await createAuditLog({
-    organizationId: input.organizationId,
-    actorUid: request.auth.uid,
-    action: "ORGANIZATION_DEACTIVATED",
-    entityType: "organization",
-    entityId: input.organizationId,
-    details: { reason: input.reason },
-  });
 
   return { success: true, message: "Organization deactivated successfully." };
 });
@@ -449,23 +443,143 @@ export const organizationsList = onCall({ region: "asia-south1" }, async (reques
   const input = parseInput(ListOrganizationsSchema, request.data);
 
   let query: FirebaseFirestore.Query = db.collection("organizations").orderBy("name");
+  let countQuery: FirebaseFirestore.Query = db.collection("organizations");
 
   if (input.status) {
     query = query.where("status", "==", input.status);
+    countQuery = countQuery.where("status", "==", input.status);
+  }
+  if (input.planId) {
+    query = query.where("planId", "==", input.planId);
+    countQuery = countQuery.where("planId", "==", input.planId);
   }
 
-  const { snapshot, nextCursor } = await fetchPage(query, "organizations", input.startAfterId, input.limit || 20);
-  const items = snapshot.docs.map((doc) => ({
-    organizationId: doc.id,
-    ...(doc.data() as OrganizationDoc),
-  }));
+  const [countSnap, { snapshot, nextCursor }] = await Promise.all([
+    countQuery.count().get(),
+    fetchPage(query, "organizations", input.startAfterId, input.limit || 20),
+  ]);
+  const totalCount = countSnap.data().count;
+
+  const items = snapshot.docs.map((doc) => {
+    const data = doc.data() as OrganizationDoc;
+    return {
+      organizationId: doc.id,
+      ...data,
+      subscriptionStatus: data.subscriptionStatus || "active",
+      subscriptionExpiresAt: data.subscriptionExpiresAt || null,
+      seatsUsed: data.activeEmployeeCount || 0,
+      branchesUsed: data.branchCount || 1,
+    };
+  });
 
   return {
     items,
+    organizations: items,
     count: items.length,
+    totalCount,
     nextCursor,
     hasMore: items.length === (input.limit || 20),
   };
+});
+
+export const organizationsReactivate = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth || request.auth.token.isSuperAdmin !== true) {
+    throw new HttpsError("permission-denied", "Platform Super Admin privileges required to reactivate organization.");
+  }
+  const input = parseInput(ReactivateOrganizationSchema, request.data);
+  const orgRef = db.collection("organizations").doc(input.organizationId);
+  const snap = await orgRef.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Organization not found.");
+  const now = new Date().toISOString();
+  await orgRef.update({
+    status: EntityStatus.ACTIVE,
+    updatedAt: now,
+    updatedBy: request.auth.uid,
+  });
+  return { success: true, status: EntityStatus.ACTIVE, message: "Organization reactivated successfully." };
+});
+
+export const organizationsPreviewDeactivationImpact = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth || request.auth.token.isSuperAdmin !== true) {
+    throw new HttpsError("permission-denied", "Super Admin privileges required to preview deactivation impact.");
+  }
+  const input = parseInput(PreviewDeactivationImpactSchema, request.data);
+  const orgRef = db.collection("organizations").doc(input.organizationId);
+  const snap = await orgRef.get();
+  if (!snap.exists) throw new HttpsError("not-found", "Organization not found.");
+  const org = snap.data() as OrganizationDoc;
+
+  const [membersSnap, branchesSnap, openBillsSnap] = await Promise.all([
+    db.collection("memberships").where("organizationId", "==", input.organizationId).where("status", "==", EntityStatus.ACTIVE).get(),
+    db.collection("organizations").doc(input.organizationId).collection("branches").get(),
+    db.collection("bills").where("organizationId", "==", input.organizationId).where("status", "in", ["draft", "active", "partial"]).get(),
+  ]);
+
+  const activeBranches = branchesSnap.docs.filter((d) => {
+    const bData = d.data();
+    return bData.isActive !== false && bData.status !== "inactive";
+  });
+
+  let outstandingBalance = 0;
+  openBillsSnap.docs.forEach((doc) => {
+    const b = doc.data();
+    outstandingBalance += Number(b.balanceAmount) || 0;
+  });
+
+  return {
+    organizationId: input.organizationId,
+    organizationName: org.name,
+    currentStatus: org.status,
+    activeBranchCount: activeBranches.length,
+    activeBranchesCount: activeBranches.length,
+    activeEmployeeCount: membersSnap.size,
+    activeEmployeesCount: membersSnap.size,
+    activeUsers: membersSnap.size,
+    branches: activeBranches.map((d) => ({ id: d.id, ...d.data() })),
+    employees: membersSnap.docs.map((d) => ({ id: d.id, ...d.data() })),
+    openDocumentsCount: openBillsSnap.size,
+    outstandingReceivables: outstandingBalance,
+    subscriptionStatus: org.subscriptionStatus || "active",
+    subscriptionExpiresAt: org.subscriptionExpiresAt || null,
+  };
+});
+
+export const organizationsGetSubscriptionHistory = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) throw new HttpsError("unauthenticated", "Authentication required.");
+  const input = parseInput(GetSubscriptionHistorySchema, request.data);
+  const isSuperAdmin = request.auth.token.isSuperAdmin === true;
+  if (!isSuperAdmin) {
+    const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.ORG_VIEW });
+    if (ctx.organizationId !== input.organizationId) {
+      throw new HttpsError("permission-denied", "Cross-organization access denied.");
+    }
+  }
+
+  // Subscription changes are the organization's own events (a Super Admin's are stored under "platform"
+  // with the organization as target): set_subscription, and create / update events that changed a
+  // subscription field.
+  const SUBSCRIPTION_FIELDS = new Set(["planId", "subscriptionStatus", "subscriptionStartsAt", "subscriptionExpiresAt", "graceDays"]);
+  const logsSnap = await db.collection("auditLogs")
+    .where("entityType", "==", "organization")
+    .where("entityId", "==", input.organizationId)
+    .where("action", "in", ["organization.set_subscription", "organization.create", "organization.update"])
+    .get();
+
+  const history = logsSnap.docs
+    .map((d) => ({ logId: d.id, ...(d.data() as AuditLogDoc) }))
+    .filter((l) => l.action === "organization.set_subscription" || (l.changedFields || []).some((f) => SUBSCRIPTION_FIELDS.has(f)))
+    .sort((a, b) => b.occurredAt.toMillis() - a.occurredAt.toMillis())
+    .slice(0, input.limit || 50)
+    .map((l) => ({
+      logId: l.logId,
+      at: l.occurredAt.toDate().toISOString(),
+      action: l.action,
+      actorUid: l.actorUid,
+      details: l.details || {},
+      changes: (l.changes?.fields || []).filter((f) => SUBSCRIPTION_FIELDS.has(f.path.split(".")[0])).map((f) => ({ field: f.path, from: f.before ?? null, to: f.after ?? null })),
+    }));
+
+  return { organizationId: input.organizationId, items: history, history };
 });
 
 /**
@@ -548,15 +662,6 @@ export const organizationsSetSubscription = onCall({ region: "asia-south1" }, as
   });
 
   if (input.planId) invalidatePlanCache(input.planId);
-  await createAuditLog({
-    organizationId: input.organizationId,
-    actorUid: request.auth.uid,
-    action: `SUBSCRIPTION_${input.action.toUpperCase()}`,
-    entityType: "organization",
-    entityId: input.organizationId,
-    details: { reason: input.reason || null, overLimit: result.overLimit },
-    changes: diffChanges(result.before as unknown as Record<string, unknown>, result.updates),
-  });
 
   const after = { ...result.before, ...result.updates } as OrganizationDoc;
   return {
@@ -568,5 +673,258 @@ export const organizationsSetSubscription = onCall({ region: "asia-south1" }, as
     graceDays: after.graceDays || 0,
     evaluation: evaluateSubscription(after),
     overLimit: result.overLimit,
+  };
+});
+
+export const organizationsGet = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const input = parseInput(GetOrganizationSchema, request.data);
+  const isSuperAdmin = request.auth.token.isSuperAdmin === true;
+
+  let targetOrgId = input.organizationId;
+
+  if (isSuperAdmin) {
+    if (!targetOrgId) {
+      throw new HttpsError("invalid-argument", "organizationId is required for Super Admin lookups.");
+    }
+  } else {
+    const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.ORG_VIEW });
+    if (targetOrgId && targetOrgId !== ctx.organizationId) {
+      throw new HttpsError("permission-denied", "Cross-tenant organization access rejected.");
+    }
+    targetOrgId = ctx.organizationId;
+  }
+
+  const snap = await db.collection("organizations").doc(targetOrgId).get();
+  if (!snap.exists) {
+    throw new HttpsError("not-found", `Organization "${targetOrgId}" not found.`);
+  }
+
+  const data = snap.data() as OrganizationDoc;
+
+  const orgPayload = {
+    id: snap.id,
+    organizationId: snap.id,
+    name: data.name,
+    legalName: data.legalName ?? null,
+    code: data.code,
+    displayName: data.displayName || data.name,
+    businessType: data.businessType,
+    businessCategory: data.businessCategory,
+    currency: data.currency || "INR",
+    currencyDecimals: data.currencyDecimals ?? 2,
+    timezone: data.timezone || "Asia/Kolkata",
+    country: data.country || "IN",
+    financialYearStartMonth: data.financialYearStartMonth ?? 4,
+    taxRegimeCode: data.taxRegimeCode || "IN_GST",
+    taxId: data.taxId ?? null,
+    contactEmail: data.contactEmail,
+    contactPhone: data.contactPhone,
+    contact: data.contact ?? null,
+    contacts: data.contacts ?? [],
+    website: data.website ?? null,
+    /** D-15: `image` is the stored ImageRef (no url inside); `imageUrl` is the computed display URL. */
+    image: data.image ? { path: data.image.path, contentType: data.image.contentType, width: data.image.width, height: data.image.height, sizeBytes: data.image.sizeBytes, updatedAt: data.image.updatedAt, thumbnailPath: data.image.thumbnailPath } : null,
+    /** D-15: computed display URL — never stored. */
+    imageUrl: hydrateImageUrl(data.image),
+    addresses: data.addresses ?? [],
+    bankAccounts: data.bankAccounts ?? [],
+    settings: data.settings,
+    salesChannels: data.salesChannels,
+    moduleToggles: data.moduleToggles,
+    status: data.status,
+    ownerStatus: data.ownerStatus ?? (data.ownerUserId ? "active" : "pending"),
+    ownerUserId: data.ownerUserId ?? null,
+    planId: data.planId,
+    subscriptionStatus: data.subscriptionStatus,
+    subscriptionExpiresAt: data.subscriptionExpiresAt,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
+  };
+
+  if (isSuperAdmin) {
+    // D-18: single canonical response — no mirrored top-level keys alongside the nested object
+    const { logoUrl: _l, imageUrls: _i, bankDetails: _bd, ...cleanData } = data as typeof data & { logoUrl?: unknown; imageUrls?: unknown; bankDetails?: unknown };
+    return {
+      organization: {
+        id: snap.id,
+        organizationId: snap.id,
+        ...cleanData,
+        ownerStatus: data.ownerStatus ?? (data.ownerUserId ? "active" : "pending"),
+        /** D-15: computed display URL added at read time. */
+        imageUrl: hydrateImageUrl(data.image),
+      },
+      evaluation: evaluateSubscription(data),
+    };
+  }
+
+  return {
+    organization: orgPayload,
+  };
+});
+
+/**
+ * organizationsProvisionUser (Super Admin only — Prompt 60 N-01/N-02/N-05)
+ * Allows Super Admin to provision an Owner or Admin for an organization.
+ * Tenant operations remain strictly forbidden (SUPER_ADMIN_TENANT_FORBIDDEN).
+ */
+export const organizationsProvisionUser = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth || request.auth.token.isSuperAdmin !== true) {
+    throw new HttpsError("permission-denied", "Super Admin privileges required to provision organization users.");
+  }
+
+  const input = parseInput(ProvisionUserSchema, request.data);
+
+  const orgRef = db.collection("organizations").doc(input.organizationId);
+  const orgSnap = await orgRef.get();
+  if (!orgSnap.exists) {
+    throw new HttpsError("not-found", `Organization "${input.organizationId}" not found.`);
+  }
+  const orgData = orgSnap.data() as OrganizationDoc;
+
+  if (input.role === "owner" && orgData.ownerStatus === "active" && orgData.ownerUserId) {
+    throw new HttpsError(
+      "failed-precondition",
+      "[ORGANIZATION_ALREADY_HAS_OWNER] Organization already has an active Owner. Use organizationsTransferOwnership to change owners.",
+      { reason: "ORGANIZATION_ALREADY_HAS_OWNER" }
+    );
+  }
+
+  const roleId = input.role === "owner" ? OWNER_ROLE_ID : ADMIN_ROLE_ID;
+
+  const result = await provisionMembershipInternal({
+    organizationId: input.organizationId,
+    roleId,
+    email: input.user.email,
+    name: input.user.name.trim(),
+    phone: input.user.phone,
+    image: input.user.image,
+    uploadId: input.user.uploadId,
+    actorUid: request.auth.uid,
+    confirmLinkExistingUser: true,
+  });
+
+  if (input.role === "owner") {
+    await orgRef.update({
+      ownerUserId: result.userId,
+      ownerStatus: "active",
+      updatedAt: new Date().toISOString(),
+      updatedBy: request.auth.uid,
+    });
+  }
+
+
+  return {
+    success: true,
+    userId: result.userId,
+    membershipId: result.membershipId,
+    role: input.role,
+    roleId,
+    organizationId: input.organizationId,
+    temporaryPassword: result.temporaryPassword,
+    inviteLink: result.inviteLink,
+    userCreated: result.userCreated,
+  };
+});
+
+/**
+ * organizationsTransferOwnership (Super Admin or Current Owner — Prompt 60 N-03)
+ * Transfers organization ownership from current owner to another active member.
+ */
+export const organizationsTransferOwnership = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const input = parseInput(TransferOwnershipSchema, request.data);
+  const isSuperAdmin = request.auth.token.isSuperAdmin === true;
+
+  if (!isSuperAdmin) {
+    const callerMemSnap = await db.collection("memberships").doc(`${request.auth.uid}_${input.organizationId}`).get();
+    if (
+      !callerMemSnap.exists ||
+      callerMemSnap.data()?.roleId !== OWNER_ROLE_ID ||
+      callerMemSnap.data()?.status !== EntityStatus.ACTIVE
+    ) {
+      throw new HttpsError("permission-denied", "Only Super Admin or the current Organization Owner can transfer ownership.");
+    }
+  }
+
+  const orgRef = db.collection("organizations").doc(input.organizationId);
+
+  const transferResult = await db.runTransaction(async (txn) => {
+    const orgSnap = await txn.get(orgRef);
+    if (!orgSnap.exists) {
+      throw new HttpsError("not-found", `Organization "${input.organizationId}" not found.`);
+    }
+    const orgData = orgSnap.data() as OrganizationDoc;
+    const currentOwnerId = orgData.ownerUserId;
+
+    if (currentOwnerId === input.newOwnerUserId) {
+      throw new HttpsError("failed-precondition", "Target user is already the owner of this organization.");
+    }
+
+    const newMemRef = db.collection("memberships").doc(`${input.newOwnerUserId}_${input.organizationId}`);
+    const newMemSnap = await txn.get(newMemRef);
+    if (!newMemSnap.exists || newMemSnap.data()?.status !== EntityStatus.ACTIVE) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Target user must be an active member of this organization before being promoted to owner."
+      );
+    }
+
+    const now = new Date().toISOString();
+
+    if (currentOwnerId) {
+      const prevMemRef = db.collection("memberships").doc(`${currentOwnerId}_${input.organizationId}`);
+      const prevMemSnap = await txn.get(prevMemRef);
+      if (prevMemSnap.exists) {
+        if (input.previousOwnerAction === "demote_to_admin") {
+          txn.update(prevMemRef, {
+            roleId: ADMIN_ROLE_ID,
+            updatedAt: now,
+            updatedBy: request.auth!.uid,
+          });
+        } else {
+          txn.update(prevMemRef, {
+            status: EntityStatus.INACTIVE,
+            updatedAt: now,
+            updatedBy: request.auth!.uid,
+          });
+        }
+      }
+    }
+
+    txn.update(newMemRef, {
+      roleId: OWNER_ROLE_ID,
+      status: EntityStatus.ACTIVE,
+      updatedAt: now,
+      updatedBy: request.auth!.uid,
+    });
+
+    txn.update(orgRef, {
+      ownerUserId: input.newOwnerUserId,
+      ownerStatus: "active",
+      updatedAt: now,
+      updatedBy: request.auth!.uid,
+    });
+
+    return {
+      previousOwnerUserId: currentOwnerId || null,
+      newOwnerUserId: input.newOwnerUserId,
+    };
+  });
+
+
+  return {
+    success: true,
+    organizationId: input.organizationId,
+    newOwnerUserId: input.newOwnerUserId,
+    previousOwnerUserId: transferResult.previousOwnerUserId,
+    previousOwnerAction: input.previousOwnerAction,
+    message: "Organization ownership transferred successfully.",
   };
 });

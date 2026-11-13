@@ -224,18 +224,7 @@ Total Concrete Collections & Subcollections: **44** (42 Root Collections + 2 Sub
 
 ### 13. `auditlog` (`AuditLogDoc`)
 
-| Field Name | Type | Optional | Classification | Description / Justification |
-|---|---|:---:|---|---|
-| `organizationId` | `string \| null` | Yes | **identity** | Tenant ID or "platform" |
-| `branchId` | `string \| null` | Yes | **reference-by-ID** | Foreign key reference by bare ID to related entity |
-| `actorUid` | `string` | No | **owned attribute/state** | Direct entity state attribute |
-| `actorMembershipId` | `string \| null` | Yes | **reference-by-ID** | Foreign key reference by bare ID to related entity |
-| `action` | `string` | No | **owned attribute/state** | Direct entity state attribute |
-| `entityType` | `string` | No | **owned attribute/state** | Direct entity state attribute |
-| `entityId` | `string` | No | **reference-by-ID** | Foreign key reference by bare ID to related entity |
-| `timestamp` | `string` | No | **owned attribute/state** | Direct entity state attribute |
-| `requestId` | `string` | Yes | **reference-by-ID** | Foreign key reference by bare ID to related entity |
-| `details` | `Record<string, unknown>` | Yes | **owned attribute/state** | Direct entity state attribute |
+`auditLogs/{requestId}_{seq}`, written only by `services/auditRecorder.ts`: mutation events in the same commit as the mutation, denied / failed / export / auth / file events at the end of the request. Field-level detail is generated in [entity-fields.md](reference/entity-fields.md); what is recorded, redacted and retained is in [the audit guide](guides/audit-trail.md). `occurredAt` and `expireAt` are Firestore Timestamps (TTL).
 
 ### 14. `device` (`DeviceDoc` — Subcollection at `users/{uid}/devices/{deviceId}`)
 
@@ -332,7 +321,7 @@ Total Concrete Collections & Subcollections: **44** (42 Root Collections + 2 Sub
 | `name` | `string` | No | **owned attribute/state** | Direct entity state attribute |
 | `mobile` | `string \| null` | Yes | **owned attribute/state** | Direct entity state attribute |
 | `email` | `string \| null` | Yes | **owned attribute/state** | Direct entity state attribute |
-| `taxNumber` | `string \| null` | Yes | **owned attribute/state** | GSTIN / VAT registration |
+| `taxId` | `string \| null` | Yes | **owned attribute/state** | GSTIN / VAT registration |
 | `billingAddress` | `string \| null` | Yes | **owned attribute/state** | Direct entity state attribute |
 | `shippingAddress` | `string \| null` | Yes | **owned attribute/state** | Direct entity state attribute |
 | `priceGroup` | `string` | Yes | **owned attribute/state** | "retail", "wholesale", "distributor" |
@@ -357,7 +346,7 @@ Total Concrete Collections & Subcollections: **44** (42 Root Collections + 2 Sub
 | `name` | `string` | No | **owned attribute/state** | Direct entity state attribute |
 | `mobile` | `string \| null` | Yes | **owned attribute/state** | Direct entity state attribute |
 | `email` | `string \| null` | Yes | **owned attribute/state** | Direct entity state attribute |
-| `taxNumber` | `string \| null` | Yes | **owned attribute/state** | GSTIN / TRN |
+| `taxId` | `string \| null` | Yes | **owned attribute/state** | GSTIN / TRN |
 | `address` | `string \| null` | Yes | **owned attribute/state** | Direct entity state attribute |
 | `contactPerson` | `string \| null` | Yes | **owned attribute/state** | Direct entity state attribute |
 | `paymentTermsDays` | `number` | Yes | **owned attribute/state** | Direct entity state attribute |
@@ -688,87 +677,18 @@ Total Concrete Collections & Subcollections: **44** (42 Root Collections + 2 Sub
 | `updatedAt` | `string` | No | **system-audit metadata** | System lifecycle timestamp or actor metadata |
 | `updatedBy` | `string` | Yes | **system-audit metadata** | System lifecycle timestamp or actor metadata |
 
-### 38. `organizationusagedaily` (`OrganizationUsageDailyDoc`)
+### 38–43. Usage and cost (prompt 66)
 
-| Field Name | Type | Optional | Classification | Description / Justification |
-|---|---|:---:|---|---|
-| `organizationId` | `string` | No | **identity** | Primary identity / tenant partition key |
-| `date` | `string` | No | **owned attribute/state** | YYYY-MM-DD |
-| `counts` | `ServiceUsageCounts` | No | **owned attribute/state** | Direct entity state attribute |
-| `estimatedCost` | `number` | No | **owned attribute/state** | Direct entity state attribute |
-| `currency` | `string` | No | **stable-code** | Standardized or system-wide immutable lookup code |
-| `rateCardVersion` | `string` | No | **stable-code** | Standardized or system-wide immutable lookup code |
-| `completenessPercent` | `number` | No | **owned attribute/state** | Indicates confidence/coverage (e.g., 90) |
-| `measurementClass` | `MeasurementClass` | No | **stable-code** | Standardized or system-wide immutable lookup code |
-| `updatedAt` | `string` | No | **system-audit metadata** | System lifecycle timestamp or actor metadata |
+Field-level detail is generated from the document types in [entity-fields.md](reference/entity-fields.md); the design is in [the cost-tracking guide](guides/cost-tracking.md).
 
-### 39. `branchusagedaily` (`BranchUsageDailyDoc`)
+| Collection | Type | Written by | Holds |
+|---|---|---|---|
+| `organizationUsageDaily/{organizationId}_{utcDate}` | `OrganizationUsageDailyDoc` | `services/requestRecorder.ts` (cost rollup) and `usageRecordClientMetric` (`clientReported` only) | organization × day quantities measured by the counting layer; `platform_{utcDate}` holds platform work with `targets` per organization; no cost (D-22) |
+| `userUsageDaily/{organizationId}_{uid}_{utcDate}` | `UserUsageDailyDoc` | `services/requestRecorder.ts` | organization × user × day quantities and devices |
+| `organizationUsageMonthly`, `branchUsageDaily`, `branchUsageMonthly` | `OrganizationUsageMonthlyDoc`, `BranchUsageDailyDoc`, `BranchUsageMonthlyDoc` | `usageRecordClientMetric` | client-reported numbers only (`clientReported`), untrusted |
+| `usageRateCards/{version}` | `UsageRateCardDoc` | Super Admin | versioned prices with their verification state ([rate card](reference/rate-card.md)) |
 
-| Field Name | Type | Optional | Classification | Description / Justification |
-|---|---|:---:|---|---|
-| `organizationId` | `string` | No | **identity** | Primary identity / tenant partition key |
-| `branchId` | `string` | No | **reference-by-ID** | Foreign key reference by bare ID to related entity |
-| `date` | `string` | No | **owned attribute/state** | YYYY-MM-DD |
-| `counts` | `ServiceUsageCounts` | No | **owned attribute/state** | Direct entity state attribute |
-| `estimatedCost` | `number` | No | **owned attribute/state** | Direct entity state attribute |
-| `currency` | `string` | No | **stable-code** | Standardized or system-wide immutable lookup code |
-| `rateCardVersion` | `string` | No | **stable-code** | Standardized or system-wide immutable lookup code |
-| `completenessPercent` | `number` | No | **owned attribute/state** | Direct entity state attribute |
-| `measurementClass` | `MeasurementClass` | No | **stable-code** | Standardized or system-wide immutable lookup code |
-| `updatedAt` | `string` | No | **system-audit metadata** | System lifecycle timestamp or actor metadata |
-
-### 40. `platformusagesnapshot` (`PlatformUsageSnapshotDoc`)
-
-| Field Name | Type | Optional | Classification | Description / Justification |
-|---|---|:---:|---|---|
-| `date` | `string` | No | **owned attribute/state** | YYYY-MM-DD |
-| `source` | `"cloud_monitoring" \| "emulator_mock" \| "app_aggregation"` | No | **owned attribute/state** | Direct entity state attribute |
-| `platformTotals` | `ServiceUsageCounts` | No | **owned attribute/state** | Direct entity state attribute |
-| `platformActualCost` | `number` | Yes | **owned attribute/state** | Direct entity state attribute |
-| `currency` | `string` | No | **stable-code** | Standardized or system-wide immutable lookup code |
-| `asOf` | `string` | No | **owned attribute/state** | Direct entity state attribute |
-
-### 41. `usageratecard` (`UsageRateCardDoc`)
-
-| Field Name | Type | Optional | Classification | Description / Justification |
-|---|---|:---:|---|---|
-| `version` | `string` | No | **identity** | Primary identity / tenant partition key |
-| `effectiveDate` | `string` | No | **owned attribute/state** | Direct entity state attribute |
-| `currency` | `string` | No | **stable-code** | Standardized or system-wide immutable lookup code |
-| `rates` | `{` | No | **owned attribute/state** | Direct entity state attribute |
-| `firestoreReadPer100k` | `number` | No | **owned attribute/state** | Direct entity state attribute |
-| `firestoreWritePer100k` | `number` | No | **owned attribute/state** | Direct entity state attribute |
-| `firestoreDeletePer100k` | `number` | No | **owned attribute/state** | Direct entity state attribute |
-| `functionsInvocationPerMillion` | `number` | No | **owned attribute/state** | Direct entity state attribute |
-| `functionsComputeGbSecond` | `number` | No | **owned attribute/state** | Direct entity state attribute |
-| `storageGbMonth` | `number` | No | **owned attribute/state** | Direct entity state attribute |
-| `fcmPerThousand` | `number` | No | **owned attribute/state** | Direct entity state attribute |
-| `locationPingPer100k` | `number` | No | **owned attribute/state** | Direct entity state attribute |
-
-### 42. `usageallocationrun` (`UsageAllocationRunDoc`)
-
-| Field Name | Type | Optional | Classification | Description / Justification |
-|---|---|:---:|---|---|
-| `runId` | `string` | No | **identity** | Primary identity / tenant partition key |
-| `billingPeriod` | `string` | No | **owned attribute/state** | YYYY-MM |
-| `rateCardVersion` | `string` | No | **stable-code** | Standardized or system-wide immutable lookup code |
-| `totalPlatformCost` | `number` | No | **derived value** | Computed financial or inventory running balance / summary |
-| `allocatedTenantCost` | `number` | No | **derived value** | Computed financial or inventory running balance / summary |
-| `unallocatedPlatformOverhead` | `number` | No | **derived value** | Computed financial or inventory running balance / summary |
-| `currency` | `string` | No | **stable-code** | Standardized or system-wide immutable lookup code |
-| `status` | `"draft_estimate" \| "audited"` | No | **owned attribute/state** | Direct entity state attribute |
-| `createdAt` | `string` | No | **system-audit metadata** | System lifecycle timestamp or actor metadata |
-| `createdBy` | `string` | No | **system-audit metadata** | System lifecycle timestamp or actor metadata |
-
-### 43. `branchusagemonthly` (`BranchUsageMonthlyDoc`)
-
-| Field Name | Type | Optional | Classification | Description / Justification |
-|---|---|:---:|---|---|
-| `organizationId` | `string` | No | **identity** | Primary identity / tenant partition key |
-| `branchId` | `string` | No | **reference-by-ID** | Foreign key reference to operating branch |
-| `yearMonth` | `string` | No | **owned attribute/state** | Billing/metering period in YYYY-MM format |
-| `counts` | `ServiceUsageCounts` | No | **derived value** | Aggregated atomic usage counts across all platform services |
-| `updatedAt` | `string` | No | **system-audit metadata** | ISO 8601 timestamp of last usage update |
+Rules: no client access. Retention: `expireAt` on the rollups (TTL policy is a cloud setting).
 
 ### 44. `barcodeLocks` (`BarcodeLockDoc`)
 
@@ -792,7 +712,7 @@ Doc id `{organizationId}_{vendorId}_{invoiceNumber lower-case}`. Fields: `organi
 
 | Collection | New fields |
 |---|---|
-| `organizations` | `subscriptionStatus`, `subscriptionStartsAt`, `subscriptionExpiresAt` (end of day in `timezone`), `graceDays`, `timezone`, `salesChannels[]`, `activeEmployeeCount`, `displayName`, `taxNumber`, `website`, `contactEmail`, `contactPhone`, `address`, `imageUrls[]`, `bankDetails{accountName,bankName,accountNumber,ifsc,upiId}`, `settings.approvals`, `updatedBy` |
+| `organizations` | `subscriptionStatus`, `subscriptionStartsAt`, `subscriptionExpiresAt` (end of day in `timezone`), `graceDays`, `timezone`, `salesChannels[]`, `activeEmployeeCount`, `displayName`, `taxId`, `website`, `contact`, `contacts`, `addresses`, `image`, `bankAccounts`, `settings.approvals`, `updatedBy` |
 | `memberships` | `dataScopes{module: self|team|branch|organization}`, `updatedBy` |
 | `teams` | `description`, `leaderMembershipId`, `isActive`, `updatedBy` |
 | `products` | `brand`, `alternateUnits[{unit,factor,sellingPrice,wholesalePrice,barcode,isPurchaseUnit,isSaleUnit}]`, `maxDiscountPercent`, `isReturnable`, `returnWindowDays`, `reorderLevel`, `maxStockLevel`, `weight`, `dimensions`, `size`, `imagePaths[]`, `warrantyMonths`, `jewellery{grossWeightGrams,netWeightGrams,purity,makingCharge,makingChargeType,hallmarkId,priceByDailyRate}`, `variantGroupId`, `variantAttributes`, `visibilityScope`, `sharedForBranchIds`, `ownerBranchId`, `updatedBy` |
@@ -803,7 +723,7 @@ Doc id `{organizationId}_{vendorId}_{invoiceNumber lower-case}`. Fields: `organi
 | `payments` | `gateway{externalReference,gatewayProvider,gatewayStatus,cardBrand,cardLast4}` (never card numbers); `partyType` adds `employee`, `other` |
 | `deliveries` | `deliveredAt`, `updatedBy` |
 | `returns` | `createdByMembershipId` |
-| `auditLogs` | `changes[{field,from,to}]`, `changedFields[]` (per-entity change history) |
+| `auditLogs` | unified event (prompt 66): `occurredAt`, `actor`, `source`, `device`, `category`, `outcome`, `targets`, `changes{fields[{path,op,before,after}]}`, `changedFields[]` |
 
 ## Whole-System Schema Matrix (2026-11-07)
 
@@ -931,8 +851,7 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 
 | ID | Kind | Collection | Field | Reason | Single writer | Reconcile / cap |
 |---|---|---|---|---|---|---|
-| DUP-020 | R3 | `auditLogs` | `changedFields` | Field names of `changes`, stored for array-contains queries (price history). Bounded by the entity's field count. | `buildLogDoc` | reconcile:auditChangedFields |
-| DUP-058 | BOUNDED_ARRAY | `auditLogs` | `changes` | Changed fields of one write (field, from, to); bounded by the entity's field count, written only by buildLogDoc. | `buildLogDoc` | cap 100 |
+| DUP-020 | R3 | `auditLogs` | `changedFields` | Top-level field names of the event's changes, stored for array-contains queries. Bounded by the entity's field count; written only by the audit recorder. | `recordCommitEvent` | reconcile:auditChangedFields |
 | DUP-028 | R3 | `bills` | `balanceAmount` | totalAmount − paidAmount, stored so statements and receivables can query open documents. | `paymentsCreate` | reconcile:documentPayments |
 | DUP-017 | R2 | `bills` | `billToSnapshot` | GST Rule 46 (CGST Rules 2017): a tax invoice must show the recipient's name, address and GSTIN as at issue. Frozen only on finalized invoices of a registered customer; for walk-in sales it is the typed counter data (no customer record exists). | `billToFromCustomer` | — |
 | DUP-002 | R2 | `bills` | `discountTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
@@ -947,6 +866,9 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-003 | R2 | `bills` | `taxTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
 | DUP-004 | R2 | `bills` | `totalAmount` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
 | DUP-064 | BOUNDED_ARRAY | `customers` | `additionalPhones` | Structured additional phone numbers list capped at 5 by Zod input, keeping the document far below the 1 MiB limit. | — | cap 5 |
+| DUP-068 | BOUNDED_ARRAY | `customers` | `addresses` | Customer delivery/billing addresses array capped at 20 by AddressArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
+| DUP-070 | BOUNDED_ARRAY | `customers` | `bankAccounts` | Customer bank accounts array capped at 10 by BankAccountArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
+| DUP-072 | BOUNDED_ARRAY | `customers` | `contacts` | Structured contact persons list capped at 20 by ContactPersonArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
 | DUP-023 | R3 | `customers` | `outstandingBalance` | Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns. | `reconcilePartyBalances` | reconcile:partyBalances |
 | DUP-050 | BOUNDED_ARRAY | `customers` | `sharedForBranchIds` | Owned list capped at 100 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 100 |
 | DUP-024 | R3 | `customers` | `totalSpend` | Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns. | `reconcilePartyBalances` | reconcile:partyBalances |
@@ -955,9 +877,10 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-041 | BOUNDED_ARRAY | `memberships` | `jobRoleIds` | Owned list capped at 20 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
 | DUP-042 | BOUNDED_ARRAY | `memberships` | `reportingToIds` | Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
 | DUP-019 | R3 | `organizations` | `activeEmployeeCount` | Transactional seat counter so concurrent employee creation cannot exceed the plan (a count query cannot be locked). | `assertSeatAvailable` | reconcile:activeEmployeeCount |
+| DUP-066 | BOUNDED_ARRAY | `organizations` | `addresses` | Structured addresses array capped at 20 by AddressArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
+| DUP-067 | BOUNDED_ARRAY | `organizations` | `bankAccounts` | Settlement bank accounts array capped at 10 by BankAccountArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
 | DUP-018 | R3 | `organizations` | `branchCount` | Plan branchLimit check inside the branch-create transaction (counting branches there would need a collection read per create). | `branchesCreate` | reconcile:branchCount |
 | DUP-063 | BOUNDED_ARRAY | `organizations` | `contacts` | Structured contact persons list capped at 20 by Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
-| DUP-044 | BOUNDED_ARRAY | `organizations` | `imageUrls` | Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
 | DUP-043 | BOUNDED_ARRAY | `organizations` | `salesChannels` | Owned list capped at 4 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 4 |
 | DUP-059 | BOUNDED_ARRAY | `organizations` | `settings.businessConfig.defaultUnits` | Owned list of default unit codes capped at 20 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
 | DUP-052 | BOUNDED_ARRAY | `outflows` | `attachmentPaths` | Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
@@ -991,6 +914,9 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-036 | R3 | `stockBalances` | `currentStock` | SUM(stockMovements.quantity) per (organization, branch, product); read on every sale for the negative-stock rule. For serial-tracked products it also equals the units in hand in serials/ (reconcile:serialStock). | `commitStockChangesInTxn` | reconcile:stockBalances |
 | DUP-038 | R4 | `stockMovements` | `balanceAfter` | Running branch balance at the moment of the movement: an immutable audit fact of the stock ledger (the movement is the source of truth for itself). | — | — |
 | DUP-065 | BOUNDED_ARRAY | `vendors` | `additionalPhones` | Structured additional phone numbers list capped at 5 by Zod input, keeping the document far below the 1 MiB limit. | — | cap 5 |
+| DUP-069 | BOUNDED_ARRAY | `vendors` | `addresses` | Vendor pickup/office addresses array capped at 20 by AddressArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
+| DUP-071 | BOUNDED_ARRAY | `vendors` | `bankAccounts` | Vendor settlement bank accounts array capped at 10 by BankAccountArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
+| DUP-073 | BOUNDED_ARRAY | `vendors` | `contacts` | Structured contact persons list capped at 20 by ContactPersonArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
 | DUP-025 | R3 | `vendors` | `outstandingPayable` | Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns. | `reconcilePartyBalances` | reconcile:partyBalances |
 | DUP-051 | BOUNDED_ARRAY | `vendors` | `sharedForBranchIds` | Owned list capped at 100 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 100 |
 | DUP-026 | R3 | `vendors` | `totalPurchase` | Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns. | `reconcilePartyBalances` | reconcile:partyBalances |

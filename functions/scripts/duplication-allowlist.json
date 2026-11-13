@@ -164,8 +164,8 @@
       "collection": "auditLogs",
       "field": "changedFields",
       "owner": "auditLogs",
-      "reason": "Field names of `changes`, stored for array-contains queries (price history). Bounded by the entity's field count.",
-      "writerFunction": "buildLogDoc",
+      "reason": "Top-level field names of the event's changes, stored for array-contains queries. Bounded by the entity's field count; written only by the audit recorder.",
+      "writerFunction": "recordCommitEvent",
       "reconcileTest": "reconcile:auditChangedFields",
       "cap": 100,
       "serverWritten": true
@@ -394,15 +394,6 @@
       "cap": 4
     },
     {
-      "id": "DUP-044",
-      "kind": "BOUNDED_ARRAY",
-      "collection": "organizations",
-      "field": "imageUrls",
-      "owner": "organizations",
-      "reason": "Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit.",
-      "cap": 10
-    },
-    {
       "id": "DUP-045",
       "kind": "BOUNDED_ARRAY",
       "collection": "roles",
@@ -502,17 +493,6 @@
       "cap": 200
     },
     {
-      "id": "DUP-058",
-      "kind": "BOUNDED_ARRAY",
-      "collection": "auditLogs",
-      "field": "changes",
-      "owner": "auditLogs",
-      "reason": "Changed fields of one write (field, from, to); bounded by the entity's field count, written only by buildLogDoc.",
-      "cap": 100,
-      "serverWritten": true,
-      "writerFunction": "buildLogDoc"
-    },
-    {
       "id": "DUP-059",
       "kind": "BOUNDED_ARRAY",
       "collection": "organizations",
@@ -576,6 +556,78 @@
       "owner": "vendors",
       "reason": "Structured additional phone numbers list capped at 5 by Zod input, keeping the document far below the 1 MiB limit.",
       "cap": 5
+    },
+    {
+      "id": "DUP-066",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "organizations",
+      "field": "addresses",
+      "owner": "organizations",
+      "reason": "Structured addresses array capped at 20 by AddressArraySchema in Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 20
+    },
+    {
+      "id": "DUP-067",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "organizations",
+      "field": "bankAccounts",
+      "owner": "organizations",
+      "reason": "Settlement bank accounts array capped at 10 by BankAccountArraySchema in Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 10
+    },
+    {
+      "id": "DUP-068",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "customers",
+      "field": "addresses",
+      "owner": "customers",
+      "reason": "Customer delivery/billing addresses array capped at 20 by AddressArraySchema in Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 20
+    },
+    {
+      "id": "DUP-069",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "vendors",
+      "field": "addresses",
+      "owner": "vendors",
+      "reason": "Vendor pickup/office addresses array capped at 20 by AddressArraySchema in Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 20
+    },
+    {
+      "id": "DUP-070",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "customers",
+      "field": "bankAccounts",
+      "owner": "customers",
+      "reason": "Customer bank accounts array capped at 10 by BankAccountArraySchema in Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 10
+    },
+    {
+      "id": "DUP-071",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "vendors",
+      "field": "bankAccounts",
+      "owner": "vendors",
+      "reason": "Vendor settlement bank accounts array capped at 10 by BankAccountArraySchema in Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 10
+    },
+    {
+      "id": "DUP-072",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "customers",
+      "field": "contacts",
+      "owner": "customers",
+      "reason": "Structured contact persons list capped at 20 by ContactPersonArraySchema in Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 20
+    },
+    {
+      "id": "DUP-073",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "vendors",
+      "field": "contacts",
+      "owner": "vendors",
+      "reason": "Structured contact persons list capped at 20 by ContactPersonArraySchema in Zod input, keeping the document far below the 1 MiB limit.",
+      "cap": 20
     }
   ]
 }

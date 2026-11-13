@@ -5,7 +5,8 @@
  * - categoriesList: Tenant-scoped listing including system categories
  */
 
-import { onCall, HttpsError, type CallableRequest } from "firebase-functions/v2/https";
+import { HttpsError, type CallableRequest } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { commitWithKeys, changedClaims } from "../services/uniqueKeys.js";
 import { nameKey } from "../services/naturalKeys.js";
 import { resolveCatalogWriteAccess } from "../services/contextResolver.js";
@@ -19,7 +20,6 @@ import {
 import { parseInput } from "../validation/parseInput.js";
 import { CategoryDoc } from "../types/models.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
-import { createAuditLog } from "../services/audit.js";
 
 /** Global records: Super Admin; organization records: tenant gate with catalog permission. */
 function verifyTenantOrSuperAdmin(request: CallableRequest, organizationId?: string | null) {
@@ -41,7 +41,7 @@ export const categoriesCreate = onCall({ region: "asia-south1" }, async (request
     actorUid: request.auth.uid,
     operation: "categories.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
 
   if (idempotency.isDuplicate) {
@@ -89,14 +89,6 @@ export const categoriesCreate = onCall({ region: "asia-south1" }, async (request
       });
     }
 
-    await createAuditLog({
-      organizationId: input.organizationId,
-      actorUid: request.auth.uid,
-      action: "CATEGORY_CREATED",
-      entityType: "category",
-      entityId: categoryId,
-      details: { name: categoryDoc.name },
-    });
 
     return response;
   } catch (error) {
@@ -141,14 +133,6 @@ export const categoriesUpdate = onCall({ region: "asia-south1" }, async (request
     : { claim: [], release: [] };
   await commitWithKeys(existing.organizationId || "global", "category", input.categoryId, (batch) => batch.update(categoryRef, updates), nameChange);
 
-  await createAuditLog({
-    organizationId: existing.organizationId,
-    actorUid: request.auth.uid,
-    action: "CATEGORY_UPDATED",
-    entityType: "category",
-    entityId: input.categoryId,
-    details: updates as Record<string, unknown>,
-  });
 
   return { success: true, message: "Category updated successfully." };
 });

@@ -7,7 +7,8 @@
  * - Generates sequential return numbers: `RET-2026-000001`
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import {
   CreateReturnSchema,
@@ -38,7 +39,6 @@ import {
   commitStockChangesInTxn,
   StockChangeItem,
 } from "../services/stockEngine.js";
-import { createAuditLog } from "../services/audit.js";
 import { Money } from "../services/money.js";
 import { hydrate } from "../services/hydration.js";
 import { evaluateApproval, assertCanDecide } from "../services/approvals.js";
@@ -339,16 +339,6 @@ export async function executeReturn(
       };
     });
 
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: ctx.branchId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: approval ? "RETURN_APPROVED" : "RETURN_PROCESSED",
-    entityType: "return",
-    entityId: returnId,
-    details: { referenceId: input.referenceId, reason: approval?.reason || null },
-  });
   return finalResult;
 }
 
@@ -363,7 +353,6 @@ export async function decideReturn(ctx: RequestContext, input: DocumentDecisionI
   if (input.decision === "reject") {
     const now = new Date().toISOString();
     await ref.update({ status: "rejected", rejectedAt: now, rejectedBy: ctx.callerUid, approvalReason: input.reason || null, updatedAt: now, updatedBy: ctx.callerUid });
-    await createAuditLog({ organizationId: ctx.organizationId, branchId: ctx.branchId, actorUid: ctx.callerUid, actorMembershipId: ctx.membershipId, action: "RETURN_REJECTED", entityType: "return", entityId: snap.id, details: { reason: input.reason || null } });
     return { returnId: snap.id, status: "rejected" };
   }
   return executeReturn(ctx, {
@@ -386,7 +375,7 @@ export const returnsCreate = onCall({ region: "asia-south1" }, async (request) =
     actorUid: ctx.callerUid,
     operation: "returns.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
 
   if (idempotency.isDuplicate) {

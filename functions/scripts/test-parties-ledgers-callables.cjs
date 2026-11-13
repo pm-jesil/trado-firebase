@@ -49,6 +49,7 @@ async function run() {
     callFunction("customersCreate", {
       organizationId: orgId,
       name: "Sneha Patel",
+      phone: "+919876500123",
     }, unassigned.idToken),
     ["permission-denied"]
   );
@@ -57,10 +58,18 @@ async function run() {
   // Create customer
   const custPayload = buildCustomerPayload(orgId, {
     name: "Sneha Patel",
-    mobile: "+919876500123",
+    phone: "+919876500123",
     email: "sneha.patel@example.local",
-    billingAddress: "42 MG Road, Bengaluru",
-    shippingAddress: "42 MG Road, Bengaluru",
+    addresses: [
+      {
+        line1: "42 MG Road",
+        city: "Bengaluru",
+        state: "Karnataka",
+        postalCode: "560001",
+        country: "IN",
+        isDefaultBilling: true,
+      },
+    ],
     creditLimit: 50000,
     creditPeriodDays: 15,
   });
@@ -76,7 +85,7 @@ async function run() {
   const custUpdateRes = await callFunction("customersUpdate", {
     organizationId: orgId,
     customerId,
-    mobile: "+919876500999",
+    phone: "+919876500999",
     creditLimit: 75000,
   }, ownerToken);
   assert.ok(custUpdateRes.success, "customersUpdate must succeed");
@@ -88,7 +97,7 @@ async function run() {
     customerId,
   }, ownerToken);
   assert.equal(custGetRes.customerId, customerId);
-  assert.equal(custGetRes.mobile, "+919876500999");
+  assert.equal(custGetRes.phone, "+919876500999");
   assert.equal(custGetRes.creditLimit, 75000);
   console.log("✓ customersGet retrieved updated customer details");
 
@@ -123,6 +132,7 @@ async function run() {
     callFunction("vendorsCreate", {
       organizationId: orgId,
       name: "Sunrise Agro Foods",
+      phone: "+919811223344",
     }, unassigned.idToken),
     ["permission-denied"]
   );
@@ -131,10 +141,27 @@ async function run() {
   // Create vendor
   const vendPayload = buildVendorPayload(orgId, {
     name: "Sunrise Agro Foods",
-    mobile: "+919811223344",
+    phone: "+919811223344",
     email: "supply@sunriseagro.local",
-    contactPerson: "Rajesh Kumar",
-    address: "Warehouse 12, APMC Yard",
+    contacts: [
+      {
+        id: "cnt_rajesh_1",
+        name: "Rajesh Kumar",
+        phone: "+919811223344",
+        email: "supply@sunriseagro.local",
+        designation: "Sales Rep",
+      },
+    ],
+    addresses: [
+      {
+        line1: "Warehouse 12, APMC Yard",
+        city: "Bengaluru",
+        state: "Karnataka",
+        postalCode: "560022",
+        country: "IN",
+        isDefaultBilling: true,
+      },
+    ],
     paymentTermsDays: 30,
     creditLimit: 200000,
   });
@@ -150,11 +177,19 @@ async function run() {
   const vendUpdateRes = await callFunction("vendorsUpdate", {
     organizationId: orgId,
     vendorId,
-    contactPerson: "Rajesh Kumar (Senior Manager)",
+    contacts: [
+      {
+        id: "cnt_rajesh_1",
+        name: "Rajesh Kumar (Senior Manager)",
+        phone: "+919811223344",
+        email: "supply@sunriseagro.local",
+        designation: "Senior Manager",
+      },
+    ],
     creditLimit: 300000,
   }, ownerToken);
   assert.ok(vendUpdateRes.success, "vendorsUpdate must succeed");
-  console.log("✓ vendorsUpdate updated contactPerson and creditLimit");
+  console.log("✓ vendorsUpdate updated contacts and creditLimit");
 
   // Get vendor
   const vendGetRes = await callFunction("vendorsGet", {
@@ -162,7 +197,7 @@ async function run() {
     vendorId,
   }, ownerToken);
   assert.equal(vendGetRes.vendorId, vendorId);
-  assert.equal(vendGetRes.contactPerson, "Rajesh Kumar (Senior Manager)");
+  assert.equal(vendGetRes.contacts[0].name, "Rajesh Kumar (Senior Manager)");
   assert.equal(vendGetRes.creditLimit, 300000);
   console.log("✓ vendorsGet retrieved updated vendor details");
 

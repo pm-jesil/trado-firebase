@@ -1,5 +1,7 @@
 # Trado Firebase Backend: Test Architecture, Feature Coverage, Repository Hygiene & Verification Audit Report
 
+> Status: archived (2026-11-13). Point-in-time report of an earlier prompt; its counts and completeness statements are not current and are not evidence. Current, computed figures: [coverage.md](coverage.md) and the verification run records under .local/verification-runs.
+
 **Audit Date**: October 2026  
 **Workspace**: `C:\Users\jesil.p\Project\FireBase\trado-firebase`  
 **Firebase Project ID**: `trado-x` (Cloud Functions Region: `asia-south1`, Cloud Firestore Region: `asia-south1`)  

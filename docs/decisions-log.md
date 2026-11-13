@@ -97,7 +97,7 @@ This document records the foundational product and technical architecture decisi
 ## Decision 9: Usage Metering — Internal Diagnostic Telemetry (Never Automated Billing)
 
 - **Date**: Confirmed Final Architecture
-- **Decision**: Usage metering (`usageRecordMetric`, `usageCalculateDryRunStatement`) is strictly an internal diagnostic telemetry system for Super Admins to monitor tenant resource consumption.
+- **Decision**: Usage metering (`usageRecordClientMetric`, `usageCalculateDryRunStatement`) is strictly an internal diagnostic telemetry system for Super Admins to monitor tenant resource consumption.
 - **Legal Guarantee**: Generated dry-run usage statements are non-binding diagnostic estimates of infrastructure utilization. Every generated statement includes an explicit legal disclaimer confirming it is NOT an invoice and no automated charge has occurred.
 
 ---
@@ -170,3 +170,65 @@ Decisions D-01 … D-12 (usage enforcement, starter plan contents, strictness bo
   - **Platform-Wide Financial Aggregation**: `reportsGetPlatformOverview` aggregates revenue, outflows, and net cash flow across active organizations while strictly querying with `where("organizationId", "==", orgId)` per organization, preserving tenant query conformance.
   - **Audit Trail Stream Querying**: `EntityHistorySchema` expands `entityType` enum to cover all 18 business entity types, with optional `entityId` and optional `entityType` allowing callers to query full-stream activity logs for an organization.
   - **Strict Super Admin Platform Boundary**: Platform Super Admin is strictly isolated from executing tenant mutations directly through tenant callables (retaining `SUPER_ADMIN_TENANT_FORBIDDEN` invariant verified across all gated mutations). All tenant mutations must be executed within tenant user context.
+
+## Decision 15 (open, owner decision required): how an image display URL is produced (prompt 65, Y-10)
+
+**Status:** open. Recorded 2026-11-13. Not implemented: it changes the stored `ImageRef` and the image read path.
+
+**What the code does today.** `hydrateImageUrl()` in `functions/src/services/imageEngine.ts` (the single hydration function since `organizations.ts` stopped returning a literal `computed:<path>` string) returns `https://storage.googleapis.com/<bucket>/<path>` in the cloud and an emulator `?alt=media` URL locally. No URL is signed and none carries a token. Nothing was "pre-signed"; the earlier CORS note was wrong.
+
+**Why that is not finished.** A `storage.googleapis.com/<bucket>/<path>` URL is served only if the object is publicly readable (IAM `allUsers: objectViewer`). Public objects are not protected by `storage.rules` (the rules allow reads to authenticated users only), so user photos and organization logos would be readable by anyone who has or guesses the path. Without public IAM, every URL returned today is a 403 in the cloud. The emulator does not show this.
+
+| Option | Lifetime | Who produces it | Cache behaviour | Notes |
+|---|---|---|---|---|
+| A. Signed read URL (`getSignedUrl`, V4) | at most 7 days; proposal 1 hour | `hydrateImageUrl` per response | URL changes on every read, so client image caches miss unless they key on `image.path` | needs `iam.serviceAccounts.signBlob` on the runtime service account; one signing call per image per response |
+| B. Firebase download token (`firebaseStorageDownloadTokens` metadata) | until the token is rotated | token created by `attachUploadedImage`, URL built by `hydrateImageUrl` | stable URL, caches well; revoke by rotating the token | stores `downloadToken` in `ImageRef`; anyone holding the URL can read until rotation |
+| C. Public objects | permanent | `hydrateImageUrl` (today's code) | best | no access control; not acceptable for user photos |
+
+**Recommendation:** B for organization logos and product images (stable, cacheable, low cost), A for user and employee photos (personal data). Either way `hydrateImageUrl` stays the only producer.
+
+**CORS:** the Flutter mobile app is not subject to CORS. A web client needs bucket CORS only if it reads image bytes with `fetch`/XHR (an `<img>` tag does not); then allow `GET` and `HEAD` from the web app's origins only. Uploads use the tmp upload session through the Firebase SDK, not a cross-origin PUT. CORS stays on the cloud checklist as "only if a web client fetches image bytes".
+
+## Decision 16: idempotency compares the client's request; a password is never cached
+
+- **Date**: 2026-11-13 (prompt 65, found by the idempotent-replay proof of the round-trip test)
+- **Context**: a replay of a create with the same key and the same payload must return the first result. Four defects stopped that:
+  - `reserveIdempotency` hashed the *parsed* input. Parsing gives addresses and bank accounts a random `id`, so two identical requests never hashed alike, and every retry of a create with an address was refused as `IDEMPOTENCY_CONFLICT`.
+  - `branchesCreate` reserved a key and never finalized it. A retry got "creation in progress" for 30 seconds, and after that created a second branch.
+  - `imagesCreateUploadSession` and `tasksCreate` stored the status `"COMPLETED"`, which is not an `IdempotencyStatus`. A replay ran the create again.
+  - `organizationsCreate` cached its whole response, including the new Owner's `temporaryPassword`, in `idempotencyRecords` for 24 hours.
+- **Decision**:
+  - Every `reserveIdempotency` call passes `payload: request.data`, which is what the client sent (`IdempotencyConfig.payload` documents this).
+  - Outside a transaction, success is recorded only through `finalizeIdempotencySuccess` (status `succeeded`, plus `updatedAt`). Creates that finalize inside their own transaction keep doing so, with `"succeeded"`.
+  - `organizationsCreate` caches its response without `temporaryPassword`. A replay returns the same organization without the password; the client received it with the first response.
+- **Client contract**: unchanged. The image family keeps `clientRequestId` as its key name. Renaming it to `idempotencyKey` would change the Flutter contract, which is not needed for correctness.
+- **Proof**: `functions/scripts/helpers/persistence-recorder.cjs` replays every create sent with a key and asserts the same result. Null and absent are treated as equal, since the callable protocol sends `undefined` as null. Coverage Engine C-10 counts these replays.
+
+## Decision 17: date fields accept dates only
+
+- **Date**: 2026-11-13 (prompt 65, found by the data checks on generated maximal payloads)
+- **Context**: four request fields stored any string. `organizationsCreate` `subscription.startsAt` (documented as an ISO instant), organization `contacts[].createdAt` / `updatedAt`, and outflow / recurring-expense line `expiryDate` accepted text such as `"startsat-pr"`. A recurring expense also accepted an `endOn` before its `startOn`.
+- **Decision**: instants are validated with `z.string().trim().datetime({ offset: true })` (the pattern used by `dueAt`); `expiryDate` is `YYYY-MM-DD`; `CreateRecurringExpenseSchema` rejects `endOn < startOn` at `endOn`.
+- **Open (owner decision)**: organization contacts accept client-supplied `createdAt`, `updatedAt`, `createdBy` and `updatedBy`. Stamping them on the server would remove them from the request contract, so that change is not made here.
+
+## Decision 18: one request context, one counting layer, one audit recording point (prompt 66)
+
+- **Date**: 2026-11-13. Facts first: [metering-audit-inventory.md](audit/metering-audit-inventory.md) (P-1…P-12, generated) and its design table DD-1…DD-9.
+- **Decision**:
+  - Every callable imports `onCall` from `functions/src/services/callable.ts`. It removes `_meta` before the handler's schema and opens the request context (AsyncLocalStorage). The gate adds the organization, membership, role and branch it already resolved, with no extra read. Triggers and the sweep open a system context.
+  - Every Firestore operation goes through the single `db` of `services/firebase.ts`, a counting proxy (`services/meteredFirestore.ts`). An independent shadow counter (emulator only) checks it on every request.
+  - Rollups `organizationUsageDaily` (reused) and `userUsageDaily` (new) hold quantities; cost is derived when read (`services/usageReport.ts`, D-22).
+  - `auditLogs` events are written by `services/auditRecorder.ts`, in the same commit as the mutation; the 69 handler audit calls were removed.
+- **Deviations from the prompt, with the reason**:
+  - `changeHistory` never existed, so there was nothing to merge (D-24 holds already). `auditGetEntityHistory` is kept as a thin call to the same query as `auditLogsList`, because the Flutter app calls it.
+  - Before-values come from documents the request already read anywhere in the request, not only in its transaction. Still no extra read.
+  - Rollups keep the hour of day as a 24-key map (`hourly."00".."23"`), not an array: Firestore cannot increment array elements.
+  - `firstSeenAt` is derived from the hourly map instead of being stored: Firestore has no "minimum" transform without a read.
+  - `audit:view` stays the organization read permission; `audit:read_own` was added; `audit:export` was not added, because no audit export callable exists.
+  - Reconciliation: the logic is here and tested on fixture export rows: the pure comparison, the BigQuery query template and the `platformCostReconciliation/{yyyyMMdd}` line schema (`services/costReconciliation.ts`). Running it needs the billing export, which is cloud-only (checklist items 1, 16, 17). No script runs it and nothing is scheduled.
+- **Owner decisions left open**:
+  - a per-instance cache of the gate's membership read (saves reads; delays revocation);
+  - `REQUIRE_META` after the app ships `_meta`;
+  - `showCostToTenant` per organization;
+  - verifying the rate card (0 prices verified);
+  - client-supplied audit fields on organization contacts (Decision 17).

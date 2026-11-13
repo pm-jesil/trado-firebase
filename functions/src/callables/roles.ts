@@ -5,7 +5,8 @@
  * - rolesList: List available roles (system roles + tenant custom roles).
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import {
   CreateRoleSchema,
@@ -14,7 +15,7 @@ import {
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
 import { RoleDoc, MembershipDoc } from "../types/models.js";
-import { createAuditLog } from "../services/audit.js";
+import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 
 export const rolesCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
@@ -44,30 +45,46 @@ export const rolesCreate = onCall({ region: "asia-south1" }, async (request) => 
     }
   }
 
-  const roleRef = db.collection("roles").doc();
-  const roleDoc: RoleDoc = {
-    organizationId: input.organizationId || null,
-    name: input.name,
-    code: input.code,
-    permissions: input.permissions,
-    isSystem: !input.organizationId,
-    description: input.description,
-    createdAt: new Date().toISOString(),
-    createdBy: request.auth.uid,
-  };
-
-  await roleRef.set(roleDoc);
-
-  await createAuditLog({
-    organizationId: input.organizationId,
+  const idempotency = await reserveIdempotency({
+    scope: input.organizationId || "platform",
     actorUid: request.auth.uid,
-    action: "ROLE_CREATED",
-    entityType: "role",
-    entityId: roleRef.id,
-    details: { code: input.code, name: input.name },
+    operation: "roles.create",
+    clientKey: input.idempotencyKey,
+    payload: request.data,
   });
 
-  return { roleId: roleRef.id, ...roleDoc };
+  if (idempotency.isDuplicate) {
+    if (idempotency.isProcessing) {
+      throw new HttpsError("already-exists", "Operation in progress. Please retry shortly.");
+    }
+    return idempotency.cachedResult;
+  }
+
+  try {
+    const roleRef = db.collection("roles").doc();
+    const roleDoc: RoleDoc = {
+      organizationId: input.organizationId || null,
+      name: input.name,
+      code: input.code,
+      permissions: input.permissions,
+      isSystem: !input.organizationId,
+      description: input.description,
+      createdAt: new Date().toISOString(),
+      createdBy: request.auth.uid,
+    };
+
+    await roleRef.set(roleDoc);
+
+
+    const result = { roleId: roleRef.id, ...roleDoc };
+
+    await finalizeIdempotencySuccess(idempotency.recordId, result);
+
+    return result;
+  } catch (err) {
+    await finalizeIdempotencyFailure(idempotency.recordId, "CREATE_ROLE_FAILED", (err as Error).message);
+    throw err;
+  }
 });
 
 export const rolesUpdate = onCall({ region: "asia-south1" }, async (request) => {
@@ -116,14 +133,6 @@ export const rolesUpdate = onCall({ region: "asia-south1" }, async (request) => 
 
   await roleRef.update(updates);
 
-  await createAuditLog({
-    organizationId: roleData.organizationId,
-    actorUid: request.auth.uid,
-    action: "ROLE_UPDATED",
-    entityType: "role",
-    entityId: input.roleId,
-    details: updates as Record<string, unknown>,
-  });
 
   return { success: true, message: "Role updated successfully." };
 });

@@ -13,12 +13,37 @@
  */
 
 /**
- * Round a number to N decimal places using commercial rounding.
+ * Round a number to N decimal places using standard commercial rounding (round half away from zero).
+ * Preserves the sign for negative values (-2.5 -> -3) and avoids IEEE 754 float drift via exponential notation.
+ * Safe against scientific notation strings (e.g. 1e-7), non-finite inputs, and negative zero.
  */
 export function roundTo(value: number, decimals: number): number {
   if (!Number.isFinite(value)) return 0;
-  const factor = Math.pow(10, decimals);
-  return Math.round((value + Number.EPSILON) * factor) / factor;
+  if (value === 0) return 0; // Guarantees +0, never -0
+
+  const d = Math.floor(Math.max(0, Math.min(20, decimals)));
+  const sign = value < 0 ? -1 : 1;
+  const abs = Math.abs(value);
+
+  // Parse mantissa and exponent separately to avoid string concatenation like "1e-7e2" -> NaN
+  const str = abs.toString().toLowerCase();
+  const [mantissa, expStr] = str.split("e");
+  const exp = expStr ? parseInt(expStr, 10) : 0;
+
+  // Shift decimal point by d places
+  const shiftedExp = exp + d;
+  const shifted = Number(mantissa + "e" + shiftedExp);
+  const rounded = Math.round(shifted);
+
+  // Unshift decimal point by d places
+  const roundedStr = rounded.toString().toLowerCase();
+  const [rMantissa, rExpStr] = roundedStr.split("e");
+  const rExp = rExpStr ? parseInt(rExpStr, 10) : 0;
+
+  const unshiftedExp = rExp - d;
+  const result = Number(rMantissa + "e" + unshiftedExp) * sign;
+
+  return result === 0 ? 0 : result;
 }
 
 /**
@@ -56,6 +81,13 @@ export function getCurrencyDecimals(currency: string = "INR"): number {
   if (threeDecimals.includes(c)) return 3;
   if (zeroDecimals.includes(c)) return 0;
   return 2;
+}
+
+/**
+ * Round an amount to the proper minor unit exponent of the currency.
+ */
+export function roundCurrency(value: number, currency: string = "INR"): number {
+  return roundTo(value, getCurrencyDecimals(currency));
 }
 
 export const Money = {

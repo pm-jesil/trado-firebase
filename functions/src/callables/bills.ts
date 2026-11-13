@@ -19,7 +19,8 @@
  *   draft / pending     → billsVoid → cancelled (reservation released)
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import type { Transaction } from "firebase-admin/firestore";
 import { db } from "../services/firebase.js";
 import {
@@ -29,6 +30,7 @@ import {
   FinalizeBillSchema,
   VoidDocumentSchema,
   GetBillSchema,
+  PreviewBillSchema,
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
 import type { DocumentDecisionInput } from "../validation/schemas.js";
@@ -41,6 +43,7 @@ import {
   PaymentDoc,
   CustomerDoc,
   ReturnDoc,
+  StockBalanceDoc,
 } from "../types/models.js";
 import {
   SalesMode,
@@ -68,7 +71,6 @@ import {
   resolveUnitConversion,
   StockChangeItem,
 } from "../services/stockEngine.js";
-import { createAuditLog, diffChanges } from "../services/audit.js";
 import {
   resolveRequestContext,
   resolveDataScope,
@@ -98,14 +100,22 @@ interface PricedBill {
   taxTotal: number;
   /** Product names whose line discount exceeds the product's maxDiscountPercent. */
   discountBreaches: string[];
+  /** Product names that are non-discountable but had a discount requested. */
+  nonDiscountableBreaches: string[];
   /** Lines of serial-tracked products with the serials given for them (registry is the store). */
   serialLines: SerialLine[];
 }
 
-async function priceBillLines(ctx: RequestContext, rawItems: BillInput["items"], currency: string): Promise<PricedBill> {
+async function priceBillLines(
+  ctx: RequestContext,
+  rawItems: BillInput["items"],
+  currency: string,
+  options?: { allowWarnings?: boolean }
+): Promise<PricedBill> {
   const snaps = await db.getAll(...rawItems.map((i) => db.collection("products").doc(i.productId)));
   const items: BillItem[] = [];
   const discountBreaches: string[] = [];
+  const nonDiscountableBreaches: string[] = [];
   const serialLines: SerialLine[] = [];
   let subTotal = 0;
   let taxTotal = 0;
@@ -135,10 +145,16 @@ async function priceBillLines(ctx: RequestContext, rawItems: BillInput["items"],
     // Discounts (explicit or via a price below list) need bill:discount
     const effectiveDiscount = Money.amount(listSubtotal - (lineSubtotal - discount), currency);
     if (product.isDiscountable === false && (effectiveDiscount > 0 || (rawItem.discountValue || 0) > 0)) {
-      throw new HttpsError("invalid-argument", `Product "${product.name}" is not eligible for discounts.`);
+      if (options?.allowWarnings) {
+        nonDiscountableBreaches.push(product.name);
+      } else {
+        throw new HttpsError("invalid-argument", `Product "${product.name}" is not eligible for discounts.`);
+      }
     }
     if (effectiveDiscount > 0 && !ctx.can(AppPermissions.BILL_DISCOUNT)) {
-      throw new HttpsError("permission-denied", `[PERMISSION_DENIED] Discounts on "${product.name}" require bill:discount.`, { reason: "PERMISSION_DENIED" });
+      if (!options?.allowWarnings) {
+        throw new HttpsError("permission-denied", `[PERMISSION_DENIED] Discounts on "${product.name}" require bill:discount.`, { reason: "PERMISSION_DENIED" });
+      }
     }
     if (product.maxDiscountPercent !== undefined && listSubtotal > 0 &&
       (effectiveDiscount / listSubtotal) * 100 > product.maxDiscountPercent + 1e-9) {
@@ -174,13 +190,15 @@ async function priceBillLines(ctx: RequestContext, rawItems: BillInput["items"],
     if (product.trackSerial && product.trackStock !== false) {
       serialLines.push({ lineId, productId: rawItem.productId, serials: rawItem.serialNumbers || [] });
     } else if (rawItem.serialNumbers?.length) {
-      throw new HttpsError("invalid-argument", `[SERIALS_NOT_TRACKED] Product "${product.name}" does not track serial numbers.`, { reason: "SERIALS_NOT_TRACKED" });
+      if (!options?.allowWarnings) {
+        throw new HttpsError("invalid-argument", `[SERIALS_NOT_TRACKED] Product "${product.name}" does not track serial numbers.`, { reason: "SERIALS_NOT_TRACKED" });
+      }
     }
     if (product.isReturnable === false) item.isReturnable = false;
     items.push(item);
   });
 
-  return { items, subTotal, taxTotal, discountBreaches, serialLines };
+  return { items, subTotal, taxTotal, discountBreaches, nonDiscountableBreaches, serialLines };
 }
 
 /** Bill-level totals from priced lines (one implementation for create and draft edits). */
@@ -230,11 +248,6 @@ export const billsUpdateDraft = onCall({ region: "asia-south1" }, async (request
   if (!Object.keys(updates).length) throw new HttpsError("invalid-argument", "No updatable fields provided.");
   const now = new Date().toISOString();
   await ref.update({ ...updates, updatedAt: now, updatedBy: ctx.callerUid });
-  await createAuditLog({
-    organizationId: ctx.organizationId, branchId: ctx.branchId, actorUid: ctx.callerUid, actorMembershipId: ctx.membershipId,
-    action: "BILL_DRAFT_UPDATED", entityType: "bill", entityId: snap.id,
-    changes: diffChanges(bill as unknown as Record<string, unknown>, updates as Record<string, unknown>, ["items", "discountTotal", "totalAmount", "customerId", "billToSnapshot", "notes"]),
-  });
   return { billId: snap.id, status: "draft", totalAmount: updates.totalAmount ?? bill.totalAmount, updated: Object.keys(updates) };
 });
 
@@ -344,8 +357,18 @@ function billToFromCustomer(snap: FirebaseFirestore.DocumentSnapshot | null): Bi
   if (!snap?.exists) return null;
   const c = snap.data() as CustomerDoc;
   const out: BillToSnapshot = { name: c.name };
-  if (c.taxNumber) out.taxNumber = c.taxNumber;
-  if (c.billingAddress) out.billingAddress = c.billingAddress;
+  if (c.phone) {
+    out.phone = c.phone ?? undefined;
+  }
+  if (c.taxId) {
+    out.taxId = c.taxId;
+  }
+  // The customer's default billing address, else the first address (D-7: flat billingAddress removed)
+  const billingAddr = c.addresses?.find((a) => a.isDefaultBilling) ?? c.addresses?.[0];
+  if (billingAddr) {
+    out.billingAddress = [billingAddr.line1, billingAddr.line2, billingAddr.city, billingAddr.state, billingAddr.postalCode]
+      .filter(Boolean).join(", ");
+  }
   return out;
 }
 
@@ -395,7 +418,7 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
     actorUid: ctx.callerUid,
     operation: "bills.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
 
   if (idempotency.isDuplicate) {
@@ -559,16 +582,6 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
 
     await markIdempotencySucceeded(idempotency.recordId, finalResult);
 
-    await createAuditLog({
-      organizationId: orgId,
-      branchId,
-      actorUid: ctx.callerUid,
-      actorMembershipId: ctx.membershipId,
-      action: pendingApproval ? "BILL_SUBMITTED_FOR_APPROVAL" : "BILL_CREATED",
-      entityType: "bill",
-      entityId: billId,
-      details: { approvalNote: approval.note || null },
-    });
 
     return finalResult;
   } catch (error) {
@@ -663,7 +676,7 @@ export const billsFinalize = onCall({ region: "asia-south1" }, async (request) =
     actorUid: ctx.callerUid,
     operation: "bills.finalize",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
 
   if (idempotency.isDuplicate) {
@@ -676,16 +689,6 @@ export const billsFinalize = onCall({ region: "asia-south1" }, async (request) =
   try {
     const finalResult = await finalizeBillInternal(ctx, input.billId);
     await markIdempotencySucceeded(idempotency.recordId, finalResult);
-    await createAuditLog({
-      organizationId: orgId,
-      branchId: ctx.branchId,
-      actorUid: ctx.callerUid,
-      actorMembershipId: ctx.membershipId,
-      action: "BILL_FINALIZED",
-      entityType: "bill",
-      entityId: input.billId,
-      details: { fromNumber: finalResult.originalQuotationNumber },
-    });
     return finalResult;
   } catch (error) {
     if (idempotency.recordId) {
@@ -868,16 +871,6 @@ export async function decideBill(ctx: RequestContext, input: DocumentDecisionInp
     return { billId: snap.id, status: "active", paymentId: effects.paymentId };
   });
 
-  await createAuditLog({
-    organizationId: ctx.organizationId,
-    branchId: ctx.branchId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: input.decision === "approve" ? "BILL_APPROVED" : "BILL_REJECTED",
-    entityType: "bill",
-    entityId: input.documentId,
-    details: { reason: input.reason || null },
-  });
   return result;
 }
 
@@ -996,17 +989,6 @@ export const billsVoid = onCall({ region: "asia-south1" }, async (request) => {
     });
 
     await markIdempotencySucceeded(idempotency.recordId, result);
-    await createAuditLog({
-      organizationId: orgId,
-      branchId: ctx.branchId,
-      actorUid: ctx.callerUid,
-      actorMembershipId: ctx.membershipId,
-      action: result.status === "voided" ? "BILL_VOIDED" : "BILL_CANCELLED",
-      entityType: "bill",
-      entityId: input.documentId,
-      details: { reason: input.reason },
-      changes: [{ field: "status", from: null, to: result.status }],
-    });
     return result;
   } catch (error) {
     if (idempotency.recordId) {
@@ -1015,4 +997,86 @@ export const billsVoid = onCall({ region: "asia-south1" }, async (request) => {
     if (error instanceof HttpsError) throw error;
     throw new HttpsError("internal", `Failed to void bill: ${(error as Error).message}`);
   }
+});
+
+// ---------------------------------------------------------------------------
+// billsPreview: read-only POS pricing preview
+// ---------------------------------------------------------------------------
+
+export const billsPreview = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+  const input = parseInput(PreviewBillSchema, request.data);
+  const ctx = await resolveRequestContext(request, {
+    requiredPermission: [
+      AppPermissions.BILL_VIEW,
+      AppPermissions.BILL_VIEW_ALL,
+      AppPermissions.SALE_VIEW,
+      AppPermissions.BILL_CREATE,
+      AppPermissions.SALE_CREATE,
+    ],
+  });
+
+  const currency = ctx.organization.currency || "INR";
+  const priced = await priceBillLines(ctx, input.items, currency, { allowWarnings: true });
+  const totals = billTotals(ctx, priced, input.discountTotal, currency);
+
+  const warnings: Array<{
+    type: "stock_shortfall" | "discount_ceiling" | "non_discountable";
+    lineId?: string;
+    productId?: string;
+    message: string;
+  }> = [];
+
+  for (const name of priced.nonDiscountableBreaches) {
+    warnings.push({
+      type: "non_discountable",
+      message: `Product "${name}" is not eligible for discounts.`,
+    });
+  }
+
+  for (const name of priced.discountBreaches) {
+    warnings.push({
+      type: "discount_ceiling",
+      message: `Discount on "${name}" exceeds the maximum allowable discount.`,
+    });
+  }
+
+  // Stock check for items that track stock
+  const trackedItems = priced.items.filter((i) => i.trackStock !== false);
+  if (trackedItems.length > 0) {
+    const balanceRefs = trackedItems.map((i) =>
+      db.collection("stockBalances").doc(`${ctx.organizationId}_${ctx.branchId}_${i.productId}`)
+    );
+    const balanceSnaps = await db.getAll(...balanceRefs);
+    balanceSnaps.forEach((snap, idx) => {
+      const item = trackedItems[idx];
+      const balData = snap.exists ? (snap.data() as StockBalanceDoc) : null;
+      const currentStock = balData?.currentStock || 0;
+      const allocatedStock = balData?.allocatedStock || 0;
+      const available = Money.qty(currentStock - allocatedStock);
+      const requested = item.baseQuantity ?? item.quantity;
+      if (requested > available) {
+        warnings.push({
+          type: "stock_shortfall",
+          lineId: item.lineId,
+          productId: item.productId,
+          message: `Stock shortfall for product "${item.productId}": required ${requested}, available ${available}.`,
+        });
+      }
+    });
+  }
+
+  return {
+    items: priced.items,
+    subTotal: priced.subTotal,
+    taxTotal: priced.taxTotal,
+    discountTotal: totals.discountTotal,
+    totalAmount: totals.totalAmount,
+    roundOff: totals.roundOff,
+    taxSnapshot: totals.taxSnapshot,
+    currency,
+    warnings,
+  };
 });

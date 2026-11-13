@@ -256,7 +256,7 @@ export function commitStockChangesInTxn(
   for (const op of prepared.operations) {
     if (op.trackStock) {
       // 1. Maintain global aggregate mirror on product document (and WAC if purchase inward)
-      const updatePayload: Record<string, any> = {
+      const updatePayload: Record<string, unknown> = {
         currentStock: op.newStock,
         updatedAt: now,
       };

@@ -150,7 +150,7 @@ async function runSimulation() {
   // Step 1: Bootstrap Tenant
   console.log('\n[B1-STEP 01] Super Admin provisions Apex Corner Retail via organizationsCreate...');
   const createOrg1Res = await callFunction('organizationsCreate', {
-    name: 'Apex Corner Retail — Emulator Demo',
+    name: `Apex Corner Retail ${b1Timestamp}`,
     businessType: 'retail_only',
     businessCategory: 'grocery_fmcg',
     country: 'IN',
@@ -281,7 +281,7 @@ async function runSimulation() {
     organizationId: org1Id,
     branchId: 'main-branch',
     name: 'Nandini Dairy Producers Ltd',
-    mobile: '9876543211',
+    phone: '9876543211',
     email: 'orders@nandinidairy.local',
     visibilityScope: 'all_branches',
   }, admin1Auth.idToken);
@@ -296,7 +296,7 @@ async function runSimulation() {
     organizationId: org1Id,
     branchId: 'main-branch',
     name: 'Mrs. Shanti Sharma',
-    mobile: '9876543212',
+    phone: '9876543212',
     email: 'shanti@customer.local',
     visibilityScope: 'all_branches',
   }, admin1Auth.idToken);
@@ -679,7 +679,7 @@ async function runSimulation() {
   // Step 1: Bootstrap Tenant
   console.log('\n[B2-STEP 01] Super Admin provisions Apex Wholesale Supplies (plan_growth)...');
   const createOrg2Res = await callFunction('organizationsCreate', {
-    name: 'Apex Wholesale Supplies — Emulator Demo',
+    name: `Apex Wholesale Supplies ${b2Timestamp}`,
     businessType: 'wholesale_only',
     businessCategory: 'grocery_fmcg',
     country: 'IN',
@@ -843,7 +843,7 @@ async function runSimulation() {
     organizationId: org2Id,
     branchId: 'main-branch',
     name: 'Metro Hypermarkets India',
-    mobile: '9111111111',
+    phone: '9111111111',
     visibilityScope: 'all_branches',
   }, owner2Auth.idToken);
   const custGlobalId = custGlobalRes.data.customerId;
@@ -853,7 +853,7 @@ async function runSimulation() {
     organizationId: org2Id,
     branchId: 'main-branch',
     name: 'Depot Corner Store',
-    mobile: '9222222222',
+    phone: '9222222222',
     visibilityScope: 'branch_only',
   }, owner2Auth.idToken);
   const custLocalId = custLocalRes.data.customerId;

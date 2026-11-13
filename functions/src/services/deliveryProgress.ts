@@ -5,6 +5,7 @@
 
 import type { BillDoc, DeliveryDoc } from "../types/models.js";
 import { DeliveryStatus } from "../constants/enums.js";
+import { round4 } from "./money.js";
 
 /** Quantity per bill line not yet on a (non-returned) delivery. */
 export function remainingToDeliver(bill: BillDoc, deliveries: DeliveryDoc[]): Record<string, number> {
@@ -12,7 +13,7 @@ export function remainingToDeliver(bill: BillDoc, deliveries: DeliveryDoc[]): Re
   for (const item of bill.items || []) out[item.lineId] = item.quantity;
   for (const d of deliveries) {
     if (d.status === DeliveryStatus.RETURNED) continue;
-    for (const l of d.lines || []) if (out[l.lineId] !== undefined) out[l.lineId] = Math.round((out[l.lineId] - l.quantity) * 10000) / 10000;
+    for (const l of d.lines || []) if (out[l.lineId] !== undefined) out[l.lineId] = round4(out[l.lineId] - l.quantity);
   }
   return out;
 }

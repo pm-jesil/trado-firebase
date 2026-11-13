@@ -13,7 +13,8 @@
  * - Finalized outflows are never deleted: outflowsVoid posts reversal entries
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import type { Transaction } from "firebase-admin/firestore";
 import { db } from "../services/firebase.js";
 import { uniqueKeyRef } from "../services/uniqueKeys.js";
@@ -45,7 +46,7 @@ import {
 } from "../constants/enums.js";
 import { AppPermissions } from "../constants/permissions.js";
 import { Money } from "../services/money.js";
-import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
+import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 import {
   readNextDocumentNumberInTxn,
   commitDocumentNumberInTxn,
@@ -57,7 +58,6 @@ import {
   resolveUnitConversion,
   StockChangeItem,
 } from "../services/stockEngine.js";
-import { createAuditLog } from "../services/audit.js";
 import { hydrate } from "../services/hydration.js";
 import { fetchPage } from "../services/pagination.js";
 import {
@@ -215,7 +215,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
     actorUid: ctx.callerUid,
     operation: "outflows.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
 
   if (idempotency.isDuplicate) {
@@ -428,29 +428,9 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
     });
 
     if (idempotency.recordId) {
-      await db.collection("idempotencyRecords").doc(idempotency.recordId).update({
-        status: "succeeded",
-        result: finalResult,
-        updatedAt: now,
-      });
+      await finalizeIdempotencySuccess(idempotency.recordId, finalResult);
     }
 
-    await createAuditLog({
-      organizationId: orgId,
-      branchId,
-      actorUid: ctx.callerUid,
-      actorMembershipId: ctx.membershipId,
-      action: pendingApproval ? "OUTFLOW_SUBMITTED_FOR_APPROVAL" : (isPurchase ? "PURCHASE_CREATED" : "EXPENSE_CREATED"),
-      entityType: "outflow",
-      entityId: outflowId,
-      details: {
-        number: finalResult.outflowNumber,
-        kind: input.kind,
-        totalAmount,
-        paidAmount,
-        approvalNote: approval.note || null,
-      },
-    });
 
     return finalResult;
   } catch (error) {
@@ -583,16 +563,6 @@ export async function decideOutflow(ctx: RequestContext, input: DocumentDecision
     return { outflowId: snap.id, status: OutflowStatus.CONFIRMED, paymentId: effects.paymentId };
   });
 
-  await createAuditLog({
-    organizationId: ctx.organizationId,
-    branchId: ctx.branchId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: input.decision === "approve" ? "OUTFLOW_APPROVED" : "OUTFLOW_REJECTED",
-    entityType: "outflow",
-    entityId: input.documentId,
-    details: { reason: input.reason || null },
-  });
   return result;
 }
 
@@ -704,19 +674,8 @@ export const outflowsVoid = onCall({ region: "asia-south1" }, async (request) =>
     });
 
     if (idempotency.recordId) {
-      await db.collection("idempotencyRecords").doc(idempotency.recordId).update({ status: "succeeded", result, updatedAt: now });
+      await finalizeIdempotencySuccess(idempotency.recordId, result);
     }
-    await createAuditLog({
-      organizationId: orgId,
-      branchId: ctx.branchId,
-      actorUid: ctx.callerUid,
-      actorMembershipId: ctx.membershipId,
-      action: result.status === OutflowStatus.VOIDED ? "OUTFLOW_VOIDED" : "OUTFLOW_CANCELLED",
-      entityType: "outflow",
-      entityId: input.documentId,
-      details: { reason: input.reason },
-      changes: [{ field: "status", from: null, to: result.status }],
-    });
     return result;
   } catch (error) {
     if (idempotency.recordId) {

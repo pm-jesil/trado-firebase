@@ -245,11 +245,11 @@ Delivery staff without `delivery:assign` see and update only deliveries assigned
 
 ### Maker–checker
 
-`organizations.settings.approvals = { enabled, modules{sale,purchase,expense,return,stock_adjustment}, amountThreshold }` (Owner-editable, off by default). A maker without the module's approve permission creates `pending_approval` documents with no stock/ledger/payment effect; approvers decide with `billsApprove` / `outflowsApprove` (never their own). Discounts above `product.maxDiscountPercent` and credit-limit breaches force approval even with the policy off. If no other active Owner/Admin exists, the document auto-approves with an audit note (small-organization mode). Returns and stock adjustments are not yet routed (OPEN).
+`organizations.settings.approvals = { enabled, modules{sale,purchase,expense,return,stock_adjustment}, amountThreshold }` (Owner-editable, off by default). A maker without the module's approve permission creates `pending_approval` documents with no stock/ledger/payment effect; approvers decide with `documentsDecide` (never their own). Discounts above `product.maxDiscountPercent` and credit-limit breaches force approval even with the policy off. If no other active Owner/Admin exists, the document auto-approves with an audit note (small-organization mode). Returns and stock adjustments are not yet routed (OPEN).
 
 ### Organization field policy
 
-Super Admin: `name`, `businessType`, `businessCategory`, `moduleToggles`, `salesChannels`, `timezone`, plan and subscription (`organizationsSetSubscription`), status. Owner: `displayName`, `logoUrl`, `imageUrls`, `taxNumber`, `website`, `contactEmail`, `contactPhone`, `address`, `bankDetails`, `settings.approvals`. Admin: none. Every change is audited with field, old → new.
+Super Admin: `name`, `businessType`, `businessCategory`, `moduleToggles`, `salesChannels`, `timezone`, plan and subscription (`organizationsSetSubscription`), status. Owner: `displayName`, `image`, `uploadId`, `taxId`, `website`, `contact`, `contacts`, `addresses`, `bankAccounts`, `settings.approvals`. Admin: none. Every change is audited with field, old → new.
 
 ### Designations are labels
 

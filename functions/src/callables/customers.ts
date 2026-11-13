@@ -6,7 +6,8 @@
  * - customersGet: Retrieve customer by ID
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import {
   CreateCustomerSchema,
@@ -15,10 +16,10 @@ import {
   GetCustomerSchema,
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
-import { CustomerDoc } from "../types/models.js";
+import { CustomerDoc, ImageRef } from "../types/models.js";
+import { attachUploadedImage } from "../services/imageEngine.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { commitWithKeys, partyClaims, changedClaims, duplicateOverride } from "../services/uniqueKeys.js";
-import { createAuditLog, diffChanges } from "../services/audit.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { redactCustomer } from "../services/redaction.js";
@@ -51,7 +52,7 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
     actorUid: request.auth.uid,
     operation: "customers.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
 
   if (idempotency.isDuplicate) {
@@ -95,17 +96,34 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
       }
     }
 
+    const partyType = input.partyType || "organization";
+    const legalName = partyType === "person" ? null : (input.legalName?.trim() || null);
+    let image: ImageRef | null = input.image || null;
+    if (input.uploadId) {
+      image = await attachUploadedImage({
+        uploadId: input.uploadId,
+        purpose: partyType === "person" ? "party_photo" : "org_logo",
+        entityType: "customer",
+        entityId: customerId,
+        callerUid: request.auth.uid,
+        scope: orgId,
+      });
+    }
+
     const customerDoc: CustomerDoc = {
       organizationId: orgId,
       customerCode,
+      partyType,
       name: input.name.trim(),
-      mobile: input.mobile?.trim() || null,
+      legalName,
+      image,
+      phone: input.phone?.trim() || null,
       additionalPhones: input.additionalPhones || [],
-      whatsApp: input.whatsApp?.trim() || null,
       email: input.email?.trim().toLowerCase() || null,
-      taxNumber: input.taxNumber?.trim() || null,
-      billingAddress: input.billingAddress?.trim() || null,
-      shippingAddress: input.shippingAddress?.trim() || null,
+      taxId: input.taxId?.trim() || null,
+      contacts: input.contacts || [],
+      addresses: input.addresses || [],
+      bankAccounts: input.bankAccounts || [],
       priceGroup: input.priceGroup?.trim() || "retail",
       creditLimit: input.creditLimit || 0,
       creditPeriodDays: input.creditPeriodDays || 30,
@@ -141,14 +159,6 @@ export const customersCreate = onCall({ region: "asia-south1" }, async (request)
       });
     }
 
-    await createAuditLog({
-      organizationId: orgId,
-      actorUid: request.auth.uid,
-      action: "CUSTOMER_CREATED",
-      entityType: "customer",
-      entityId: customerId,
-      details: { duplicateOverrideReason: input.duplicateOverrideReason || null },
-    });
 
     return response;
   } catch (error) {
@@ -189,14 +199,34 @@ export const customersUpdate = onCall({ region: "asia-south1" }, async (request)
     updatedBy: ctx.callerUid,
   };
 
+  if (input.partyType !== undefined) updates.partyType = input.partyType;
+  if (input.legalName !== undefined) {
+    updates.legalName = (input.partyType === "person" || existing.partyType === "person") ? null : (input.legalName?.trim() || null);
+  }
+  if (input.uploadId) {
+    const isPerson = (input.partyType === "person" || existing.partyType === "person");
+    const attachedImage = await attachUploadedImage({
+      uploadId: input.uploadId,
+      purpose: isPerson ? "party_photo" : "org_logo",
+      entityType: "customer",
+      entityId: input.customerId,
+      callerUid: request.auth.uid,
+      scope: orgId,
+    });
+    updates.image = attachedImage;
+  } else if (input.image !== undefined) {
+    updates.image = input.image;
+  }
   if (input.name) updates.name = input.name.trim();
-  if (input.mobile !== undefined) updates.mobile = input.mobile?.trim() || null;
+  if (input.phone !== undefined) {
+    updates.phone = input.phone?.trim() || null;
+  }
   if (input.additionalPhones !== undefined) updates.additionalPhones = input.additionalPhones;
-  if (input.whatsApp !== undefined) updates.whatsApp = input.whatsApp?.trim() || null;
   if (input.email !== undefined) updates.email = input.email?.trim().toLowerCase() || null;
-  if (input.taxNumber !== undefined) updates.taxNumber = input.taxNumber?.trim() || null;
-  if (input.billingAddress !== undefined) updates.billingAddress = input.billingAddress?.trim() || null;
-  if (input.shippingAddress !== undefined) updates.shippingAddress = input.shippingAddress?.trim() || null;
+  if (input.taxId !== undefined) updates.taxId = input.taxId?.trim() || null;
+  if (input.contacts !== undefined) updates.contacts = input.contacts;
+  if (input.addresses !== undefined) updates.addresses = input.addresses;
+  if (input.bankAccounts !== undefined) updates.bankAccounts = input.bankAccounts;
   if (input.priceGroup !== undefined) updates.priceGroup = input.priceGroup;
   if (input.creditLimit !== undefined) updates.creditLimit = input.creditLimit;
   if (input.creditPeriodDays !== undefined) updates.creditPeriodDays = input.creditPeriodDays;
@@ -216,16 +246,6 @@ export const customersUpdate = onCall({ region: "asia-south1" }, async (request)
   const keyChange = duplicateOverride(ctx, input.duplicateOverrideReason) ? { claim: [], release: changedClaims(before, after).release } : changedClaims(before, after);
   await commitWithKeys(orgId, "customer", input.customerId, (batch) => batch.update(customerRef, updates), keyChange);
 
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: ctx.branchId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: "CUSTOMER_UPDATED",
-    entityType: "customer",
-    entityId: input.customerId,
-    changes: diffChanges(existing as unknown as Record<string, unknown>, updates as Record<string, unknown>),
-  });
 
   return { success: true, message: "Customer updated successfully." };
 });
@@ -258,6 +278,11 @@ export const customersList = onCall({ region: "asia-south1" }, async (request) =
       }
       return true;
     });
+  }
+
+  // Filter by partyType if requested
+  if (input.partyType) {
+    items = items.filter((c) => (c.partyType || "organization") === input.partyType);
   }
 
   return { items: items.map((i) => redactCustomer(i, ctx)), count: items.length, nextCursor };

@@ -188,7 +188,7 @@ interface CreateBillRequest {
   walkInCustomer?: {                 // Walk-in counterparty details (only without customerId)
     name: string;
     mobile?: string;
-    taxNumber?: string;
+    taxId?: string;
     billingAddress?: string;
   };
   items: Array<{

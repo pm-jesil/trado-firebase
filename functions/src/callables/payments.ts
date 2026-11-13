@@ -7,7 +7,8 @@
  * - Records inbound collections (from customers) and outbound vouchers (to vendors)
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import {
   CreatePaymentSchema,
@@ -17,12 +18,11 @@ import {
 import { parseInput } from "../validation/parseInput.js";
 import { PaymentDoc, BillDoc, OutflowDoc, CustomerDoc, VendorDoc } from "../types/models.js";
 import { Money } from "../services/money.js";
-import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
+import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 import {
   readNextDocumentNumberInTxn,
   commitDocumentNumberInTxn,
 } from "../services/documentCounter.js";
-import { createAuditLog } from "../services/audit.js";
 import { hydrate } from "../services/hydration.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext, resolveDataScope, applyDataScope } from "../services/contextResolver.js";
@@ -60,7 +60,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
     actorUid: ctx.callerUid,
     operation: "payments.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
 
   if (idempotency.isDuplicate) {
@@ -235,20 +235,6 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
       });
     }
 
-    await createAuditLog({
-      organizationId: orgId,
-      branchId,
-      actorUid: ctx.callerUid,
-      actorMembershipId: ctx.membershipId,
-      action: "PAYMENT_RECORDED",
-      entityType: "payment",
-      entityId: paymentId,
-      details: {
-        paymentNumber: finalResult.paymentNumber,
-        amount: input.amount,
-        direction: input.direction,
-      },
-    });
 
     return finalResult;
   } catch (error) {
@@ -387,27 +373,9 @@ export const paymentsVoid = onCall({ region: "asia-south1" }, async (request) =>
     });
 
     if (idempotency.recordId) {
-      await db.collection("idempotencyRecords").doc(idempotency.recordId).update({
-        status: "succeeded",
-        result,
-        updatedAt: now,
-      });
+      await finalizeIdempotencySuccess(idempotency.recordId, result);
     }
 
-    await createAuditLog({
-      organizationId: orgId,
-      branchId: ctx.branchId,
-      actorUid: ctx.callerUid,
-      actorMembershipId: ctx.membershipId,
-      action: "PAYMENT_VOIDED",
-      entityType: "payment",
-      entityId: input.paymentId,
-      details: {
-        paymentNumber: result.paymentNumber,
-        reason: input.reason,
-        reversedDocumentId: result.reversedDocumentId,
-      },
-    });
 
     return result;
   } catch (error) {

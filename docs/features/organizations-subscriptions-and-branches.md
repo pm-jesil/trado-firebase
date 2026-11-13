@@ -190,7 +190,7 @@ Updates legal profile, operational settings, or platform configuration.
 
 #### Who Can Call
 - **Platform Super Admin**: Allowed to edit platform attributes (`name`, `businessType`, `businessCategory`, `moduleToggles`, `salesChannels`, `timezone`).
-- **Organization Owner (`role_org_owner`)**: Allowed to edit profile attributes (`displayName`, `logoUrl`, `imageUrls`, `taxNumber`, `website`, `contactEmail`, `contactPhone`, `contacts`, `address`, `bankDetails`, `settings`).
+- **Organization Owner (`role_org_owner`)**: Allowed to edit profile attributes (`displayName`, `image`, `uploadId`, `taxId`, `website`, `contact`, `contacts`, `addresses`, `bankAccounts`, `settings`).
 - **Tenant Admins / Staff**: Strictly rejected with `permission-denied` (Decision D-07: Admins operate daily business but cannot mutate legal organization profile).
 
 #### Request Parameters
@@ -206,28 +206,14 @@ interface UpdateOrganizationRequest {
   timezone?: string;
   // Owner editable fields:
   displayName?: string;
-  logoUrl?: string;                  // Valid URL
-  imageUrls?: string[];              // Array of up to 10 URLs
-  taxNumber?: string | null;         // GSTIN / TRN / VAT registration number
+  image?: ImageRef;
+  uploadId?: string;
+  taxId?: string | null;             // GSTIN / TRN / VAT registration number
   website?: string | null;
-  contactEmail?: string | null;
-  contactPhone?: string | null;
+  contact?: OrganizationContact;
   contacts?: OrganizationContact[];
-  address?: {
-    line1?: string;
-    line2?: string;
-    city?: string;
-    state?: string;
-    pincode?: string;
-    country?: string;
-  };
-  bankDetails?: {
-    accountName?: string;
-    bankName?: string;
-    accountNumber?: string;
-    ifsc?: string;
-    upiId?: string;
-  } | null;
+  addresses?: Address[];
+  bankAccounts?: BankAccount[];
   settings?: {
     approvals?: {
       enabled: boolean;
@@ -253,7 +239,7 @@ interface UpdateOrganizationRequest {
 ```json
 {
   "organizationId": "org_7f8a9b2c",
-  "updatedFields": ["displayName", "taxNumber", "settings"],
+  "updatedFields": ["displayName", "taxId", "settings"],
   "updatedAt": "2026-11-08T18:00:00.000Z",
   "message": "Organization updated successfully."
 }
@@ -287,7 +273,7 @@ interface CreateBranchRequest {
     contactPerson?: string | null;
   };
   settings?: {
-    taxNumber?: string | null;       // Branch-specific GSTIN / tax registration
+    taxId?: string | null;           // Branch-specific GSTIN / tax registration
     allowNegativeStock?: boolean;    // Default: false
     defaultSalesMode?: SalesMode;    // Default: pos
     moduleOverrides?: Record<string, boolean>;

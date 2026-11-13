@@ -3,7 +3,8 @@
  * Exposes modules, tax regimes, and permission catalog data.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { parseInput } from "../validation/parseInput.js";
 import { ContextOnlySchema } from "../validation/schemas.js";
 import { db } from "../services/firebase.js";

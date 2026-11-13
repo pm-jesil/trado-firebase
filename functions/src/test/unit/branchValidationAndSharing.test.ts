@@ -16,6 +16,7 @@ describe("Branch Validation & Sharing Policies (Unit)", () => {
       const result = CreateCustomerSchema.safeParse({
         organizationId: "org-123",
         name: "Acme Corp",
+        phone: "9876543210",
         visibilityScope: "all_branches",
       });
       assert.strictEqual(result.success, true);
@@ -28,6 +29,7 @@ describe("Branch Validation & Sharing Policies (Unit)", () => {
       const result = CreateCustomerSchema.safeParse({
         organizationId: "org-123",
         name: "Regional Store",
+        phone: "9876543210",
         visibilityScope: "selected_branches",
         sharedForBranchIds: ["main-branch", "branch-south"],
       });
@@ -42,6 +44,7 @@ describe("Branch Validation & Sharing Policies (Unit)", () => {
       const result = CreateCustomerSchema.safeParse({
         organizationId: "org-123",
         name: "Local Client",
+        phone: "9876543210",
         visibilityScope: "branch_only",
         sharedForBranchIds: ["branch-south"],
       });
@@ -55,6 +58,7 @@ describe("Branch Validation & Sharing Policies (Unit)", () => {
       const result = CreateCustomerSchema.safeParse({
         organizationId: "org-123",
         name: "Invalid Customer",
+        phone: "9876543210",
         visibilityScope: "invalid_scope" as any,
       });
       assert.strictEqual(result.success, false);
@@ -77,6 +81,7 @@ describe("Branch Validation & Sharing Policies (Unit)", () => {
         organizationId: "org-123",
         branchId: "branch-north",
         name: "National Distributor",
+        phone: "9876543210",
         visibilityScope: "all_branches",
       });
       assert.strictEqual(result.success, true);

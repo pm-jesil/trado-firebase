@@ -1,6 +1,6 @@
 # Trado API Reference
 
-This document is the single, authoritative reference for all **121 exported Cloud Functions** (115 HTTPS Callables + 5 Firestore/Auth Event Triggers + 1 scheduled sweep function) in the Trado backend. All HTTPS Callables are deployed to region `asia-south1` (Mumbai) using Cloud Functions Gen 2 on Node.js 22.
+This document is the single, authoritative reference for all **134 exported Cloud Functions** (128 HTTPS Callables + 5 Firestore/Auth Event Triggers + 1 scheduled sweep function) in the Trado backend. All HTTPS Callables are deployed to region `asia-south1` (Mumbai) using Cloud Functions Gen 2 on Node.js 22.
 
 ## Global Calling Convention
 
@@ -20,6 +20,7 @@ This document is the single, authoritative reference for all **121 exported Clou
 | 4 | `organizationsUpdate` | Callable | Tenancy | `org:manage / org:view` |
 | 5 | `organizationsDeactivate` | Callable | Tenancy | `org:manage / org:view` |
 | 6 | `organizationsList` | Callable | Tenancy | `org:manage / org:view` |
+| 6a | `organizationsGet` | Callable | Tenancy | `org:manage / org:view` |
 | 7 | `branchesGetDefault` | Callable | Branch Management | `branch:view` |
 | 8 | `branchesList` | Callable | Branch Management | `branch:view` |
 | 9 | `branchesCreate` | Callable | Branch Management | `branch:create` |
@@ -31,6 +32,7 @@ This document is the single, authoritative reference for all **121 exported Clou
 | 15 | `employeesUpdate` | Callable | Staff & Memberships | `employee:update` |
 | 16 | `employeesDeactivate` | Callable | Staff & Memberships | `employee:view` |
 | 17 | `employeesList` | Callable | Staff & Memberships | `employee:view` |
+| 17a | `employeesGet` | Callable | Staff & Memberships | `employee:view` |
 | 18 | `rolesCreate` | Callable | RBAC Roles | `role:create / role:update` |
 | 19 | `rolesUpdate` | Callable | RBAC Roles | `role:create / role:update` |
 | 20 | `rolesList` | Callable | RBAC Roles | `role:view` |
@@ -46,6 +48,7 @@ This document is the single, authoritative reference for all **121 exported Clou
 | 30 | `plansCreate` | Callable | Subscription Plans | `Platform Super Admin` |
 | 31 | `plansUpdate` | Callable | Subscription Plans | `Platform Super Admin` |
 | 32 | `plansList` | Callable | Subscription Plans | `Platform Super Admin` |
+| 32a | `plansPreviewImpact` | Callable | Subscription Plans | `Platform Super Admin` |
 | 33 | `permissionCatalogList` | Callable | General | `Authenticated` |
 | 34 | `modulesList` | Callable | General | `Authenticated` |
 | 35 | `taxRegimesList` | Callable | General | `Authenticated` |
@@ -75,6 +78,7 @@ This document is the single, authoritative reference for all **121 exported Clou
 | 59 | `billsFinalize` | Callable | Billing & POS | `bill:create / bill:view / bill:void` |
 | 60 | `billsList` | Callable | Billing & POS | `bill:create / bill:view / bill:void` |
 | 61 | `billsGet` | Callable | Billing & POS | `bill:create / bill:view / bill:void` |
+| 61a | `billsPreview` | Callable | Billing & POS | `bill:create / bill:view / bill:void` |
 | 62 | `deliveriesCreate` | Callable | Dispatch & Delivery | `delivery:view / delivery:create / delivery:assign` |
 | 63 | `deliveriesUpdateStatus` | Callable | Dispatch & Delivery | `delivery:view / delivery:create / delivery:assign` |
 | 64 | `deliveriesList` | Callable | Dispatch & Delivery | `delivery:view / delivery:create / delivery:assign` |
@@ -115,12 +119,27 @@ This document is the single, authoritative reference for all **121 exported Clou
 | 99 | `usageRecordClientMetric` | Callable | Usage Metering | `Platform Super Admin (Diagnostic Only)` |
 | 100 | `usageGetLimits` | Callable | Usage Metering & Quotas | `Platform Super Admin / Tenant Owner` |
 | 101 | `usageUpdateLimits` | Callable | Usage Metering & Quotas | `Platform Super Admin Only` |
-| 102 | `onBillWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
-| 103 | `onOutflowWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
-| 104 | `onPaymentWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
-| 105 | `onDeliveryWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
-| 106 | `onStorageObjectFinalized` | Storage Trigger | Usage Metering | `System Trigger (Internal)` |
-| 107 | `subscriptionAndUsageSweep` | Scheduled | Subscription Lifecycle | `System Trigger (Internal)` |
+| 102 | `organizationsReactivate` | Callable | Tenancy Governance | `Platform Super Admin` |
+| 103 | `organizationsPreviewDeactivationImpact` | Callable | Tenancy Governance | `Platform Super Admin` |
+| 104 | `organizationsGetSubscriptionHistory` | Callable | Tenancy Governance | `Platform Super Admin` |
+| 105 | `plansGet` | Callable | Subscription Plans | `Public / Authenticated` |
+| 106 | `plansArchive` | Callable | Subscription Plans | `Platform Super Admin` |
+| 107 | `plansDelete` | Callable | Subscription Plans | `Platform Super Admin` |
+| 108 | `platformUsersList` | Callable | Platform Directory | `Platform Super Admin` |
+| 109 | `platformUsersGet` | Callable | Platform Directory | `Platform Super Admin` |
+| 110 | `auditLogsList` | Callable | Audit & Compliance | `Platform Super Admin` |
+| 111 | `usersUpdateMe` | Callable | User Profile | `Authenticated` |
+| 112 | `imagesCreateUploadSession` | Callable | Image Pipeline | `Authenticated` |
+| 113 | `imagesAttach` | Callable | Image Pipeline | `Entity Update Permission` |
+| 114 | `imagesRemove` | Callable | Image Pipeline | `Entity Update Permission` |
+| 115 | `organizationsProvisionUser` | Callable | Tenancy & Governance | `Platform Super Admin` |
+| 116 | `organizationsTransferOwnership` | Callable | Tenancy & Governance | `Super Admin / Org Owner` |
+| 117 | `onBillWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 118 | `onOutflowWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 119 | `onPaymentWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 120 | `onDeliveryWritten` | Firestore Trigger | Event Automation | `System Trigger (Internal)` |
+| 121 | `onStorageObjectFinalized` | Storage Trigger | Usage Metering | `System Trigger (Internal)` |
+| 122 | `subscriptionAndUsageSweep` | Scheduled | Subscription Lifecycle | `System Trigger (Internal)` |
 
 ---
 
@@ -186,6 +205,13 @@ This document is the single, authoritative reference for all **121 exported Clou
 - **Source File**: `functions/src/callables/organizations.ts`
 - **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/organizationsList` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/organizationsList` (Emulator)
 - **Summary**: Cloud function handling `organizationsList` business workflow with transactional integrity and anti-embedding validation.
+
+#### `organizationsGet`
+
+- **Function Export**: `organizationsGet`
+- **Source File**: `functions/src/callables/organizations.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/organizationsGet` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/organizationsGet` (Emulator)
+- **Summary**: Cloud function handling single organization retrieval with permission-based field trimming (Super Admin any org, Tenant Owner/Admin own org).
 
 ### Module: `./callables/branches.js` (Branches)
 
@@ -267,6 +293,13 @@ This document is the single, authoritative reference for all **121 exported Clou
 - **Source File**: `functions/src/callables/employees.ts`
 - **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/employeesList` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/employeesList` (Emulator)
 - **Summary**: Cloud function handling `employeesList` business workflow with transactional integrity and anti-embedding validation.
+
+#### `employeesGet`
+
+- **Function Export**: `employeesGet`
+- **Source File**: `functions/src/callables/employees.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/employeesGet` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/employeesGet` (Emulator)
+- **Summary**: Cloud function handling detailed employee profile retrieval with permission-based trimming (phone hidden unless `employee:manage_sensitive`, overrides hidden unless Owner/Admin).
 
 ### Module: `./callables/roles.js` (Roles)
 
@@ -382,6 +415,13 @@ This document is the single, authoritative reference for all **121 exported Clou
 - **Source File**: `functions/src/callables/plans.ts`
 - **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/plansList` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/plansList` (Emulator)
 - **Summary**: Cloud function handling `plansList` business workflow with transactional integrity and anti-embedding validation.
+
+#### `plansPreviewImpact`
+
+- **Function Export**: `plansPreviewImpact`
+- **Source File**: `functions/src/callables/plans.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/plansPreviewImpact` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/plansPreviewImpact` (Emulator)
+- **Summary**: Cloud function handling read-only preview of plan downgrade or upgrade impact on tenant branch limits, seat capacity, and module features.
 
 ### Module: `./callables/catalogs.js` (Catalogs)
 
@@ -603,6 +643,13 @@ This document is the single, authoritative reference for all **121 exported Clou
 - **Source File**: `functions/src/callables/bills.ts`
 - **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/billsGet` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/billsGet` (Emulator)
 - **Summary**: Cloud function handling `billsGet` business workflow with transactional integrity and anti-embedding validation.
+
+#### `billsPreview`
+
+- **Function Export**: `billsPreview`
+- **Source File**: `functions/src/callables/bills.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/billsPreview` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/billsPreview` (Emulator)
+- **Summary**: Read-only pricing preview endpoint using identical calculation pipeline as `billsCreate`, providing non-blocking warnings for stock shortfalls, discount ceiling breaches, and non-discountable items without writing records or mutating counters.
 
 ### Module: `./callables/deliveries.js` (Deliveries)
 
@@ -971,7 +1018,7 @@ Super Admin may run `platform:*` callables and read-only tenant views (support);
 ### Module: `./callables/bills.js` — lifecycle
 
 - `billsUpdateDraft` — `bill:update`. Input `{ billId, items?, notes?, idempotencyKey? }`. Updates a draft invoice or quotation (recalculates pricing and total). Audited with field changes in entity history. Finalized invoices are immutable and reject draft updates with `DOCUMENT_IMMUTABLE`.
-- `billsApprove` / `documentsDecide` — `bill:approve`. Unified via `documentsDecide`. Input `{ documentType: "bill", documentId, decision: "approve"|"reject", reason? }`. Applies the held stock, customer-ledger and tender payment on approve; `rejected` leaves no effect. Makers cannot approve their own bills.
+- `documentsDecide` — `bill:approve`. Unified maker-checker decision router. Input `{ documentType: "bill", documentId, decision: "approve"|"reject", reason? }`. Applies the held stock, customer-ledger and tender payment on approve; `rejected` leaves no effect. Makers cannot approve their own bills.
 - `billsVoid` — `bill:void`. Input `{ documentId, reason, idempotencyKey? }`. Active bill → `voided` with stock returned, customer `totalSpend`/`outstandingBalance` reversed and linked payments voided; drafts / pending → `cancelled` (reservation released). Rejected when non-voided returns exist.
 - `billsCreate` changes: sales orders reserve stock (`allocatedStock`) instead of deducting; line `unit` may be an alternate unit (`conversionFactor`, `baseQuantity` frozen); discounts need `bill:discount`; discount above `maxDiscountPercent` or a credit-limit breach routes the bill to `pending_approval`; B2B requires `customerId`.
 
@@ -987,14 +1034,14 @@ Super Admin may run `platform:*` callables and read-only tenant views (support);
 
 ### Module: `./callables/outflows.js` — lifecycle
 
-- `outflowsApprove` — `purchase:approve` / `expense:approve` / `outflow:approve`. Unified via `documentsDecide`. Same contract as `billsApprove`.
+- `documentsDecide` — `purchase:approve` / `expense:approve` / `outflow:approve`. Unified maker-checker decision router across document types.
 - `outflowsVoid` — `purchase:void` / `expense:void` / `outflow:void`. Reverses good units received, vendor payable/total purchase, voids payments, releases the vendor-invoice lock.
 - `outflowsCreate` changes: per-vendor unique `invoiceNumber`; lines accept `damagedQuantity`/`damageReason` (written off at receipt) and `serialNumbers`; `payeeType` (`vendor`|`employee`|`other`), `payeeMembershipId` (sensitive, needs `expense:view_sensitive` to read), `expenseCategoryId`, `billDiscountAmount`/`billDiscountPercent`, `attachmentPaths`.
 
 ### Module: `./callables/organizations.js` — subscriptions
 
 - `organizationsSetSubscription` — Super Admin only. Input `{ organizationId, action: "set"|"renew"|"extend"|"suspend"|"reactivate"|"cancel"|"change_plan", planId?, expiresOn? (YYYY-MM-DD), durationDays?, extendDays?, graceDays?, reason? }`. Returns the stored fields, an `evaluation`, and `overLimit` (`branches`/`employees`) after a downgrade.
-- `organizationsUpdate` field policy: Super Admin — `name`, `businessType`, `businessCategory`, `moduleToggles`, `salesChannels`, `timezone` (+ all Owner fields); Owner — `displayName`, `logoUrl`, `imageUrls`, `taxNumber`, `website`, `contactEmail`, `contactPhone`, `address`, `bankDetails`, `settings.approvals`; Admin — none. Unknown fields → `INVALID_ARGUMENT`.
+- `organizationsUpdate` field policy: Super Admin — `name`, `businessType`, `businessCategory`, `moduleToggles`, `salesChannels`, `timezone` (+ all Owner fields); Owner — `displayName`, `image`, `uploadId`, `taxId`, `website`, `contact`, `contacts`, `addresses`, `bankAccounts`, `settings.approvals`; Admin — none. Unknown fields → `INVALID_ARGUMENT`.
 
 ### Module: `./callables/teams.js`
 
@@ -1014,6 +1061,27 @@ Super Admin may run `platform:*` callables and read-only tenant views (support);
 - `reportsGetOutflowSummary` — `report:view` / `outflow:view`. `accrual.totalOutflow = purchases + expenses`, `cash.paid`, grouped by day/category/employee/vendor/branch. Never add `totalOutflow` to the P&L (purchases reach it only as COGS).
 - `reportsGetProfitLoss` now returns `inventoryWriteOff` (damage/expiry/theft/samples/internal use/count shortfall/damaged on receipt at movement cost) and `netProfit = grossProfit − expenses − inventoryWriteOff`.
 - `reportsGetStaffActivity` now covers sales, purchases, expenses, returns, deliveries, stock adjustments, approvals and tasks per employee, scoped (Owner/Admin all, managers team, others self).
+
+### Module: `./callables/platformUsers.js` (Super Admin Platform Users Directory)
+
+- `platformUsersList` — `platform:user:view`. Super Admin only. Input `{ organizationId?, roleId?, status?, branchId?, q?, limit?, cursor? }`. Cursor pagination, embedded user memberships, and normalized `included` map of organizations and roles.
+- `platformUsersGet` — `platform:user:view`. Super Admin only. Input `{ userId }`. Detailed user profile, all organization memberships, assigned branch IDs, and server-computed effective permissions across all four layers.
+
+### Module: `./callables/plans.js` (Extended Platform Callables)
+
+- `plansGet` — Public / Authenticated. Input `{ planId }`. Retrieves subscription plan details. Direct reads in rules restricted to active, public plans; private/archived plans accessible by Super Admin.
+- `plansArchive` — `platform:plan:manage`. Super Admin only. Input `{ planId, reason? }`. Safely sets `isArchived: true` so no new organizations can select it while preserving existing subscriptions.
+- `plansDelete` — `platform:plan:manage`. Super Admin only. Input `{ planId }`. Permanently deletes unreferenced, unused plans; strictly rejects deletion with `FAILED_PRECONDITION` if any organization references it.
+
+### Module: `./callables/organizations.js` (Extended Tenancy Governance)
+
+- `organizationsReactivate` — `platform:org:deactivate`. Super Admin only. Input `{ organizationId, reason? }`. Reactivates a suspended organization and records audit log.
+- `organizationsPreviewDeactivationImpact` — `platform:org:deactivate`. Super Admin only. Input `{ organizationId }`. Read-only impact report calculating total affected users, active branches, open unpaid bills/outflows, outstanding balances, and active subscription details.
+- `organizationsGetSubscriptionHistory` — `platform:org:view`. Super Admin only. Input `{ organizationId, limit? }`. Returns immutable subscription change chronology derived from audit logs with actor and plan name hydration.
+
+### Module: `./callables/history.js` (Extended Platform Activity Logs)
+
+- `auditLogsList` — `platform:audit:view`. Super Admin only. Input `{ actorUserId?, organizationId?, entityType?, entityId?, action?, from?, to?, limit?, cursor? }`. Platform-wide audit trail search with cursor pagination, secret scrubbing (redacted passwords, tokens, API keys), and normalized `included` references for actors and organizations.
 
 ### Scheduled: `./triggers/scheduled.js`
 
@@ -1043,6 +1111,60 @@ node scripts/generate-openapi.js
 node tools/api-explorer/server.js
 # → Open browser to http://127.0.0.1:3939
 ```
+
+### Module: `./callables/users.js` (User Profile)
+
+#### `usersUpdateMe`
+- **Function Export**: `usersUpdateMe`
+- **Source File**: `functions/src/callables/users.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/usersUpdateMe` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/usersUpdateMe` (Emulator)
+- **Input Schema**: `UpdateMeSchema` (`name`, `phone`, `image`, `uploadId`, `clientRequestId`)
+- **Output Schema**: `{ success: boolean, message: string, user: UserDoc }`
+- **Summary**: Updates authenticated user's profile including name, normalized phone, and avatar image.
+
+### Module: `./callables/images.js` (Image Pipeline)
+
+#### `imagesCreateUploadSession`
+- **Function Export**: `imagesCreateUploadSession`
+- **Source File**: `functions/src/callables/images.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/imagesCreateUploadSession` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/imagesCreateUploadSession` (Emulator)
+- **Input Schema**: `CreateImageUploadSessionSchema` (`organizationId`, `branchId`, `purpose`, `entityType`, `entityId`, `contentType`, `sizeBytes`, `clientRequestId`)
+- **Output Schema**: `{ uploadId: string, uploadPath: string, expiresAt: string, maxBytes: number, purpose: string }`
+- **Summary**: Creates a scoped temporary upload session for raw client asset uploads (raw max 5MB).
+
+#### `imagesAttach`
+- **Function Export**: `imagesAttach`
+- **Source File**: `functions/src/callables/images.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/imagesAttach` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/imagesAttach` (Emulator)
+- **Input Schema**: `AttachImageSchema` (`organizationId`, `branchId`, `uploadId`, `entityType`, `entityId`, `clientRequestId`)
+- **Output Schema**: `{ success: boolean, image: ImageRef, previousImageDeleted: boolean }`
+- **Summary**: Processes temporary upload via sharp (WebP conversion, metadata stripping, magic byte validation) and links to target entity.
+
+#### `imagesRemove`
+- **Function Export**: `imagesRemove`
+- **Source File**: `functions/src/callables/images.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/imagesRemove` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/imagesRemove` (Emulator)
+- **Input Schema**: `RemoveImageSchema` (`organizationId`, `branchId`, `entityType`, `entityId`, `clientRequestId`)
+- **Output Schema**: `{ success: boolean, message: string }`
+- **Summary**: Unlinks and purges image asset from target entity and storage bucket.
+
+### Module: `./callables/organizations.js` (Onboarding & Governance Additions)
+
+#### `organizationsProvisionUser`
+- **Function Export**: `organizationsProvisionUser`
+- **Source File**: `functions/src/callables/organizations.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/organizationsProvisionUser` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/organizationsProvisionUser` (Emulator)
+- **Input Schema**: `ProvisionUserSchema` (`organizationId`, `role`, `user`, `credentialMode`, `reason`, `clientRequestId`)
+- **Output Schema**: `{ success: boolean, userId: string, membershipId: string, role: string, temporaryPassword?: string, inviteLink?: string, userCreated: boolean }`
+- **Summary**: Platform Super Admin provisions an Owner or Admin for an organization with transactional membership creation and rollback compensation.
+
+#### `organizationsTransferOwnership`
+- **Function Export**: `organizationsTransferOwnership`
+- **Source File**: `functions/src/callables/organizations.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/organizationsTransferOwnership` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/organizationsTransferOwnership` (Emulator)
+- **Input Schema**: `TransferOwnershipSchema` (`organizationId`, `newOwnerUserId`, `previousOwnerAction`, `reason`, `clientRequestId`)
+- **Output Schema**: `{ success: boolean, organizationId: string, newOwnerUserId: string, previousOwnerUserId: string | null, previousOwnerAction: string }`
+- **Summary**: Transfers organization ownership to an active member while demoting or deactivating the previous owner in a single atomic transaction.
 
 ### Related Resources
 

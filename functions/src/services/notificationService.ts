@@ -90,10 +90,11 @@ export async function createAndDispatchNotification(
           await deviceDoc.ref.delete();
         }
       }
-    } catch (err: any) {
+    } catch (err) {
+      const failure = err as { message?: string; code?: string } | null;
       if (
-        err?.message?.includes("registration-token-not-registered") ||
-        err?.code === "messaging/registration-token-not-registered"
+        failure?.message?.includes("registration-token-not-registered") ||
+        failure?.code === "messaging/registration-token-not-registered"
       ) {
         await deviceDoc.ref.delete();
       }

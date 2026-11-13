@@ -1,5 +1,7 @@
 # Trado Backend: Comprehensive Test Coverage Matrix
 
+> Status: archived (2026-11-13). Point-in-time report of an earlier prompt; its counts and completeness statements are not current and are not evidence. Current, computed figures: [coverage.md](coverage.md) and the verification run records under .local/verification-runs.
+
 This document provides the authoritative, exhaustive test mapping across all **102 Cloud Functions exports** (98 HTTPS Callables + 4 Firestore Triggers) and **43 concrete Firestore collection paths** in the Trado backend repository.
 
 ---

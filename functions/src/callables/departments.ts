@@ -2,7 +2,8 @@
  * Department Callables
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { nameKey } from "../services/naturalKeys.js";
 import { commitWithKeys, changedClaims } from "../services/uniqueKeys.js";
 import { resolveCatalogWriteAccess } from "../services/contextResolver.js";
@@ -15,7 +16,7 @@ import {
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
 import { DepartmentDoc } from "../types/models.js";
-import { createAuditLog } from "../services/audit.js";
+import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 
 export const departmentsCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
@@ -26,31 +27,47 @@ export const departmentsCreate = onCall({ region: "asia-south1" }, async (reques
 
   await resolveCatalogWriteAccess(request, input.organizationId, AppPermissions.DEPARTMENT_MANAGE);
 
-  const deptRef = db.collection("departments").doc();
-  const deptDoc: DepartmentDoc = {
-    organizationId: input.organizationId || null,
-    name: input.name,
-    headMembershipIds: input.headMembershipIds || [],
-    isSystem: !input.organizationId,
-    createdAt: new Date().toISOString(),
-    createdBy: request.auth.uid,
-  };
-
-  // Unique name per organization ("global" for platform catalog entries)
-  await commitWithKeys(deptDoc.organizationId || "global", "department", deptRef.id, (batch) => batch.set(deptRef, deptDoc), {
-    claim: [{ kind: "department_name", key: nameKey(deptDoc.name) }],
-  });
-
-  await createAuditLog({
-    organizationId: input.organizationId,
+  const idempotency = await reserveIdempotency({
+    scope: input.organizationId || "platform",
     actorUid: request.auth.uid,
-    action: "DEPARTMENT_CREATED",
-    entityType: "department",
-    entityId: deptRef.id,
-    details: { name: input.name },
+    operation: "departments.create",
+    clientKey: input.idempotencyKey,
+    payload: request.data,
   });
 
-  return { departmentId: deptRef.id, ...deptDoc };
+  if (idempotency.isDuplicate) {
+    if (idempotency.isProcessing) {
+      throw new HttpsError("already-exists", "Operation in progress. Please retry shortly.");
+    }
+    return idempotency.cachedResult;
+  }
+
+  try {
+    const deptRef = db.collection("departments").doc();
+    const deptDoc: DepartmentDoc = {
+      organizationId: input.organizationId || null,
+      name: input.name,
+      headMembershipIds: input.headMembershipIds || [],
+      isSystem: !input.organizationId,
+      createdAt: new Date().toISOString(),
+      createdBy: request.auth.uid,
+    };
+
+    // Unique name per organization ("global" for platform catalog entries)
+    await commitWithKeys(deptDoc.organizationId || "global", "department", deptRef.id, (batch) => batch.set(deptRef, deptDoc), {
+      claim: [{ kind: "department_name", key: nameKey(deptDoc.name) }],
+    });
+
+
+    const result = { departmentId: deptRef.id, ...deptDoc };
+
+    await finalizeIdempotencySuccess(idempotency.recordId, result);
+
+    return result;
+  } catch (err) {
+    await finalizeIdempotencyFailure(idempotency.recordId, "CREATE_DEPARTMENT_FAILED", (err as Error).message);
+    throw err;
+  }
 });
 
 export const departmentsUpdate = onCall({ region: "asia-south1" }, async (request) => {
@@ -87,14 +104,6 @@ export const departmentsUpdate = onCall({ region: "asia-south1" }, async (reques
     : { claim: [], release: [] };
   await commitWithKeys(deptData.organizationId || "global", "department", input.departmentId, (batch) => batch.update(deptRef, updates), nameChange);
 
-  await createAuditLog({
-    organizationId: deptData.organizationId,
-    actorUid: request.auth.uid,
-    action: "DEPARTMENT_UPDATED",
-    entityType: "department",
-    entityId: input.departmentId,
-    details: updates as Record<string, unknown>,
-  });
 
   return { success: true, message: "Department updated successfully." };
 });

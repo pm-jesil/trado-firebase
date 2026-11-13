@@ -3,7 +3,7 @@
  * Used to verify Cloud Functions emulator discovery and round-trip execution.
  */
 
-import { onCall } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { parseInput } from "../validation/parseInput.js";
 import { ContextOnlySchema } from "../validation/schemas.js";
 

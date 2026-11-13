@@ -28,6 +28,7 @@ import {
   SubscriptionPlanDoc,
   RoleDoc,
   UserDoc,
+  TeamDoc,
 } from "../types/models.js";
 import { EntityStatus, GateReason } from "../constants/enums.js";
 import {
@@ -44,6 +45,7 @@ import {
   mergeUsageLimits,
   type MeteredMetric,
 } from "./usageMetering.js";
+import { withCategory, currentContext } from "./requestContext.js";
 import { AppPermissions } from "../constants/permissions.js";
 
 /**
@@ -73,6 +75,7 @@ export interface RequestContextOptions {
   requiredPermission?: string | string[];
   allowPlatformSuperAdmin?: boolean;
   allowInactiveBranch?: boolean;
+  allowTeamLeader?: boolean;
   /** Server-derived branch override (e.g. the branch of a referenced document). */
   branchId?: string;
   /** Server-derived organization (e.g. the organization of an existing record being updated). */
@@ -181,7 +184,23 @@ export async function resolveRequestContext(
 ): Promise<RequestContext> {
   const meter: MeterHandle = {};
   try {
-    return await resolveGate(request, options, meter);
+    // The gate's reads are counted as category "gate"; what it resolved becomes the request's
+    // attribution (prompt 66 §3.1): no read is added for it. Super Admin work is platform work (D-21).
+    const gate = await withCategory("gate", () => resolveGate(request, options, meter));
+    const exec = currentContext();
+    if (exec) {
+      exec.organizationId = gate.isSuperAdmin ? "platform" : gate.organizationId;
+      exec.targetOrgId = gate.isSuperAdmin ? gate.organizationId : null;
+      exec.timeZone = gate.organization.timezone || DEFAULT_ORG_TIMEZONE;
+      exec.actor = {
+        uid: gate.callerUid,
+        kind: gate.isSuperAdmin ? "superAdminOnBehalf" : "user",
+        role: gate.role?.code ?? null,
+        membershipId: gate.membershipId,
+        branchId: gate.branchId,
+      };
+    }
+    return gate;
   } catch (err) {
     // A call denied after metering performed no operation: give the operation unit back
     // (the invocation itself stays counted), so denials never consume a tenant's quota.
@@ -416,8 +435,20 @@ async function resolveGate(
         `Module "${inPlan.join(", ")}" is disabled for this organization or branch.`);
     }
     if (!isSuperAdmin && !required.some(can)) {
-      throw gateError("permission-denied", GateReason.PERMISSION_DENIED,
-        `Insufficient permissions: "${required.join("\" or \"")}" is required.`);
+      let isAuthorizedLeader = false;
+      if (options.allowTeamLeader && request.data?.teamId && membershipId) {
+        const teamSnap = await db.collection("teams").doc(request.data.teamId).get();
+        if (teamSnap.exists) {
+          const team = teamSnap.data() as TeamDoc;
+          if (team.organizationId === targetOrgId && team.leaderMembershipId === membershipId) {
+            isAuthorizedLeader = true;
+          }
+        }
+      }
+      if (!isAuthorizedLeader) {
+        throw gateError("permission-denied", GateReason.PERMISSION_DENIED,
+          `Insufficient permissions: "${required.join("\" or \"")}" is required.`);
+      }
     }
   }
 

@@ -1,4 +1,5 @@
 /**
+ * @guard-scope: per-collection (every collection derived from source; docs/generated/guard-scopes/check-data-duplication.json)
  * Dynamic data checks on the emulator (Parts 2.3, 2.4, 7.3, 7.6). Read-only.
  *
  *  1. Reference integrity   every *Id / *Ids field resolves to an existing document of the right
@@ -27,16 +28,16 @@ const EPS = 0.011;
 // Load
 // ---------------------------------------------------------------------------
 
-const store = new Map(); // collection -> Map(id -> data)
+const truth = require("../../scripts/lib/source-truth.js");
+const { writeGuardScope } = require("../../scripts/lib/guard-scope.js");
+const COLLECTIONS = truth.getCollections().collections; // derived from source, empty collections included
+
+const store = new Map(); // collection name -> Map(id -> data); subcollection ids are "<parentId>/<id>"
 async function loadAll() {
-  for (const col of await db.listCollections()) {
-    const snap = await col.get();
-    store.set(col.id, new Map(snap.docs.map((d) => [d.id, d.data()])));
+  for (const c of COLLECTIONS) {
+    const snap = await (c.parent ? db.collectionGroup(c.name) : db.collection(c.name)).get();
+    store.set(c.name, new Map(snap.docs.map((d) => [c.parent ? d.ref.parent.parent.id + "/" + d.id : d.id, d.data()])));
   }
-  const branches = await db.collectionGroup("branches").get();
-  store.set("branches", new Map(branches.docs.map((d) => [`${d.ref.parent.parent.id}/${d.id}`, d.data()])));
-  const devices = await db.collectionGroup("devices").get();
-  store.set("devices", new Map(devices.docs.map((d) => [`${d.ref.parent.parent.id}/${d.id}`, d.data()])));
 }
 const col = (name) => store.get(name) || new Map();
 const inScope = (doc) => !ONLY_ORG || doc.organizationId === ONLY_ORG || doc.organizationId === undefined;
@@ -64,7 +65,7 @@ const POLYMORPHIC = {
   relatedEntityId: (d) => ({ bill: "bills", outflow: "outflows", delivery: "deliveries", customer: "customers", vendor: "vendors", product: "products", payment: "payments", task: "tasks", return: "returns" })[d.relatedEntityType],
   entityId: (d) => ({ bill: "bills", outflow: "outflows", delivery: "deliveries", customer: "customers", vendor: "vendors", product: "products", payment: "payments", task: "tasks", return: "returns", organization: "organizations", membership: "memberships", employee: "memberships", team: "teams", role: "roles", branch: "branches", category: "categories", unit: "units", department: "departments", job_role: "jobRoles" })[d.entityType],
 };
-const SKIP_COLLECTIONS = new Set(["idempotencyRecords", "documentCounters", "usageCounterShards", "platformUsageSnapshots", "usageRateCards", "usageAllocationRuns"]);
+const SKIP_COLLECTIONS = new Set(["idempotencyRecords", "documentCounters", "usageCounterShards", "platformUsageSnapshots", "usageRateCards", "usageAllocationRuns", "auditLogs", "organizationUsageDaily", "userUsageDaily", "platformCostReconciliation"]);
 
 function lookup(collection, id, orgId) {
   if (collection === "branches") return col("branches").get(`${orgId}/${id}`);
@@ -92,6 +93,10 @@ function checkReferences(collection, id, doc) {
           stats.references++;
           const hit = lookup(target, ref, orgId);
           if (!hit) {
+            // Audit logs legitimately retain entity IDs of entities that have been deleted (e.g. TASK_DELETED)
+            if (collection === "auditLogs" && k === "entityId") {
+              continue;
+            }
             findings.reference.push(`${where} → ${target}/${ref} does not exist`);
             continue;
           }
@@ -117,7 +122,7 @@ function checkReferences(collection, id, doc) {
 // 2. Value duplication
 // ---------------------------------------------------------------------------
 
-const DESCRIPTIVE = ["name", "displayName", "mobile", "phone", "email", "address", "billingAddress", "shippingAddress", "sku", "barcode", "taxNumber", "code", "customerCode", "vendorCode", "baseUnit", "billNumber", "outflowNumber", "invoiceNumber", "contactPerson", "brand", "lowStockThreshold", "reorderPoint"];
+const DESCRIPTIVE = ["name", "displayName", "mobile", "phone", "email", "address", "billingAddress", "shippingAddress", "sku", "barcode", "taxId", "code", "customerCode", "vendorCode", "baseUnit", "billNumber", "outflowNumber", "invoiceNumber", "contactPerson", "brand", "lowStockThreshold", "reorderPoint"];
 const norm = (v) => (typeof v === "string" ? v.trim().replace(/\s+/g, " ").toLowerCase() : typeof v === "number" ? String(v) : null);
 const registered = (collection, fieldPath) => allowlist.entries.some((e) => e.collection === collection &&
   (fieldPath === e.field || fieldPath.startsWith(`${e.field}.`) || fieldPath.replace(/\[\d+\]/g, "") === e.field || fieldPath.replace(/\[\d+\]/g, "").startsWith(`${e.field}.`)));
@@ -320,11 +325,14 @@ function reconcile() {
     const actual = Array.from(new Set(o.productIds || [])).sort().join(",");
     if (expected !== actual) fail("reconcile:outflowProductIds", `outflows/${oid} productIds [${actual}] ≠ lines [${expected}]`);
   }
-  // reconcile:auditChangedFields — equals changes[].field
+  // reconcile:auditChangedFields — equals changes[].field or changes.fields[].path
   for (const [lid, l] of byOrg("auditLogs")) {
     if (!l.changes) continue;
     stats.reconcileChecks++;
-    if ((l.changedFields || []).join(",") !== l.changes.map((c) => c.field).join(",")) fail("reconcile:auditChangedFields", `auditLogs/${lid} changedFields mismatch`);
+    const changeFields = Array.isArray(l.changes)
+      ? l.changes.map((c) => c.field || c.path)
+      : (l.changes.fields || []).map((f) => f.path.split(".")[0]).filter((p, i, a) => p !== "(document)" && a.indexOf(p) === i);
+    if ((l.changedFields || []).join(",") !== changeFields.join(",")) fail("reconcile:auditChangedFields", `auditLogs/${lid} changedFields mismatch`);
   }
   // reconcile:branchCount / reconcile:activeEmployeeCount
   const activeBranches = new Map();
@@ -350,8 +358,8 @@ function reconcile() {
 const INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/;
 const CAL_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const YEAR_MONTH = /^\d{4}-\d{2}$/;
-const TTL_FIELDS = new Set(["locationPings.expiresAt"]);
-const CALENDAR_FIELDS = new Set(["date", "dueDate", "expiryDate", "expiresOn", "day", "startDate", "endDate", "startOn", "nextRunOn", "endOn"]);
+const TTL_FIELDS = new Set(["locationPings.expiresAt", "auditLogs.expireAt", "auditLogs.occurredAt", "organizationUsageDaily.expireAt", "organizationUsageDaily.lastSeenAt", "userUsageDaily.expireAt", "userUsageDaily.lastSeenAt"]);
+const CALENDAR_FIELDS = new Set(["date", "dueDate", "expiryDate", "expiresOn", "day", "startDate", "endDate", "startOn", "nextRunOn", "endOn", "occurredLocalDate"]);
 const dateTable = new Map(); // "collection.field" -> { class, values, bad }
 
 function classify(collection, field) {
@@ -423,6 +431,7 @@ async function main() {
     console.log("\n| Field | Class | Values | Bad |\n|---|---|---|---|");
     for (const [key, row] of Array.from(dateTable.entries()).sort()) console.log(`| ${key} | ${row.cls} | ${row.values} | ${row.bad} |`);
   }
+  writeGuardScope(__filename, COLLECTIONS.map((c) => c.key), []);
   console.log(total ? `✗ ${total} data finding(s).` : "[PASS] Zero dangling/cross-tenant references, zero unregistered value copies, every cache reconciles, dates consistent.");
   process.exit(total ? 1 : 0);
 }

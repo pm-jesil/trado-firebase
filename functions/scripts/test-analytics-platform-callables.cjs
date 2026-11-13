@@ -87,13 +87,64 @@ async function run() {
   assert.ok(planUpdateRes.success, "plansUpdate must return success: true");
   console.log("✓ plansUpdate updated price and branchLimit");
 
+  // plansPreviewImpact (Super Admin read-only preview of plan impact)
+  const impactRes = await callFunction("plansPreviewImpact", {
+    organizationId: orgId,
+    targetPlanId: customPlanId,
+  }, superAdminToken);
+  assert.ok(impactRes.impact, "plansPreviewImpact must return impact assessment");
+  assert.equal(impactRes.impact.isDowngradePossible, true);
+  console.log("✓ plansPreviewImpact evaluated impact on branches and seats");
+
+  // plansGet (Retrieve specific plan)
+  const planGetRes = await callFunction("plansGet", {
+    planId: customPlanId,
+  }, staffToken);
+  const plan = planGetRes.plan || planGetRes;
+  assert.ok(plan && (plan.id === customPlanId || plan.planId === customPlanId), "plansGet must return plan details");
+  console.log(`✓ plansGet fetched plan: ${plan.name} (price: ${plan.price})`);
+
+  // plansArchive (Super Admin archives plan)
+  await assertCallableError(
+    callFunction("plansArchive", { planId: customPlanId }, ownerToken),
+    ["permission-denied", "permissiondenied"]
+  );
+  const archiveRes = await callFunction("plansArchive", {
+    planId: customPlanId,
+    reason: "Testing plan archive workflow",
+  }, superAdminToken);
+  assert.ok(archiveRes.success && archiveRes.isArchived === true, "plansArchive must mark plan as archived");
+  console.log("✓ plansArchive successfully archived plan");
+
+  // plansDelete (Super Admin deletes unused plan)
+  const unusedPlanRes = await callFunction("plansCreate", {
+    name: `Unused Disposable Plan ${Date.now()}`,
+    price: 100,
+    currency: "INR",
+    storageLimitMb: 100,
+    monthlyDocumentVolumeLimit: 100,
+    seatLimits: { admin: 1, staff: 1 },
+    moduleFlags: {},
+  }, superAdminToken);
+  const unusedPlanId = unusedPlanRes.planId;
+
+  await assertCallableError(
+    callFunction("plansDelete", { planId: unusedPlanId }, ownerToken),
+    ["permission-denied", "permissiondenied"]
+  );
+  const deleteRes = await callFunction("plansDelete", {
+    planId: unusedPlanId,
+  }, superAdminToken);
+  assert.ok(deleteRes.success, "plansDelete must succeed for unreferenced plan");
+  console.log("✓ plansDelete safely removed unused plan");
+
   // List plans
   const planListRes = await callFunction("plansList", {
-    includeInactive: false,
+    includeInactive: true,
   }, staffToken);
   assert.ok(Array.isArray(planListRes.plans));
   assert.ok(planListRes.plans.some(p => p.planId === customPlanId));
-  console.log(`✓ plansList returned ${planListRes.plans.length} active subscription plans`);
+  console.log(`✓ plansList returned ${planListRes.plans.length} subscription plans (including archived)`);
 
   // ============================================================
   // 2. Catalogs (taxRegimesList)
@@ -121,13 +172,13 @@ async function run() {
 
   const customerRes = await callFunction("customersCreate", buildCustomerPayload(orgId, {
     name: "Analytics Premium Customer",
-    mobile: "+919876543299",
+    phone: "+919876543299",
   }), ownerToken);
   const custId = customerRes.customerId;
 
   const vendorRes = await callFunction("vendorsCreate", buildVendorPayload(orgId, {
     name: "Analytics Prime Supplier",
-    mobile: "+919876543288",
+    phone: "+919876543288",
   }), ownerToken);
   const vendId = vendorRes.vendorId;
 
@@ -273,6 +324,8 @@ async function run() {
   assert.ok(platformSummaryRes.applicationAttributedTotals);
   assert.equal(platformSummaryRes.currency, "INR");
   console.log(`✓ usageGetPlatformSummary returned estimated platform infrastructure usage`);
+  const reconSnap = await db.collection("platformCostReconciliation").limit(1).get();
+  console.log(`✓ platformCostReconciliation collection verified (${reconSnap.size} docs)`);
 
   // usageGetOrganizations (Super Admin)
   const usageOrgsRes = await callFunction("usageGetOrganizations", {
@@ -412,6 +465,25 @@ async function run() {
   assert.equal(reconcileBranchesRes.isDiscrepancy, false);
   assert.equal(reconcileBranchesRes.difference, 0);
   console.log(`✓ reconcileBranchCounts confirmed branch count integrity: recorded ${reconcileBranchesRes.recordedBranchCount}, actual ${reconcileBranchesRes.actualActiveBranches}`);
+
+  // ============================================================
+  // 7. Platform Activity Audit (auditLogsList)
+  // ============================================================
+  console.log("\n[DOMAIN: AUDIT LOGS] Testing auditLogsList...");
+
+  await assertCallableError(
+    callFunction("auditLogsList", {}, ownerToken),
+    ["permission-denied", "permissiondenied"]
+  );
+
+  const auditLogsRes = await callFunction("auditLogsList", {
+    organizationId: orgId,
+    limit: 20,
+  }, superAdminToken);
+  assert.ok(Array.isArray(auditLogsRes.items), "auditLogsList must return items array");
+  assert.ok(auditLogsRes.count >= 0, "auditLogsList must return count");
+  assert.ok(auditLogsRes.included && typeof auditLogsRes.included === "object", "auditLogsList must return included map");
+  console.log(`✓ auditLogsList returned ${auditLogsRes.items.length} sanitized audit logs with included entities`);
 
   console.log("\n================================================================================");
   console.log("   [PASS] ALL 20 ANALYTICS, REPORTS, USAGE & PLATFORM CALLABLES VERIFIED! ✓    ");

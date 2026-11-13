@@ -2,8 +2,9 @@
  * Job Role Callables
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { nameKey } from "../services/naturalKeys.js";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
+import { nameKey, codeSlug } from "../services/naturalKeys.js";
 import { commitWithKeys, changedClaims } from "../services/uniqueKeys.js";
 import { resolveCatalogWriteAccess } from "../services/contextResolver.js";
 import { AppPermissions } from "../constants/permissions.js";
@@ -15,7 +16,7 @@ import {
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
 import { JobRoleDoc } from "../types/models.js";
-import { createAuditLog } from "../services/audit.js";
+import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 
 export const jobRolesCreate = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
@@ -26,30 +27,47 @@ export const jobRolesCreate = onCall({ region: "asia-south1" }, async (request) 
 
   await resolveCatalogWriteAccess(request, input.organizationId, AppPermissions.JOB_ROLE_MANAGE);
 
-  const jobRoleRef = db.collection("jobRoles").doc();
-  const jobRoleDoc: JobRoleDoc = {
-    organizationId: input.organizationId || null,
-    name: input.name,
-    isSystem: !input.organizationId,
-    createdAt: new Date().toISOString(),
-    createdBy: request.auth.uid,
-  };
-
-  // Unique name per organization ("global" for platform catalog entries)
-  await commitWithKeys(jobRoleDoc.organizationId || "global", "job_role", jobRoleRef.id, (batch) => batch.set(jobRoleRef, jobRoleDoc), {
-    claim: [{ kind: "job_role_name", key: nameKey(jobRoleDoc.name) }],
-  });
-
-  await createAuditLog({
-    organizationId: input.organizationId,
+  const idempotency = await reserveIdempotency({
+    scope: input.organizationId || "platform",
     actorUid: request.auth.uid,
-    action: "JOB_ROLE_CREATED",
-    entityType: "jobRole",
-    entityId: jobRoleRef.id,
-    details: { name: input.name },
+    operation: "jobRoles.create",
+    clientKey: input.idempotencyKey,
+    payload: request.data,
   });
 
-  return { jobRoleId: jobRoleRef.id, ...jobRoleDoc };
+  if (idempotency.isDuplicate) {
+    if (idempotency.isProcessing) {
+      throw new HttpsError("already-exists", "Operation in progress. Please retry shortly.");
+    }
+    return idempotency.cachedResult;
+  }
+
+  try {
+    const jobRoleRef = db.collection("jobRoles").doc();
+    const jobRoleDoc: JobRoleDoc = {
+      organizationId: input.organizationId || null,
+      name: input.name,
+      code: input.code || codeSlug(input.name),
+      isSystem: !input.organizationId,
+      createdAt: new Date().toISOString(),
+      createdBy: request.auth.uid,
+    };
+
+    // Unique name per organization ("global" for platform catalog entries)
+    await commitWithKeys(jobRoleDoc.organizationId || "global", "job_role", jobRoleRef.id, (batch) => batch.set(jobRoleRef, jobRoleDoc), {
+      claim: [{ kind: "job_role_name", key: nameKey(jobRoleDoc.name) }],
+    });
+
+
+    const result = { jobRoleId: jobRoleRef.id, ...jobRoleDoc };
+
+    await finalizeIdempotencySuccess(idempotency.recordId, result);
+
+    return result;
+  } catch (err) {
+    await finalizeIdempotencyFailure(idempotency.recordId, "CREATE_JOB_ROLE_FAILED", (err as Error).message);
+    throw err;
+  }
 });
 
 export const jobRolesUpdate = onCall({ region: "asia-south1" }, async (request) => {
@@ -85,14 +103,6 @@ export const jobRolesUpdate = onCall({ region: "asia-south1" }, async (request) 
     : { claim: [], release: [] };
   await commitWithKeys(jobRoleData.organizationId || "global", "job_role", input.jobRoleId, (batch) => batch.update(jobRoleRef, updates), nameChange);
 
-  await createAuditLog({
-    organizationId: jobRoleData.organizationId,
-    actorUid: request.auth.uid,
-    action: "JOB_ROLE_UPDATED",
-    entityType: "jobRole",
-    entityId: input.jobRoleId,
-    details: updates as Record<string, unknown>,
-  });
 
   return { success: true, message: "Job role updated successfully." };
 });

@@ -1,0 +1,72 @@
+{
+  "runId": "rules-mwf43uhv",
+  "generatedAt": "2026-11-13T15:08:55.459Z",
+  "firestore": {
+    "38:read": {
+      "allowed": 4,
+      "denied": 20
+    },
+    "40:read": {
+      "allowed": 2,
+      "denied": 10
+    },
+    "45:read": {
+      "allowed": 4,
+      "denied": 40
+    },
+    "49:read": {
+      "allowed": 4,
+      "denied": 40
+    },
+    "53:read": {
+      "allowed": 4,
+      "denied": 40
+    },
+    "59:read": {
+      "allowed": 20,
+      "denied": 112
+    },
+    "66:read": {
+      "allowed": 45,
+      "denied": 1023
+    },
+    "70:read": {
+      "allowed": 20,
+      "denied": 692
+    },
+    "75:read": {
+      "allowed": 0,
+      "denied": 6
+    },
+    "75:write": {
+      "allowed": 0,
+      "denied": 6
+    }
+  },
+  "firestoreMeta": {
+    "projectId": "trado-x-rules-mwf43ie7",
+    "recordedOutcomes": 12
+  },
+  "storage": {
+    "25:read": {
+      "allowed": 1,
+      "denied": 1
+    },
+    "26:write": {
+      "allowed": 1,
+      "denied": 7
+    },
+    "32:read": {
+      "allowed": 1,
+      "denied": 2
+    },
+    "33:write": {
+      "allowed": 0,
+      "denied": 9
+    }
+  },
+  "storageMeta": {
+    "requests": 14,
+    "unmatched": []
+  }
+}

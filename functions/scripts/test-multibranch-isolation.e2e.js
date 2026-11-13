@@ -294,7 +294,7 @@ async function runBranchDeepE2ESuite() {
       organizationId: orgAId,
       branchId: branchA1Id,
       name: "Alpha Retail Walk-in Customer",
-      mobile: "9876543201",
+      phone: "9876543201",
       visibilityScope: "branch_only",
       idempotencyKey: `cust_b1_${runId}`,
     }, ownerAToken);
@@ -391,7 +391,7 @@ async function runBranchDeepE2ESuite() {
       organizationId: orgAId,
       branchId: branchA1Id,
       name: "Kerala Spice Suppliers",
-      mobile: "9123456781",
+      phone: "9123456781",
       visibilityScope: "branch_only",
       idempotencyKey: `vend_b1_${runId}`,
     }, ownerAToken);

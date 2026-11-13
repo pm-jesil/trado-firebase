@@ -20,7 +20,7 @@ import { evaluateSubscription, DEFAULT_ORG_TIMEZONE, localDateInTimezone } from 
 import { getServerUsageSnapshot, evaluateUsageLimits, mergeUsageLimits } from "../services/usageMetering.js";
 import { reserveIdempotency } from "../services/idempotency.js";
 import { createAndDispatchNotification } from "../services/notificationService.js";
-import { createAuditLog } from "../services/audit.js";
+import { withScheduledContext, forTargetOrg } from "../services/systemContext.js";
 import { generateDueRecurringExpenses } from "../callables/recurringExpenses.js";
 
 const REMINDER_DAYS = [7, 3, 1];
@@ -78,6 +78,7 @@ export async function runSubscriptionAndUsageSweep(nowMs: number = Date.now()): 
   for (const orgSnap of orgs.docs) {
     const org = orgSnap.data() as OrganizationDoc;
     const orgId = orgSnap.id;
+    forTargetOrg(orgId); // platform work for this organization (D-21)
     const tz = org.timezone || DEFAULT_ORG_TIMEZONE;
     result.organizationsScanned++;
 
@@ -95,14 +96,6 @@ export async function runSubscriptionAndUsageSweep(nowMs: number = Date.now()): 
       }
       if (!sub.allowed && sub.state === SubscriptionStatus.EXPIRED && org.subscriptionStatus !== SubscriptionStatus.EXPIRED) {
         await orgSnap.ref.update({ subscriptionStatus: SubscriptionStatus.EXPIRED, updatedAt: new Date(nowMs).toISOString(), updatedBy: "system" });
-        await createAuditLog({
-          organizationId: orgId,
-          actorUid: "system",
-          action: "SUBSCRIPTION_EXPIRED",
-          entityType: "organization",
-          entityId: orgId,
-          changes: [{ field: "subscriptionStatus", from: org.subscriptionStatus || null, to: SubscriptionStatus.EXPIRED }],
-        });
         result.expiredFlipped++;
       }
     }
@@ -130,8 +123,8 @@ export async function runSubscriptionAndUsageSweep(nowMs: number = Date.now()): 
 
 export const subscriptionAndUsageSweep = onSchedule(
   { schedule: "0 2 * * *", timeZone: "Asia/Kolkata", region: "asia-south1" },
-  async () => {
+  withScheduledContext("subscriptionAndUsageSweep", async () => {
     const result = await runSubscriptionAndUsageSweep();
     console.log("[sweep] subscription & usage sweep complete", result);
-  }
+  })
 );

@@ -1,0 +1,1058 @@
+{
+ "runId": "roundtrip-mwf7lcq0",
+ "generatedAt": "2026-11-13T16:46:31.080Z",
+ "callables": {
+  "usersUpdateMe": {
+   "calls": 1,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "imagesCreateUploadSession": {
+   "calls": 1,
+   "proven": [
+    "contentType",
+    "entityId",
+    "entityType",
+    "purpose"
+   ],
+   "transformed": [],
+   "documents": [
+    "imageUploadSessions/up_309ab2c65a739f057093b52d5c91f803"
+   ]
+  },
+  "imagesAttach": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "organizationsCreate": {
+   "calls": 2,
+   "proven": [
+    "addresses[].area",
+    "addresses[].city",
+    "addresses[].contactName",
+    "addresses[].country",
+    "addresses[].geoPoint.latitude",
+    "addresses[].geoPoint.longitude",
+    "addresses[].id",
+    "addresses[].isDefaultBilling",
+    "addresses[].isDefaultShipping",
+    "addresses[].label",
+    "addresses[].line1",
+    "addresses[].line2",
+    "addresses[].phone",
+    "addresses[].postalCode",
+    "addresses[].state",
+    "bankAccounts[].accountHolderName",
+    "bankAccounts[].accountNumber",
+    "bankAccounts[].bankName",
+    "bankAccounts[].currency",
+    "bankAccounts[].id",
+    "bankAccounts[].isDefault",
+    "bankAccounts[].label",
+    "bankAccounts[].routingCode",
+    "bankAccounts[].routingType",
+    "bankAccounts[].showOnInvoice",
+    "bankAccounts[].status",
+    "bankAccounts[].upiId",
+    "businessCategory",
+    "businessType",
+    "contact.altPhone",
+    "contact.email",
+    "contact.name",
+    "contact.phone",
+    "contacts[].createdAt",
+    "contacts[].createdBy",
+    "contacts[].designation",
+    "contacts[].email",
+    "contacts[].id",
+    "contacts[].isActive",
+    "contacts[].isPrimary",
+    "contacts[].name",
+    "contacts[].notifyBy",
+    "contacts[].phone",
+    "contacts[].type",
+    "contacts[].updatedAt",
+    "contacts[].updatedBy",
+    "country",
+    "currency",
+    "financialYearStartMonth",
+    "legalName",
+    "name",
+    "planId",
+    "salesChannels[]",
+    "taxId",
+    "taxRegimeCode",
+    "timezone",
+    "website"
+   ],
+   "transformed": [],
+   "documents": [
+    "organizations/UVQwVKyti5jbh3AAURHC",
+    "organizations/ABpBaat0RIBtUfXkyawA"
+   ]
+  },
+  "organizationsUpdate": {
+   "calls": 2,
+   "proven": [
+    "addresses[].area",
+    "addresses[].city",
+    "addresses[].contactName",
+    "addresses[].country",
+    "addresses[].geoPoint.latitude",
+    "addresses[].geoPoint.longitude",
+    "addresses[].id",
+    "addresses[].isDefaultBilling",
+    "addresses[].isDefaultShipping",
+    "addresses[].label",
+    "addresses[].line1",
+    "addresses[].line2",
+    "addresses[].phone",
+    "addresses[].postalCode",
+    "addresses[].state",
+    "bankAccounts[].accountHolderName",
+    "bankAccounts[].accountNumber",
+    "bankAccounts[].bankName",
+    "bankAccounts[].currency",
+    "bankAccounts[].id",
+    "bankAccounts[].isDefault",
+    "bankAccounts[].label",
+    "bankAccounts[].routingType",
+    "bankAccounts[].showOnInvoice",
+    "bankAccounts[].status",
+    "bankAccounts[].upiId",
+    "contact.altPhone",
+    "contact.email",
+    "contact.name",
+    "contact.phone",
+    "contactEmail",
+    "contactPhone",
+    "contacts[].createdAt",
+    "contacts[].createdBy",
+    "contacts[].designation",
+    "contacts[].email",
+    "contacts[].id",
+    "contacts[].isActive",
+    "contacts[].isPrimary",
+    "contacts[].name",
+    "contacts[].notifyBy",
+    "contacts[].phone",
+    "contacts[].type",
+    "contacts[].updatedAt",
+    "contacts[].updatedBy",
+    "legalName",
+    "settings.approvals.amountThreshold",
+    "settings.approvals.enabled",
+    "settings.approvals.modules.expense",
+    "settings.approvals.modules.purchase",
+    "settings.approvals.modules.return",
+    "settings.approvals.modules.sale",
+    "settings.approvals.modules.stock_adjustment",
+    "settings.businessConfig.defaultUnits[]",
+    "settings.businessConfig.salesMode",
+    "taxId",
+    "website"
+   ],
+   "transformed": [],
+   "documents": [
+    "organizations/UVQwVKyti5jbh3AAURHC",
+    "organizations/KIAJXRawJPixA8dF49Ku"
+   ]
+  },
+  "organizationsReactivate": {
+   "calls": 1,
+   "proven": [],
+   "transformed": [],
+   "documents": [
+    "organizations/KIAJXRawJPixA8dF49Ku"
+   ]
+  },
+  "organizationsSetSubscription": {
+   "calls": 1,
+   "proven": [
+    "graceDays",
+    "planId"
+   ],
+   "transformed": [
+    "status"
+   ],
+   "documents": [
+    "organizations/KIAJXRawJPixA8dF49Ku"
+   ]
+  },
+  "organizationsProvisionUser": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "organizationsTransferOwnership": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "branchesCreate": {
+   "calls": 2,
+   "proven": [],
+   "transformed": [
+    "name"
+   ],
+   "documents": [
+    "organizations/KIAJXRawJPixA8dF49Ku"
+   ]
+  },
+  "branchesUpdate": {
+   "calls": 2,
+   "proven": [
+    "contact.email",
+    "contact.phone"
+   ],
+   "transformed": [
+    "name"
+   ],
+   "documents": [
+    "organizations/KIAJXRawJPixA8dF49Ku"
+   ]
+  },
+  "branchContextSwitch": {
+   "calls": 1,
+   "proven": [],
+   "transformed": [],
+   "documents": [
+    "organizations/KIAJXRawJPixA8dF49Ku"
+   ]
+  },
+  "sharingPoliciesUpdate": {
+   "calls": 1,
+   "proven": [],
+   "transformed": [],
+   "documents": [
+    "organizations/KIAJXRawJPixA8dF49Ku"
+   ]
+  },
+  "employeesCreate": {
+   "calls": 1,
+   "proven": [
+    "email",
+    "name",
+    "phone"
+   ],
+   "transformed": [],
+   "documents": [
+    "users/mPdFNf1Pn8Bo60ai4OJTb7sPoU95"
+   ]
+  },
+  "employeesUpdate": {
+   "calls": 2,
+   "proven": [
+    "departmentId",
+    "jobRoleIds[]",
+    "reportingToIds[]",
+    "roleId",
+    "status",
+    "teamId"
+   ],
+   "transformed": [],
+   "documents": [
+    "memberships/mPdFNf1Pn8Bo60ai4OJTb7sPoU95_KIAJXRawJPixA8dF49Ku"
+   ]
+  },
+  "rolesCreate": {
+   "calls": 1,
+   "proven": [
+    "code",
+    "description",
+    "name",
+    "permissions[]"
+   ],
+   "transformed": [],
+   "documents": [
+    "roles/K7TljgjmwHirtp7vXKrP"
+   ]
+  },
+  "rolesUpdate": {
+   "calls": 1,
+   "proven": [
+    "description",
+    "name",
+    "permissions[]"
+   ],
+   "transformed": [],
+   "documents": [
+    "roles/K7TljgjmwHirtp7vXKrP"
+   ]
+  },
+  "departmentsCreate": {
+   "calls": 1,
+   "proven": [
+    "headMembershipIds[]",
+    "name"
+   ],
+   "transformed": [],
+   "documents": [
+    "departments/UMqkfNKE6WB6OQaKLX3l"
+   ]
+  },
+  "departmentsUpdate": {
+   "calls": 1,
+   "proven": [
+    "headMembershipIds[]",
+    "name"
+   ],
+   "transformed": [],
+   "documents": [
+    "departments/UMqkfNKE6WB6OQaKLX3l"
+   ]
+  },
+  "jobRolesCreate": {
+   "calls": 1,
+   "proven": [
+    "code",
+    "name"
+   ],
+   "transformed": [],
+   "documents": [
+    "jobRoles/sOuRBic4M4167XQaJFCj"
+   ]
+  },
+  "jobRolesUpdate": {
+   "calls": 1,
+   "proven": [
+    "name"
+   ],
+   "transformed": [],
+   "documents": [
+    "jobRoles/sOuRBic4M4167XQaJFCj"
+   ]
+  },
+  "teamsCreate": {
+   "calls": 1,
+   "proven": [
+    "description",
+    "leaderMembershipId",
+    "name"
+   ],
+   "transformed": [],
+   "documents": [
+    "teams/FnwPblh7f6V0YooOxOEY"
+   ]
+  },
+  "teamsUpdate": {
+   "calls": 1,
+   "proven": [
+    "description",
+    "isActive",
+    "leaderMembershipId",
+    "name"
+   ],
+   "transformed": [],
+   "documents": [
+    "teams/FnwPblh7f6V0YooOxOEY"
+   ]
+  },
+  "teamsAssignMember": {
+   "calls": 1,
+   "proven": [
+    "teamId"
+   ],
+   "transformed": [],
+   "documents": [
+    "memberships/mPdFNf1Pn8Bo60ai4OJTb7sPoU95_KIAJXRawJPixA8dF49Ku"
+   ]
+  },
+  "plansCreate": {
+   "calls": 2,
+   "proven": [
+    "branchLimit",
+    "currency",
+    "isActive",
+    "monthlyDocumentVolumeLimit",
+    "name",
+    "price",
+    "seatLimits.admin",
+    "seatLimits.staff",
+    "storageLimitMb"
+   ],
+   "transformed": [],
+   "documents": [
+    "subscriptionPlans/mZ8EW02qwB6R66ghJrvg",
+    "subscriptionPlans/0wekyWAcl4EprOHPSUOR"
+   ]
+  },
+  "plansUpdate": {
+   "calls": 1,
+   "proven": [
+    "branchLimit",
+    "isActive",
+    "name",
+    "price"
+   ],
+   "transformed": [],
+   "documents": [
+    "subscriptionPlans/0wekyWAcl4EprOHPSUOR"
+   ]
+  },
+  "notificationsRegisterFcmToken": {
+   "calls": 1,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "productsCreate": {
+   "calls": 2,
+   "proven": [
+    "alternateUnits[].barcode",
+    "alternateUnits[].factor",
+    "alternateUnits[].isPurchaseUnit",
+    "alternateUnits[].isSaleUnit",
+    "alternateUnits[].sellingPrice",
+    "alternateUnits[].unit",
+    "alternateUnits[].wholesalePrice",
+    "barcode",
+    "baseUnit",
+    "brand",
+    "categoryId",
+    "costPrice",
+    "description",
+    "dimensions.height",
+    "dimensions.length",
+    "dimensions.unit",
+    "dimensions.width",
+    "hasExpiry",
+    "hasVariants",
+    "imagePaths[]",
+    "isDiscountable",
+    "isExpenseOnly",
+    "isPurchaseOnly",
+    "isReturnable",
+    "isSaleOnly",
+    "isTaxable",
+    "jewellery.grossWeightGrams",
+    "jewellery.hallmarkId",
+    "jewellery.makingCharge",
+    "jewellery.makingChargeType",
+    "jewellery.netWeightGrams",
+    "jewellery.priceByDailyRate",
+    "jewellery.purity",
+    "lowStockThreshold",
+    "maxDiscountPercent",
+    "maxStockLevel",
+    "mrp",
+    "name",
+    "reorderLevel",
+    "returnWindowDays",
+    "sellingPrice",
+    "sharedForBranchIds[]",
+    "size",
+    "sku",
+    "taxCode",
+    "taxExemptionReason",
+    "taxInclusive",
+    "taxRatePercent",
+    "trackBatch",
+    "trackSerial",
+    "trackStock",
+    "variantGroupId",
+    "visibilityScope",
+    "warrantyMonths",
+    "weight.unit",
+    "weight.value",
+    "wholesalePrice"
+   ],
+   "transformed": [],
+   "documents": [
+    "products/zd0wj1xmjDby1jQHHDpc",
+    "products/J25hJDHzrXIjTlZ7HpJH"
+   ]
+  },
+  "productsUpdate": {
+   "calls": 2,
+   "proven": [
+    "alternateUnits[].barcode",
+    "alternateUnits[].factor",
+    "alternateUnits[].isPurchaseUnit",
+    "alternateUnits[].isSaleUnit",
+    "alternateUnits[].sellingPrice",
+    "alternateUnits[].unit",
+    "alternateUnits[].wholesalePrice",
+    "barcode",
+    "baseUnit",
+    "brand",
+    "categoryId",
+    "costPrice",
+    "description",
+    "dimensions.height",
+    "dimensions.length",
+    "dimensions.unit",
+    "dimensions.width",
+    "hasExpiry",
+    "imagePaths[]",
+    "isActive",
+    "isDiscountable",
+    "isReturnable",
+    "isTaxable",
+    "jewellery.grossWeightGrams",
+    "jewellery.hallmarkId",
+    "jewellery.makingCharge",
+    "jewellery.makingChargeType",
+    "jewellery.netWeightGrams",
+    "jewellery.priceByDailyRate",
+    "jewellery.purity",
+    "lowStockThreshold",
+    "maxDiscountPercent",
+    "maxStockLevel",
+    "mrp",
+    "name",
+    "reorderLevel",
+    "returnWindowDays",
+    "sellingPrice",
+    "sharedForBranchIds[]",
+    "size",
+    "sku",
+    "taxCode",
+    "taxExemptionReason",
+    "taxInclusive",
+    "taxRatePercent",
+    "trackBatch",
+    "trackSerial",
+    "trackStock",
+    "variantGroupId",
+    "visibilityScope",
+    "warrantyMonths",
+    "weight.unit",
+    "weight.value",
+    "wholesalePrice"
+   ],
+   "transformed": [],
+   "documents": [
+    "products/zd0wj1xmjDby1jQHHDpc",
+    "products/J25hJDHzrXIjTlZ7HpJH"
+   ]
+  },
+  "categoriesCreate": {
+   "calls": 1,
+   "proven": [
+    "name",
+    "nature",
+    "parentId"
+   ],
+   "transformed": [],
+   "documents": [
+    "categories/jKjB8LrrFAfYPQyUosKs"
+   ]
+  },
+  "categoriesUpdate": {
+   "calls": 1,
+   "proven": [
+    "isActive",
+    "name",
+    "nature",
+    "parentId"
+   ],
+   "transformed": [],
+   "documents": [
+    "categories/jKjB8LrrFAfYPQyUosKs"
+   ]
+  },
+  "unitsCreate": {
+   "calls": 1,
+   "proven": [
+    "baseUnit",
+    "code",
+    "conversionFactor",
+    "group",
+    "name",
+    "precision"
+   ],
+   "transformed": [],
+   "documents": [
+    "units/jp3zOF6odsbeixKi2uQy"
+   ]
+  },
+  "unitsUpdate": {
+   "calls": 1,
+   "proven": [
+    "isActive",
+    "name",
+    "precision"
+   ],
+   "transformed": [],
+   "documents": [
+    "units/jp3zOF6odsbeixKi2uQy"
+   ]
+  },
+  "customersCreate": {
+   "calls": 2,
+   "proven": [
+    "additionalPhones[]",
+    "addresses[].area",
+    "addresses[].city",
+    "addresses[].contactName",
+    "addresses[].country",
+    "addresses[].geoPoint.latitude",
+    "addresses[].geoPoint.longitude",
+    "addresses[].id",
+    "addresses[].isDefaultBilling",
+    "addresses[].isDefaultShipping",
+    "addresses[].label",
+    "addresses[].line1",
+    "addresses[].line2",
+    "addresses[].phone",
+    "addresses[].postalCode",
+    "addresses[].state",
+    "bankAccounts[].accountHolderName",
+    "bankAccounts[].accountNumber",
+    "bankAccounts[].bankName",
+    "bankAccounts[].currency",
+    "bankAccounts[].id",
+    "bankAccounts[].isDefault",
+    "bankAccounts[].label",
+    "bankAccounts[].routingCode",
+    "bankAccounts[].routingType",
+    "bankAccounts[].showOnInvoice",
+    "bankAccounts[].status",
+    "bankAccounts[].upiId",
+    "contacts[].designation",
+    "contacts[].email",
+    "contacts[].id",
+    "contacts[].name",
+    "contacts[].phone",
+    "contacts[].whatsApp",
+    "creditLimit",
+    "creditPeriodDays",
+    "email",
+    "isDefault",
+    "legalName",
+    "name",
+    "partyType",
+    "phone",
+    "priceGroup",
+    "sharedForBranchIds[]",
+    "taxId",
+    "visibilityScope"
+   ],
+   "transformed": [
+    "creditPeriodDays"
+   ],
+   "documents": [
+    "customers/ZxE9vidgUpl9DuiCI9A5",
+    "customers/OBuiUAbeVlFBPJRN69NK"
+   ]
+  },
+  "customersUpdate": {
+   "calls": 2,
+   "proven": [
+    "additionalPhones[]",
+    "addresses[].area",
+    "addresses[].city",
+    "addresses[].contactName",
+    "addresses[].country",
+    "addresses[].geoPoint.latitude",
+    "addresses[].geoPoint.longitude",
+    "addresses[].id",
+    "addresses[].isDefaultBilling",
+    "addresses[].isDefaultShipping",
+    "addresses[].label",
+    "addresses[].line1",
+    "addresses[].line2",
+    "addresses[].phone",
+    "addresses[].postalCode",
+    "addresses[].state",
+    "bankAccounts[].accountHolderName",
+    "bankAccounts[].accountNumber",
+    "bankAccounts[].bankName",
+    "bankAccounts[].currency",
+    "bankAccounts[].id",
+    "bankAccounts[].isDefault",
+    "bankAccounts[].label",
+    "bankAccounts[].routingType",
+    "bankAccounts[].showOnInvoice",
+    "bankAccounts[].status",
+    "bankAccounts[].upiId",
+    "contacts[].designation",
+    "contacts[].email",
+    "contacts[].id",
+    "contacts[].name",
+    "contacts[].phone",
+    "contacts[].whatsApp",
+    "creditLimit",
+    "creditPeriodDays",
+    "email",
+    "isActive",
+    "legalName",
+    "name",
+    "partyType",
+    "phone",
+    "priceGroup",
+    "sharedForBranchIds[]",
+    "taxId",
+    "visibilityScope"
+   ],
+   "transformed": [],
+   "documents": [
+    "customers/ZxE9vidgUpl9DuiCI9A5",
+    "customers/OBuiUAbeVlFBPJRN69NK"
+   ]
+  },
+  "vendorsCreate": {
+   "calls": 2,
+   "proven": [
+    "additionalPhones[]",
+    "addresses[].area",
+    "addresses[].city",
+    "addresses[].contactName",
+    "addresses[].country",
+    "addresses[].geoPoint.latitude",
+    "addresses[].geoPoint.longitude",
+    "addresses[].id",
+    "addresses[].isDefaultBilling",
+    "addresses[].isDefaultShipping",
+    "addresses[].label",
+    "addresses[].line1",
+    "addresses[].line2",
+    "addresses[].phone",
+    "addresses[].postalCode",
+    "addresses[].state",
+    "bankAccounts[].accountHolderName",
+    "bankAccounts[].accountNumber",
+    "bankAccounts[].bankName",
+    "bankAccounts[].currency",
+    "bankAccounts[].id",
+    "bankAccounts[].isDefault",
+    "bankAccounts[].label",
+    "bankAccounts[].routingCode",
+    "bankAccounts[].routingType",
+    "bankAccounts[].showOnInvoice",
+    "bankAccounts[].status",
+    "bankAccounts[].upiId",
+    "contacts[].designation",
+    "contacts[].email",
+    "contacts[].id",
+    "contacts[].name",
+    "contacts[].phone",
+    "contacts[].whatsApp",
+    "creditLimit",
+    "email",
+    "isDefault",
+    "legalName",
+    "name",
+    "partyType",
+    "paymentTermsDays",
+    "phone",
+    "sharedForBranchIds[]",
+    "taxId",
+    "visibilityScope"
+   ],
+   "transformed": [],
+   "documents": [
+    "vendors/ds7qJnWUj3tVesdA3Uw5",
+    "vendors/XrbmGWz2Di08b9sd5PKy"
+   ]
+  },
+  "vendorsUpdate": {
+   "calls": 2,
+   "proven": [
+    "additionalPhones[]",
+    "addresses[].area",
+    "addresses[].city",
+    "addresses[].contactName",
+    "addresses[].country",
+    "addresses[].geoPoint.latitude",
+    "addresses[].geoPoint.longitude",
+    "addresses[].id",
+    "addresses[].isDefaultBilling",
+    "addresses[].isDefaultShipping",
+    "addresses[].label",
+    "addresses[].line1",
+    "addresses[].line2",
+    "addresses[].phone",
+    "addresses[].postalCode",
+    "addresses[].state",
+    "bankAccounts[].accountHolderName",
+    "bankAccounts[].accountNumber",
+    "bankAccounts[].bankName",
+    "bankAccounts[].currency",
+    "bankAccounts[].id",
+    "bankAccounts[].isDefault",
+    "bankAccounts[].label",
+    "bankAccounts[].routingType",
+    "bankAccounts[].showOnInvoice",
+    "bankAccounts[].status",
+    "bankAccounts[].upiId",
+    "contacts[].designation",
+    "contacts[].email",
+    "contacts[].id",
+    "contacts[].name",
+    "contacts[].phone",
+    "contacts[].whatsApp",
+    "creditLimit",
+    "email",
+    "isActive",
+    "legalName",
+    "name",
+    "partyType",
+    "paymentTermsDays",
+    "phone",
+    "sharedForBranchIds[]",
+    "taxId",
+    "visibilityScope"
+   ],
+   "transformed": [],
+   "documents": [
+    "vendors/ds7qJnWUj3tVesdA3Uw5",
+    "vendors/XrbmGWz2Di08b9sd5PKy"
+   ]
+  },
+  "outflowsCreate": {
+   "calls": 1,
+   "proven": [
+    "invoiceNumber",
+    "kind",
+    "lines[].productId",
+    "lines[].quantity",
+    "lines[].unit",
+    "lines[].unitPrice",
+    "paidAmount",
+    "vendorId"
+   ],
+   "transformed": [],
+   "documents": [
+    "outflows/FjSguRG2YJXI305JtMVo"
+   ]
+  },
+  "billsCreate": {
+   "calls": 1,
+   "proven": [
+    "customerId",
+    "items[].productId",
+    "items[].quantity",
+    "items[].unit",
+    "notes",
+    "paidAmount",
+    "salesMode"
+   ],
+   "transformed": [],
+   "documents": [
+    "bills/ZacDB9TG5CP2Ht7UCYj8"
+   ]
+  },
+  "billsUpdateDraft": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "recurringExpensesCreate": {
+   "calls": 1,
+   "proven": [
+    "dayOfMonth",
+    "expenseCategoryId",
+    "frequency",
+    "lines[].addToStock",
+    "lines[].batch",
+    "lines[].categoryId",
+    "lines[].damageReason",
+    "lines[].damagedQuantity",
+    "lines[].discountAmount",
+    "lines[].expiryDate",
+    "lines[].itemName",
+    "lines[].quantity",
+    "lines[].serialNumbers[]",
+    "lines[].taxPercent",
+    "lines[].unit",
+    "lines[].unitPrice",
+    "name",
+    "payee",
+    "payeeMembershipId",
+    "payeeType",
+    "startOn",
+    "vendorId",
+    "weekday"
+   ],
+   "transformed": [],
+   "documents": [
+    "recurringExpenses/BJzBCxCQuFktamXNt2TF"
+   ]
+  },
+  "recurringExpensesUpdate": {
+   "calls": 1,
+   "proven": [
+    "endOn",
+    "isActive",
+    "lines[].addToStock",
+    "lines[].batch",
+    "lines[].categoryId",
+    "lines[].damageReason",
+    "lines[].damagedQuantity",
+    "lines[].discountAmount",
+    "lines[].expiryDate",
+    "lines[].itemName",
+    "lines[].quantity",
+    "lines[].serialNumbers[]",
+    "lines[].taxPercent",
+    "lines[].unit",
+    "lines[].unitPrice",
+    "name"
+   ],
+   "transformed": [],
+   "documents": [
+    "recurringExpenses/BJzBCxCQuFktamXNt2TF"
+   ]
+  },
+  "deliveriesCreate": {
+   "calls": 1,
+   "proven": [
+    "address.city",
+    "address.line1",
+    "address.pincode",
+    "billId",
+    "recipient.name",
+    "recipient.phone"
+   ],
+   "transformed": [],
+   "documents": [
+    "deliveries/H0W72safwZp7QDJwTWdS"
+   ]
+  },
+  "deliveriesUpdateStatus": {
+   "calls": 1,
+   "proven": [
+    "notes",
+    "riderMembershipId",
+    "status"
+   ],
+   "transformed": [],
+   "documents": [
+    "deliveries/H0W72safwZp7QDJwTWdS"
+   ]
+  },
+  "returnsCreate": {
+   "calls": 1,
+   "proven": [
+    "items[].productId",
+    "items[].quantity",
+    "items[].reason",
+    "items[].refundAmount",
+    "referenceId",
+    "refundMethod",
+    "returnType"
+   ],
+   "transformed": [],
+   "documents": [
+    "returns/Ol7bwaRAv8qeXMF2lASX"
+   ]
+  },
+  "paymentsCreate": {
+   "calls": 1,
+   "proven": [
+    "amount",
+    "direction",
+    "gateway.externalReference",
+    "gateway.gatewayProvider",
+    "method",
+    "notes",
+    "partyId",
+    "partyType"
+   ],
+   "transformed": [],
+   "documents": [
+    "payments/4cnRZJ2swg9y6MA6Ejbg"
+   ]
+  },
+  "stockAdjust": {
+   "calls": 2,
+   "proven": [],
+   "transformed": [],
+   "documents": [
+    "products/zd0wj1xmjDby1jQHHDpc",
+    "products/J25hJDHzrXIjTlZ7HpJH"
+   ]
+  },
+  "tasksCreate": {
+   "calls": 1,
+   "proven": [
+    "assignedToMembershipId",
+    "description",
+    "dueAt",
+    "priority",
+    "relatedEntityId",
+    "relatedEntityType",
+    "title"
+   ],
+   "transformed": [],
+   "documents": [
+    "tasks/FcMCuR8e7dmjF6K9tsSU"
+   ]
+  },
+  "tasksUpdate": {
+   "calls": 1,
+   "proven": [
+    "assignedToMembershipId",
+    "description",
+    "dueAt",
+    "priority",
+    "status",
+    "title"
+   ],
+   "transformed": [],
+   "documents": [
+    "tasks/FcMCuR8e7dmjF6K9tsSU"
+   ]
+  },
+  "tasksAssign": {
+   "calls": 1,
+   "proven": [
+    "assignedToMembershipId"
+   ],
+   "transformed": [],
+   "documents": [
+    "tasks/FcMCuR8e7dmjF6K9tsSU"
+   ]
+  },
+  "tasksUpdateStatus": {
+   "calls": 1,
+   "proven": [
+    "status"
+   ],
+   "transformed": [],
+   "documents": [
+    "tasks/FcMCuR8e7dmjF6K9tsSU"
+   ]
+  },
+  "locationsRecordPing": {
+   "calls": 1,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "notificationsMarkRead": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "usageCalculateDryRunStatement": {
+   "calls": 1,
+   "proven": [],
+   "transformed": [],
+   "documents": [
+    "organizations/KIAJXRawJPixA8dF49Ku"
+   ]
+  },
+  "usageRecordClientMetric": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "usageUpdateLimits": {
+   "calls": 1,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  }
+ }
+}

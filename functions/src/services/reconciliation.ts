@@ -8,7 +8,7 @@
  */
 
 import { db } from "./firebase.js";
-import { ProductDoc, StockMovementDoc, CustomerDoc, VendorDoc, BillDoc, OutflowDoc, PaymentDoc, ReturnDoc, OrganizationDoc } from "../types/models.js";
+import { ProductDoc, StockMovementDoc, CustomerDoc, VendorDoc, BillDoc, OutflowDoc, PaymentDoc, ReturnDoc, OrganizationDoc, StockBalanceDoc } from "../types/models.js";
 import { Money } from "./money.js";
 import { PaymentDirection, PartyType } from "../constants/enums.js";
 
@@ -103,7 +103,7 @@ export async function reconcileStock(
     if (branchId) {
       const balanceSnap = await db.collection("stockBalances").doc(`${organizationId}_${branchId}_${prodId}`).get();
       if (balanceSnap.exists) {
-        currentStock = (balanceSnap.data() as any).currentStock || 0;
+        currentStock = (balanceSnap.data() as StockBalanceDoc).currentStock || 0;
       }
     }
 

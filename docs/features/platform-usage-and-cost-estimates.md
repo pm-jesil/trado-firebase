@@ -1,95 +1,35 @@
 # Feature Guide: Platform Usage Metering & Cost Estimates
 
----
+How the backend counts what each organization and user uses, and turns it into a cost **estimate**. The design, the counting rules and what the numbers include are in [the cost-tracking guide](../guides/cost-tracking.md); the prices in [the rate card](../reference/rate-card.md); measured costs per callable in [the API cost profile](../reference/api-cost-profile.md).
 
-## 1. Purpose & Scope
-This module provides tenant-level infrastructure resource tracking, usage aggregation, and diagnostic dry-run statements for Trado Platform Super Administrators:
-- **Tenant & Branch Telemetry**: Aggregates daily Firestore reads, writes, and Cloud Function invocations across organizations (`organizationUsageDaily`) and branches (`branchUsageDaily`).
-- **Platform Aggregates**: Generates global platform rollups (`platformUsageSnapshots`) across all tenants.
-- **Diagnostic Dry-Run Statements**: `usageCalculateDryRunStatement` evaluates tenant consumption against versioned rate cards (`usageRateCards`) to produce internal resource cost estimates.
-- **Strict Legal & Billing Boundaries**: Clearly marks all cost reports as non-invoice diagnostic estimates. Does not initiate payment gateway transactions or real cloud billing charges.
+## What is recorded
 
----
+Every callable, trigger and the scheduled job runs inside a request context (`functions/src/services/requestContext.ts`). Every Firestore operation goes through one counting layer (`functions/src/services/meteredFirestore.ts`) and is added to that request. At the end of the request the counts go into two rollups:
 
-## 2. Actors & Permissions
-- **Platform Super Admin** (`isSuperAdmin: true`): Exclusively authorized to access platform summary metrics (`usageGetPlatformSummary`), tenant consumption rankings (`usageGetOrganizations`), branch details (`usageGetBranches`), time series history (`usageGetDetail`), and dry-run cost calculations.
-- **Tenant Users / Non-Super Admins**: Completely denied access to usage metering APIs (fails with `permission-denied`).
-- **Telemetry Ingestion**: Clients report operational telemetry counters via `usageRecordClientMetric`.
+| Collection | Key | Holds |
+|---|---|---|
+| `organizationUsageDaily` | `{organizationId}_{utcDate}` (`platform_{utcDate}` for platform work) | organization × day quantities |
+| `userUsageDaily` | `{organizationId}_{uid}_{utcDate}` | organization × user × day quantities, devices |
 
----
+Quantities only: reads, writes, deletes (total and by category: gate / app / audit / meter), calls, errors, denials, durations, bytes, by callable, by collection, by UTC hour. No cost is stored (D-22).
 
-## 3. Resource Metering Architecture
+Separate from this, the gate keeps exact **plan-limit counters** (`usageCounterShards`: one call counted per gated call, for `hard_block` limits). They count calls, not Firestore operations.
 
-### Aggregation Hierarchy
-```
-[Client Telemetry & Server Operations]
-                |
-                +---> branchUsageDaily/{orgId}_{branchId}_{date}
-                |
-                +---> organizationUsageDaily/{orgId}_{date}
-                |
-                +---> platformUsageSnapshots/{date}
-```
+What the app reports itself (`usageRecordClientMetric`) is stored under `clientReported` and never mixed with what the server measured; `branchUsageDaily`, `branchUsageMonthly` and `organizationUsageMonthly` hold only such client-reported numbers.
 
-### Versioned Rate Cards (`usageRateCards`)
-Pricing for diagnostic estimates is stored in versioned rate cards (e.g. `ratecard_v1`):
-- `firestoreRates`:
-  - `readPer100k`: ₹15.00 INR
-  - `writePer100k`: ₹45.00 INR
-  - `deletePer100k`: ₹15.00 INR
-- `functionRates`:
-  - `invocationsPerMillion`: ₹35.00 INR
-  - `computeGpuGbSecond`: ₹0.0025 INR
-- `storageRates`:
-  - `gbMonth`: ₹2.00 INR
+## Callables
 
----
+| Callable | Who | Answer |
+|---|---|---|
+| `usageGetPlatformSummary` | Super Admin | measured totals of all organizations and the platform; estimated cost by SKU; platform overhead (measured); top callables and collections |
+| `usageGetOrganizations` | Super Admin | organizations ranked by operations or estimated cost; work the platform did for each (not charged to it); anomalies computed when read |
+| `usageGetDetail` | Super Admin, or a member: `usage:read` for the organization, `usage:read_users` for every user, always their own | by day or month, hour of day, operation type, callable, collection, user, device; cost only for the Super Admin or with `showCostToTenant` |
+| `usageCalculateDryRunStatement` | Super Admin | a month's measured quantities priced by the rate card; labelled as an estimate, never an invoice |
+| `usageGetLimits`, `usageUpdateLimits` | owner / admin, Super Admin | plan limits and overrides (limit counters) |
+| `usageRecordClientMetric` | any member | client-reported numbers (untrusted) |
+| `usageGetBranches` | Super Admin | client-reported branch numbers |
 
-## 4. Step-by-Step Workflows
+## Boundaries
 
-### 4.1 Ingesting Client-Attributed Metrics
-1. **Client calls `usageRecordClientMetric`**:
-   - Payload:
-     ```json
-     {
-       "organizationId": "org_demo",
-       "branchId": "main-branch",
-       "service": "firestore",
-       "operation": "read",
-       "count": 15
-     }
-     ```
-2. **Backend Execution**:
-   - Increments daily counters in `branchUsageDaily` and `organizationUsageDaily` using Firestore `FieldValue.increment`.
-
-### 4.2 Super Admin Evaluates Diagnostic Statement
-1. **Super Admin calls `usageCalculateDryRunStatement`**:
-   - Payload:
-     ```json
-     {
-       "organizationId": "org_demo",
-       "period": "2026-10",
-       "rateCardVersion": "v1"
-     }
-     ```
-2. **Backend Execution**:
-   - Aggregates daily usage records for `org_demo` across October 2026.
-   - Evaluates consumption against `ratecard_v1`.
-   - Computes estimated resource costs broken down by service.
-   - Logs audit record in `usageAllocationRuns`.
-   - Returns statement with explicit disclaimer:
-     > *"This statement is an internal diagnostic estimate of infrastructure resource consumption. It is NOT an invoice and no automated charge has occurred."*
-
----
-
-## 5. Security & Boundary Rules
-- **Super Admin Guard**: Any non-superadmin attempting to invoke `usageGetPlatformSummary` or `usageCalculateDryRunStatement` is rejected with `permission-denied`.
-- **Anti-Recursion Safeguard**: Metering writes use lightweight counter increments and do not trigger recursive event triggers.
-- **Attribution Coverage Notice**: Client-reported telemetry covers approximately 90% of user-initiated operations. Server background triggers and cache hits are accounted for in platform snapshots. Authoritative cloud billing requires Google Cloud Billing Export to BigQuery.
-
----
-
-## 6. Local Testing & Verification
-- **Unit Tests**: `functions/src/test/unit/usageMetering.test.ts` (Validates schemas, rate card cost formulas, and zero-count edge cases).
-- **Integration Tests**: Part 6 of `functions/scripts/test-phase3-integration.js` (Tests metric ingestion, platform summaries, organization rankings, branch breakdowns, dry-run statements, and security rejection of non-superadmins).
-
+- Firebase bills the project, not organizations: every cost is an estimate, labelled with the rate-card version and whether its prices are verified, and must be reconciled against the Cloud Billing export (cloud-only, production checklist).
+- No payment is ever triggered by these numbers.

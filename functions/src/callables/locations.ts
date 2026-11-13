@@ -7,7 +7,8 @@
  * - `locationsGetHistory`: Queries historical location route pings within the retention window
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { Timestamp } from "firebase-admin/firestore";
 import { db } from "../services/firebase.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
@@ -57,7 +58,7 @@ export const locationsRecordPing = onCall({ region: "asia-south1" }, async (requ
   }
 
   const memberData = memberSnap.data() as MembershipDoc;
-  if (memberData.status === "inactive" || (memberData as any).isActive === false) {
+  if (memberData.status !== "active") {
     throw new HttpsError("failed-precondition", "Employee membership is inactive or deactivated.");
   }
 
@@ -239,11 +240,8 @@ export const locationsGetHistory = onCall({ region: "asia-south1" }, async (requ
 
   const pings = snap.docs.map((d) => {
     const data = d.data() as LocationPingDoc;
-    let expiresAtVal: any = data.expiresAt;
-    // Format native Timestamp to ISO 8601 string for wire transport compatibility
-    if (expiresAtVal && typeof expiresAtVal.toDate === "function") {
-      expiresAtVal = expiresAtVal.toDate().toISOString();
-    }
+    // Native Timestamp (TTL field) to ISO 8601 for wire transport
+    const expiresAtVal = data.expiresAt instanceof Timestamp ? data.expiresAt.toDate().toISOString() : data.expiresAt;
     return {
       ...data,
       expiresAt: expiresAtVal,

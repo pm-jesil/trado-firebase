@@ -11,6 +11,7 @@
  */
 
 import { TaxSnapshot } from "../types/models.js";
+import { round2 } from "./money.js";
 
 export interface CalculateTaxParams {
   taxRegimeCode: string;
@@ -99,9 +100,9 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
       break;
   }
 
-  // Round amounts to 2 decimal places
-  const taxAmount = Math.round((subTotal * (effectiveRate / 100)) * 100) / 100;
-  const totalWithTax = Math.round((subTotal + taxAmount) * 100) / 100;
+  // Round amounts using decimal-safe commercial rounding
+  const taxAmount = round2(subTotal * (effectiveRate / 100));
+  const totalWithTax = round2(subTotal + taxAmount);
 
   const breakdown: Array<{ name: string; rate: number; amount: number }> = [];
 
@@ -114,7 +115,7 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
       });
     } else {
       const halfRate = effectiveRate / 2;
-      const halfAmount = Math.round((taxAmount / 2) * 100) / 100;
+      const halfAmount = round2(taxAmount / 2);
       breakdown.push({
         name: `CGST (${halfRate}%)`,
         rate: halfRate,
@@ -123,7 +124,7 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
       breakdown.push({
         name: `SGST (${halfRate}%)`,
         rate: halfRate,
-        amount: Math.round((taxAmount - halfAmount) * 100) / 100,
+        amount: round2(taxAmount - halfAmount),
       });
     }
   } else if (effectiveRate > 0) {

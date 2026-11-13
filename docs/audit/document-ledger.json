@@ -1,0 +1,1187 @@
+{
+  "generatedAt": "2026-11-12T15:34:39.892Z",
+  "totalDocuments": 146,
+  "categoryCounts": {
+    "Agent Skill": 83,
+    "Guide": 4,
+    "Project Root": 41,
+    "Architecture": 1,
+    "Audit": 14,
+    "Reference": 2,
+    "Functions Internal": 1
+  },
+  "statusCounts": {
+    "CURRENT": 125,
+    "GENERATED": 21
+  },
+  "documents": [
+    {
+      "path": ".agents/skills/extension-to-functions-codebase/references/configuration-migration.md",
+      "linesCount": 162,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/extension-to-functions-codebase/references/destructuring-shim.md",
+      "linesCount": 123,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/extension-to-functions-codebase/references/signature-mapping.md",
+      "linesCount": 85,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/extension-to-functions-codebase/SKILL.md",
+      "linesCount": 131,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-ai-logic-basics/references/flutter_setup.md",
+      "linesCount": 136,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-ai-logic-basics/references/ios_setup.md",
+      "linesCount": 250,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-ai-logic-basics/references/tts_generation.md",
+      "linesCount": 677,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-ai-logic-basics/references/usage_patterns_android.md",
+      "linesCount": 243,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-ai-logic-basics/references/usage_patterns_web.md",
+      "linesCount": 275,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-ai-logic-basics/SKILL.md",
+      "linesCount": 290,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-app-hosting-basics/references/cli_commands.md",
+      "linesCount": 84,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-app-hosting-basics/references/configuration.md",
+      "linesCount": 61,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-app-hosting-basics/references/emulation.md",
+      "linesCount": 60,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-app-hosting-basics/SKILL.md",
+      "linesCount": 95,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/references/client_sdk_android.md",
+      "linesCount": 198,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/references/client_sdk_web.md",
+      "linesCount": 302,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/references/flutter_setup.md",
+      "linesCount": 152,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/references/ios_setup.md",
+      "linesCount": 88,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/references/security_rules.md",
+      "linesCount": 52,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-auth-basics/SKILL.md",
+      "linesCount": 131,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/android_setup.md",
+      "linesCount": 248,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/firebase-cli-guide.md",
+      "linesCount": 19,
+      "category": "Guide",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/firebase-service-init.md",
+      "linesCount": 21,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/flutter_setup.md",
+      "linesCount": 144,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/ios_setup.md",
+      "linesCount": 171,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/local-env-setup.md",
+      "linesCount": 81,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/refresh/android_studio.md",
+      "linesCount": 42,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/refresh/antigravity.md",
+      "linesCount": 65,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/refresh/claude.md",
+      "linesCount": 13,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/refresh/gemini-cli.md",
+      "linesCount": 14,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/refresh/other-agents.md",
+      "linesCount": 68,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/android_studio.md",
+      "linesCount": 24,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/antigravity.md",
+      "linesCount": 99,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/claude_code.md",
+      "linesCount": 46,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/cursor.md",
+      "linesCount": 94,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/gemini_cli.md",
+      "linesCount": 54,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/github_copilot.md",
+      "linesCount": 105,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/setup/other_agents.md",
+      "linesCount": 100,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/references/web_setup.md",
+      "linesCount": 130,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-basics/SKILL.md",
+      "linesCount": 156,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-crashlytics/references/android_setup.md",
+      "linesCount": 184,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-crashlytics/references/ios_setup.md",
+      "linesCount": 116,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-crashlytics/SKILL.md",
+      "linesCount": 46,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/examples.md",
+      "linesCount": 639,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/cloud_functions.md",
+      "linesCount": 185,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/config.md",
+      "linesCount": 273,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/data_seeding.md",
+      "linesCount": 186,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/native_sql.md",
+      "linesCount": 171,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/operations.md",
+      "linesCount": 386,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/realtime.md",
+      "linesCount": 213,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/schema.md",
+      "linesCount": 291,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/sdk_admin_node.md",
+      "linesCount": 142,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/sdk_android.md",
+      "linesCount": 182,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/sdk_flutter.md",
+      "linesCount": 135,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/sdk_ios.md",
+      "linesCount": 158,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/sdk_web.md",
+      "linesCount": 163,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/search.md",
+      "linesCount": 265,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/reference/security.md",
+      "linesCount": 296,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/SKILL.md",
+      "linesCount": 196,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-data-connect/templates.md",
+      "linesCount": 320,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/android_sdk_usage.md",
+      "linesCount": 258,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/data_model.md",
+      "linesCount": 76,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/flutter_setup.md",
+      "linesCount": 181,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/indexes.md",
+      "linesCount": 135,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/ios_setup.md",
+      "linesCount": 190,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/provisioning.md",
+      "linesCount": 119,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/python_sdk_usage.md",
+      "linesCount": 143,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/enterprise/web_sdk_usage.md",
+      "linesCount": 128,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/android_sdk_usage.md",
+      "linesCount": 230,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/flutter_setup.md",
+      "linesCount": 177,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/indexes.md",
+      "linesCount": 113,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/ios_setup.md",
+      "linesCount": 175,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/provisioning.md",
+      "linesCount": 111,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/references/standard/web_sdk_usage.md",
+      "linesCount": 193,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-firestore/SKILL.md",
+      "linesCount": 109,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-hosting-basics/references/configuration.md",
+      "linesCount": 116,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": ".agents/skills/firebase-hosting-basics/references/deploying.md",
+      "linesCount": 49,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-hosting-basics/SKILL.md",
+      "linesCount": 69,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-remote-config-basics/references/android_setup.md",
+      "linesCount": 111,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-remote-config-basics/references/ios_setup.md",
+      "linesCount": 84,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-remote-config-basics/SKILL.md",
+      "linesCount": 125,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firebase-security-rules-auditor/SKILL.md",
+      "linesCount": 86,
+      "category": "Agent Skill",
+      "status": "GENERATED",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/firestore-rules-creation/SKILL.md",
+      "linesCount": 601,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": ".agents/skills/xcode-project-setup/SKILL.md",
+      "linesCount": 144,
+      "category": "Agent Skill",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/api-reference.md",
+      "linesCount": 1183,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/architecture.md",
+      "linesCount": 171,
+      "category": "Architecture",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "N/A"
+    },
+    {
+      "path": "docs/audit-baseline.md",
+      "linesCount": 167,
+      "category": "Project Root",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/blast-radius-table.md",
+      "linesCount": 59,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/callable-and-trigger-inventory.md",
+      "linesCount": 440,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/catalog-diff.md",
+      "linesCount": 157,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/coverage.md",
+      "linesCount": 22,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/current-repository-baseline.md",
+      "linesCount": 195,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/document-ledger.md",
+      "linesCount": 165,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/documentation-inventory-and-deduplication.md",
+      "linesCount": 81,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/documentation-verification-report.md",
+      "linesCount": 247,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/issue-ledger.md",
+      "linesCount": 463,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/open-items.md",
+      "linesCount": 70,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/roundtrip-results.md",
+      "linesCount": 125,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/test-coverage-matrix.md",
+      "linesCount": 164,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/test-file-refactor.md",
+      "linesCount": 75,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/audit/test-refactor-verification-report.md",
+      "linesCount": 264,
+      "category": "Audit",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/current-regression-report.md",
+      "linesCount": 250,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/data-model.md",
+      "linesCount": 1006,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/decisions-log.md",
+      "linesCount": 173,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/feature-audit-matrix.md",
+      "linesCount": 60,
+      "category": "Project Root",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/customers-and-vendors.md",
+      "linesCount": 192,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/deliveries.md",
+      "linesCount": 185,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/employee-location-and-privacy.md",
+      "linesCount": 83,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/inventory-stock-and-costing.md",
+      "linesCount": 160,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/notifications.md",
+      "linesCount": 79,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/offline-sync.md",
+      "linesCount": 80,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/organizations-subscriptions-and-branches.md",
+      "linesCount": 355,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/payments-and-party-ledgers.md",
+      "linesCount": 209,
+      "category": "Project Root",
+      "status": "GENERATED",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/platform-usage-and-cost-estimates.md",
+      "linesCount": 96,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/products-categories-units-and-barcodes.md",
+      "linesCount": 199,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/purchases-and-expenses.md",
+      "linesCount": 221,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/reports-and-analytics.md",
+      "linesCount": 159,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/returns-waste-and-stock-adjustments.md",
+      "linesCount": 155,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/sales-billing-and-quotations.md",
+      "linesCount": 271,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/tasks-and-employee-operations.md",
+      "linesCount": 92,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/features/users-memberships-and-permissions.md",
+      "linesCount": 328,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/flutter-client-integration.md",
+      "linesCount": 835,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/generated/contract-changes.md",
+      "linesCount": 20,
+      "category": "Project Root",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/local-development-seed-guide.md",
+      "linesCount": 218,
+      "category": "Guide",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/manual-api-testing-guide.md",
+      "linesCount": 304,
+      "category": "Guide",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/permissions-and-roles.md",
+      "linesCount": 262,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/production-readiness.md",
+      "linesCount": 189,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/README.md",
+      "linesCount": 84,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/reference/api-audit.md",
+      "linesCount": 298,
+      "category": "Reference",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/reference/entity-fields.md",
+      "linesCount": 899,
+      "category": "Reference",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/repository-cleanup-manifest.md",
+      "linesCount": 81,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/schema-and-source-of-truth-audit.md",
+      "linesCount": 325,
+      "category": "Project Root",
+      "status": "GENERATED",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/security-and-permissions.md",
+      "linesCount": 204,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/testing-guide.md",
+      "linesCount": 182,
+      "category": "Guide",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/testing-personas-and-credentials.md",
+      "linesCount": 151,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": false,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/workflows/customers-vendors-and-sharing.md",
+      "linesCount": 93,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": "docs/workflows/deliveries-returns-and-waste.md",
+      "linesCount": 122,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": "docs/workflows/employee-and-branch-access.md",
+      "linesCount": 123,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": "docs/workflows/inventory-and-costing.md",
+      "linesCount": 105,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": "docs/workflows/organization-and-onboarding.md",
+      "linesCount": 114,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": "docs/workflows/purchases-and-expenses.md",
+      "linesCount": 109,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/workflows/reports-tasks-locations-notifications.md",
+      "linesCount": 119,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/workflows/sales-and-billing.md",
+      "linesCount": 120,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "docs/workflows/subscriptions-usage-and-platform-admin.md",
+      "linesCount": 113,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "N/A"
+    },
+    {
+      "path": "functions/README.md",
+      "linesCount": 93,
+      "category": "Functions Internal",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    },
+    {
+      "path": "README.md",
+      "linesCount": 436,
+      "category": "Project Root",
+      "status": "CURRENT",
+      "hasCodeBlocks": true,
+      "executedProof": "YES"
+    }
+  ]
+}

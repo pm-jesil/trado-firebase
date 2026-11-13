@@ -26,50 +26,56 @@ const OTHER_ORG = "org_beta";
 const UID: Record<Exclude<Persona, "anon">, string> = { other: "bob", member: "alice", owner: "olga", sa: "root", deactivated: "dave" };
 
 // Read access classes
-const TENANT = ["member", "owner", "sa"]; // active members of the organization + Super Admin
-const OWN = ["member", "sa"]; // the document's own user + Super Admin
+const SELF = ["member"]; // the document's own user (alice)
 const SIGNED_IN = ["other", "member", "owner", "sa", "deactivated"];
-const SA_ONLY = ["sa"];
 const NOBODY: string[] = [];
 
 /** collection path template → readers. `{org}` / `{uid}` are filled in. */
 const RULES_MATRIX: Record<string, { path: string; data?: Record<string, unknown>; readers: string[] }> = {
-  "users": { path: "users/alice", readers: OWN },
-  "users/devices": { path: "users/alice/devices/d1", readers: OWN },
-  "memberships": { path: `memberships/alice_${ORG}`, readers: TENANT },
-  "membershipBranches": { path: `membershipBranches/alice_${ORG}_main-branch`, readers: TENANT },
-  "organizations": { path: `organizations/${ORG}`, readers: TENANT },
-  "organizations/branches": { path: `organizations/${ORG}/branches/main-branch`, readers: TENANT },
-  "stockBalances": { path: "stockBalances/sb1", readers: TENANT },
-  "teams": { path: "teams/t1", readers: TENANT },
-  "roles": { path: "roles/r1", readers: TENANT },
-  "departments": { path: "departments/d1", readers: TENANT },
-  "jobRoles": { path: "jobRoles/j1", readers: TENANT },
-  "categories": { path: "categories/c1", readers: TENANT },
-  "units": { path: "units/u1", readers: TENANT },
-  "categories(global)": { path: "categories/global1", data: { organizationId: null }, readers: SIGNED_IN },
-  "subscriptionPlans": { path: "subscriptionPlans/p1", readers: SIGNED_IN },
+  "users": { path: "users/alice", readers: SELF },
+  "users/devices": { path: "users/alice/devices/d1", readers: SELF },
+  "memberships": { path: `memberships/alice_${ORG}`, readers: SELF },
+  "membershipBranches": { path: `membershipBranches/alice_${ORG}_main-branch`, readers: SELF },
+  "notifications": { path: "notifications/n1", readers: SELF },
+  "subscriptionPlans": { path: "subscriptionPlans/p1", data: { isActive: true, isPrivate: false }, readers: SIGNED_IN },
+  "subscriptionPlans(private)": { path: "subscriptionPlans/private1", data: { isActive: true, isPrivate: true }, readers: NOBODY },
+  "subscriptionPlans(archived)": { path: "subscriptionPlans/archived1", data: { isActive: false, isArchived: true }, readers: NOBODY },
   "permissionCatalog": { path: "permissionCatalog/bill:create", readers: SIGNED_IN },
   "modules": { path: "modules/billing", readers: SIGNED_IN },
   "taxRegimes": { path: "taxRegimes/IN_GST", readers: SIGNED_IN },
-  "tasks": { path: "tasks/task1", data: { assignedToMembershipId: `alice_${ORG}`, createdBy: "someone" }, readers: OWN },
-  "latestLocations": { path: "latestLocations/l1", readers: OWN },
-  "locationPings": { path: "locationPings/p1", readers: OWN },
-  "notifications": { path: "notifications/n1", readers: OWN },
-  ...Object.fromEntries(["products", "customers", "vendors", "outflows", "bills", "stockMovements", "deliveries", "returns",
-    "payments", "dailySummaries", "monthlySummaries", "organizationUsageDaily", "organizationUsageMonthly", "branchUsageDaily",
-    "branchUsageMonthly", "usageRateCards", "usageCounterShards", "serials", "stockAdjustmentRequests", "recurringExpenses"]
-    .map((c) => [c, { path: `${c}/x1`, readers: SA_ONLY }])),
-  ...Object.fromEntries(["documentCounters", "idempotencyRecords", "auditLogs", "notificationOutbox", "uniqueKeys"]
-    .map((c) => [c, { path: `${c}/x1`, readers: NOBODY }])),
+  "categories(global)": { path: "categories/global1", data: { organizationId: null }, readers: SIGNED_IN },
+  "units(global)": { path: "units/global1", data: { organizationId: null }, readers: SIGNED_IN },
+  "organizations": { path: `organizations/${ORG}`, readers: NOBODY },
+  "organizations/branches": { path: `organizations/${ORG}/branches/main-branch`, readers: NOBODY },
+  "stockBalances": { path: "stockBalances/sb1", readers: NOBODY },
+  "teams": { path: "teams/t1", readers: NOBODY },
+  "roles": { path: "roles/r1", readers: NOBODY },
+  "departments": { path: "departments/d1", readers: NOBODY },
+  "jobRoles": { path: "jobRoles/j1", readers: NOBODY },
+  "categories": { path: "categories/c1", readers: NOBODY },
+  "units": { path: "units/u1", readers: NOBODY },
+  "tasks": { path: "tasks/task1", readers: NOBODY },
+  "latestLocations": { path: "latestLocations/l1", readers: NOBODY },
+  "locationPings": { path: "locationPings/p1", readers: NOBODY },
+  ...Object.fromEntries([
+    "products", "customers", "vendors", "outflows", "bills", "stockMovements", "deliveries", "returns",
+    "payments", "dailySummaries", "monthlySummaries", "organizationUsageDaily", "organizationUsageMonthly", "userUsageDaily", "branchUsageDaily",
+    "branchUsageMonthly", "usageRateCards", "usageCounterShards", "platformCostReconciliation", "serials", "stockAdjustmentRequests", "recurringExpenses",
+    "documentCounters", "idempotencyRecords", "auditLogs", "notificationOutbox", "uniqueKeys", "imageUploadSessions",
+  ].map((c) => [c, { path: `${c}/x1`, readers: NOBODY }])),
 };
 
 describe("Firestore rules matrix (every collection × persona × read/write)", () => {
   let env: RulesTestEnvironment;
 
   before(async () => {
-    const rulesPath = [path.resolve(process.cwd(), "..", "firestore.rules"), path.resolve(process.cwd(), "firestore.rules")].find(fs.existsSync) as string;
-    env = await initializeTestEnvironment({ projectId: "trado-x-rules-matrix", firestore: { rules: fs.readFileSync(rulesPath, "utf8"), host: "127.0.0.1", port: 8080 } });
+    const rulesPath = [path.resolve(process.cwd(), "firestore.rules"), path.resolve(process.cwd(), "..", "firestore.rules")].find(fs.existsSync) as string;
+    // One project id per run: the emulator's rule-coverage counters are per project, so the evidence
+    // collected by scripts/collect-rules-coverage.js describes this run only.
+    const projectId = `trado-x-rules-${Date.now().toString(36)}`;
+    fs.mkdirSync(path.resolve(__dirname, "../../../../.local/rules-evidence"), { recursive: true });
+    fs.writeFileSync(path.resolve(__dirname, "../../../../.local/rules-evidence/firestore.json"), JSON.stringify({ projectId }));
+    env = await initializeTestEnvironment({ projectId, firestore: { rules: fs.readFileSync(rulesPath, "utf8"), host: "127.0.0.1", port: 8080 } });
     await env.clearFirestore();
     await env.withSecurityRulesDisabled(async (ctx) => {
       const db = ctx.firestore();
@@ -94,7 +100,8 @@ describe("Firestore rules matrix (every collection × persona × read/write)", (
   const client = (p: Persona) => (p === "anon" ? env.unauthenticatedContext() : env.authenticatedContext(UID[p], p === "sa" ? { isSuperAdmin: true } : {})).firestore();
 
   it("covers every collection of the source inventory", () => {
-    const inventory = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), "..", "tests/api/canonical-source-inventory.json"), "utf8"));
+    const inventoryPath = [path.resolve(process.cwd(), "tests/api/canonical-source-inventory.json"), path.resolve(process.cwd(), "..", "tests/api/canonical-source-inventory.json")].find(fs.existsSync) as string;
+    const inventory = JSON.parse(fs.readFileSync(inventoryPath, "utf8"));
     const declared = new Set(Object.keys(RULES_MATRIX).map((k) => k.replace(/\(.*\)$/, "")));
     const missing = (inventory.concreteCollections as Array<{ path: string }>)
       .map((c) => c.path.replace(/\/\{[^}]+\}/g, "").replace(/^organizations\/branches$/, "organizations/branches").replace(/^users\/devices$/, "users/devices"))
@@ -112,4 +119,20 @@ describe("Firestore rules matrix (every collection × persona × read/write)", (
       }
     });
   }
+
+  it("denies a path no rule names (catch-all /{document=**}) for every persona", async () => {
+    // Four segments: matched by no collection rule, only by the catch-all deny.
+    // The emulator's rule-coverage report has no entry for a literal `if false`, so these outcomes are
+    // recorded for scripts/collect-rules-coverage.js (C-9).
+    const outcomes: Array<{ op: "read" | "write"; path: string; allowed: boolean }> = [];
+    for (const p of PERSONAS) {
+      const ref = doc(client(p), "bills/x1/unlisted/y1");
+      await assertFails(getDoc(ref));
+      outcomes.push({ op: "read", path: "bills/x1/unlisted/y1", allowed: false });
+      await assertFails(setDoc(ref, { organizationId: ORG }));
+      outcomes.push({ op: "write", path: "bills/x1/unlisted/y1", allowed: false });
+    }
+    const evidence = path.resolve(__dirname, "../../../../.local/rules-evidence/firestore.json");
+    fs.writeFileSync(evidence, JSON.stringify({ ...JSON.parse(fs.readFileSync(evidence, "utf8")), outcomes }));
+  });
 });

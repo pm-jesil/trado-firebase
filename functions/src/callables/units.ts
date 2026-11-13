@@ -5,7 +5,8 @@
  * - unitsList: List units available to tenant (including global catalog)
  */
 
-import { onCall, HttpsError, type CallableRequest } from "firebase-functions/v2/https";
+import { HttpsError, type CallableRequest } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { nameKey } from "../services/naturalKeys.js";
 import { commitWithKeys, changedClaims } from "../services/uniqueKeys.js";
 import { resolveCatalogWriteAccess } from "../services/contextResolver.js";
@@ -19,7 +20,6 @@ import {
 import { parseInput } from "../validation/parseInput.js";
 import { UnitDoc } from "../types/models.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
-import { createAuditLog } from "../services/audit.js";
 
 /** Global records: Super Admin; organization records: tenant gate with catalog permission. */
 function verifyTenantOrSuperAdmin(request: CallableRequest, organizationId?: string | null) {
@@ -41,7 +41,7 @@ export const unitsCreate = onCall({ region: "asia-south1" }, async (request) => 
     actorUid: request.auth.uid,
     operation: "units.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
 
   if (idempotency.isDuplicate) {
@@ -92,14 +92,6 @@ export const unitsCreate = onCall({ region: "asia-south1" }, async (request) => 
       });
     }
 
-    await createAuditLog({
-      organizationId: input.organizationId,
-      actorUid: request.auth.uid,
-      action: "UNIT_CREATED",
-      entityType: "unit",
-      entityId: unitId,
-      details: { code: unitDoc.code, name: unitDoc.name },
-    });
 
     return response;
   } catch (error) {
@@ -140,14 +132,6 @@ export const unitsUpdate = onCall({ region: "asia-south1" }, async (request) => 
     : { claim: [], release: [] };
   await commitWithKeys(existing.organizationId || "global", "unit", input.unitId, (batch) => batch.update(unitRef, updates), nameChange);
 
-  await createAuditLog({
-    organizationId: existing.organizationId,
-    actorUid: request.auth.uid,
-    action: "UNIT_UPDATED",
-    entityType: "unit",
-    entityId: input.unitId,
-    details: updates as Record<string, unknown>,
-  });
 
   return { success: true, message: "Unit updated successfully." };
 });

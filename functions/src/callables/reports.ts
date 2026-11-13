@@ -11,7 +11,8 @@
  * - `reportsExportCsv`: Scoped CSV data export
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import { resolveRequestContext, resolveDataScope } from "../services/contextResolver.js";
 import { DEFAULT_ORG_TIMEZONE, localDateInTimezone } from "../services/subscription.js";
@@ -29,7 +30,7 @@ import {
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
 import { calculateStockValuation } from "../services/costingEngine.js";
-import { round2 } from "../services/money.js";
+import { round2, roundTo } from "../services/money.js";
 import { hydrate } from "../services/hydration.js";
 import {
   ProductDoc,
@@ -41,6 +42,9 @@ import {
   PaymentDoc,
   DeliveryDoc,
   TaskDoc,
+  OrganizationDoc,
+  StockBalanceDoc,
+  AuditLogDoc,
 } from "../types/models.js";
 import { ReturnType, ReturnDisposition, StockMovementType } from "../constants/enums.js";
 
@@ -50,7 +54,7 @@ const WRITE_OFF_MOVEMENT_TYPES = [StockMovementType.DAMAGE_OUT, StockMovementTyp
 /**
  * Helper to convert array of flat objects to CSV format.
  */
-function toCsv(rows: Record<string, any>[]): string {
+function toCsv(rows: Record<string, unknown>[]): string {
   if (!rows || rows.length === 0) return "";
   const headers = Object.keys(rows[0]);
   const lines = [headers.join(",")];
@@ -102,9 +106,51 @@ function productSalesTotals(docs: FirebaseFirestore.QueryDocumentSnapshot[]): Ma
 }
 
 /** Profit & loss for a period: the single implementation behind reportsGetProfitLoss and the P&L CSV. */
-export async function computeProfitLoss(orgId: string, validated: { branchId?: string; from?: string; to?: string }) {
+export async function computeProfitLoss(orgId: string, validated: {
+  branchId?: string;
+  from?: string;
+  to?: string;
+  periodType?: "day" | "week" | "month" | "year" | "custom";
+  periodValue?: string;
+  comparePreviousPeriod?: boolean;
+}) {
   const targetBranchId = validated.branchId;
-  const billsQuery = billsInPeriod(orgId, validated);
+
+  // Load organization configuration (timezone, financial year start, currency decimals)
+  const orgDoc = await db.collection("organizations").doc(orgId).get();
+  const orgData = (orgDoc.exists ? orgDoc.data() : {}) as OrganizationDoc;
+  const tz = orgData.timezone || DEFAULT_ORG_TIMEZONE;
+  const fyStartMonth = (orgData as unknown as { financialYearStartMonth?: number }).financialYearStartMonth || 4;
+  const decimals = orgData.currencyDecimals ?? 2;
+
+  let effectiveFrom = validated.from;
+  let effectiveTo = validated.to;
+
+  // Resolve period boundaries if periodType is specified
+  if (validated.periodType && validated.periodType !== "custom") {
+    const now = new Date();
+    const todayStr = localDateInTimezone(now.getTime(), tz);
+    if (validated.periodType === "day") {
+      effectiveFrom = validated.periodValue || todayStr;
+      effectiveTo = effectiveFrom;
+    } else if (validated.periodType === "month") {
+      const monthPrefix = validated.periodValue || todayStr.slice(0, 7);
+      effectiveFrom = `${monthPrefix}-01`;
+      const [y, m] = monthPrefix.split("-").map(Number);
+      const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+      effectiveTo = `${monthPrefix}-${String(lastDay).padStart(2, "0")}`;
+    } else if (validated.periodType === "year") {
+      const targetYear = validated.periodValue ? parseInt(validated.periodValue, 10) : parseInt(todayStr.slice(0, 4), 10);
+      effectiveFrom = `${targetYear}-${String(fyStartMonth).padStart(2, "0")}-01`;
+      const endYear = fyStartMonth === 1 ? targetYear : targetYear + 1;
+      const endMonth = fyStartMonth === 1 ? 12 : fyStartMonth - 1;
+      const lastDay = new Date(Date.UTC(endYear, endMonth, 0)).getUTCDate();
+      effectiveTo = `${endYear}-${String(endMonth).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+    }
+  }
+
+  const periodParams = { branchId: targetBranchId, from: effectiveFrom, to: effectiveTo };
+  const billsQuery = billsInPeriod(orgId, periodParams);
 
   // Read outflows for operational expenses
   let outflowsQuery = db
@@ -115,11 +161,11 @@ export async function computeProfitLoss(orgId: string, validated: { branchId?: s
   if (targetBranchId) {
     outflowsQuery = outflowsQuery.where("branchId", "==", targetBranchId);
   }
-  if (validated.from) {
-    outflowsQuery = outflowsQuery.where("createdAt", ">=", validated.from);
+  if (effectiveFrom) {
+    outflowsQuery = outflowsQuery.where("createdAt", ">=", effectiveFrom);
   }
-  if (validated.to) {
-    outflowsQuery = outflowsQuery.where("createdAt", "<=", `${validated.to}T23:59:59.999Z`);
+  if (effectiveTo) {
+    outflowsQuery = outflowsQuery.where("createdAt", "<=", `${effectiveTo}T23:59:59.999Z`);
   }
 
   const [billsSnap, outflowsSnap, returnsSnap, writeOffSnap] = await Promise.all([
@@ -135,15 +181,18 @@ export async function computeProfitLoss(orgId: string, validated: { branchId?: s
   let grossRevenue = 0;
   let grossCogs = 0;
   let billCount = 0;
+  let totalTax = 0;
+  let totalDiscounts = 0;
 
   billsSnap.docs.forEach((doc) => {
     const bill = doc.data() as BillDoc;
     grossRevenue += bill.totalAmount || 0;
+    totalTax += bill.taxTotal || 0;
+    totalDiscounts += bill.discountTotal || 0;
     billCount++;
 
     if (Array.isArray(bill.items)) {
       bill.items.forEach((item) => {
-        // Historical COGS: the cost per line unit frozen on the line at sale/invoice time (R2)
         grossCogs += (item.quantity || 0) * (item.costSnapshot || 0);
       });
     }
@@ -153,12 +202,11 @@ export async function computeProfitLoss(orgId: string, validated: { branchId?: s
   let cogsReversals = 0;
   let returnCount = 0;
 
-  // Restocked returns reverse COGS at the cost frozen on the SOURCE bill line (by reference)
   const inPeriodReturns = returnsSnap.docs.map((d) => d.data() as ReturnDoc).filter((ret) =>
     ret.status !== "voided" &&
     !(targetBranchId && ret.branchId && ret.branchId !== targetBranchId) &&
-    !(validated.from && ret.createdAt < validated.from) &&
-    !(validated.to && ret.createdAt > `${validated.to}T23:59:59.999Z`));
+    !(effectiveFrom && ret.createdAt < effectiveFrom) &&
+    !(effectiveTo && ret.createdAt > `${effectiveTo}T23:59:59.999Z`));
   const sourceBills = await sourceLinesById(inPeriodReturns.map((r) => r.referenceId));
   inPeriodReturns.forEach((ret) => {
     salesReturns += ret.totalRefundAmount || 0;
@@ -171,68 +219,74 @@ export async function computeProfitLoss(orgId: string, validated: { branchId?: s
     }
   });
 
-  grossRevenue = round2(grossRevenue);
-  salesReturns = round2(salesReturns);
-  const netRevenue = round2(Math.max(0, grossRevenue - salesReturns));
+  grossRevenue = roundTo(grossRevenue, decimals);
+  salesReturns = roundTo(salesReturns, decimals);
+  const netRevenue = roundTo(Math.max(0, grossRevenue - salesReturns), decimals);
 
-  grossCogs = round2(grossCogs);
-  cogsReversals = round2(cogsReversals);
-  const netCogs = round2(Math.max(0, grossCogs - cogsReversals));
+  grossCogs = roundTo(grossCogs, decimals);
+  cogsReversals = roundTo(cogsReversals, decimals);
+  const netCogs = roundTo(Math.max(0, grossCogs - cogsReversals), decimals);
 
   let totalExpenses = 0;
   let outflowCount = 0;
+  const expensesByCategory: Record<string, number> = {};
 
   outflowsSnap.docs.forEach((doc) => {
     const outflow = doc.data() as OutflowDoc;
     if (outflow.kind === "expense") {
-      totalExpenses += outflow.totalAmount || 0;
+      const amt = outflow.totalAmount || 0;
+      totalExpenses += amt;
+      const cat = outflow.expenseCategoryId || "general";
+      expensesByCategory[cat] = roundTo((expensesByCategory[cat] || 0) + amt, decimals);
       outflowCount++;
     } else if (outflow.kind === "purchase") {
       outflowCount++;
     }
   });
 
-  totalExpenses = round2(totalExpenses);
+  totalExpenses = roundTo(totalExpenses, decimals);
 
-  // Inventory write-offs (damage, expiry, theft, samples, internal use, count shortfalls,
-  // damaged-on-receipt) valued at the cost snapshot frozen on each movement.
   let inventoryWriteOff = 0;
   let writeOffCount = 0;
   writeOffSnap.docs.forEach((doc) => {
     const mv = doc.data() as StockMovementDoc;
     if (targetBranchId && mv.branchId && mv.branchId !== targetBranchId) return;
-    if (validated.from && mv.createdAt < validated.from) return;
-    if (validated.to && mv.createdAt > `${validated.to}T23:59:59.999Z`) return;
+    if (effectiveFrom && mv.createdAt < effectiveFrom) return;
+    if (effectiveTo && mv.createdAt > `${effectiveTo}T23:59:59.999Z`) return;
     const unitCost = mv.unitCostSnapshot || 0;
     inventoryWriteOff += Math.abs(mv.quantity || 0) * unitCost;
     writeOffCount++;
   });
-  inventoryWriteOff = round2(inventoryWriteOff);
+  inventoryWriteOff = roundTo(inventoryWriteOff, decimals);
 
-  const grossProfit = round2(netRevenue - netCogs);
+  const grossProfit = roundTo(netRevenue - netCogs, decimals);
   const grossMarginPercent = netRevenue > 0 ? round2((grossProfit / netRevenue) * 100) : 0;
-  const netProfit = round2(grossProfit - totalExpenses - inventoryWriteOff);
+  const netProfit = roundTo(grossProfit - totalExpenses - inventoryWriteOff, decimals);
   const netMarginPercent = netRevenue > 0 ? round2((netProfit / netRevenue) * 100) : 0;
 
   return {
     branchId: targetBranchId || null,
-    from: validated.from || null,
-    to: validated.to || null,
-    // GAAP / IFRS Revenue Breakdown
+    from: effectiveFrom || null,
+    to: effectiveTo || null,
+    periodType: validated.periodType || "custom",
+    timezone: tz,
+    currencyDecimals: decimals,
+    financialYearStartMonth: fyStartMonth,
     grossRevenue,
+    discounts: roundTo(totalDiscounts, decimals),
+    tax: roundTo(totalTax, decimals),
     salesReturns,
     netRevenue,
     totalRevenue: netRevenue,
-    // COGS Breakdown
     grossCogs,
     cogsReversals,
     netCogs,
     cogs: netCogs,
-    // Profit Metrics
     grossProfit,
     grossMarginPercent,
     operatingExpenses: totalExpenses,
     totalExpenses,
+    expensesByCategory,
     inventoryWriteOff,
     writeOffCount,
     netProfit,
@@ -375,7 +429,7 @@ export const reportsGetStockValuation = onCall({ region: "asia-south1" }, async 
       .get();
     const balanceMap = new Map<string, number>();
     balancesSnap.docs.forEach((doc) => {
-      const data = doc.data() as any;
+      const data = doc.data() as StockBalanceDoc;
       balanceMap.set(data.productId, data.currentStock || 0);
     });
     products = products.map((p) => ({
@@ -384,7 +438,7 @@ export const reportsGetStockValuation = onCall({ region: "asia-south1" }, async 
     }));
   }
 
-  const valuationResult = calculateStockValuation(products as any);
+  const valuationResult = calculateStockValuation(products);
   return valuationResult;
 });
 
@@ -502,7 +556,7 @@ export const reportsGetStaffActivity = onCall({ region: "asia-south1" }, async (
       .where("referenceModel", "==", "manual_adjustment").limit(LIMIT).get(),
     db.collection("tasks").where("organizationId", "==", orgId).where("status", "==", "completed").limit(LIMIT).get(),
     db.collection("auditLogs").where("organizationId", "==", orgId)
-      .where("action", "in", ["BILL_APPROVED", "BILL_REJECTED", "OUTFLOW_APPROVED", "OUTFLOW_REJECTED"]).limit(LIMIT).get(),
+      .where("action", "==", "document.decide").where("entityType", "in", ["bill", "outflow"]).limit(LIMIT).get(),
   ]);
 
   interface StaffStats {
@@ -578,8 +632,8 @@ export const reportsGetStaffActivity = onCall({ region: "asia-south1" }, async (
     get(uid as string).tasksCompleted++;
   });
   approvalsSnap.docs.forEach((d) => {
-    const a = d.data() as { actorUid: string; timestamp: string; branchId?: string };
-    if (!inRange(a.timestamp) || !allowedUid(a.actorUid)) return;
+    const a = d.data() as AuditLogDoc;
+    if (!a.actorUid || !inRange(a.occurredAt.toDate().toISOString()) || !allowedUid(a.actorUid)) return;
     get(a.actorUid).approvalsDecided++;
   });
 
@@ -616,25 +670,43 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
     throw new HttpsError("permission-denied", "Super Admin authorization required");
   }
 
-  const [orgsSnap, plansSnap] = await Promise.all([
+  const [orgsSnap, plansSnap, usersSnap] = await Promise.all([
     db.collection("organizations").get(),
     db.collection("subscriptionPlans").get(),
+    db.collection("users").get(),
   ]);
 
   const planCounts: Record<string, number> = {};
-  let activeOrgs = 0;
-  let suspendedOrgs = 0;
+  const statusCounts: Record<string, number> = { active: 0, suspended: 0, inactive: 0 };
+  const countryCounts: Record<string, number> = {};
+  const subscriptionsExpiring: Array<{ organizationId: string; name: string; expiresAt: string; daysLeft: number }> = [];
   const activeOrgIds: string[] = [];
+  const nowMs = Date.now();
 
   orgsSnap.docs.forEach((doc) => {
-    const data = doc.data();
+    const data = doc.data() as OrganizationDoc;
     const planId = data.planId || "free";
     planCounts[planId] = (planCounts[planId] || 0) + 1;
+    const st = data.status || "active";
+    statusCounts[st] = (statusCounts[st] || 0) + 1;
+    const c = data.country || "IN";
+    countryCounts[c] = (countryCounts[c] || 0) + 1;
+
     if (data.status === "active") {
-      activeOrgs++;
       activeOrgIds.push(doc.id);
-    } else {
-      suspendedOrgs++;
+    }
+
+    if (data.subscriptionExpiresAt) {
+      const expMs = Date.parse(data.subscriptionExpiresAt);
+      const daysLeft = Math.round((expMs - nowMs) / 86400000);
+      if (daysLeft <= 7 && daysLeft >= 0) {
+        subscriptionsExpiring.push({
+          organizationId: doc.id,
+          name: data.name,
+          expiresAt: data.subscriptionExpiresAt,
+          daysLeft,
+        });
+      }
     }
   });
 
@@ -642,6 +714,7 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
   let billsCount = 0;
   let totalPlatformOutflows = 0;
   let outflowsCount = 0;
+  const orgUsageMap: Array<{ organizationId: string; billsCount: number; revenue: number }> = [];
 
   const orgQueries = activeOrgIds.map(async (orgId) => {
     const [bSnap, oSnap] = await Promise.all([
@@ -649,12 +722,15 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
       db.collection("outflows").where("organizationId", "==", orgId).where("status", "in", ["active", "partial", "paid"]).get(),
     ]);
 
+    let orgRev = 0;
     bSnap.docs.forEach((doc) => {
       const data = doc.data();
       const createdAt = data.createdAt;
       if (input.from && createdAt < input.from) return;
       if (input.to && createdAt > `${input.to}T23:59:59.999Z`) return;
-      totalPlatformRevenue += Number(data.totalAmount) || 0;
+      const amt = Number(data.totalAmount) || 0;
+      totalPlatformRevenue += amt;
+      orgRev += amt;
       billsCount++;
     });
 
@@ -666,16 +742,28 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
       totalPlatformOutflows += Number(data.totalAmount) || 0;
       outflowsCount++;
     });
+
+    orgUsageMap.push({ organizationId: orgId, billsCount: bSnap.size, revenue: round2(orgRev) });
   });
 
   await Promise.all(orgQueries);
 
+  // Top organizations by usage
+  const topOrganizationsByUsage = orgUsageMap.sort((a, b) => b.billsCount - a.billsCount).slice(0, 5);
+
   return {
     totalOrganizations: orgsSnap.size,
-    activeOrganizations: activeOrgs,
-    suspendedOrganizations: suspendedOrgs,
+    activeOrganizations: statusCounts.active || 0,
+    suspendedOrganizations: statusCounts.suspended || 0,
+    inactiveOrganizations: statusCounts.inactive || 0,
+    organizationsByStatus: statusCounts,
+    organizationsByCountry: countryCounts,
     organizationsByPlan: planCounts,
     availablePlansCount: plansSnap.size,
+    totalUsers: usersSnap.size,
+    subscriptionsExpiring,
+    atRiskOrganizations: [],
+    topOrganizationsByUsage,
     totalPlatformRevenue: round2(totalPlatformRevenue),
     totalPlatformOutflows: round2(totalPlatformOutflows),
     netPlatformCashFlow: round2(totalPlatformRevenue - totalPlatformOutflows),
@@ -721,7 +809,7 @@ export const reportsExportCsv = onCall({ region: "asia-south1" }, async (request
         .get();
       const balanceMap = new Map<string, number>();
       balancesSnap.docs.forEach((doc) => {
-        const data = doc.data() as any;
+        const data = doc.data() as StockBalanceDoc;
         balanceMap.set(data.productId, data.currentStock || 0);
       });
       products = products.map((p) => ({

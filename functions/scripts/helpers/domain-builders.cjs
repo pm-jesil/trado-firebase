@@ -29,7 +29,7 @@ function buildCustomerPayload(organizationId, overrides = {}) {
   return {
     organizationId,
     name: `Customer ${unique}`,
-    mobile: `+9198${Math.floor(10000000 + Math.random() * 90000000)}`,
+    phone: `+9198${Math.floor(10000000 + Math.random() * 90000000)}`,
     email: `customer_${unique}@domain.local`,
     visibilityScope: overrides.visibilityScope ?? "all_branches",
     ...overrides,
@@ -41,7 +41,7 @@ function buildVendorPayload(organizationId, overrides = {}) {
   return {
     organizationId,
     name: `Vendor ${unique}`,
-    mobile: `+9199${Math.floor(10000000 + Math.random() * 90000000)}`,
+    phone: `+9199${Math.floor(10000000 + Math.random() * 90000000)}`,
     email: `vendor_${unique}@vendor.local`,
     visibilityScope: overrides.visibilityScope ?? "all_branches",
     ...overrides,

@@ -6,7 +6,8 @@
  * - vendorsGet: Retrieve vendor by ID
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import {
   CreateVendorSchema,
@@ -15,10 +16,10 @@ import {
   GetVendorSchema,
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
-import { VendorDoc } from "../types/models.js";
+import { VendorDoc, ImageRef } from "../types/models.js";
+import { attachUploadedImage } from "../services/imageEngine.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { commitWithKeys, partyClaims, changedClaims, duplicateOverride } from "../services/uniqueKeys.js";
-import { createAuditLog, diffChanges } from "../services/audit.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { redactVendor } from "../services/redaction.js";
@@ -51,7 +52,7 @@ export const vendorsCreate = onCall({ region: "asia-south1" }, async (request) =
     actorUid: request.auth.uid,
     operation: "vendors.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
 
   if (idempotency.isDuplicate) {
@@ -95,17 +96,34 @@ export const vendorsCreate = onCall({ region: "asia-south1" }, async (request) =
       }
     }
 
+    const partyType = input.partyType || "organization";
+    const legalName = partyType === "person" ? null : (input.legalName?.trim() || null);
+    let image: ImageRef | null = input.image || null;
+    if (input.uploadId) {
+      image = await attachUploadedImage({
+        uploadId: input.uploadId,
+        purpose: partyType === "person" ? "party_photo" : "org_logo",
+        entityType: "vendor",
+        entityId: vendorId,
+        callerUid: request.auth.uid,
+        scope: orgId,
+      });
+    }
+
     const vendorDoc: VendorDoc = {
       organizationId: orgId,
       vendorCode,
+      partyType,
       name: input.name.trim(),
-      mobile: input.mobile?.trim() || null,
+      legalName,
+      image,
+      phone: input.phone?.trim() || null,
       additionalPhones: input.additionalPhones || [],
-      whatsApp: input.whatsApp?.trim() || null,
       email: input.email?.trim().toLowerCase() || null,
-      taxNumber: input.taxNumber?.trim() || null,
-      address: input.address?.trim() || null,
-      contactPerson: input.contactPerson?.trim() || null,
+      taxId: input.taxId?.trim() || null,
+      addresses: input.addresses || [],
+      bankAccounts: input.bankAccounts || [],
+      contacts: input.contacts || [],
       paymentTermsDays: input.paymentTermsDays || 0,
       creditLimit: input.creditLimit || 0,
       outstandingPayable: 0,
@@ -140,14 +158,6 @@ export const vendorsCreate = onCall({ region: "asia-south1" }, async (request) =
       });
     }
 
-    await createAuditLog({
-      organizationId: orgId,
-      actorUid: request.auth.uid,
-      action: "VENDOR_CREATED",
-      entityType: "vendor",
-      entityId: vendorId,
-      details: { duplicateOverrideReason: input.duplicateOverrideReason || null },
-    });
 
     return response;
   } catch (error) {
@@ -188,14 +198,36 @@ export const vendorsUpdate = onCall({ region: "asia-south1" }, async (request) =
     updatedBy: ctx.callerUid,
   };
 
+  if (input.partyType !== undefined) updates.partyType = input.partyType;
+  if (input.legalName !== undefined) {
+    updates.legalName = (input.partyType === "person" || existing.partyType === "person") ? null : (input.legalName?.trim() || null);
+  }
+  if (input.uploadId) {
+    const isPerson = (input.partyType === "person" || existing.partyType === "person");
+    const attachedImage = await attachUploadedImage({
+      uploadId: input.uploadId,
+      purpose: isPerson ? "party_photo" : "org_logo",
+      entityType: "vendor",
+      entityId: input.vendorId,
+      callerUid: request.auth.uid,
+      scope: orgId,
+    });
+    updates.image = attachedImage;
+  } else if (input.image !== undefined) {
+    updates.image = input.image;
+  }
   if (input.name) updates.name = input.name.trim();
-  if (input.mobile !== undefined) updates.mobile = input.mobile?.trim() || null;
+  if (input.phone !== undefined) {
+    updates.phone = input.phone?.trim() || null;
+  }
   if (input.additionalPhones !== undefined) updates.additionalPhones = input.additionalPhones;
-  if (input.whatsApp !== undefined) updates.whatsApp = input.whatsApp?.trim() || null;
   if (input.email !== undefined) updates.email = input.email?.trim().toLowerCase() || null;
-  if (input.taxNumber !== undefined) updates.taxNumber = input.taxNumber?.trim() || null;
-  if (input.address !== undefined) updates.address = input.address?.trim() || null;
-  if (input.contactPerson !== undefined) updates.contactPerson = input.contactPerson?.trim() || null;
+  if (input.taxId !== undefined) {
+    updates.taxId = input.taxId?.trim() || null;
+  }
+  if (input.addresses !== undefined) updates.addresses = input.addresses;
+  if (input.bankAccounts !== undefined) updates.bankAccounts = input.bankAccounts;
+  if (input.contacts !== undefined) updates.contacts = input.contacts;
   if (input.paymentTermsDays !== undefined) updates.paymentTermsDays = input.paymentTermsDays;
   if (input.creditLimit !== undefined) updates.creditLimit = input.creditLimit;
   if (input.isActive !== undefined) updates.isActive = input.isActive;
@@ -214,16 +246,6 @@ export const vendorsUpdate = onCall({ region: "asia-south1" }, async (request) =
   const keyChange = duplicateOverride(ctx, input.duplicateOverrideReason) ? { claim: [], release: changedClaims(before, after).release } : changedClaims(before, after);
   await commitWithKeys(orgId, "vendor", input.vendorId, (batch) => batch.update(vendorRef, updates), keyChange);
 
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: ctx.branchId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: "VENDOR_UPDATED",
-    entityType: "vendor",
-    entityId: input.vendorId,
-    changes: diffChanges(existing as unknown as Record<string, unknown>, updates as Record<string, unknown>),
-  });
 
   return { success: true, message: "Vendor updated successfully." };
 });
@@ -256,6 +278,11 @@ export const vendorsList = onCall({ region: "asia-south1" }, async (request) => 
       }
       return true;
     });
+  }
+
+  // Filter by partyType if requested
+  if (input.partyType) {
+    items = items.filter((v) => (v.partyType || "organization") === input.partyType);
   }
 
   return { items: items.map((i) => redactVendor(i, ctx)), count: items.length, nextCursor };

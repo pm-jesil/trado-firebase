@@ -30,7 +30,7 @@ In modern Trado architecture, FCM tokens are stored in:
 
 ---
 
-## 4. The 4 Automated Event Triggers
+## 4. Automated Transaction Event Triggers
 
 The module `functions/src/triggers/eventTriggers.ts` exports 4 Cloud Functions Gen 2 triggers that execute automatically when transactions are recorded:
 

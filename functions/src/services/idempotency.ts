@@ -6,6 +6,7 @@
  */
 
 import { createHash } from "crypto";
+import { HttpsError } from "firebase-functions/v2/https";
 import { db } from "./firebase.js";
 import { IdempotencyStatus } from "../constants/enums.js";
 import { IdempotencyRecordDoc } from "../types/models.js";
@@ -15,7 +16,12 @@ export interface IdempotencyConfig {
   actorUid: string;
   operation: string; // e.g. "organizations.create", "employees.create"
   clientKey?: string;
-  payload: Record<string, unknown>;
+  /**
+   * What "the same request" is compared on: the client's request data (`request.data`), not the parsed
+   * input. Parsing adds server-generated values (address and bank-account ids), so two identical
+   * requests would never hash alike and every retry would be an IDEMPOTENCY_CONFLICT.
+   */
+  payload: unknown;
   ttlHours?: number;
   leaseSeconds?: number; // In-flight lease timeout, default 30 seconds
   recoveryChecker?: () => Promise<Record<string, unknown> | null>; // Check if prior side-effects completed
@@ -53,7 +59,7 @@ export function canonicalizeJson(obj: unknown): string {
 /**
  * Computes a SHA-256 hash of the canonicalized request payload.
  */
-export function hashPayload(payload: Record<string, unknown>): string {
+export function hashPayload(payload: unknown): string {
   return createHash("sha256").update(canonicalizeJson(payload)).digest("hex");
 }
 
@@ -102,7 +108,8 @@ export async function reserveIdempotency(config: IdempotencyConfig): Promise<Ide
       if (!isExpired) {
         // Conflict check: same key with different payload
         if (existing.requestHash !== requestHash) {
-          throw new Error("IDEMPOTENCY_CONFLICT: Idempotency key reused with a different request payload.");
+          // A stable reason for the client (a plain Error surfaced as INTERNAL)
+          throw new HttpsError("failed-precondition", "IDEMPOTENCY_CONFLICT: Idempotency key reused with a different request payload.", { reason: "IDEMPOTENCY_CONFLICT" });
         }
 
         // Succeeded case: return cached result
@@ -209,7 +216,7 @@ export async function reserveIdempotency(config: IdempotencyConfig): Promise<Ide
  */
 export async function finalizeIdempotencySuccess(
   recordId: string,
-  safeResult: Record<string, unknown>
+  safeResult: object
 ): Promise<void> {
   if (!recordId) return;
 
@@ -217,6 +224,7 @@ export async function finalizeIdempotencySuccess(
   await recordRef.update({
     status: IdempotencyStatus.SUCCEEDED,
     result: safeResult,
+    updatedAt: new Date().toISOString(),
   });
 }
 

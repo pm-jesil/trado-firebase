@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /**
+ * @guard-scope: artifacts docs/openapi.json against scripts/generate-openapi.js output
  * Trado Firebase — OpenAPI Drift Checker
  *
  * Verifies that docs/openapi.json is up to date with the current

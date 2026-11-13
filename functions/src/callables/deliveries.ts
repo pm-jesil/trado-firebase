@@ -7,7 +7,8 @@
  * - Delivery address is stored as the specific delivery destination.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import {
   CreateDeliverySchema,
@@ -21,7 +22,6 @@ import { DeliveryStatus, DeliveryPartner, PaymentMethod, DocumentType } from "..
 import { prepareReservationInTxn, commitReservationInTxn } from "../services/stockEngine.js";
 import { remainingToDeliver } from "../services/deliveryProgress.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
-import { createAuditLog } from "../services/audit.js";
 import { hydrate } from "../services/hydration.js";
 import { fetchPage } from "../services/pagination.js";
 import {
@@ -108,7 +108,7 @@ export const deliveriesCreate = onCall({ region: "asia-south1" }, async (request
     actorUid: ctx.callerUid,
     operation: "deliveries.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
 
   if (idempotency.isDuplicate) {
@@ -191,16 +191,6 @@ export const deliveriesCreate = onCall({ region: "asia-south1" }, async (request
       });
     }
 
-    await createAuditLog({
-      organizationId: orgId,
-      branchId,
-      actorUid: ctx.callerUid,
-      actorMembershipId: ctx.membershipId,
-      action: "DELIVERY_CREATED",
-      entityType: "delivery",
-      entityId: deliveryId,
-      details: { billId: input.billId, status: deliveryDoc.status },
-    });
 
     return response;
   } catch (error) {
@@ -292,17 +282,6 @@ export const deliveriesUpdateStatus = onCall({ region: "asia-south1" }, async (r
 
   await deliveryRef.update(updates);
 
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: ctx.branchId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: "DELIVERY_STATUS_UPDATED",
-    entityType: "delivery",
-    entityId: input.deliveryId,
-    details: { status: input.status, finalizedBillNumber: finalizedBill?.billNumber || null },
-    changes: [{ field: "status", from: existing.status, to: input.status }],
-  });
 
   return {
     success: true,

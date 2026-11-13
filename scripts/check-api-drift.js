@@ -1,4 +1,5 @@
 /**
+ * @guard-scope: files docs/api-reference.md, functions/src/index.ts
  * API Documentation vs Index Exports Drift Checker
  * 
  * Verifies that:

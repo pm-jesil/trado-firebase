@@ -11,7 +11,8 @@
  *   unassigned staff, remove members of own team.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { nameKey } from "../services/naturalKeys.js";
 import { commitWithKeys, changedClaims } from "../services/uniqueKeys.js";
 import { db } from "../services/firebase.js";
@@ -23,10 +24,10 @@ import {
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
 import { TeamDoc, MembershipDoc, UserDoc } from "../types/models.js";
-import { createAuditLog, diffChanges } from "../services/audit.js";
 import { AppPermissions } from "../constants/permissions.js";
 import { resolveRequestContext, collectReporteeUserIds, gateError, type RequestContext } from "../services/contextResolver.js";
 import { GateReason } from "../constants/enums.js";
+import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 
 const TEAM_READ = [AppPermissions.TEAM_MANAGE, AppPermissions.EMPLOYEE_VIEW];
 
@@ -60,36 +61,51 @@ export const teamsCreate = onCall({ region: "asia-south1" }, async (request) => 
   }
   if (input.leaderMembershipId) await assertMemberOfOrg(ctx.organizationId, input.leaderMembershipId);
 
-  const now = new Date().toISOString();
-  const teamRef = db.collection("teams").doc();
-  const teamDoc: TeamDoc = {
-    organizationId: ctx.organizationId,
-    name: input.name,
-    description: input.description || "",
-    leaderMembershipId: input.leaderMembershipId || null,
-    isActive: true,
-    createdAt: now,
-    createdBy: ctx.callerUid,
-    updatedAt: now,
-    updatedBy: ctx.callerUid,
-  };
-
-  // Unique name per organization ("global" for platform catalog entries)
-  await commitWithKeys(teamDoc.organizationId || "global", "team", teamRef.id, (batch) => batch.set(teamRef, teamDoc), {
-    claim: [{ kind: "team_name", key: nameKey(teamDoc.name) }],
-  });
-
-  await createAuditLog({
-    organizationId: ctx.organizationId,
+  const idempotency = await reserveIdempotency({
+    scope: ctx.organizationId,
     actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: "TEAM_CREATED",
-    entityType: "team",
-    entityId: teamRef.id,
-    details: { name: input.name, leaderMembershipId: teamDoc.leaderMembershipId },
+    operation: "teams.create",
+    clientKey: input.idempotencyKey,
+    payload: request.data,
   });
 
-  return { teamId: teamRef.id, ...teamDoc };
+  if (idempotency.isDuplicate) {
+    if (idempotency.isProcessing) {
+      throw new HttpsError("already-exists", "Operation in progress. Please retry shortly.");
+    }
+    return idempotency.cachedResult;
+  }
+
+  try {
+    const now = new Date().toISOString();
+    const teamRef = db.collection("teams").doc();
+    const teamDoc: TeamDoc = {
+      organizationId: ctx.organizationId,
+      name: input.name,
+      description: input.description || "",
+      leaderMembershipId: input.leaderMembershipId || null,
+      isActive: true,
+      createdAt: now,
+      createdBy: ctx.callerUid,
+      updatedAt: now,
+      updatedBy: ctx.callerUid,
+    };
+
+    // Unique name per organization ("global" for platform catalog entries)
+    await commitWithKeys(teamDoc.organizationId || "global", "team", teamRef.id, (batch) => batch.set(teamRef, teamDoc), {
+      claim: [{ kind: "team_name", key: nameKey(teamDoc.name) }],
+    });
+
+
+    const result = { teamId: teamRef.id, ...teamDoc };
+
+    await finalizeIdempotencySuccess(idempotency.recordId, result);
+
+    return result;
+  } catch (err) {
+    await finalizeIdempotencyFailure(idempotency.recordId, "CREATE_TEAM_FAILED", (err as Error).message);
+    throw err;
+  }
 });
 
 export const teamsUpdate = onCall({ region: "asia-south1" }, async (request) => {
@@ -99,7 +115,7 @@ export const teamsUpdate = onCall({ region: "asia-south1" }, async (request) => 
 
   const input = parseInput(UpdateTeamSchema, request.data);
 
-  const ctx = await resolveRequestContext(request, { requiredPermission: TEAM_READ });
+  const ctx = await resolveRequestContext(request, { requiredPermission: TEAM_READ, allowTeamLeader: true });
   const { ref, data: teamData } = await loadTeam(ctx, input.teamId);
 
   const canManage = ctx.can(AppPermissions.TEAM_MANAGE);
@@ -126,15 +142,6 @@ export const teamsUpdate = onCall({ region: "asia-south1" }, async (request) => 
     : { claim: [], release: [] };
   await commitWithKeys(teamData.organizationId || "global", "team", input.teamId, (batch) => batch.update(ref, updates), nameChange);
 
-  await createAuditLog({
-    organizationId: ctx.organizationId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: "TEAM_UPDATED",
-    entityType: "team",
-    entityId: input.teamId,
-    changes: diffChanges(teamData as unknown as Record<string, unknown>, updates as Record<string, unknown>),
-  });
 
   return { success: true, message: "Team updated successfully." };
 });
@@ -148,7 +155,7 @@ export const teamsAssignMember = onCall({ region: "asia-south1" }, async (reques
     throw new HttpsError("unauthenticated", "Authentication required.");
   }
   const input = parseInput(TeamMemberSchema, request.data);
-  const ctx = await resolveRequestContext(request, { requiredPermission: TEAM_READ });
+  const ctx = await resolveRequestContext(request, { requiredPermission: TEAM_READ, allowTeamLeader: true });
   const { data: team } = await loadTeam(ctx, input.teamId);
   if (team.isActive === false && input.action === "add") {
     throw new HttpsError("failed-precondition", "Cannot add members to an inactive team.");
@@ -171,7 +178,6 @@ export const teamsAssignMember = onCall({ region: "asia-south1" }, async (reques
     }
   }
 
-  const before = member.teamId || null;
   const after = input.action === "add" ? input.teamId : (member.teamId === input.teamId ? null : member.teamId || null);
   await db.collection("memberships").doc(input.membershipId).update({
     teamId: after,
@@ -179,15 +185,6 @@ export const teamsAssignMember = onCall({ region: "asia-south1" }, async (reques
     updatedBy: ctx.callerUid,
   });
 
-  await createAuditLog({
-    organizationId: ctx.organizationId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: input.action === "add" ? "TEAM_MEMBER_ADDED" : "TEAM_MEMBER_REMOVED",
-    entityType: "employee",
-    entityId: input.membershipId,
-    changes: [{ field: "teamId", from: before, to: after }],
-  });
   return { success: true, membershipId: input.membershipId, teamId: after };
 });
 

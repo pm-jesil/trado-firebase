@@ -7,6 +7,10 @@
  */
 
 import type { Timestamp } from "firebase-admin/firestore";
+import type { z } from "zod";
+import type { AddressSchema, BankAccountSchema, ContactPersonSchema } from "../validation/sharedSchemas.js";
+import type { BranchSettingsSchema, CreateRecurringExpenseSchema } from "../validation/schemas.js";
+import type { MeteredMetric } from "../services/usageMetering.js";
 import {
   BusinessType,
   BusinessCategory,
@@ -35,12 +39,21 @@ import {
 /**
  * 1. users/{uid}
  * Document ID = Firebase Auth UID
+ *
+ * D-15: ONE stored image field: `image: ImageRef`. No URL inside it.
+ * The computed display URL (`imageUrl`) is added by the hydration layer at read time.
+ * `photoUrl` and `avatarUrl` are REMOVED — they are D-15 violations and compile errors.
  */
 export interface UserDoc {
   name: string;
+  nameParts?: { first: string; last: string };
   email: string;
   phone?: string | null;
   accountType: "standard" | "admin" | "system";
+  /** D-15: single stored image reference; no URL stored inside it. */
+  image?: ImageRef;
+  primaryOrganizationId?: string;
+  mustChangePassword?: boolean;
   isActive: boolean;
   createdAt: string; // ISO 8601
   createdBy?: string;
@@ -75,23 +88,61 @@ export interface MembershipDoc {
 }
 
 /**
- * 3. organizations/{organizationId}
+ * D-15: ImageRef — the ONLY stored image structure in the system.
+ * - `path`: Cloud Storage object path (never a full URL — paths are stable; URLs expire).
+ * - `url` is NOT stored; it is computed at read time by the hydration layer.
+ * - Every entity that carries an image stores ONE field named `image` of this type.
+ * - `photoUrl`, `avatarUrl`, `logoUrl`, `imageUrls` are REMOVED from all stored documents.
+ *
+ * D-16: No `as any` cast on write paths — ImageRef is used end-to-end without casts.
+ */
+export interface ImageRef {
+  path: string;
+  contentType: "image/jpeg" | "image/png" | "image/webp";
+  width: number;
+  height: number;
+  sizeBytes: number;
+  updatedAt: string;
+  /** thumbnailPath: storage path of the smaller thumbnail asset (products only). */
+  thumbnailPath?: string;
+}
+
+/**
+ * D-15 compliant. ONE stored image: `image: ImageRef`. No `logoUrl`, no `imageUrls`.
+ * Computed `imageUrl` added at read time by the hydration layer.
+ *
+ * D-16: `bankAccounts` typed as `BankAccountRecord[]` — no `any[]`.
+ *
+ * Contact model: `contact` (flat primary contact) + `contacts` (list up to 20).
+ * `contactEmail` and `contactPhone` are TOP-LEVEL convenience shortcuts for the primary
+ * contact stored flat — preserved for query efficiency but must stay in sync with `contact`.
+ * `address` is the primary/registered address; `addresses` is the full list.
+ * `bankDetails` removed — superseded by `bankAccounts: BankAccountRecord[]`.
  */
 export interface OrganizationDoc {
   name: string;
+  code?: string;
+  legalName?: string;
+  legalNameKey?: string; // normalized legalName, unique-lookup key (written by organizationsCreate / Update)
   businessType: BusinessType;
   businessCategory: BusinessCategory;
   country: string; // ISO 3166-1 alpha-2
   currency: string; // ISO 4217 code
+  currencyDecimals?: number;
   taxRegimeCode: string; // Reference to taxRegimes/{taxRegimeCode}
   status: EntityStatus;
   planId: string; // Reference to subscriptionPlans/{planId}
   moduleToggles: Record<string, boolean>; // Per-tenant feature switches
-  logoUrl?: string;
+  /** D-15: single stored image reference (org logo); no URL inside. */
+  image?: ImageRef;
+  ownerStatus?: "pending" | "active";
+  ownerUserId?: string | null;
+  financialYearStartMonth?: number;
   defaultBranchId?: string;
   branchCount?: number;
   sharingPolicies?: OrganizationSharingPolicies;
   usageLimitOverrides?: UsageLimitsConfig; // Super Admin per-tenant usage limit overrides
+  showCostToTenant?: boolean; // D-25: tenants see the cost estimate (labelled) only when the Super Admin enables it
   // Subscription (per organization; Super Admin only). ISO-8601 UTC instants, server-set.
   subscriptionStatus?: SubscriptionStatus;
   subscriptionStartsAt?: string;
@@ -102,19 +153,31 @@ export interface OrganizationDoc {
   activeEmployeeCount?: number; // Transactional seat counter (excludes Owner)
   // Owner-editable profile (see ORGANIZATION_FIELD_POLICY)
   displayName?: string;
-  taxNumber?: string | null; // GSTIN / VAT
-  website?: string | null;
+  taxId?: string | null;
+  website?: string | null; // R1: external reference — URL is intentional here (D-15 exception)
+  /** R3: convenience shortcut duplicating contact.email — single writer: organizationsUpdate */
   contactEmail?: string | null;
+  /** R3: convenience shortcut duplicating contact.phone — single writer: organizationsUpdate */
   contactPhone?: string | null;
+  contact?: OrganizationPrimaryContact;
   contacts?: OrganizationContact[];
-  address?: BranchAddress;
-  imageUrls?: string[];
-  bankDetails?: OrganizationBankDetails | null;
+  address?: AddressRecord;
+  addresses?: AddressRecord[];
+  /** D-16: typed bank accounts — no `any`. Single source: BankAccountRecord[]. */
+  bankAccounts?: BankAccountRecord[];
   settings?: OrganizationSettings;
   createdAt: string;
   createdBy: string;
   updatedAt?: string;
   updatedBy?: string;
+}
+
+/** Flat primary contact stored as a convenience field (R3 cache, single writer: organizationsUpdate). */
+export interface OrganizationPrimaryContact {
+  name: string;
+  email: string;
+  phone: string;
+  altPhone?: string;
 }
 
 export interface OrganizationContact {
@@ -133,13 +196,6 @@ export interface OrganizationContact {
   updatedBy?: string;
 }
 
-export interface OrganizationBankDetails {
-  accountName?: string;
-  bankName?: string;
-  accountNumber?: string; // Bank account for invoice printing; never a card number
-  ifsc?: string;
-  upiId?: string;
-}
 
 export interface OrganizationSettings {
   approvals?: ApprovalPolicy;
@@ -199,7 +255,9 @@ export interface DepartmentDoc {
 export interface JobRoleDoc {
   organizationId: string | null; // Null for system catalog
   name: string;
+  code: string; // e.g. "warehouse_manager", "delivery_executive"
   isSystem: boolean;
+  description?: string;
   createdAt?: string;
   createdBy?: string;
   updatedAt?: string;
@@ -239,6 +297,7 @@ export interface SubscriptionPlanDoc {
   branchLimit?: number;
   usageLimits?: UsageLimitsConfig; // Plan baseline usage thresholds & limits
   isActive: boolean;
+  isArchived?: boolean; // set by the plan archive callable; archived plans cannot be assigned
   createdAt?: string;
   createdBy?: string;
   updatedAt?: string;
@@ -289,32 +348,45 @@ export interface IdempotencyRecordDoc {
     message: string;
   };
   createdAt: string;
+  updatedAt?: string; // set when a timed-out PROCESSING record self-heals to SUCCEEDED
   processingExpiresAt?: string; // ISO 8601 lease timeout for PROCESSING status
   expiresAt: string; // ISO 8601
 }
 
 /**
- * 13. auditLogs/{logId}
+ * 13. auditLogs/{requestId}_{seq}: written only by services/auditRecorder.ts (prompt 66 §6.2).
+ * Mutation events are written in the same commit as the mutation; the id makes a replay idempotent.
  */
 export interface AuditLogDoc {
-  organizationId?: string | null; // Tenant ID or "platform"
-  branchId?: string | null;
-  actorUid: string;
-  actorMembershipId?: string | null;
-  action: string;
-  entityType: string;
-  entityId: string;
-  timestamp: string;
-  requestId?: string;
-  details?: Record<string, unknown>;
-  changes?: AuditFieldChange[]; // Per-entity change history (immutable; never embedded on the entity)
-  changedFields?: string[]; // Field names in `changes`, for array-contains queries (e.g. price history)
+  occurredAt: Timestamp; // server clock
+  occurredLocalDate: string; // YYYY-MM-DD in the organization timezone
+  organizationId: string; // the organization the event belongs to, or "platform" (D-21)
+  targetOrgId?: string | null; // the organization platform work was done for
+  actorUid: string | null; // null for triggers and scheduled jobs
+  actor: { kind: "user" | "system" | "trigger" | "scheduled" | "superAdminOnBehalf"; role?: string | null; membershipId?: string | null; branchId?: string | null };
+  source: { callable?: string; trigger?: string; scheduled?: string; requestId: string; clientRequestId?: string | null; eventId?: string | null };
+  device?: { deviceId: string | null; deviceRegistered: boolean | null; platform: string | null; appVersion: string | null; ipTruncated: string | null; userAgentFamily: string | null; appCheckVerified: boolean | null };
+  action: string; // "<entity>.<verb>" from constants/auditRegistry.ts
+  category: "mutation" | "read_sensitive" | "export" | "auth" | "file" | "security" | "admin" | "system";
+  outcome: "success" | "denied" | "failed";
+  reason: string | null; // stable details.reason of a denial or failure
+  attemptedAction?: string | null; // the action a denied request tried
+  entityType: string | null; // the primary target (query key)
+  entityId: string | null;
+  targets?: Array<{ type: string; id: string; path: string | null; op: string | null }>; // every changed document, primary first
+  changes?: { fields: AuditFieldChange[]; truncated: boolean; redacted: string[]; beforeAvailable: boolean };
+  changedFields?: string[]; // top-level fields in "changes", for array-contains queries (price history)
+  details?: Record<string, unknown>; // reason fields of the request (registry inputFields), redacted
+  ops?: { reads: number; writes: number; deletes: number }; // operations of the request at commit
+  suppressedSincePrevious?: number; // rate-limited security events folded into this one
+  expireAt: Timestamp; // TTL (system setting AUDIT_RETENTION_MONTHS, default 24)
 }
 
 export interface AuditFieldChange {
-  field: string;
-  from: string | number | boolean | null | Record<string, unknown> | unknown[];
-  to: string | number | boolean | null | Record<string, unknown> | unknown[];
+  path: string;
+  op: string; // set | unset | inc | server_time | array
+  before?: unknown; // only when the request had already read the document (no extra read)
+  after?: unknown;
 }
 
 /**
@@ -324,6 +396,7 @@ export interface DeviceDoc {
   // Document id = deviceId (never repeated as a field)
   fcmToken: string;
   platform: "android" | "ios" | "web";
+  lastLoginAt?: string; // written by authLogin on every sign-in from this device
   createdAt: string;
   updatedAt: string;
 }
@@ -483,19 +556,33 @@ export interface UnitDoc {
 }
 
 /**
+ * Stored address / bank account / contact person records. Derived from the shared Zod schemas that
+ * produce the stored values (validation/sharedSchemas.ts), so the stored type cannot drift from what
+ * the callables write. Used by organizations, branches, customers and vendors.
+ */
+export type AddressRecord = z.output<typeof AddressSchema>;
+export type BankAccountRecord = z.output<typeof BankAccountSchema>;
+export type ContactPersonRecord = z.output<typeof ContactPersonSchema>;
+
+/**
  * 19. customers/{customerId}
  */
 export interface CustomerDoc {
   organizationId: string;
   customerCode: string; // e.g. "CUST-000001"
   name: string;
-  mobile?: string | null;
+  legalName?: string | null;
+  partyType?: "organization" | "person";
+  image?: ImageRef | null;
+  /** Structured contact persons (replaces contactPerson: any). */
+  contacts?: ContactPersonRecord[];
+  phone?: string | null;
   additionalPhones?: string[];
-  whatsApp?: string | null;
   email?: string | null;
-  taxNumber?: string | null; // GSTIN / VAT registration
-  billingAddress?: string | null;
-  shippingAddress?: string | null;
+  taxId?: string | null;
+  /** Structured address array (replaces flat billingAddress/shippingAddress strings). */
+  addresses?: AddressRecord[];
+  bankAccounts?: BankAccountRecord[];
   priceGroup?: string; // "retail", "wholesale", "distributor"
   creditLimit: number;
   creditPeriodDays: number;
@@ -518,13 +605,18 @@ export interface VendorDoc {
   organizationId: string;
   vendorCode: string; // e.g. "VEND-000001"
   name: string;
-  mobile?: string | null;
+  legalName?: string | null;
+  partyType?: "organization" | "person";
+  image?: ImageRef | null;
+  phone?: string | null;
   additionalPhones?: string[];
-  whatsApp?: string | null;
   email?: string | null;
-  taxNumber?: string | null; // GSTIN / TRN
-  address?: string | null;
-  contactPerson?: string | null;
+  taxId?: string | null;
+  /** Structured address array (replaces flat address string). */
+  addresses?: AddressRecord[];
+  bankAccounts?: BankAccountRecord[];
+  /** Structured contact persons (replaces contactPerson: any). */
+  contacts?: ContactPersonRecord[];
   paymentTermsDays?: number;
   creditLimit?: number;
   outstandingPayable: number; // Amount owed to vendor
@@ -569,7 +661,23 @@ export interface OutflowLine {
  * 21. outflows/{outflowId}
  * Unified Outflow collection for both purchases and expenses
  */
-export interface OutflowDoc {
+/**
+ * Who approved, rejected or voided a document and why. Written only by the decide / void callables
+ * (bills, outflows, payments, returns, stock adjustment requests). `approvalNote` is the requester's
+ * note; `approvalReason` is the decider's reason.
+ */
+export interface DecisionStamps {
+  approvedAt?: string;
+  approvedBy?: string;
+  rejectedAt?: string;
+  rejectedBy?: string;
+  approvalReason?: string | null;
+  voidedAt?: string;
+  voidedBy?: string;
+  voidReason?: string;
+}
+
+export interface OutflowDoc extends DecisionStamps {
   organizationId: string;
   branchId?: string;
   outflowNumber: string; // e.g. "PUR-2026-000001" or "EXP-2026-000001"
@@ -637,8 +745,8 @@ export interface BillItem {
  */
 export interface BillToSnapshot {
   name: string;
-  mobile?: string;
-  taxNumber?: string;
+  phone?: string;
+  taxId?: string;
   billingAddress?: string;
 }
 
@@ -646,7 +754,7 @@ export interface BillToSnapshot {
  * 22. bills/{billId}
  * Shared Sales & Billing engine (POS & B2B)
  */
-export interface BillDoc {
+export interface BillDoc extends DecisionStamps {
   organizationId: string;
   branchId?: string;
   billNumber: string; // e.g. "INV-2026-000001", "POS-2026-000001", "QTN-2026-000001"
@@ -668,7 +776,10 @@ export interface BillDoc {
   approvalNote?: string | null; // Approval state lives in status (pending_approval / rejected) + approvedBy/rejectedBy
   requestedPaidAmount?: number; // Tender held until approval
   requestedPaymentMethod?: PaymentMethod;
-  stockReserved?: boolean; // Sales order holding allocatedStock
+  stockReserved?: boolean;
+  finalizedAt?: string; // quotation / proforma converted to an invoice
+  finalizedBy?: string;
+  originalQuotationNumber?: string; // R2: number of the quotation this invoice was finalized from // Sales order holding allocatedStock
   createdByMembershipId?: string | null;
   taxSnapshot?: TaxSnapshot | null;
   notes?: string;
@@ -760,7 +871,7 @@ export interface ReturnItem {
 /**
  * 25. returns/{returnId}
  */
-export interface ReturnDoc {
+export interface ReturnDoc extends DecisionStamps {
   organizationId: string;
   branchId?: string;
   returnNumber: string; // e.g. "RET-2026-000001"
@@ -786,7 +897,7 @@ export interface ReturnDoc {
  * 26. payments/{paymentId}
  * Payment ledger record
  */
-export interface PaymentDoc {
+export interface PaymentDoc extends DecisionStamps {
   organizationId: string;
   branchId?: string;
   paymentNumber: string; // e.g. "PAY-2026-000001"
@@ -970,14 +1081,6 @@ export interface NotificationDoc {
  * -------------------------------------------------------------
  */
 
-export interface BranchAddress {
-  line1?: string;
-  line2?: string;
-  city?: string;
-  state?: string;
-  pincode?: string;
-  country?: string;
-}
 
 export interface BranchContact {
   phone?: string | null;
@@ -986,13 +1089,8 @@ export interface BranchContact {
   contactPerson?: string | null;
 }
 
-export interface BranchSettings {
-  allowNegativeStock?: boolean;
-  autoFulfillDeliveries?: boolean;
-  receiptPrefix?: string;
-  taxInclusivePrices?: boolean;
-  moduleOverrides?: Record<string, boolean>;
-}
+/** Stored branch settings: the output of BranchSettingsSchema (validation/schemas.ts). */
+export type BranchSettings = z.output<typeof BranchSettingsSchema>;
 
 export interface BranchDoc {
   organizationId: string;
@@ -1000,8 +1098,8 @@ export interface BranchDoc {
   code: string;
   isDefault: boolean;
   isActive: boolean;
-  gstin?: string;
-  address?: BranchAddress;
+  taxId?: string;
+  address?: AddressRecord;
   contact?: BranchContact;
   settings?: BranchSettings;
   createdAt: string;
@@ -1092,54 +1190,80 @@ export interface ServiceUsageCounts {
   locationPings: number;
 }
 
-export interface OrganizationUsageDailyDoc {
-  organizationId: string;
-  date: string; // YYYY-MM-DD
-  counts: ServiceUsageCounts;
-  estimatedCost: number;
-  currency: string;
-  rateCardVersion: string;
-  completenessPercent: number; // Indicates confidence/coverage (e.g., 90)
-  measurementClass: MeasurementClass;
-  updatedAt: string;
+export interface UsageOps {
+  reads: number;
+  writes: number;
+  deletes: number;
+  aggregationReads?: number; // reads billed for count() / aggregations (part of reads)
 }
 
+/** Quantities of one rollup document (prompt 66 Part 5): written by services/requestRecorder.ts only. */
+export interface UsageRollupQuantities {
+  calls?: number;
+  errors?: number;
+  denied?: number;
+  durationMsSum?: number;
+  bytesIn?: number; // request payload bytes
+  bytesOut?: number; // response bytes
+  redundantReads?: number; // a document read twice in one request with no write in between
+  ops?: UsageOps; // every Firestore operation of the requests, overhead included
+  byCategory?: Partial<Record<"gate" | "app" | "audit" | "meter", UsageOps>>; // gate reads, business, audit and meter writes
+  byCallable?: Record<string, UsageOps & { calls: number }>;
+  byCollection?: Record<string, UsageOps>; // collection templates ("organizations/{id}/branches"), bounded, overflow "other"
+  hourly?: Record<string, UsageOps & { calls: number }>; // "00".."23" (UTC hour)
+  shadowChecked?: number; // emulator only: requests whose counts the independent shadow counter checked
+  shadowMismatch?: number; // emulator only: requests where it disagreed (must stay 0)
+  shadowMismatchLast?: string;
+  lastSeenAt?: Timestamp; // last flush (within the flush interval of the last call)
+  expireAt?: Timestamp; // TTL (system setting METER_RETENTION_MONTHS, default 25)
+}
+
+/**
+ * organizationUsageDaily/{organizationId|platform}_{utcDate}: organization × day cost rollup, quantities
+ * only (D-22); cost is derived when read (services/usageReport.ts). "platform" holds platform work with
+ * targets per organization (D-21). `clientReported`: numbers the app reported (usageRecordClientMetric),
+ * untrusted and kept apart from what the server measured.
+ */
+export interface OrganizationUsageDailyDoc extends UsageRollupQuantities {
+  organizationId: string;
+  date: string; // YYYY-MM-DD (UTC: reconciles with the billing export)
+  targets?: Record<string, UsageOps & { calls: number }>;
+  clientReported?: Partial<ServiceUsageCounts>;
+  updatedAt?: string;
+}
+
+/** userUsageDaily/{organizationId}_{uid}_{utcDate}: organization × user × day cost rollup. */
+export interface UserUsageDailyDoc extends UsageRollupQuantities {
+  organizationId: string;
+  uid: string;
+  date: string; // YYYY-MM-DD (UTC)
+  devices?: Record<string, { calls: number }>; // _meta.deviceId → calls (bounded, overflow "other")
+}
+
+/** organizationUsageMonthly/{organizationId}_{YYYY-MM}: client-reported numbers (usageRecordClientMetric) only. */
 export interface OrganizationUsageMonthlyDoc {
   organizationId: string;
   month: string; // YYYY-MM
-  counts: ServiceUsageCounts;
-  estimatedCost: number;
-  currency: string;
-  rateCardVersion: string;
-  completenessPercent: number;
-  measurementClass: MeasurementClass;
-  updatedAt: string;
+  clientReported?: Partial<ServiceUsageCounts>; // untrusted client estimates
+  updatedAt?: string;
 }
 
+/** branchUsageDaily/{organizationId}_{branchId}_{date}: client-reported numbers (usageRecordClientMetric) only. */
 export interface BranchUsageDailyDoc {
   organizationId: string;
   branchId: string;
   date: string; // YYYY-MM-DD
-  counts: ServiceUsageCounts;
-  estimatedCost: number;
-  currency: string;
-  rateCardVersion: string;
-  completenessPercent: number;
-  measurementClass: MeasurementClass;
-  updatedAt: string;
+  clientReported?: Partial<ServiceUsageCounts>; // untrusted client estimates
+  updatedAt?: string;
 }
 
+/** branchUsageMonthly/{organizationId}_{branchId}_{YYYY-MM}: client-reported numbers (usageRecordClientMetric) only. */
 export interface BranchUsageMonthlyDoc {
   organizationId: string;
   branchId: string;
   month: string; // YYYY-MM
-  counts: ServiceUsageCounts;
-  estimatedCost: number;
-  currency: string;
-  rateCardVersion: string;
-  completenessPercent: number;
-  measurementClass: MeasurementClass;
-  updatedAt: string;
+  clientReported?: Partial<ServiceUsageCounts>; // untrusted client estimates
+  updatedAt?: string;
 }
 
 // warn_only: warnings only; hard_block: the breached metric class is refused. (soft_throttle was removed:
@@ -1176,6 +1300,10 @@ export interface UsageRateCardDoc {
   status: "active" | "draft" | "deprecated";
   createdAt: string;
   createdBy: string;
+  /** Per rate: where the price comes from and whether it was checked against the official pricing (prompt 66 §2.3). */
+  verification?: Partial<Record<keyof UsageRateCardDoc["rates"], { verified: boolean; source: string; verifiedAt: string | null; region?: string }>>;
+  /** Project-level free allowance (not allocated to organizations); with its source. */
+  freeTier?: { firestoreReadsPerDay: number; firestoreWritesPerDay: number; firestoreDeletesPerDay: number; firestoreStoredGiB: number; egressGiBPerMonth: number; source: string; verifiedAt: string };
 }
 
 
@@ -1206,7 +1334,7 @@ export interface SerialDoc {
  * stockAdjustmentRequests/{requestId} — a stock adjustment waiting for approval (maker–checker).
  * Approval writes the stock movement through the stock engine and links it (movementId).
  */
-export interface StockAdjustmentRequestDoc {
+export interface StockAdjustmentRequestDoc extends DecisionStamps {
   organizationId: string;
   branchId: string;
   productId: string;
@@ -1220,10 +1348,52 @@ export interface StockAdjustmentRequestDoc {
   createdAt: string;
   createdBy: string;
   createdByMembershipId?: string | null;
-  approvedAt?: string;
-  approvedBy?: string;
-  rejectedAt?: string;
-  rejectedBy?: string;
   updatedAt?: string;
   updatedBy?: string;
+}
+
+/**
+ * recurringExpenses/{templateId}: one template per recurring cost; the daily sweep turns each due
+ * period into an outflow through outflowsCreate. Client fields are the create schema's output.
+ */
+export interface RecurringExpenseDoc extends Omit<z.output<typeof CreateRecurringExpenseSchema>, "idempotencyKey" | "organizationId" | "branchId" | "endOn"> {
+  organizationId: string;
+  branchId: string;
+  endOn?: string | null;
+  nextRunOn: string; // calendar date (organization timezone) of the next generation
+  lastGeneratedPeriod?: string; // YYYY-MM (monthly) or YYYY-MM-DD (weekly)
+  isActive: boolean;
+  createdBy: string;
+  createdByMembershipId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  updatedBy?: string;
+}
+
+/** usageCounterShards/{organizationId}_{month}_{shard}: sharded server usage counters (incrementServerUsage). */
+export interface UsageCounterShardDoc {
+  organizationId: string;
+  month: string; // YYYY-MM (organization timezone)
+  shard: number;
+  updatedAt: string;
+  days: Record<string, Partial<Record<MeteredMetric, number>>>; // day (YYYY-MM-DD) → metric → count
+  branches?: Record<string, Record<string, Partial<Record<MeteredMetric, number>>>>; // branchId → day → metric → count
+}
+
+/** imageUploadSessions/{uploadId}: one client upload slot (imagesCreateUploadSession); consumed once by imagesAttach. */
+export interface ImageUploadSessionDoc {
+  uploadId: string;
+  scope: string; // organizationId, "platform" or "users"
+  callerUid: string;
+  purpose: string;
+  entityType: string;
+  entityId: string | null;
+  contentType: string;
+  maxBytes: number;
+  uploadPath: string; // tmp/{scope}/{uid}/{uploadId}
+  isUsed: boolean;
+  createdAt: string;
+  expiresAt: string;
+  attachedAt?: string; // set by attachUploadedImage when the upload is attached
+  finalPath?: string; // storage path of the processed image, set on attach
 }

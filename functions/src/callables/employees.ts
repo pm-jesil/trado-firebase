@@ -11,7 +11,8 @@
  * changed only inside transactions, so two concurrent creations at (limit − 1) yield one success.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import type { Transaction } from "firebase-admin/firestore";
 import { db, auth } from "../services/firebase.js";
 import {
@@ -19,6 +20,7 @@ import {
   UpdateEmployeeSchema,
   DeactivateEmployeeSchema,
   ListEmployeesSchema,
+  GetEmployeeSchema,
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
 import { CreateEmployeeResponse } from "../types/api.js";
@@ -36,7 +38,7 @@ import { AppPermissions } from "../constants/permissions.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { compensateAuthUser } from "../services/compensation.js";
 import { getUserCustomClaims, setPrimaryOrganizationClaim, setPrimaryBranchClaim } from "../services/claims.js";
-import { createAuditLog, diffChanges } from "../services/audit.js";
+import { attachUploadedImage } from "../services/imageEngine.js";
 import { queueWelcomeNotification } from "../services/notificationSender.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext, gateError, type RequestContext } from "../services/contextResolver.js";
@@ -157,7 +159,7 @@ export const employeesCreate = onCall({ region: "asia-south1" }, async (request)
   const input = parseInput(CreateEmployeeSchema, request.data);
 
   const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.EMPLOYEE_CREATE });
-  if (input.organizationId !== ctx.organizationId) {
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
     throw gateError("permission-denied", GateReason.TENANT_MISMATCH, "organizationId does not match caller's organization.");
   }
   const orgId = ctx.organizationId;
@@ -184,7 +186,7 @@ export const employeesCreate = onCall({ region: "asia-south1" }, async (request)
     actorUid: ctx.callerUid,
     operation: "employees.create",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
     recoveryChecker: async () => {
       try {
         const existingAuth = await auth.getUserByEmail(input.email);
@@ -265,6 +267,18 @@ export const employeesCreate = onCall({ region: "asia-south1" }, async (request)
       message: "Employee provisioned successfully.",
     };
 
+    let imageRef = input.image || null;
+    if (input.uploadId) {
+      imageRef = await attachUploadedImage({
+        uploadId: input.uploadId,
+        purpose: "user_photo",
+        entityType: "user",
+        entityId: targetUid,
+        callerUid: ctx.callerUid,
+        scope: orgId,
+      });
+    }
+
     await db.runTransaction(async (txn) => {
       // === READS ===
       const existingMembership = await txn.get(membershipRef);
@@ -280,6 +294,8 @@ export const employeesCreate = onCall({ region: "asia-south1" }, async (request)
           name: input.name,
           email: input.email,
           phone: input.phone || null,
+          /** D-15: ONE stored image field, NO url inside, NO photoUrl/avatarUrl duplicates. */
+          image: imageRef || undefined,
           accountType: "standard",
           isActive: true,
           createdAt: now,
@@ -287,7 +303,12 @@ export const employeesCreate = onCall({ region: "asia-south1" }, async (request)
         };
         txn.set(userRef, userDocData);
       } else {
-        txn.update(userRef, { isActive: true, updatedAt: now });
+        txn.update(userRef, {
+          isActive: true,
+          updatedAt: now,
+          /** D-15: only the typed ImageRef stored; no url, no photoUrl, no avatarUrl. */
+          ...(imageRef ? { image: imageRef } : {}),
+        });
       }
       txn.set(membershipRef, membershipDocData);
       for (const bId of assignedBranchIds) {
@@ -323,16 +344,6 @@ export const employeesCreate = onCall({ region: "asia-south1" }, async (request)
       await setPrimaryBranchClaim(targetUid, employeeDefaultBranch);
     }
 
-    await createAuditLog({
-      organizationId: orgId,
-      branchId: ctx.branchId,
-      actorUid: ctx.callerUid,
-      actorMembershipId: ctx.membershipId,
-      action: "EMPLOYEE_CREATED",
-      entityType: "employee",
-      entityId: membershipId,
-      details: { userId: targetUid, email: input.email, roleId: assignedRoleId },
-    });
 
     await queueWelcomeNotification(targetUid, input.name, orgData.name);
 
@@ -366,7 +377,7 @@ export const employeesUpdate = onCall({ region: "asia-south1" }, async (request)
   const input = parseInput(UpdateEmployeeSchema, request.data);
 
   const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.EMPLOYEE_UPDATE });
-  if (input.organizationId !== ctx.organizationId) {
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
     throw gateError("permission-denied", GateReason.TENANT_MISMATCH, "organizationId does not match caller's organization.");
   }
   const orgId = ctx.organizationId;
@@ -434,24 +445,28 @@ export const employeesUpdate = onCall({ region: "asia-south1" }, async (request)
     txn.update(membershipRef, updates);
   });
 
-  if (input.name !== undefined || input.phone !== undefined) {
+  let updatedImageRef = input.image;
+  if (input.uploadId) {
+    updatedImageRef = await attachUploadedImage({
+      uploadId: input.uploadId,
+      purpose: "user_photo",
+      entityType: "user",
+      entityId: target.userId,
+      callerUid: ctx.callerUid,
+      scope: orgId,
+    });
+  }
+
+  if (input.name !== undefined || input.phone !== undefined || updatedImageRef !== undefined) {
     await db.collection("users").doc(target.userId).update({
       ...(input.name !== undefined ? { name: input.name } : {}),
       ...(input.phone !== undefined ? { phone: input.phone || null } : {}),
+    /** D-15: only the typed ImageRef; no url, no photoUrl, no avatarUrl. */
+    ...(updatedImageRef ? { image: updatedImageRef } : {}),
       updatedAt: now,
     });
   }
 
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: ctx.branchId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: "EMPLOYEE_UPDATED",
-    entityType: "employee",
-    entityId: input.membershipId,
-    changes: diffChanges(target as unknown as Record<string, unknown>, updates as Record<string, unknown>),
-  });
 
   return { success: true, message: "Employee membership updated successfully." };
 });
@@ -470,7 +485,7 @@ export const employeesDeactivate = onCall({ region: "asia-south1" }, async (requ
   const ctx = await resolveRequestContext(request, {
     requiredPermission: [AppPermissions.EMPLOYEE_SUSPEND, AppPermissions.EMPLOYEE_DELETE, AppPermissions.EMPLOYEE_UPDATE],
   });
-  if (input.organizationId !== ctx.organizationId) {
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
     throw gateError("permission-denied", GateReason.TENANT_MISMATCH, "organizationId does not match caller's organization.");
   }
   const orgId = ctx.organizationId;
@@ -518,17 +533,6 @@ export const employeesDeactivate = onCall({ region: "asia-south1" }, async (requ
     });
   }
 
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: ctx.branchId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: "EMPLOYEE_DEACTIVATED",
-    entityType: "employee",
-    entityId: input.membershipId,
-    details: { reason: input.reason },
-    changes: [{ field: "status", from: memData.status, to: EntityStatus.INACTIVE }],
-  });
 
   return { success: true, message: "Employee deactivated successfully in this organization." };
 });
@@ -545,7 +549,7 @@ export const employeesList = onCall({ region: "asia-south1" }, async (request) =
   const input = parseInput(ListEmployeesSchema, request.data);
 
   const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.EMPLOYEE_VIEW });
-  if (input.organizationId !== ctx.organizationId) {
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
     throw gateError("permission-denied", GateReason.TENANT_MISMATCH, "organizationId does not match caller's organization.");
   }
 
@@ -588,5 +592,80 @@ export const employeesList = onCall({ region: "asia-south1" }, async (request) =
     items,
     count: items.length,
     nextCursor,
+  };
+});
+
+// ---------------------------------------------------------------------------
+// employeesGet: single employee full profile (permission-gated)
+// ---------------------------------------------------------------------------
+
+export const employeesGet = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const input = parseInput(GetEmployeeSchema, request.data);
+  const ctx = await resolveRequestContext(request, { requiredPermission: AppPermissions.EMPLOYEE_VIEW });
+
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw gateError("permission-denied", GateReason.TENANT_MISMATCH, "organizationId does not match caller's organization.");
+  }
+  const orgId = ctx.organizationId;
+
+  const memRef = db.collection("memberships").doc(input.membershipId);
+  const memDoc = await memRef.get();
+  if (!memDoc.exists) {
+    throw new HttpsError("not-found", "Membership record not found.");
+  }
+  const memData = memDoc.data() as MembershipDoc;
+  if (memData.organizationId !== orgId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
+
+  const userSnap = await db.collection("users").doc(memData.userId).get();
+  const userData = userSnap.exists ? (userSnap.data() as UserDoc) : null;
+
+  const branchSnap = await db
+    .collection("membershipBranches")
+    .where("membershipId", "==", input.membershipId)
+    .where("organizationId", "==", orgId)
+    .get();
+
+  const branchAssignments = branchSnap.docs.map((d) => {
+    const b = d.data() as MembershipBranchDoc;
+    return {
+      branchId: b.branchId,
+      isDefault: b.isDefaultForMembership || false,
+    };
+  });
+
+  const isSelf = input.membershipId === ctx.membershipId;
+  const isAdmin = ctx.isOwner || ctx.role?.code === "admin" || ctx.membership?.roleId === "role_admin";
+  const canViewPhone = isSelf || isAdmin || ctx.can(AppPermissions.EMPLOYEE_UPDATE);
+  const canViewOverrides = isSelf || ctx.isOwner || ctx.can(AppPermissions.EMPLOYEE_PERMISSION_UPDATE) || ctx.can(AppPermissions.EMPLOYEE_UPDATE);
+
+  const employeePayload = {
+    membershipId: input.membershipId,
+    userId: memData.userId,
+    organizationId: memData.organizationId,
+    name: userData?.name || "",
+    email: userData?.email || "",
+    phone: canViewPhone ? (userData?.phone || null) : undefined,
+    roleId: memData.roleId,
+    departmentId: memData.departmentId || null,
+    jobRoleIds: memData.jobRoleIds || [],
+    teamId: memData.teamId || null,
+    reportingToIds: memData.reportingToIds || [],
+    status: memData.status,
+    primaryBranchId: memData.primaryBranchId || null,
+    branchAssignments,
+    permissionOverrides: canViewOverrides ? (memData.permissions || {}) : undefined,
+    dataScopes: memData.dataScopes || null,
+    createdAt: memData.createdAt,
+    updatedAt: memData.updatedAt,
+  };
+
+  return {
+    employee: employeePayload,
   };
 });

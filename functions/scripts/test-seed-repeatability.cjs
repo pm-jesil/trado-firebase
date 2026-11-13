@@ -11,13 +11,15 @@ const { spawnSync } = require("node:child_process");
 const { enforceLocalEmulatorSafety, verifyEmulatorHealth } = require("./helpers/emulator-helper.cjs");
 const { db } = require("./helpers/auth-personas.cjs");
 
-const METERING_ONLY = new Set(["usageCounterShards"]);
+const METERING_ONLY = new Set(["usageCounterShards", "organizationUsageDaily", "userUsageDaily"]);
 
+const { getCollections } = require("../../scripts/lib/source-truth.js");
+const COLLECTIONS = getCollections().collections; // derived from source: every collection the code reads or writes
+
+/** Document count of every derived collection (subcollections through a collection-group count), empty ones included. */
 async function counts() {
   const out = {};
-  for (const col of await db.listCollections()) out[col.id] = (await col.count().get()).data().count;
-  out["organizations/*/branches"] = (await db.collectionGroup("branches").count().get()).data().count;
-  out["users/*/devices"] = (await db.collectionGroup("devices").count().get()).data().count;
+  for (const c of COLLECTIONS) out[c.key] = (await (c.parent ? db.collectionGroup(c.name) : db.collection(c.name)).count().get()).data().count;
   return out;
 }
 
@@ -35,6 +37,8 @@ async function main() {
   const first = await counts();
   const passes2 = runSeed();
   const second = await counts();
+  console.log(`Collections counted: ${COLLECTIONS.length} (derived from source; ${COLLECTIONS.filter((c) => c.parent).length} subcollections)`);
+  for (const c of COLLECTIONS) console.log(`  ${c.key.padEnd(28)} ${c.parent ? "sub " : "root"} ${String(first[c.key]).padStart(6)} → ${String(second[c.key]).padStart(6)}`);
   assert.ok(passes1 >= 5 && passes2 === passes1, `seeded organizations passing data checks: ${passes1} then ${passes2}`);
   console.log(`✓ both runs exit 0; ${passes2} seeded organizations pass the data checks`);
 

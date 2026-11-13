@@ -191,7 +191,7 @@ The catalog is defined canonically in `functions/src/constants/permissions.ts`. 
    - `latestLocations`, `locationPings`: Read allowed only with manager permission or self. Write denied.
    - `notifications`: Read allowed by recipient user (`resource.data.userId == request.auth.uid`). Write denied.
    - `dailySummaries`, `monthlySummaries`: Read allowed by tenant members. Write denied.
-   - `organizationUsageDaily`, `branchUsageDaily`, `platformUsageSnapshots`: Super Admin read only. Write denied.
+   - `organizationUsageDaily`, `userUsageDaily`, `branchUsageDaily` and the other usage rollups: no client access (rules deny); read only through the usage callables (`usageGetDetail` for members with `usage:read` / `usage:read_users` or their own usage, the platform callables for the Super Admin).
 
 ---
 

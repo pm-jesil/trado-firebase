@@ -1,0 +1,69 @@
+{
+  "version": "1.0.0",
+  "roundingPolicy": "half_away_from_zero",
+  "description": "Cross-language test vectors for decimal-safe commercial money rounding (Dart / TypeScript parity).",
+  "vectors": [
+    { "input": 1.005, "decimals": 2, "expected": 1.01, "note": "Exact tie round up" },
+    { "input": 2.675, "decimals": 2, "expected": 2.68, "note": "IEEE 754 precision boundary" },
+    { "input": 10.005, "decimals": 2, "expected": 10.01, "note": "Two-decimal exact tie" },
+    { "input": 0.285, "decimals": 2, "expected": 0.29, "note": "Sub-unit exact tie" },
+    { "input": 35.255, "decimals": 2, "expected": 35.26, "note": "Two-decimal boundary" },
+    { "input": -2.5, "decimals": 0, "expected": -3.0, "note": "Negative exact tie rounds away from zero to -3" },
+    { "input": -0.125, "decimals": 2, "expected": -0.13, "note": "Negative two-decimal exact tie rounds to -0.13" },
+    { "input": -1.005, "decimals": 2, "expected": -1.01, "note": "Negative symmetric tie" },
+    { "input": -2.675, "decimals": 2, "expected": -2.68, "note": "Negative IEEE 754 boundary" },
+    { "input": -10.005, "decimals": 2, "expected": -10.01, "note": "Negative symmetric tie" },
+    { "input": -0.285, "decimals": 2, "expected": -0.29, "note": "Negative sub-unit tie" },
+    { "input": 2.5, "decimals": 0, "expected": 3.0, "note": "Zero-decimal positive exact tie" },
+    { "input": 2.49, "decimals": 0, "expected": 2.0, "note": "Zero-decimal round down" },
+    { "input": -2.49, "decimals": 0, "expected": -2.0, "note": "Zero-decimal negative round up towards zero" },
+    { "input": 1.0005, "decimals": 3, "expected": 1.001, "note": "Three-decimal exact tie (OMR/BHD)" },
+    { "input": -1.0005, "decimals": 3, "expected": -1.001, "note": "Negative three-decimal exact tie (OMR/BHD)" },
+    { "input": 0.1235, "decimals": 3, "expected": 0.124, "note": "Three-decimal tie round up" },
+    { "input": -0.1235, "decimals": 3, "expected": -0.124, "note": "Negative three-decimal tie round down" },
+    { "input": 15.5555, "decimals": 3, "expected": 15.556, "note": "Three-decimal precision tie" },
+    { "input": -15.5555, "decimals": 3, "expected": -15.556, "note": "Negative three-decimal precision tie" },
+    { "input": 9876543210.125, "decimals": 2, "expected": 9876543210.13, "note": "Large financial quantity exact tie" },
+    { "input": -9876543210.125, "decimals": 2, "expected": -9876543210.13, "note": "Negative large financial quantity" },
+    { "input": 1e-7, "decimals": 2, "expected": 0.0, "note": "Scientific notation sub-cent zero round" },
+    { "input": 5e-7, "decimals": 2, "expected": 0.0, "note": "Scientific notation sub-cent zero round" },
+    { "input": -1e-7, "decimals": 2, "expected": 0.0, "note": "Negative scientific notation sub-cent zero round" },
+    { "input": 1e21, "decimals": 2, "expected": 1e21, "note": "Large exponent scientific notation preservation" },
+    { "input": 5.551115123125783e-17, "decimals": 2, "expected": 0.0, "note": "Float residual zero round (0.1+0.2-0.3)" },
+    { "input": 5.1e-15, "decimals": 2, "expected": 0.0, "note": "Float residual zero round (100-99.99-0.01)" },
+    { "input": -0.0, "decimals": 0, "expected": 0.0, "note": "Negative zero normalized to +0" }
+  ],
+  "taxSplitVectors": [
+    {
+      "subTotal": 100.05,
+      "regime": "IN_GST",
+      "rate": 18,
+      "totalTax": 18.01,
+      "cgst": 9.01,
+      "sgst": 9.0,
+      "cgstPlusSgstEqualsTotal": true,
+      "note": "Odd-cent split ensures CGST + SGST === totalTax exactly"
+    },
+    {
+      "subTotal": 250.0,
+      "regime": "IN_GST",
+      "rate": 12,
+      "totalTax": 30.0,
+      "cgst": 15.0,
+      "sgst": 15.0,
+      "cgstPlusSgstEqualsTotal": true,
+      "note": "Even-cent split"
+    },
+    {
+      "subTotal": 99.99,
+      "regime": "IN_GST",
+      "rate": 5,
+      "totalTax": 5.0,
+      "cgst": 2.5,
+      "sgst": 2.5,
+      "cgstPlusSgstEqualsTotal": true,
+      "note": "5% GST split"
+    }
+  ]
+}
+

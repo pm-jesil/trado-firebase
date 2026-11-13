@@ -13,9 +13,9 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { db } from "./firebase.js";
 import { round2, round4 } from "./money.js";
+import { readRollups, sumRollups, estimateCost } from "./usageReport.js";
 import {
   ServiceUsageCounts,
-  OrganizationUsageDailyDoc,
   UsageRateCardDoc,
   OrganizationDoc,
   SubscriptionPlanDoc,
@@ -29,8 +29,11 @@ import {
  * Reflects baseline Google Cloud Firebase published rates.
  */
 export const DEFAULT_RATE_CARD_V1: UsageRateCardDoc = {
-  version: "v1.0.0",
-  effectiveDate: "2026-01-01",
+  // v1.1.0 (2026-11-13): same prices as v1.0.0, now with their verification state. None of the unit
+  // prices could be read from the official pricing page (script-rendered per region), so every one is
+  // verified: false and listed on the cloud checklist; the free allowance below was verified.
+  version: "v1.1.0",
+  effectiveDate: "2026-11-13",
   currency: "INR",
   rates: {
     firestoreReadPer100k: 5.0, // ~Rs 5.00 per 100,000 reads ($0.06 USD)
@@ -45,6 +48,25 @@ export const DEFAULT_RATE_CARD_V1: UsageRateCardDoc = {
   status: "active",
   createdAt: "2026-01-01T00:00:00.000Z",
   createdBy: "system",
+  verification: {
+    firestoreReadPer100k: { verified: false, source: "carried over from rate card v1.0.0 (INR conversion of USD 0.06); https://cloud.google.com/firestore/pricing could not be read on 2026-11-13", verifiedAt: null, region: "asia-south1" },
+    firestoreWritePer100k: { verified: false, source: "carried over from rate card v1.0.0 (INR conversion of USD 0.18); https://cloud.google.com/firestore/pricing could not be read on 2026-11-13", verifiedAt: null, region: "asia-south1" },
+    firestoreDeletePer100k: { verified: false, source: "carried over from rate card v1.0.0 (INR conversion of USD 0.02); https://cloud.google.com/firestore/pricing could not be read on 2026-11-13", verifiedAt: null, region: "asia-south1" },
+    functionsInvocationPerMillion: { verified: false, source: "carried over from rate card v1.0.0 (INR conversion of USD 0.40); https://cloud.google.com/firestore/pricing could not be read on 2026-11-13", verifiedAt: null, region: "asia-south1" },
+    functionsComputeGbSecond: { verified: false, source: "carried over from rate card v1.0.0 (no source recorded); https://cloud.google.com/firestore/pricing could not be read on 2026-11-13", verifiedAt: null, region: "asia-south1" },
+    storageGbMonth: { verified: false, source: "carried over from rate card v1.0.0 (INR conversion of USD 0.026); https://cloud.google.com/firestore/pricing could not be read on 2026-11-13", verifiedAt: null, region: "asia-south1" },
+    fcmPerThousand: { verified: false, source: "carried over from rate card v1.0.0 (no source recorded); https://cloud.google.com/firestore/pricing could not be read on 2026-11-13", verifiedAt: null, region: "asia-south1" },
+    locationPingPer100k: { verified: false, source: "carried over from rate card v1.0.0 (internal estimate, not a Google SKU); https://cloud.google.com/firestore/pricing could not be read on 2026-11-13", verifiedAt: null, region: "asia-south1" },
+  },
+  freeTier: {
+    firestoreReadsPerDay: 50_000,
+    firestoreWritesPerDay: 20_000,
+    firestoreDeletesPerDay: 20_000,
+    firestoreStoredGiB: 1,
+    egressGiBPerMonth: 10,
+    source: "https://firebase.google.com/docs/firestore/pricing (free quota; applied per project, daily, reset around midnight Pacific time)",
+    verifiedAt: "2026-11-13",
+  },
 };
 
 /**
@@ -125,35 +147,28 @@ export async function recordUsageMetrics(params: {
   const orgDocRef = db.collection("organizationUsageDaily").doc(orgDailyId);
   const orgMonthlyDocRef = db.collection("organizationUsageMonthly").doc(orgMonthlyId);
 
-  const incrementFields: Record<string, any> = {
+  const incrementFields: Record<string, unknown> = {
     organizationId,
     date: dateStr,
-    rateCardVersion: DEFAULT_RATE_CARD_V1.version,
-    currency: DEFAULT_RATE_CARD_V1.currency,
-    measurementClass: "app_attributed",
-    completenessPercent: 90, // Server-observed telemetry coverage
     updatedAt: now,
   };
 
-  const monthlyIncrementFields: Record<string, any> = {
+  const monthlyIncrementFields: Record<string, unknown> = {
     organizationId,
     month: monthStr,
-    rateCardVersion: DEFAULT_RATE_CARD_V1.version,
-    currency: DEFAULT_RATE_CARD_V1.currency,
-    measurementClass: "app_attributed",
-    completenessPercent: 90,
     updatedAt: now,
   };
 
   for (const [key, val] of Object.entries(metrics)) {
     if (typeof val === "number" && val !== 0) {
-      incrementFields[`counts.${key}`] = FieldValue.increment(val);
-      monthlyIncrementFields[`counts.${key}`] = FieldValue.increment(val);
+      // Client estimates: kept apart from what the server measured (DD-5).
+      incrementFields[`clientReported.${key}`] = FieldValue.increment(val);
+      monthlyIncrementFields[`clientReported.${key}`] = FieldValue.increment(val);
     }
   }
 
   // Update organization daily & monthly buckets
-  const writes: Promise<any>[] = [
+  const writes: Promise<unknown>[] = [
     orgDocRef.set(incrementFields, { merge: true }),
     orgMonthlyDocRef.set(monthlyIncrementFields, { merge: true }),
   ];
@@ -465,100 +480,40 @@ export async function generateDryRunUsageStatement(params: {
     unit: string;
     unitRate: number;
     amount: number;
+    verified: boolean;
   }>;
   subtotal: number;
   sharedOverheadAllocation: number;
   totalEstimatedCharge: number;
+  rateCardVersion: string;
+  verified: boolean;
 }> {
   const { organizationId, billingPeriod } = params;
   const rateCard = await getActiveRateCard();
-  const r = rateCard.rates;
-
-  // Query all daily records for this month
-  const startDate = `${billingPeriod}-01`;
-  const endDate = `${billingPeriod}-31`;
-
-  const dailySnaps = await db
-    .collection("organizationUsageDaily")
-    .where("organizationId", "==", organizationId)
-    .where("date", ">=", startDate)
-    .where("date", "<=", endDate)
-    .get();
-
-  const totals = createEmptyServiceCounts();
-  for (const doc of dailySnaps.docs) {
-    const data = doc.data() as OrganizationUsageDailyDoc;
-    if (data.counts) {
-      totals.firestoreReads += data.counts.firestoreReads || 0;
-      totals.firestoreWrites += data.counts.firestoreWrites || 0;
-      totals.firestoreDeletes += data.counts.firestoreDeletes || 0;
-      totals.functionsInvocations += data.counts.functionsInvocations || 0;
-      totals.functionsErrors += data.counts.functionsErrors || 0;
-      totals.functionsExecutionMs += data.counts.functionsExecutionMs || 0;
-      totals.storageUploadBytes += data.counts.storageUploadBytes || 0;
-      totals.storageDownloadBytes += data.counts.storageDownloadBytes || 0;
-      totals.authOperations += data.counts.authOperations || 0;
-      totals.fcmDispatches += data.counts.fcmDispatches || 0;
-      totals.locationPings += data.counts.locationPings || 0;
-    }
-  }
-
-  const lineItems = [
-    {
-      service: "Cloud Firestore",
-      metric: "Document Reads",
-      quantity: totals.firestoreReads,
-      unit: "100k Reads",
-      unitRate: r.firestoreReadPer100k,
-      amount: round2((totals.firestoreReads / 100000) * r.firestoreReadPer100k),
-    },
-    {
-      service: "Cloud Firestore",
-      metric: "Document Writes",
-      quantity: totals.firestoreWrites,
-      unit: "100k Writes",
-      unitRate: r.firestoreWritePer100k,
-      amount: round2((totals.firestoreWrites / 100000) * r.firestoreWritePer100k),
-    },
-    {
-      service: "Cloud Firestore",
-      metric: "Document Deletes",
-      quantity: totals.firestoreDeletes,
-      unit: "100k Deletes",
-      unitRate: r.firestoreDeletePer100k,
-      amount: round2((totals.firestoreDeletes / 100000) * r.firestoreDeletePer100k),
-    },
-    {
-      service: "Cloud Functions Gen 2",
-      metric: "Invocations",
-      quantity: totals.functionsInvocations,
-      unit: "1M Invocations",
-      unitRate: r.functionsInvocationPerMillion,
-      amount: round2((totals.functionsInvocations / 1000000) * r.functionsInvocationPerMillion),
-    },
-    {
-      service: "Employee Live Tracking",
-      metric: "Location Pings",
-      quantity: totals.locationPings,
-      unit: "100k Pings",
-      unitRate: r.locationPingPer100k,
-      amount: round2((totals.locationPings / 100000) * r.locationPingPer100k),
-    },
-  ];
-
+  // The measured cost rollups of the month (prompt 66), priced when read (D-22). No overhead is added:
+  // platform work is measured under organization "platform" and is not charged to tenants (D-21).
+  const days = await readRollups("organizationUsageDaily", { organizationId, startDate: `${billingPeriod}-01`, endDate: `${billingPeriod}-31`, limit: 40 });
+  const estimate = estimateCost(sumRollups(days), rateCard);
+  const lineItems = estimate.lines.map((l) => ({
+    service: l.sku.startsWith("firestore") ? "Cloud Firestore" : "Cloud Functions",
+    metric: l.unit,
+    quantity: l.quantity,
+    unit: l.unit,
+    unitRate: l.unitPrice,
+    amount: round2(l.cost),
+    verified: l.verified,
+  }));
   const subtotal = round2(lineItems.reduce((acc, curr) => acc + curr.amount, 0));
-  // Documented shared platform overhead allocation (5% fixed operational baseline)
-  const sharedOverheadAllocation = round2(subtotal * 0.05);
-  const totalEstimatedCharge = round2(subtotal + sharedOverheadAllocation);
-
   return {
     organizationId,
     billingPeriod,
     currency: rateCard.currency,
+    rateCardVersion: rateCard.version,
+    verified: estimate.verified,
     lineItems,
     subtotal,
-    sharedOverheadAllocation,
-    totalEstimatedCharge,
+    sharedOverheadAllocation: 0,
+    totalEstimatedCharge: subtotal,
   };
 }
 

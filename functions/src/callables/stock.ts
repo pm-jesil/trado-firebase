@@ -4,7 +4,8 @@
  * - stockMovementsList: Tenant-scoped stock movement ledger
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { db } from "../services/firebase.js";
 import {
   StockAdjustSchema,
@@ -13,10 +14,9 @@ import {
 import { parseInput } from "../validation/parseInput.js";
 import { StockMovementDoc, ProductDoc } from "../types/models.js";
 import { StockMovementType, StockAdjustmentReason, WRITE_OFF_REASONS } from "../constants/enums.js";
-import { reserveIdempotency, finalizeIdempotencyFailure } from "../services/idempotency.js";
+import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 import { applyStockChangesInTxn } from "../services/stockEngine.js";
 import { assertSerialCount, prepareSerialsInTxn } from "../services/serials.js";
-import { createAuditLog } from "../services/audit.js";
 import { hydrate } from "../services/hydration.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext, resolveDataScope, applyDataScope, type RequestContext } from "../services/contextResolver.js";
@@ -81,16 +81,6 @@ export async function applyStockAdjustment(ctx: RequestContext, adj: AdjustmentR
   });
 
   const changeResult = results[0];
-  await createAuditLog({
-    organizationId: orgId,
-    branchId: adj.branchId,
-    actorUid: ctx.callerUid,
-    actorMembershipId: ctx.membershipId,
-    action: requestRef ? "STOCK_ADJUSTMENT_APPROVED" : "STOCK_ADJUSTED",
-    entityType: "product",
-    entityId: adj.productId,
-    details: { quantity: adj.quantity, previousStock: changeResult.previousStock, newStock: changeResult.newStock, reason: adj.reason, reasonCode, requestId: requestRef?.id || null },
-  });
   return {
     productId: adj.productId,
     organizationId: orgId,
@@ -119,7 +109,7 @@ export const stockAdjust = onCall({ region: "asia-south1" }, async (request) => 
     actorUid: ctx.callerUid,
     operation: "stock.adjust",
     clientKey: input.idempotencyKey,
-    payload: input as unknown as Record<string, unknown>,
+    payload: request.data,
   });
   if (idempotency.isDuplicate) {
     if (idempotency.isProcessing) throw new HttpsError("already-exists", "Operation in progress. Please retry shortly.");
@@ -145,7 +135,7 @@ export const stockAdjust = onCall({ region: "asia-south1" }, async (request) => 
       response = await applyStockAdjustment(ctx, adj);
     }
     if (idempotency.recordId) {
-      await db.collection("idempotencyRecords").doc(idempotency.recordId).update({ status: "succeeded", result: response, updatedAt: new Date().toISOString() });
+      await finalizeIdempotencySuccess(idempotency.recordId, response);
     }
     return response;
   } catch (error) {

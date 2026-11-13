@@ -6,7 +6,8 @@
  * AuthSessionContext, registers optional device identity, and returns credentials: null.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { parseInput } from "../validation/parseInput.js";
 import { AuthMeResponse } from "../types/api.js";
 import { AuthMeSchema } from "../validation/schemas.js";
@@ -27,6 +28,7 @@ export const authMe = onCall({ region: "asia-south1" }, async (request): Promise
   });
 
   return {
+    /** D-18: single canonical response — `context` is the one source of truth; no mirrored top-level keys. */
     context,
     credentials: null,
   };

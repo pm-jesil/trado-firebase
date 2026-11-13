@@ -5,7 +5,8 @@
  * (e.g., Firebase Auth user created, but subsequent Firestore writes fail).
  */
 
-import { auth, db } from "./firebase.js";
+import { auth } from "./firebase.js";
+import { recordSystemEvent } from "./auditRecorder.js";
 
 export interface RollbackResult {
   attempted: boolean;
@@ -34,18 +35,7 @@ export async function compensateAuthUser(uid: string, reason: string): Promise<R
 
     // Record an uncompensated orphan event in audit logs for manual/automated reconciliation
     try {
-      await db.collection("auditLogs").add({
-        action: "COMPENSATION_FAILED",
-        actorUid: "system",
-        entityType: "user",
-        entityId: uid,
-        timestamp: new Date().toISOString(),
-        details: {
-          originalReason: reason,
-          rollbackError: errMessage,
-          severity: "CRITICAL",
-        },
-      });
+      await recordSystemEvent("auth.compensation_failed", { type: "user", id: uid }, { originalReason: reason, rollbackError: errMessage, severity: "CRITICAL" });
     } catch {
       // Emergency fallback logging
       console.error(`[CRITICAL] Failed to delete orphan Auth user ${uid} and failed to write audit log:`, errMessage);

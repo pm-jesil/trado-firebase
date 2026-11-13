@@ -1,119 +1,76 @@
 rules_version = '2';
 
-// Trado Firestore rules.
-// - Every client write is denied (nothing below grants write): all writes go through callables.
-// - Reads are granted per collection by ONE rule each; the expectation table in
-//   functions/src/test/rules/firestoreRules.test.ts (RULES_MATRIX) is the contract and
-//   scripts/check-gate-conformance.js checks that every collection is listed here and there.
+// Trado Firestore Security Rules.
+// - Every client write is denied: all mutations go through atomic Cloud Functions Callables.
+// - Direct client reads are restricted strictly to:
+//     1. Caller's own user profile & devices (/users/{uid}, /users/{uid}/devices/{deviceId})
+//     2. Caller's own membership documents (/memberships/{id} where resource.data.userId == request.auth.uid)
+//     3. Caller's own branch join documents (/membershipBranches/{id} where resource.data.userId == request.auth.uid)
+//     4. Caller's own in-app notifications (/notifications/{id} where resource.data.userId == request.auth.uid)
+//     5. Non-sensitive global reference catalogs (/subscriptionPlans, /permissionCatalog, /modules, /taxRegimes, and global categories/units)
+// - ALL tenant business, operational, inventory, customer, vendor, and financial collections
+//   are CALLABLE-ONLY (allow read, write: if false).
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- Helpers ---------------------------------------------------------------
-
     function signedIn() {
       return request.auth != null;
-    }
-
-    function isSuperAdmin() {
-      return signedIn() && request.auth.token.get('isSuperAdmin', false) == true;
     }
 
     function isSelf(uid) {
       return signedIn() && request.auth.uid == uid;
     }
 
-    // ACTIVE membership only: a deactivated employee loses direct read access immediately.
-    function isOrgMember(orgId) {
-      return signedIn() && orgId != null &&
-        exists(/databases/$(database)/documents/memberships/$(request.auth.uid + '_' + orgId)) &&
-        get(/databases/$(database)/documents/memberships/$(request.auth.uid + '_' + orgId)).data.status == 'active';
-    }
-
-    // The document belongs to the caller (userId field).
     function ownsDoc() {
       return signedIn() && resource.data.userId == request.auth.uid;
     }
 
-    // Active member of the document's organization.
-    function memberOfDocOrg() {
-      return isOrgMember(resource.data.organizationId);
+    function isGlobalCatalog() {
+      return signedIn() && (
+        resource.data.get('organizationId', null) == null ||
+        resource.data.get('isSystem', false) == true
+      );
     }
 
-    // Platform catalog entry (organizationId null / system) or the caller's organization's entry.
-    function globalOrMember() {
-      return signedIn() && (resource.data.get('organizationId', null) == null ||
-        resource.data.get('isSystem', false) == true || memberOfDocOrg());
-    }
-
-    // --- Collections readable by clients -----------------------------------------
-    // Read-metering strategy (decision D-04, hybrid): business and financial collections are
-    // readable ONLY through callables (plan/permission/data scope, redaction, metering). Direct
-    // SDK reads stay for small bounded reference documents and the caller's own documents.
+    // --- Caller's own documents (Zero get() overhead) ---
 
     match /users/{uid} {
-      allow read: if isSelf(uid) || isSuperAdmin();
+      allow read: if isSelf(uid);
       match /devices/{deviceId} {
-        allow read: if isSelf(uid) || isSuperAdmin();
+        allow read: if isSelf(uid);
       }
     }
 
     match /memberships/{membershipId} {
-      allow read: if isSuperAdmin() || ownsDoc() || memberOfDocOrg();
+      allow read: if ownsDoc();
     }
 
     match /membershipBranches/{membershipBranchId} {
-      allow read: if isSuperAdmin() || ownsDoc() || memberOfDocOrg();
+      allow read: if ownsDoc();
     }
 
-    match /organizations/{organizationId} {
-      allow read: if isSuperAdmin() || isOrgMember(organizationId);
-      match /branches/{branchId} {
-        allow read: if isSuperAdmin() || isOrgMember(organizationId);
-      }
+    match /notifications/{notificationId} {
+      allow read: if ownsDoc();
     }
 
-    match /stockBalances/{stockBalanceId} {
-      allow read: if isSuperAdmin() || memberOfDocOrg();
+    // --- Non-sensitive global platform catalogs (Signed-in users) ---
+
+    match /subscriptionPlans/{planId} {
+      allow read: if signedIn() &&
+        resource.data.get('isActive', true) == true &&
+        resource.data.get('isPrivate', false) != true &&
+        resource.data.get('isArchived', false) != true;
     }
 
-    match /teams/{teamId} {
-      allow read: if isSuperAdmin() || memberOfDocOrg();
-    }
-
-    // Tenant or platform catalogs
     match /{catalog}/{docId} {
-      allow read: if catalog in ['roles', 'departments', 'jobRoles', 'categories', 'units'] &&
-        (isSuperAdmin() || globalOrMember());
+      allow read: if catalog in ['permissionCatalog', 'modules', 'taxRegimes'] && signedIn();
     }
 
-    // Platform catalogs: any signed-in user
     match /{catalog}/{docId} {
-      allow read: if catalog in ['subscriptionPlans', 'permissionCatalog', 'modules', 'taxRegimes'] && signedIn();
+      allow read: if catalog in ['categories', 'units'] && isGlobalCatalog();
     }
 
-    // Own documents only (other staff's tasks / locations need the callables' permissions)
-    match /tasks/{taskId} {
-      allow read: if isSuperAdmin() || (memberOfDocOrg() &&
-        (resource.data.assignedToMembershipId == request.auth.uid + '_' + resource.data.organizationId ||
-         resource.data.createdBy == request.auth.uid));
-    }
-
-    match /{own}/{docId} {
-      allow read: if own in ['latestLocations', 'locationPings', 'notifications'] && (isSuperAdmin() || ownsDoc());
-    }
-
-    // --- Callable-only business collections and platform usage: Super Admin direct read ---
-    match /{superAdminOnly}/{docId} {
-      allow read: if superAdminOnly in [
-        'products', 'customers', 'vendors', 'outflows', 'bills', 'stockMovements', 'deliveries',
-        'returns', 'payments', 'dailySummaries', 'monthlySummaries',
-        'organizationUsageDaily', 'organizationUsageMonthly', 'branchUsageDaily', 'branchUsageMonthly',
-        'usageRateCards', 'usageCounterShards', 'serials', 'stockAdjustmentRequests', 'recurringExpenses'
-      ] && isSuperAdmin();
-    }
-
-    // Internal server collections (documentCounters, idempotencyRecords, auditLogs,
-    // notificationOutbox, uniqueKeys) and anything unlisted: no client access at all.
+    // --- Everything else is callable-only (No direct client access) ---
     match /{document=**} {
       allow read, write: if false;
     }

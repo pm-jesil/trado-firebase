@@ -8,7 +8,8 @@
  * outflowsApprove.
  */
 
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../services/callable.js";
 import { DocumentDecisionSchema } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
 import { resolveRequestContext } from "../services/contextResolver.js";

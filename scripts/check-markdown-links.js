@@ -1,4 +1,5 @@
 /**
+ * @guard-scope: files **\/*.md (repository)
  * Trado Markdown Link Checker
  * 
  * Scans all documentation and README.md files to ensure all relative links
@@ -14,7 +15,7 @@ function getMarkdownFiles(dir) {
   let results = [];
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   for (const ent of entries) {
-    if (ent.name === 'node_modules' || ent.name === '.git' || ent.name === 'lib') continue;
+    if (ent.name === 'node_modules' || ent.name === '.git' || ent.name === 'lib' || ent.name === '.local') continue; // .local: runtime output, rewritten while units run
     const full = path.join(dir, ent.name);
     if (ent.isDirectory()) {
       results = results.concat(getMarkdownFiles(full));

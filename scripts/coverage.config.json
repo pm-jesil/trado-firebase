@@ -1,0 +1,140 @@
+{
+  "$comment": "Hand-kept registers read by scripts/coverage-engine.js. Every entry needs a reason; entries are counted in coverage.md as 'by register', never as evidence.",
+  "systemManaged": [],
+  "deferred": [],
+  "nonPersistedInputPaths": [
+    {
+      "callable": "*",
+      "path": "idempotencyKey",
+      "reason": "client request id; stored as the idempotencyRecords document key, not as a field of the entity"
+    }
+  ],
+  "removedFieldNames": [
+    {
+      "name": "photoUrl",
+      "callables": [
+        "usersUpdateMe",
+        "employeesCreate",
+        "employeesUpdate",
+        "organizationsProvisionUser"
+      ],
+      "reason": "D-15: one stored image field `image`; the URL is computed at read time"
+    },
+    {
+      "name": "avatarUrl",
+      "callables": [
+        "usersUpdateMe",
+        "employeesCreate",
+        "employeesUpdate",
+        "organizationsProvisionUser"
+      ],
+      "reason": "D-15"
+    },
+    {
+      "name": "logoUrl",
+      "callables": [
+        "organizationsCreate",
+        "organizationsUpdate"
+      ],
+      "reason": "D-15"
+    },
+    {
+      "name": "imageUrls",
+      "callables": [
+        "organizationsCreate",
+        "organizationsUpdate",
+        "productsCreate",
+        "productsUpdate"
+      ],
+      "reason": "D-15"
+    },
+    {
+      "name": "imageUrl",
+      "callables": [
+        "organizationsCreate",
+        "organizationsUpdate",
+        "productsCreate",
+        "productsUpdate",
+        "customersCreate",
+        "customersUpdate",
+        "vendorsCreate",
+        "vendorsUpdate",
+        "usersUpdateMe"
+      ],
+      "reason": "D-15: imageUrl is a computed response field, never input"
+    },
+    {
+      "name": "bankDetails",
+      "callables": [
+        "organizationsCreate",
+        "organizationsUpdate"
+      ],
+      "reason": "superseded by bankAccounts[]"
+    },
+    {
+      "name": "taxNumber",
+      "callables": [
+        "customersCreate",
+        "customersUpdate",
+        "vendorsCreate",
+        "vendorsUpdate"
+      ],
+      "reason": "D-7: renamed to taxId"
+    },
+    {
+      "name": "billingAddress",
+      "callables": [
+        "customersCreate",
+        "customersUpdate",
+        "vendorsCreate",
+        "vendorsUpdate"
+      ],
+      "reason": "D-7: replaced by addresses[] with isDefaultBilling"
+    },
+    {
+      "name": "shippingAddress",
+      "callables": [
+        "customersCreate",
+        "customersUpdate",
+        "vendorsCreate",
+        "vendorsUpdate"
+      ],
+      "reason": "D-7: replaced by addresses[] with isDefaultShipping"
+    },
+    {
+      "name": "contactPerson",
+      "callables": [
+        "customersCreate",
+        "customersUpdate",
+        "vendorsCreate",
+        "vendorsUpdate"
+      ],
+      "reason": "D-7: replaced by contacts[]"
+    },
+    {
+      "name": "whatsApp",
+      "callables": [
+        "customersCreate",
+        "customersUpdate",
+        "vendorsCreate",
+        "vendorsUpdate"
+      ],
+      "reason": "D-7: top-level whatsApp removed; contacts[].whatsApp remains"
+    },
+    {
+      "name": "branchName",
+      "path": "bankAccounts[].branchName",
+      "callables": [
+        "organizationsCreate",
+        "organizationsUpdate",
+        "customersCreate",
+        "customersUpdate",
+        "vendorsCreate",
+        "vendorsUpdate"
+      ],
+      "reason": "removed from BankAccountRecord (Y-8); routing uses routingType + routingCode"
+    }
+  ],
+  "inapplicableTestClasses": [],
+  "idempotencyExemptions": []
+}

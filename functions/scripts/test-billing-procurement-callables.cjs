@@ -50,13 +50,13 @@ async function run() {
 
   const custRes = await callFunction("customersCreate", buildCustomerPayload(orgId, {
     name: "Vikram Sharma",
-    mobile: "+919988776655",
+    phone: "+919988776655",
   }), ownerToken);
   const customerId = custRes.customerId;
 
   const vendRes = await callFunction("vendorsCreate", buildVendorPayload(orgId, {
     name: "Pure Agro Organics",
-    mobile: "+919988112233",
+    phone: "+919988112233",
   }), ownerToken);
   const vendorId = vendRes.vendorId;
   console.log(`✓ Test entities ready: Product ${productId}, Customer ${customerId}, Vendor ${vendorId}\n`);
@@ -156,6 +156,26 @@ async function run() {
     ["permission-denied"]
   );
   console.log("✓ billsCreate rejected unassigned user");
+
+  // Preview POS Bill (read-only pricing preview)
+  const previewBillRes = await callFunction("billsPreview", {
+    organizationId: orgId,
+    salesMode: "pos",
+    customerId,
+    items: [
+      {
+        productId,
+        quantity: 5,
+        unitPriceOverride: 450,
+      },
+    ],
+    paidAmount: 2250,
+    paymentMethod: "upi",
+  }, ownerToken);
+  const calc = previewBillRes.calculation || previewBillRes;
+  assert.ok(calc, "billsPreview must return calculation");
+  assert.ok(Array.isArray(previewBillRes.warnings), "billsPreview must return warnings array");
+  console.log(`✓ billsPreview returned live pricing preview (total: ₹${calc.grandTotal || calc.totalAmount})`);
 
   // Create Active POS Bill (immediate counter sale)
   const activeBillRes = await callFunction("billsCreate", {

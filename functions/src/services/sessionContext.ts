@@ -33,6 +33,7 @@ import {
 import { resolveAllEffectivePermissions } from "./permissionResolver.js";
 import { DEFAULT_SYSTEM_ROLES } from "../constants/catalogs.js";
 import { evaluateSubscription } from "./subscription.js";
+import { hydrateImageUrl } from "./imageEngine.js";
 import { GateReason } from "../constants/enums.js";
 
 export interface BuildAuthSessionContextOptions {
@@ -77,7 +78,7 @@ export async function buildAuthSessionContext(
     const cleanDeviceId = deviceId.trim();
     const nowIso = new Date().toISOString();
     const deviceRef = userDocRef.collection("devices").doc(cleanDeviceId);
-    
+
     await deviceRef.set(
       {
         lastLoginAt: nowIso,
@@ -101,7 +102,7 @@ export async function buildAuthSessionContext(
       throw new HttpsError("permission-denied", "User account is disabled in Firebase Authentication.");
     }
     isSuperAdmin = userRecord.customClaims?.isSuperAdmin === true;
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err instanceof HttpsError) throw err;
     isSuperAdmin = false;
   }
@@ -128,7 +129,8 @@ export async function buildAuthSessionContext(
       email: userData.email,
       name: userData.name,
       phone: userData.phone || null,
-      avatarUrl: null,
+      /** D-15: compute display URL from stored path via hydrateImageUrl; never read a stored URL field. */
+      imageUrl: hydrateImageUrl(userData.image),
       accountType: "super_admin",
       isActive: userData.isActive,
       isSuperAdmin: true,
@@ -164,8 +166,9 @@ export async function buildAuthSessionContext(
     email: userData.email,
     name: userData.name,
     phone: userData.phone || null,
-    avatarUrl: null,
-    accountType: (userData.accountType as any) || "staff",
+    /** D-15: compute display URL from stored path via hydrateImageUrl; never read a stored URL field. */
+    imageUrl: hydrateImageUrl(userData.image),
+    accountType: userData.accountType || "standard",
     isActive: userData.isActive,
     isSuperAdmin: false,
   };
@@ -265,6 +268,13 @@ export async function buildAuthSessionContext(
     ? {
       organizationId: primaryMembership.organizationId,
       name: primaryOrgData.name,
+      currency: primaryOrgData.currency || "INR",
+      currencyDecimals: primaryOrgData.currencyDecimals ?? 2,
+      timezone: primaryOrgData.timezone || "Asia/Kolkata",
+      country: primaryOrgData.country || "IN",
+      taxRegimeCode: primaryOrgData.taxRegimeCode || "IN_GST",
+      businessType: primaryOrgData.businessType,
+      businessCategory: primaryOrgData.businessCategory,
     }
     : null;
 
@@ -285,7 +295,7 @@ export async function buildAuthSessionContext(
         permissions: [],
         platformPermissions: [],
         organizations: organizationsList,
-        primaryOrganization: { organizationId: primaryMembership.organizationId, name: primaryOrgData.name },
+        primaryOrganization: primaryOrgContext,
         branches: [],
         primaryBranch: null,
         device: deviceContext,
@@ -318,7 +328,7 @@ export async function buildAuthSessionContext(
         jobRolesList.push({
           jobRoleId: jrDoc.id,
           name: jrData.name,
-          code: (jrData as any).code || jrDoc.id,
+          code: jrData.code || jrDoc.id,
         });
       }
     }
