@@ -1,0 +1,258 @@
+{
+  "entity": "delivery",
+  "label": "Delivery",
+  "callables": {
+    "create": "deliveriesCreate",
+    "update": "deliveriesUpdateStatus"
+  },
+  "fields": [
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "billId",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample billId"
+    },
+    {
+      "path": "lines[].lineId",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 10
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample lines[].lineId"
+    },
+    {
+      "path": "lines[].quantity",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "recipient.name",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample recipient.name"
+    },
+    {
+      "path": "recipient.phone",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 4,
+        "maxLength": 30
+      },
+      "enumValues": [],
+      "uiHint": "phone",
+      "example": "Sample recipient.phone"
+    },
+    {
+      "path": "address.line1",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.line1"
+    },
+    {
+      "path": "address.line2",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.line2"
+    },
+    {
+      "path": "address.landmark",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.landmark"
+    },
+    {
+      "path": "address.city",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.city"
+    },
+    {
+      "path": "address.pincode",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.pincode"
+    },
+    {
+      "path": "riderMembershipId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample riderMembershipId"
+    },
+    {
+      "path": "partner",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "internal",
+        "swiggy",
+        "zomato",
+        "dunzo",
+        "other"
+      ],
+      "uiHint": "dropdown",
+      "example": "internal"
+    },
+    {
+      "path": "deliveryFee",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "cod.isCod",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "cod.amount",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "notes",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample notes"
+    }
+  ]
+}

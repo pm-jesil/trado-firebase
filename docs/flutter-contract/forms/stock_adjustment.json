@@ -1,0 +1,121 @@
+{
+  "entity": "stock_adjustment",
+  "label": "Stock Adjustment / Wastage",
+  "callables": {
+    "create": "stockAdjust",
+    "update": "stockGetLevels"
+  },
+  "fields": [
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "productId",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample productId"
+    },
+    {
+      "path": "quantity",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "reason",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample reason"
+    },
+    {
+      "path": "reasonCode",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "damaged",
+        "expired",
+        "lost_theft",
+        "sample",
+        "internal_use",
+        "damaged_on_receipt",
+        "count_correction",
+        "opening_stock",
+        "other"
+      ],
+      "uiHint": "dropdown",
+      "example": "damaged"
+    },
+    {
+      "path": "serialNumbers[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 64
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample serialNumbers[]"
+    }
+  ]
+}

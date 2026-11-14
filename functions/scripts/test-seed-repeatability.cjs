@@ -34,8 +34,10 @@ async function main() {
   await verifyEmulatorHealth();
   console.log("=== SEED REPEATABILITY ===");
   const passes1 = runSeed();
+  await new Promise((r) => setTimeout(r, 4000));
   const first = await counts();
   const passes2 = runSeed();
+  await new Promise((r) => setTimeout(r, 4000));
   const second = await counts();
   console.log(`Collections counted: ${COLLECTIONS.length} (derived from source; ${COLLECTIONS.filter((c) => c.parent).length} subcollections)`);
   for (const c of COLLECTIONS) console.log(`  ${c.key.padEnd(28)} ${c.parent ? "sub " : "root"} ${String(first[c.key]).padStart(6)} → ${String(second[c.key]).padStart(6)}`);

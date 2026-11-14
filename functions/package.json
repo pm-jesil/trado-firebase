@@ -16,7 +16,10 @@
     "test:triggers": "node scripts/test-event-triggers.cjs",
     "test:e2e": "node scripts/test-retail-lifecycle.e2e.js && node scripts/test-multibranch-isolation.e2e.js",
     "test:completeness": "node ../scripts/check-test-completeness.js",
-    "test:static": "node ../scripts/check-schema-duplicates.js && node ../scripts/generate-source-inventory.js && node ../scripts/check-gate-conformance.js && node ../scripts/check-api-drift.js && node ../scripts/check-test-completeness.js && node ../scripts/check-markdown-links.js && node ../scripts/check-openapi-drift.js && node ../scripts/check-field-parity.js && node ../scripts/check-dead-fields.js && node ../scripts/check-naming.js && node ../scripts/check-naming.js --test && node ../scripts/check-shared-schemas.js && node ../scripts/check-shared-schemas.js --test && node ../scripts/check-sensitive.js && node ../scripts/check-sensitive.js --test && node ../scripts/check-doc-truth.js && node ../scripts/check-doc-counts.js && node ../scripts/check-doc-examples.js && node ../scripts/check-doc-index.js && node ../scripts/generate-doc-index.js --check && node ../scripts/generate-audit-registry.js --check && node ../scripts/generate-metering-inventory.js --check && node ../scripts/generate-rate-card-doc.js --check && node ../scripts/check-recording-points.js && node ../scripts/check-recording-points.js --test && node ../scripts/check-firestore-indexes.js --test && node ../scripts/check-doc-banned-words.js && node scripts/check-stored-url-fields.js && node scripts/check-no-any-writes.js",
+    "test:static": "node ../scripts/check-schema-duplicates.js && node ../scripts/generate-source-inventory.js && node ../scripts/check-gate-conformance.js && node ../scripts/check-api-drift.js && node ../scripts/check-test-completeness.js && node ../scripts/check-markdown-links.js && node ../scripts/check-openapi-drift.js && node ../scripts/check-field-parity.js && node ../scripts/check-dead-fields.js && node ../scripts/check-naming.js && node ../scripts/check-naming.js --test && node ../scripts/check-shared-schemas.js && node ../scripts/check-shared-schemas.js --test && node ../scripts/check-sensitive.js && node ../scripts/check-sensitive.js --test && node ../scripts/check-doc-truth.js && node ../scripts/check-doc-counts.js && node ../scripts/check-doc-examples.js && node ../scripts/check-doc-index.js && node ../scripts/generate-doc-index.js --check && node ../scripts/generate-audit-registry.js --check && node ../scripts/generate-metering-inventory.js --check && node ../scripts/generate-rate-card-doc.js --check && node ../scripts/check-recording-points.js && node ../scripts/check-recording-points.js --test && node ../scripts/check-firestore-indexes.js --test && node ../scripts/check-doc-banned-words.js && node scripts/check-stored-url-fields.js && node scripts/check-no-any-writes.js && node ../scripts/check-rules-sync.js && node ../scripts/verify-coupling.js && node ../scripts/verify-coupling.js --test && node ../scripts/check-test-quality.js && node ../scripts/check-test-quality.js --test && node ../scripts/check-flutter-contract.js",
+    "check:rules-sync": "node ../scripts/check-rules-sync.js",
+    "verify:coupling": "node ../scripts/verify-coupling.js",
+    "check:test-quality": "node ../scripts/check-test-quality.js",
     "check:field-parity": "node ../scripts/check-field-parity.js",
     "check:dead-fields": "node ../scripts/check-dead-fields.js",
     "check:naming": "node ../scripts/check-naming.js",
@@ -50,6 +53,9 @@
     "test:schema-sweep": "node scripts/test-schema-contract-sweep.cjs",
     "test:coverage-defects": "node ../scripts/test-coverage-engine-defects.cjs",
     "test:metering": "node scripts/test-metering-layer.cjs && node scripts/test-metering-rollups.cjs && node scripts/test-audit-completeness.cjs",
+    "test:scenarios": "node scripts/test-real-world-scenarios.cjs && node scripts/test-subscription-limits-and-audit-visibility.cjs",
+    "contract:generate": "node ../scripts/generate-flutter-contract.js",
+    "check:flutter-contract": "node ../scripts/check-flutter-contract.js",
     "test:guard-defects": "node scripts/test-same-doc-duplicates-defects.cjs"
   },
   "engines": {

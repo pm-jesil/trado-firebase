@@ -1,0 +1,75 @@
+{
+  "entity": "job_role",
+  "label": "Job Role",
+  "callables": {
+    "create": "jobRolesCreate",
+    "update": "jobRolesDelete"
+  },
+  "fields": [
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "name",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample name"
+    },
+    {
+      "path": "code",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 60,
+        "format": "regex"
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample code"
+    }
+  ]
+}

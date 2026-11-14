@@ -1,0 +1,71 @@
+{
+  "entity": "department",
+  "label": "Department",
+  "callables": {
+    "create": "departmentsCreate",
+    "update": "departmentsDelete"
+  },
+  "fields": [
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "name",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample name"
+    },
+    {
+      "path": "headMembershipIds[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample headMembershipIds[]"
+    }
+  ]
+}

@@ -105,8 +105,16 @@ const md = [
   "Every callable and trigger has exactly one action. Events are written by the counting layer in the same commit as the mutation (`services/auditRecorder.ts`); denied, failed, export, auth and sensitive-read events are written at the end of the request. Category `none` (plain reads) is not audited. See [the audit guide](../guides/audit-trail.md).", "",
   "| Category | Exports |", "|---|---|",
   ...Object.entries(byCategory).sort().map(([c, list]) => `| \`${c}\` | ${list.length} |`), "",
-  "| Export | Action | Category | Primary collection | Reason fields |", "|---|---|---|---|---|",
-  ...Object.entries(entries).sort(([a], [b]) => a.localeCompare(b)).map(([n, e]) => `| \`${n}\` | \`${e.action}\` | ${e.category} | ${e.collection ? `\`${e.collection}\`` : "—"} | ${e.inputFields.map((f) => `\`${f}\``).join(", ") || "—"} |`),
+  "| Code | Action | Entity Type | Verb | Display Key | Status Tracked | Audit Before | Category | Primary Collection | Reason Fields |", "|---|---|---|---|---|---|---|---|---|---|",
+  ...Object.entries(entries).sort(([a], [b]) => a.localeCompare(b)).map(([n, e]) => {
+    const parts = e.action.split(".");
+    const entity = parts[0];
+    const verb = parts[1] || "call";
+    const displayKey = `audit.action.${entity}.${verb}`;
+    const statusTracked = /finalize|void|approve|cancel|reject|complete|status|status_change/i.test(n) || /bill|delivery|outflow|task|order/i.test(entity);
+    const auditBefore = e.category === "mutation";
+    return `| \`${n}\` | \`${e.action}\` | \`${entity}\` | \`${verb}\` | \`${displayKey}\` | ${statusTracked ? "Yes" : "No"} | ${auditBefore ? "Yes" : "No"} | ${e.category} | ${e.collection ? `\`${e.collection}\`` : "—"} | ${e.inputFields.map((f) => `\`${f}\``).join(", ") || "—"} |`;
+  }),
   "",
 ].join("\n");
 

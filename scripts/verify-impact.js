@@ -207,7 +207,7 @@ function enumerateUnits() {
     add({ id: `rules:${svc}`, command: `node --test lib/test/rules/${f.replace(/\.ts$/, ".js")} && node ../scripts/collect-rules-coverage.js ${svc}`, cwd: FUNCTIONS, entries: [`functions/src/test/rules/${f}`], needsBuild: true, emulator: true, phase: 2, declared: [`${svc}.rules`, "firebase.json"] });
   }
   // Emulator suites, derived from the package scripts that run them.
-  const groups = [["test:seed", "seed", 1.5], ["test:callables", "suite", 2.5], ["test:triggers", "trigger", 2.5], ["test:e2e", "suite", 2.5], ["test:simulation", "suite", 2.5], ["test:roundtrip", "roundtrip", 2.5], ["test:schema-sweep", "sweep", 2.5], ["api:audit:generate", "ledger", 3.5], ["test:guard-defects", "guardtest", 3.2], ["test:coverage-defects", "engine", 5], ["test:metering", "metering", 2.5]];
+  const groups = [["test:seed", "seed", 1.5], ["test:callables", "suite", 2.5], ["test:triggers", "trigger", 2.5], ["test:e2e", "suite", 2.5], ["test:simulation", "suite", 2.5], ["test:roundtrip", "roundtrip", 2.5], ["test:schema-sweep", "sweep", 2.5], ["api:audit:generate", "ledger", 3.5], ["test:guard-defects", "guardtest", 3.2], ["test:coverage-defects", "engine", 5], ["test:metering", "metering", 2.5], ["test:scenarios", "scenario", 2.5]];
   for (const [script, kind, phase] of groups) {
     for (const { file } of nodeCommands(pkg[script])) {
       add({ id: `${kind}:${base(file).replace(/^(test|run|generate)-|-callables$|\.e2e$/g, "")}`, command: `node ${file}`, entries: [file], needsBuild: true, emulator: true, phase, declared: ["firestore.rules", "storage.rules", "firestore.indexes.json", "firebase.json"] });

@@ -1,0 +1,88 @@
+{
+  "entity": "team",
+  "label": "Team",
+  "callables": {
+    "create": "teamsCreate",
+    "update": "teamsUpdate"
+  },
+  "fields": [
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "name",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample name"
+    },
+    {
+      "path": "description",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample description"
+    },
+    {
+      "path": "leaderMembershipId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample leaderMembershipId"
+    }
+  ]
+}

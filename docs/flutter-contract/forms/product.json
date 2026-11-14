@@ -1,0 +1,822 @@
+{
+  "entity": "product",
+  "label": "Product",
+  "callables": {
+    "create": "productsCreate",
+    "update": "productsUpdate"
+  },
+  "fields": [
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "name",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 150
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample name"
+    },
+    {
+      "path": "description",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 1000
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample description"
+    },
+    {
+      "path": "categoryId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample categoryId"
+    },
+    {
+      "path": "baseUnit",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 30
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample baseUnit"
+    },
+    {
+      "path": "sellingPrice",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "costPrice",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "mrp",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "wholesalePrice",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "taxInclusive",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "taxRatePercent",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true,
+        "max": 100,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": 1
+    },
+    {
+      "path": "taxCode",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 50
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample taxCode"
+    },
+    {
+      "path": "barcode",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample barcode"
+    },
+    {
+      "path": "sku",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample sku"
+    },
+    {
+      "path": "hasExpiry",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "trackStock",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "initialStock",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "lowStockThreshold",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "trackBatch",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": true
+    },
+    {
+      "path": "trackSerial",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "hasVariants",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "isPurchaseOnly",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "isExpenseOnly",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "isSaleOnly",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "brand",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample brand"
+    },
+    {
+      "path": "alternateUnits[].unit",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 30
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample alternateUnits[].unit"
+    },
+    {
+      "path": "alternateUnits[].factor",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": 1
+    },
+    {
+      "path": "alternateUnits[].sellingPrice",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": 1
+    },
+    {
+      "path": "alternateUnits[].wholesalePrice",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": 1
+    },
+    {
+      "path": "alternateUnits[].barcode",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample alternateUnits[].barcode"
+    },
+    {
+      "path": "alternateUnits[].isPurchaseUnit",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": true
+    },
+    {
+      "path": "alternateUnits[].isSaleUnit",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": true
+    },
+    {
+      "path": "isTaxable",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "taxExemptionReason",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 200
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample taxExemptionReason"
+    },
+    {
+      "path": "isDiscountable",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "maxDiscountPercent",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true,
+        "max": 100,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "isReturnable",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "returnWindowDays",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": true,
+        "max": 3650,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "reorderLevel",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "maxStockLevel",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "weight.value",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "weight.unit",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 10
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample weight.unit"
+    },
+    {
+      "path": "dimensions.length",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "dimensions.width",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "dimensions.height",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "dimensions.unit",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 10
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample dimensions.unit"
+    },
+    {
+      "path": "size",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 50
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample size"
+    },
+    {
+      "path": "imagePaths[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": "Sample imagePaths[]"
+    },
+    {
+      "path": "warrantyMonths",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": true,
+        "max": 240,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "jewellery.grossWeightGrams",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "jewellery.netWeightGrams",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "jewellery.purity",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 20
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample jewellery.purity"
+    },
+    {
+      "path": "jewellery.makingCharge",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "jewellery.makingChargeType",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "per_gram",
+        "flat",
+        "percent"
+      ],
+      "uiHint": "dropdown",
+      "example": "per_gram"
+    },
+    {
+      "path": "jewellery.hallmarkId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 50
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample jewellery.hallmarkId"
+    },
+    {
+      "path": "jewellery.priceByDailyRate",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": true
+    },
+    {
+      "path": "variantGroupId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample variantGroupId"
+    },
+    {
+      "path": "variantAttributes.*",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 60
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample variantAttributes.*"
+    },
+    {
+      "path": "visibilityScope",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "all_branches",
+        "selected_branches",
+        "branch_only"
+      ],
+      "uiHint": "dropdown",
+      "example": "all_branches"
+    },
+    {
+      "path": "sharedForBranchIds[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample sharedForBranchIds[]"
+    }
+  ]
+}

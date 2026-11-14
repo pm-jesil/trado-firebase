@@ -1,0 +1,1157 @@
+{
+  "entity": "organization",
+  "label": "Organization",
+  "callables": {
+    "create": "organizationsCreate",
+    "update": "organizationsUpdate"
+  },
+  "fields": [
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "name",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample name"
+    },
+    {
+      "path": "legalName",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 120
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample legalName"
+    },
+    {
+      "path": "businessType",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "retail_only",
+        "wholesale_only",
+        "wholesale_retail",
+        "distributor",
+        "restaurant",
+        "cafe_bakery",
+        "service",
+        "general_trading",
+        "manufacturer_b2b",
+        "pos_counter"
+      ],
+      "uiHint": "dropdown",
+      "example": "retail_only"
+    },
+    {
+      "path": "businessCategory",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "bicycle",
+        "motorcycle",
+        "car_automobile",
+        "auto_spare_parts",
+        "mobile_electronics",
+        "grocery_fmcg",
+        "pharmacy_medical",
+        "textile_garments",
+        "hardware_building",
+        "furniture_home",
+        "stationery_books",
+        "food_beverage",
+        "agri_products",
+        "jewellery",
+        "kitchenware_household",
+        "gifts_toys",
+        "restaurant_food_service",
+        "services_repair",
+        "general"
+      ],
+      "uiHint": "date_picker",
+      "example": "bicycle"
+    },
+    {
+      "path": "country",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 2,
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample country"
+    },
+    {
+      "path": "currency",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 3,
+        "minLength": 3
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample currency"
+    },
+    {
+      "path": "taxRegimeCode",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 32
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample taxRegimeCode"
+    },
+    {
+      "path": "planId",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 64
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample planId"
+    },
+    {
+      "path": "createOwner",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": true
+    },
+    {
+      "path": "confirmLinkExistingUser",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "ownerEmail",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "format": "email"
+      },
+      "enumValues": [],
+      "uiHint": "email",
+      "example": "Sample ownerEmail"
+    },
+    {
+      "path": "ownerName",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample ownerName"
+    },
+    {
+      "path": "ownerPhone",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "phone",
+      "example": "Sample ownerPhone"
+    },
+    {
+      "path": "credentialMode",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "temporaryPassword",
+        "invite"
+      ],
+      "uiHint": "dropdown",
+      "example": "temporaryPassword"
+    },
+    {
+      "path": "initialPassword",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "password",
+      "example": "Sample initialPassword"
+    },
+    {
+      "path": "financialYearStartMonth",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 12,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "taxId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 30
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample taxId"
+    },
+    {
+      "path": "website",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "url"
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample website"
+    },
+    {
+      "path": "addresses[].id",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample addresses[].id"
+    },
+    {
+      "path": "addresses[].label",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample addresses[].label"
+    },
+    {
+      "path": "addresses[].line1",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample addresses[].line1"
+    },
+    {
+      "path": "addresses[].line2",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 200
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample addresses[].line2"
+    },
+    {
+      "path": "addresses[].area",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample addresses[].area"
+    },
+    {
+      "path": "addresses[].city",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample addresses[].city"
+    },
+    {
+      "path": "addresses[].state",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample addresses[].state"
+    },
+    {
+      "path": "addresses[].postalCode",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 20
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample addresses[].postalCode"
+    },
+    {
+      "path": "addresses[].country",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 2,
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample addresses[].country"
+    },
+    {
+      "path": "addresses[].geoPoint.latitude",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": -90,
+        "minInclusive": true,
+        "max": 90,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": 1
+    },
+    {
+      "path": "addresses[].geoPoint.longitude",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": -180,
+        "minInclusive": true,
+        "max": 180,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": 1
+    },
+    {
+      "path": "addresses[].contactName",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample addresses[].contactName"
+    },
+    {
+      "path": "addresses[].phone",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "phone",
+      "example": "Sample addresses[].phone"
+    },
+    {
+      "path": "addresses[].isDefaultBilling",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": true
+    },
+    {
+      "path": "addresses[].isDefaultShipping",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": true
+    },
+    {
+      "path": "bankAccounts[].id",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample bankAccounts[].id"
+    },
+    {
+      "path": "bankAccounts[].label",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample bankAccounts[].label"
+    },
+    {
+      "path": "bankAccounts[].accountHolderName",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 150
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample bankAccounts[].accountHolderName"
+    },
+    {
+      "path": "bankAccounts[].bankName",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample bankAccounts[].bankName"
+    },
+    {
+      "path": "bankAccounts[].accountNumber",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 4,
+        "maxLength": 50
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample bankAccounts[].accountNumber"
+    },
+    {
+      "path": "bankAccounts[].routingType",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "ifsc",
+        "iban",
+        "swift",
+        "us_routing",
+        "sg_code",
+        "other"
+      ],
+      "uiHint": "dropdown",
+      "example": "ifsc"
+    },
+    {
+      "path": "bankAccounts[].routingCode",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 50
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample bankAccounts[].routingCode"
+    },
+    {
+      "path": "bankAccounts[].upiId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample bankAccounts[].upiId"
+    },
+    {
+      "path": "bankAccounts[].currency",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 3,
+        "minLength": 3
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample bankAccounts[].currency"
+    },
+    {
+      "path": "bankAccounts[].isDefault",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "bankAccounts[].showOnInvoice",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "bankAccounts[].status",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "active",
+        "archived"
+      ],
+      "uiHint": "date_picker",
+      "example": "active"
+    },
+    {
+      "path": "image.path",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": "Sample image.path"
+    },
+    {
+      "path": "image.contentType",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ],
+      "uiHint": "image_picker",
+      "example": "image/jpeg"
+    },
+    {
+      "path": "image.width",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 10000,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": 1
+    },
+    {
+      "path": "image.height",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 10000,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": 1
+    },
+    {
+      "path": "image.sizeBytes",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 10485760,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": 1
+    },
+    {
+      "path": "image.updatedAt",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": "Sample image.updatedAt"
+    },
+    {
+      "path": "image.thumbnailPath",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": "Sample image.thumbnailPath"
+    },
+    {
+      "path": "uploadId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample uploadId"
+    },
+    {
+      "path": "defaultBranchName",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample defaultBranchName"
+    },
+    {
+      "path": "defaultBranchCode",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 20,
+        "format": "regex"
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample defaultBranchCode"
+    },
+    {
+      "path": "salesChannels[]",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "pos",
+        "b2b",
+        "order_taking",
+        "online"
+      ],
+      "uiHint": "dropdown",
+      "example": "pos"
+    },
+    {
+      "path": "timezone",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 3,
+        "maxLength": 64
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample timezone"
+    },
+    {
+      "path": "contact.name",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample contact.name"
+    },
+    {
+      "path": "contact.email",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "email",
+        "maxLength": 254
+      },
+      "enumValues": [],
+      "uiHint": "email",
+      "example": "Sample contact.email"
+    },
+    {
+      "path": "contact.phone",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 30
+      },
+      "enumValues": [],
+      "uiHint": "phone",
+      "example": "Sample contact.phone"
+    },
+    {
+      "path": "contact.altPhone",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 30
+      },
+      "enumValues": [],
+      "uiHint": "phone",
+      "example": "Sample contact.altPhone"
+    },
+    {
+      "path": "contacts[].id",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 64
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample contacts[].id"
+    },
+    {
+      "path": "contacts[].name",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample contacts[].name"
+    },
+    {
+      "path": "contacts[].designation",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample contacts[].designation"
+    },
+    {
+      "path": "contacts[].phone",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {
+        "maxLength": 30
+      },
+      "enumValues": [],
+      "uiHint": "phone",
+      "example": "Sample contacts[].phone"
+    },
+    {
+      "path": "contacts[].email",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {
+        "format": "email"
+      },
+      "enumValues": [],
+      "uiHint": "email",
+      "example": "Sample contacts[].email"
+    },
+    {
+      "path": "contacts[].type",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "primary",
+        "billing",
+        "technical",
+        "operations",
+        "other"
+      ],
+      "uiHint": "dropdown",
+      "example": "primary"
+    },
+    {
+      "path": "contacts[].isPrimary",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "contacts[].notifyBy",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "email",
+        "sms",
+        "both",
+        "none"
+      ],
+      "uiHint": "dropdown",
+      "example": "email"
+    },
+    {
+      "path": "contacts[].isActive",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "contacts[].createdAt",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "datetime"
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample contacts[].createdAt"
+    },
+    {
+      "path": "contacts[].updatedAt",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "datetime"
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample contacts[].updatedAt"
+    },
+    {
+      "path": "contacts[].createdBy",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample contacts[].createdBy"
+    },
+    {
+      "path": "contacts[].updatedBy",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample contacts[].updatedBy"
+    },
+    {
+      "path": "subscription.status",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "trial",
+        "active",
+        "grace",
+        "expired",
+        "suspended",
+        "cancelled"
+      ],
+      "uiHint": "date_picker",
+      "example": "trial"
+    },
+    {
+      "path": "subscription.startsAt",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "format": "datetime"
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample subscription.startsAt"
+    },
+    {
+      "path": "subscription.expiresOn",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "format": "regex"
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample subscription.expiresOn"
+    },
+    {
+      "path": "subscription.durationDays",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 3660,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": 1
+    },
+    {
+      "path": "subscription.graceDays",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": true,
+        "max": 90,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    }
+  ]
+}

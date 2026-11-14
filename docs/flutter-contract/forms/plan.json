@@ -1,0 +1,185 @@
+{
+  "entity": "plan",
+  "label": "Subscription Plan",
+  "callables": {
+    "create": "plansCreate",
+    "update": "plansUpdate"
+  },
+  "fields": [
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "name",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample name"
+    },
+    {
+      "path": "price",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "currency",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 3,
+        "minLength": 3
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample currency"
+    },
+    {
+      "path": "storageLimitMb",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "monthlyDocumentVolumeLimit",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "seatLimits.admin",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": 1
+    },
+    {
+      "path": "seatLimits.staff",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": 1
+    },
+    {
+      "path": "branchLimit",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "moduleFlags.*",
+      "type": "boolean",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "isActive",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    }
+  ]
+}

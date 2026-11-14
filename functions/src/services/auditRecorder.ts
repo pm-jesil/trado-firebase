@@ -162,13 +162,64 @@ export function recordCommitEvent(writes: PendingWrite[], append: (path: string,
   }
   const now = new Date();
   const seq = ++ctx.auditSeq;
+
+  const pData = (primary.data || {}) as Record<string, unknown>;
+  const bData = (before || {}) as Record<string, unknown>;
+
+  // Distinguish entity types per A-3: purchase vs expense
+  let entityType = entry?.collection && collectionTemplate(collectionOf(primary.path)).endsWith(entry.collection) ? entry.action.split(".")[0] : entityTypeOf(primary.path);
+  let action = entry?.action || `${entityTypeOf(primary.path)}.write`;
+
+  if (primary.path.startsWith("outflows/")) {
+    const kind = pData.kind || bData.kind;
+    if (kind === "purchase") {
+      entityType = "purchase";
+      action = action.replace(/^outflow\./, "purchase.");
+    } else if (kind === "expense") {
+      entityType = "expense";
+      action = action.replace(/^outflow\./, "expense.");
+    }
+  } else if (primary.path.startsWith("bills/")) {
+    entityType = "bill";
+  } else if (primary.path.startsWith("stockAdjustments/") || (primary.path.startsWith("stockMovements/") && (pData.reason === "wastage" || pData.reason === "damage" || pData.movementType === "damage"))) {
+    entityType = "wastage";
+  }
+
+  // Derive operation (A-4)
+  let operation: "create" | "update" | "delete" | "status_change" = "update";
+  if (primary.kind === "create" || (!before && !primary.merge) || action.endsWith(".create") || action.endsWith(".add")) {
+    operation = "create";
+  } else if (primary.kind === "delete" || action.endsWith(".delete")) {
+    operation = "delete";
+  } else if ((pData.status && bData.status && pData.status !== bData.status) || /finalize|void|approve|cancel|reject|complete|status/i.test(action)) {
+    operation = "status_change";
+  }
+
+  // Derive statusBefore and statusAfter (A-5)
+  const statusAfter = (pData.status || bData.status || null) as string | null;
+  const statusBefore = (bData.status || null) as string | null;
+
+  // Derive human label (A-7)
+  const humanLabel = ((pData.billNumber || pData.invoiceNumber || pData.number || pData.name || pData.sku || pData.code || bData.billNumber || bData.invoiceNumber || bData.name || null) as string | null);
+
+  // Derive amount and currency (A-2)
+  const amount = ((pData.totalAmount ?? pData.amount ?? pData.totalPaise ?? bData.totalAmount ?? bData.amount ?? null) as number | null);
+  const currency = ((pData.currency || bData.currency || "INR") as string);
+  const branchId = ((pData.branchId || bData.branchId || ctx.actor.branchId || null) as string | null);
+
   const event = {
-    ...baseEvent(ctx, now, entry?.category && entry.category !== "none" ? entry.category : "mutation", entry?.action || `${entityTypeOf(primary.path)}.write`),
+    ...baseEvent(ctx, now, entry?.category && entry.category !== "none" ? entry.category : "mutation", action),
     outcome: "success",
     reason: null,
-    // The registry's entity for its own collection (employee for memberships), else the collection's.
-    entityType: entry?.collection && collectionTemplate(collectionOf(primary.path)).endsWith(entry.collection) ? entry.action.split(".")[0] : entityTypeOf(primary.path),
+    operation,
+    entityType,
     entityId: primary.path.split("/").pop(),
+    humanLabel,
+    statusBefore,
+    statusAfter,
+    amount,
+    currency,
+    branchId,
     targets: ordered.map((w) => ({ type: entityTypeOf(w.path), id: w.path.split("/").pop(), path: w.path, op: w.kind })),
     changes: { fields, truncated, redacted, beforeAvailable: before !== undefined || primary.kind === "create" },
     changedFields: fields.map((f) => f.path.split(".")[0]).filter((p, i, a) => p !== "(document)" && a.indexOf(p) === i),

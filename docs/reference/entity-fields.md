@@ -1,12 +1,12 @@
 # Stored field catalog
 
-Generated 2026-11-13T16:50:39.366Z by `scripts/generate-field-catalog.js` from `functions/src/types/models.ts` (TypeScript checker) and the raw field census (`census-mwf2szdt`). Do not edit.
+Generated 2026-11-14T07:43:37.206Z by `scripts/generate-field-catalog.js` from `functions/src/types/models.ts` (TypeScript checker) and the raw field census (`census-mwg3ltga`). Do not edit.
 
-48 collections, 1044 typed stored leaf paths, 917 with a description, 1 collections without a document interface.
+48 collections, 1051 typed stored leaf paths, 920 with a description, 1 collections without a document interface.
 
 ## `auditLogs` (`AuditLogDoc`)
 
-Typed leaf paths: 47. Documents observed in the census: 1452. Stored but untyped paths: 270.
+Typed leaf paths: 54. Documents observed in the census: 1514. Stored but untyped paths: 290.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -55,7 +55,14 @@ Typed leaf paths: 47. Documents observed in the census: 1452. Stored but untyped
 | `ops.reads` | `number` | yes | public | yes |  |
 | `ops.writes` | `number` | yes | public | yes |  |
 | `ops.deletes` | `number` | yes | public | yes |  |
-| `suppressedSincePrevious` | `number | undefined` | no | public | no | rate-limited security events folded into this one |
+| `suppressedSincePrevious` | `number | undefined` | no | public | yes | rate-limited security events folded into this one |
+| `operation` | `"create" | "update" | "delete" | "status_change" | undefined` | no | public | yes |  |
+| `statusBefore` | `string | null | undefined` | no | public | yes |  |
+| `statusAfter` | `string | null | undefined` | no | public | yes |  |
+| `humanLabel` | `string | null | undefined` | no | public | yes |  |
+| `amount` | `number | null | undefined` | no | public | yes | Amount in the currency's major unit. |
+| `currency` | `string | null | undefined` | no | public | yes | ISO 4217 currency code. |
+| `branchId` | `string | null | undefined` | no | public | yes | Id of the branch the record belongs to or applies to. |
 | `expireAt` | `Timestamp` | yes | public | yes | TTL (system setting AUDIT_RETENTION_MONTHS, default 24) |
 
 Stored but untyped:
@@ -73,6 +80,8 @@ Stored but untyped:
 - `changes.fields[].after.approvals.modules.sale`
 - `changes.fields[].after.approvals.modules.stock_adjustment`
 - `changes.fields[].after.area`
+- `changes.fields[].after.audit:read_own`
+- `changes.fields[].after.audit:view`
 - `changes.fields[].after.bill:create`
 - `changes.fields[].after.bill:discount`
 - `changes.fields[].after.bill:update`
@@ -104,11 +113,25 @@ Stored but untyped:
 - `changes.fields[].after.expense:view`
 - `changes.fields[].after.expenses`
 - `changes.fields[].after.externalReference`
+- `changes.fields[].after.firestoreReads.dailyLimit`
+- `changes.fields[].after.firestoreReads.enabled`
+- `changes.fields[].after.firestoreReads.enforcementMode`
+- `changes.fields[].after.firestoreReads.hardThresholdPercent`
+- `changes.fields[].after.firestoreReads.monthlyLimit`
+- `changes.fields[].after.firestoreReads.warningThresholdPercent`
+- `changes.fields[].after.firestoreWrites.dailyLimit`
 - `changes.fields[].after.firestoreWrites.enabled`
 - `changes.fields[].after.firestoreWrites.enforcementMode`
 - `changes.fields[].after.firestoreWrites.hardThresholdPercent`
+- `changes.fields[].after.firestoreWrites.monthlyLimit`
 - `changes.fields[].after.firestoreWrites.warningThresholdPercent`
 - `changes.fields[].after.firestoreWrites.weeklyLimit`
+- `changes.fields[].after.functionsInvocations.dailyLimit`
+- `changes.fields[].after.functionsInvocations.enabled`
+- `changes.fields[].after.functionsInvocations.enforcementMode`
+- `changes.fields[].after.functionsInvocations.hardThresholdPercent`
+- `changes.fields[].after.functionsInvocations.monthlyLimit`
+- `changes.fields[].after.functionsInvocations.warningThresholdPercent`
 - `changes.fields[].after.gatewayProvider`
 - `changes.fields[].after.geoPoint.latitude`
 - `changes.fields[].after.geoPoint.longitude`
@@ -152,6 +175,7 @@ Stored but untyped:
 - `changes.fields[].after.netWeightGrams`
 - `changes.fields[].after.notification:view`
 - `changes.fields[].after.org:view`
+- `changes.fields[].after.outflow:create`
 - `changes.fields[].after.path`
 - `changes.fields[].after.payment:create`
 - `changes.fields[].after.payments`
@@ -171,6 +195,7 @@ Stored but untyped:
 - `changes.fields[].after.return:create`
 - `changes.fields[].after.return:view`
 - `changes.fields[].after.returns`
+- `changes.fields[].after.sale:create`
 - `changes.fields[].after.sales`
 - `changes.fields[].after.size`
 - `changes.fields[].after.sizeBytes`
@@ -274,9 +299,11 @@ Stored but untyped:
 - `changes.fields[].before.customers`
 - `changes.fields[].before.deliveries`
 - `changes.fields[].before.expenses`
+- `changes.fields[].before.firestoreWrites.dailyLimit`
 - `changes.fields[].before.firestoreWrites.enabled`
 - `changes.fields[].before.firestoreWrites.enforcementMode`
 - `changes.fields[].before.firestoreWrites.hardThresholdPercent`
+- `changes.fields[].before.firestoreWrites.monthlyLimit`
 - `changes.fields[].before.firestoreWrites.warningThresholdPercent`
 - `changes.fields[].before.firestoreWrites.weeklyLimit`
 - `changes.fields[].before.height`
@@ -333,7 +360,7 @@ Stored but untyped:
 
 ## `bills` (`BillDoc`)
 
-Typed leaf paths: 67. Documents observed in the census: 31. Stored but untyped paths: 1.
+Typed leaf paths: 67. Documents observed in the census: 34. Stored but untyped paths: 1.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -445,7 +472,7 @@ Stored but untyped:
 
 ## `organizations/branches` (`BranchDoc`)
 
-Typed leaf paths: 33. Documents observed in the census: 71. Stored but untyped paths: 1.
+Typed leaf paths: 33. Documents observed in the census: 74. Stored but untyped paths: 1.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -489,7 +516,7 @@ Stored but untyped:
 
 ## `categories` (`CategoryDoc`)
 
-Typed leaf paths: 10. Documents observed in the census: 9. Stored but untyped paths: 0.
+Typed leaf paths: 10. Documents observed in the census: 10. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -506,7 +533,7 @@ Typed leaf paths: 10. Documents observed in the census: 9. Stored but untyped pa
 
 ## `customers` (`CustomerDoc`)
 
-Typed leaf paths: 62. Documents observed in the census: 24. Stored but untyped paths: 4.
+Typed leaf paths: 62. Documents observed in the census: 30. Stored but untyped paths: 4.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -582,7 +609,7 @@ Stored but untyped:
 
 ## `dailySummaries` (`DailySummaryDoc`)
 
-Typed leaf paths: 16. Documents observed in the census: 25. Stored but untyped paths: 0.
+Typed leaf paths: 16. Documents observed in the census: 27. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -605,7 +632,7 @@ Typed leaf paths: 16. Documents observed in the census: 25. Stored but untyped p
 
 ## `deliveries` (`DeliveryDoc`)
 
-Typed leaf paths: 27. Documents observed in the census: 7. Stored but untyped paths: 0.
+Typed leaf paths: 27. Documents observed in the census: 8. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -666,7 +693,7 @@ Typed leaf paths: 5. Documents observed in the census: 3. Stored but untyped pat
 
 ## `documentCounters` (`DocumentCounterDoc`)
 
-Typed leaf paths: 5. Documents observed in the census: 79. Stored but untyped paths: 0.
+Typed leaf paths: 5. Documents observed in the census: 85. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -678,7 +705,7 @@ Typed leaf paths: 5. Documents observed in the census: 79. Stored but untyped pa
 
 ## `idempotencyRecords` (`IdempotencyRecordDoc`)
 
-Typed leaf paths: 11. Documents observed in the census: 109. Stored but untyped paths: 126.
+Typed leaf paths: 11. Documents observed in the census: 111. Stored but untyped paths: 126.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -900,7 +927,7 @@ Typed leaf paths: 13. Documents observed in the census: 3. Stored but untyped pa
 
 ## `membershipBranches` (`MembershipBranchDoc`)
 
-Typed leaf paths: 11. Documents observed in the census: 156. Stored but untyped paths: 0.
+Typed leaf paths: 11. Documents observed in the census: 162. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -918,7 +945,7 @@ Typed leaf paths: 11. Documents observed in the census: 156. Stored but untyped 
 
 ## `memberships` (`MembershipDoc`)
 
-Typed leaf paths: 17. Documents observed in the census: 145. Stored but untyped paths: 34.
+Typed leaf paths: 17. Documents observed in the census: 151. Stored but untyped paths: 38.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -950,6 +977,8 @@ Stored but untyped:
 - `dataScopes.sales`
 - `dataScopes.stock`
 - `dataScopes.tasks`
+- `permissions.audit:read_own`
+- `permissions.audit:view`
 - `permissions.bill:create`
 - `permissions.bill:discount`
 - `permissions.bill:update`
@@ -964,6 +993,7 @@ Stored but untyped:
 - `permissions.location:view_own`
 - `permissions.notification:view`
 - `permissions.org:view`
+- `permissions.outflow:create`
 - `permissions.payment:create`
 - `permissions.product:view`
 - `permissions.product:view_cost`
@@ -972,6 +1002,7 @@ Stored but untyped:
 - `permissions.report:view`
 - `permissions.return:create`
 - `permissions.return:view`
+- `permissions.sale:create`
 - `permissions.stock:adjust`
 - `permissions.stock:view`
 - `permissions.task:update`
@@ -989,7 +1020,7 @@ Typed leaf paths: 3. Documents observed in the census: 12. Stored but untyped pa
 
 ## `monthlySummaries` (`MonthlySummaryDoc`)
 
-Typed leaf paths: 11. Documents observed in the census: 24. Stored but untyped paths: 0.
+Typed leaf paths: 11. Documents observed in the census: 26. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1007,7 +1038,7 @@ Typed leaf paths: 11. Documents observed in the census: 24. Stored but untyped p
 
 ## `notificationOutbox` (`NotificationOutboxDoc`)
 
-Typed leaf paths: 10. Documents observed in the census: 82. Stored but untyped paths: 2.
+Typed leaf paths: 10. Documents observed in the census: 88. Stored but untyped paths: 2.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1029,7 +1060,7 @@ Stored but untyped:
 
 ## `notifications` (`NotificationDoc`)
 
-Typed leaf paths: 12. Documents observed in the census: 100. Stored but untyped paths: 1.
+Typed leaf paths: 12. Documents observed in the census: 109. Stored but untyped paths: 1.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1052,7 +1083,7 @@ Stored but untyped:
 
 ## `organizationUsageDaily` (`OrganizationUsageDailyDoc`)
 
-Typed leaf paths: 25. Documents observed in the census: 94. Stored but untyped paths: 571.
+Typed leaf paths: 25. Documents observed in the census: 75. Stored but untyped paths: 577.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1459,6 +1490,9 @@ Stored but untyped:
 - `byCallable.unitsUpdate.deletes`
 - `byCallable.unitsUpdate.reads`
 - `byCallable.unitsUpdate.writes`
+- `byCallable.unknown.calls`
+- `byCallable.unknown.reads`
+- `byCallable.unknown.writes`
 - `byCallable.usageCalculateDryRunStatement.calls`
 - `byCallable.usageCalculateDryRunStatement.reads`
 - `byCallable.usageCalculateDryRunStatement.writes`
@@ -1607,54 +1641,57 @@ Stored but untyped:
 - `byCollection.vendors.writes`
 - `clientReported.locationPings`
 - `clientReported.storageOperations`
-- `hourly.14.aggregationReads`
-- `hourly.14.calls`
-- `hourly.14.deletes`
-- `hourly.14.reads`
-- `hourly.14.writes`
-- `targets.5XVdxoOsiOGvSqndqJyr.calls`
-- `targets.5XVdxoOsiOGvSqndqJyr.reads`
-- `targets.5XVdxoOsiOGvSqndqJyr.writes`
-- `targets.64pWLVKzcZrf1uaI32Se.calls`
-- `targets.64pWLVKzcZrf1uaI32Se.writes`
-- `targets.AkZBmJLstf0fulE0CgEv.calls`
-- `targets.AkZBmJLstf0fulE0CgEv.reads`
-- `targets.AkZBmJLstf0fulE0CgEv.writes`
-- `targets.DFGcYL43hAwK8ihzZHMl.calls`
-- `targets.DFGcYL43hAwK8ihzZHMl.writes`
-- `targets.EoVumM1jRMVV8Ts7qn9a.calls`
-- `targets.EoVumM1jRMVV8Ts7qn9a.reads`
-- `targets.EoVumM1jRMVV8Ts7qn9a.writes`
-- `targets.INuKgQ8wH4WukF4IDlrL.calls`
-- `targets.INuKgQ8wH4WukF4IDlrL.reads`
-- `targets.INuKgQ8wH4WukF4IDlrL.writes`
-- `targets.QC4ikRKLo5wm4TAB5aT0.calls`
-- `targets.QC4ikRKLo5wm4TAB5aT0.reads`
-- `targets.QC4ikRKLo5wm4TAB5aT0.writes`
-- `targets.XQurJ0qx8wtziNJ4iRF2.calls`
-- `targets.XQurJ0qx8wtziNJ4iRF2.reads`
-- `targets.XQurJ0qx8wtziNJ4iRF2.writes`
-- `targets.dKo6G00jvkVSv2E4CBfZ.calls`
-- `targets.dKo6G00jvkVSv2E4CBfZ.reads`
-- `targets.dKo6G00jvkVSv2E4CBfZ.writes`
-- `targets.gyqLG6hgjZrO29OnWOPh.calls`
-- `targets.gyqLG6hgjZrO29OnWOPh.reads`
-- `targets.gyqLG6hgjZrO29OnWOPh.writes`
-- `targets.ipBCXIomnq3lRQQX0gwU.calls`
-- `targets.ipBCXIomnq3lRQQX0gwU.reads`
-- `targets.ipBCXIomnq3lRQQX0gwU.writes`
+- `hourly.07.aggregationReads`
+- `hourly.07.calls`
+- `hourly.07.deletes`
+- `hourly.07.reads`
+- `hourly.07.writes`
+- `targets.1yNQMJVkLYjJvAfQpqWP.calls`
+- `targets.1yNQMJVkLYjJvAfQpqWP.reads`
+- `targets.1yNQMJVkLYjJvAfQpqWP.writes`
+- `targets.EXryzEWQz2nPYHkDMtS1.calls`
+- `targets.EXryzEWQz2nPYHkDMtS1.reads`
+- `targets.EXryzEWQz2nPYHkDMtS1.writes`
+- `targets.LJECIl5Ddm8lyWTPODTq.calls`
+- `targets.LJECIl5Ddm8lyWTPODTq.reads`
+- `targets.LJECIl5Ddm8lyWTPODTq.writes`
+- `targets.MjuYlEyhcUoFdhzLvHC4.calls`
+- `targets.MjuYlEyhcUoFdhzLvHC4.reads`
+- `targets.MjuYlEyhcUoFdhzLvHC4.writes`
+- `targets.Q8BsqrspomJaAjNgWLrt.calls`
+- `targets.Q8BsqrspomJaAjNgWLrt.reads`
+- `targets.Q8BsqrspomJaAjNgWLrt.writes`
+- `targets.R4CRAXy9wIIWNjABfEPU.calls`
+- `targets.R4CRAXy9wIIWNjABfEPU.reads`
+- `targets.R4CRAXy9wIIWNjABfEPU.writes`
+- `targets.RkUlcKs6tl7z1uWkgCUf.calls`
+- `targets.RkUlcKs6tl7z1uWkgCUf.writes`
+- `targets.TDOc9e05sL6vRdNGlcZq.calls`
+- `targets.TDOc9e05sL6vRdNGlcZq.reads`
+- `targets.TDOc9e05sL6vRdNGlcZq.writes`
+- `targets.XBQTndmFNK6izDxj7nqU.calls`
+- `targets.XBQTndmFNK6izDxj7nqU.reads`
+- `targets.XBQTndmFNK6izDxj7nqU.writes`
+- `targets.aZIjzzPMdp6mlN0CBS9y.calls`
+- `targets.aZIjzzPMdp6mlN0CBS9y.reads`
+- `targets.aZIjzzPMdp6mlN0CBS9y.writes`
+- `targets.i5FuACJ6WtLfIfyTm2Zf.calls`
+- `targets.i5FuACJ6WtLfIfyTm2Zf.reads`
+- `targets.i5FuACJ6WtLfIfyTm2Zf.writes`
+- `targets.mVnhzw25axKxZIuWjbBI.calls`
+- `targets.mVnhzw25axKxZIuWjbBI.reads`
+- `targets.mVnhzw25axKxZIuWjbBI.writes`
+- `targets.oXXoMJO7GAm9aqtf6th1.calls`
+- `targets.oXXoMJO7GAm9aqtf6th1.reads`
+- `targets.oXXoMJO7GAm9aqtf6th1.writes`
 - `targets.platform.calls`
 - `targets.platform.reads`
 - `targets.platform.writes`
-- `targets.qy45yPIARSwzBkNOBEAr.calls`
-- `targets.qy45yPIARSwzBkNOBEAr.reads`
-- `targets.qy45yPIARSwzBkNOBEAr.writes`
-- `targets.vdMe6PhZKFZd08kpXtHU.calls`
-- `targets.vdMe6PhZKFZd08kpXtHU.reads`
-- `targets.vdMe6PhZKFZd08kpXtHU.writes`
-- `targets.zOAayCVJfp6PfUtmjmzd.calls`
-- `targets.zOAayCVJfp6PfUtmjmzd.reads`
-- `targets.zOAayCVJfp6PfUtmjmzd.writes`
+- `targets.xJNmXOTmKYC5Ewrr2Wwk.calls`
+- `targets.xJNmXOTmKYC5Ewrr2Wwk.reads`
+- `targets.xJNmXOTmKYC5Ewrr2Wwk.writes`
+- `targets.zxhuba86TNGa2pI1pxyV.calls`
+- `targets.zxhuba86TNGa2pI1pxyV.writes`
 
 ## `organizationUsageMonthly` (`OrganizationUsageMonthlyDoc`)
 
@@ -1674,7 +1711,7 @@ Stored but untyped:
 
 ## `organizations` (`OrganizationDoc`)
 
-Typed leaf paths: 117. Documents observed in the census: 57. Stored but untyped paths: 36.
+Typed leaf paths: 117. Documents observed in the census: 60. Stored but untyped paths: 50.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1817,11 +1854,25 @@ Stored but untyped:
 - `settings.businessConfig.productFields.jewellery`
 - `settings.businessConfig.productFields.serial`
 - `settings.businessConfig.productFields.variants`
+- `usageLimitOverrides.firestoreReads.dailyLimit`
+- `usageLimitOverrides.firestoreReads.enabled`
+- `usageLimitOverrides.firestoreReads.enforcementMode`
+- `usageLimitOverrides.firestoreReads.hardThresholdPercent`
+- `usageLimitOverrides.firestoreReads.monthlyLimit`
+- `usageLimitOverrides.firestoreReads.warningThresholdPercent`
+- `usageLimitOverrides.firestoreWrites.dailyLimit`
 - `usageLimitOverrides.firestoreWrites.enabled`
 - `usageLimitOverrides.firestoreWrites.enforcementMode`
 - `usageLimitOverrides.firestoreWrites.hardThresholdPercent`
+- `usageLimitOverrides.firestoreWrites.monthlyLimit`
 - `usageLimitOverrides.firestoreWrites.warningThresholdPercent`
 - `usageLimitOverrides.firestoreWrites.weeklyLimit`
+- `usageLimitOverrides.functionsInvocations.dailyLimit`
+- `usageLimitOverrides.functionsInvocations.enabled`
+- `usageLimitOverrides.functionsInvocations.enforcementMode`
+- `usageLimitOverrides.functionsInvocations.hardThresholdPercent`
+- `usageLimitOverrides.functionsInvocations.monthlyLimit`
+- `usageLimitOverrides.functionsInvocations.warningThresholdPercent`
 - `usageLimitOverrides.k1.dailyLimit`
 - `usageLimitOverrides.k1.enabled`
 - `usageLimitOverrides.k1.enforcementMode`
@@ -1837,7 +1888,7 @@ Stored but untyped:
 
 ## `outflows` (`OutflowDoc`)
 
-Typed leaf paths: 70. Documents observed in the census: 32. Stored but untyped paths: 0.
+Typed leaf paths: 70. Documents observed in the census: 34. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1914,7 +1965,7 @@ Typed leaf paths: 70. Documents observed in the census: 32. Stored but untyped p
 
 ## `payments` (`PaymentDoc`)
 
-Typed leaf paths: 30. Documents observed in the census: 46. Stored but untyped paths: 0.
+Typed leaf paths: 30. Documents observed in the census: 50. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1966,7 +2017,7 @@ Typed leaf paths: 0. Documents observed in the census: 0. Stored but untyped pat
 
 ## `products` (`ProductDoc`)
 
-Typed leaf paths: 68. Documents observed in the census: 63. Stored but untyped paths: 4.
+Typed leaf paths: 68. Documents observed in the census: 67. Stored but untyped paths: 4.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2204,7 +2255,7 @@ Typed leaf paths: 23. Documents observed in the census: 2. Stored but untyped pa
 
 ## `stockBalances` (`StockBalanceDoc`)
 
-Typed leaf paths: 7. Documents observed in the census: 47. Stored but untyped paths: 0.
+Typed leaf paths: 7. Documents observed in the census: 51. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2218,7 +2269,7 @@ Typed leaf paths: 7. Documents observed in the census: 47. Stored but untyped pa
 
 ## `stockMovements` (`StockMovementDoc`)
 
-Typed leaf paths: 14. Documents observed in the census: 108. Stored but untyped paths: 0.
+Typed leaf paths: 14. Documents observed in the census: 117. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2281,7 +2332,7 @@ Stored but untyped:
 
 ## `tasks` (`TaskDoc`)
 
-Typed leaf paths: 16. Documents observed in the census: 3. Stored but untyped paths: 0.
+Typed leaf paths: 16. Documents observed in the census: 2. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2332,7 +2383,7 @@ Typed leaf paths: 9. Documents observed in the census: 6. Stored but untyped pat
 
 ## `uniqueKeys` (`UniqueKeyDoc`)
 
-Typed leaf paths: 5. Documents observed in the census: 170. Stored but untyped paths: 0.
+Typed leaf paths: 5. Documents observed in the census: 186. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2344,7 +2395,7 @@ Typed leaf paths: 5. Documents observed in the census: 170. Stored but untyped p
 
 ## `units` (`UnitDoc`)
 
-Typed leaf paths: 12. Documents observed in the census: 6. Stored but untyped paths: 0.
+Typed leaf paths: 12. Documents observed in the census: 7. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2363,7 +2414,7 @@ Typed leaf paths: 12. Documents observed in the census: 6. Stored but untyped pa
 
 ## `usageCounterShards` (`UsageCounterShardDoc`)
 
-Typed leaf paths: 6. Documents observed in the census: 238. Stored but untyped paths: 35.
+Typed leaf paths: 6. Documents observed in the census: 271. Stored but untyped paths: 35.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2376,41 +2427,41 @@ Typed leaf paths: 6. Documents observed in the census: 238. Stored but untyped p
 
 Stored but untyped:
 
-- `branches.0mvKzUOybr883mYLPgVM.2026-11-13.firestoreReads`
-- `branches.0mvKzUOybr883mYLPgVM.2026-11-13.functionsInvocations`
-- `branches.GtzVzs9H5W40ZYWxaZoD.2026-11-13.firestoreReads`
-- `branches.GtzVzs9H5W40ZYWxaZoD.2026-11-13.firestoreWrites`
-- `branches.GtzVzs9H5W40ZYWxaZoD.2026-11-13.functionsInvocations`
-- `branches.GtzVzs9H5W40ZYWxaZoD.2026-11-13.locationPings`
-- `branches.HIo25I6zYnzT8VOYeF9S.2026-11-13.firestoreWrites`
-- `branches.HIo25I6zYnzT8VOYeF9S.2026-11-13.functionsInvocations`
-- `branches.IoQSR846lQUvCk6HOXX2.2026-11-13.firestoreWrites`
-- `branches.IoQSR846lQUvCk6HOXX2.2026-11-13.functionsInvocations`
-- `branches.PuYfErCtW1eCoiMRxopU.2026-11-13.firestoreWrites`
-- `branches.PuYfErCtW1eCoiMRxopU.2026-11-13.functionsInvocations`
-- `branches.U92rmdgUufpM9A0srUnD.2026-11-13.firestoreReads`
-- `branches.U92rmdgUufpM9A0srUnD.2026-11-13.firestoreWrites`
-- `branches.U92rmdgUufpM9A0srUnD.2026-11-13.functionsInvocations`
-- `branches.VEYS4D8GwK0gVuZsPZVy.2026-11-13.firestoreReads`
-- `branches.VEYS4D8GwK0gVuZsPZVy.2026-11-13.firestoreWrites`
-- `branches.VEYS4D8GwK0gVuZsPZVy.2026-11-13.functionsInvocations`
-- `branches.WY3gFdKMNgrtJFxFaKYx.2026-11-13.firestoreWrites`
-- `branches.WY3gFdKMNgrtJFxFaKYx.2026-11-13.functionsInvocations`
-- `branches.branch_warehouse.2026-11-13.firestoreWrites`
-- `branches.branch_warehouse.2026-11-13.functionsInvocations`
-- `branches.branchid-pr.2026-11-13.firestoreWrites`
-- `branches.branchid-pr.2026-11-13.functionsInvocations`
-- `branches.main-branch.2026-11-13.firestoreReads`
-- `branches.main-branch.2026-11-13.firestoreWrites`
-- `branches.main-branch.2026-11-13.functionsInvocations`
-- `branches.main-branch.2026-11-13.locationPings`
-- `branches.nope-branch.2026-11-13.firestoreWrites`
-- `branches.nope-branch.2026-11-13.functionsInvocations`
-- `days.2026-11-13.firestoreReads`
-- `days.2026-11-13.firestoreWrites`
-- `days.2026-11-13.functionsInvocations`
-- `days.2026-11-13.locationPings`
-- `days.2026-11-13.storageUploadBytes`
+- `branches.3gHR6ErgaCDDwVzgpD86.2026-11-14.firestoreWrites`
+- `branches.3gHR6ErgaCDDwVzgpD86.2026-11-14.functionsInvocations`
+- `branches.5DMUBRFZa7imB9Uh5ONT.2026-11-14.firestoreWrites`
+- `branches.5DMUBRFZa7imB9Uh5ONT.2026-11-14.functionsInvocations`
+- `branches.MQLZTeQw5aNu24Eot3Pq.2026-11-14.firestoreReads`
+- `branches.MQLZTeQw5aNu24Eot3Pq.2026-11-14.firestoreWrites`
+- `branches.MQLZTeQw5aNu24Eot3Pq.2026-11-14.functionsInvocations`
+- `branches.Q8RzvQYpgw4I4CpSzEJq.2026-11-14.firestoreReads`
+- `branches.Q8RzvQYpgw4I4CpSzEJq.2026-11-14.firestoreWrites`
+- `branches.Q8RzvQYpgw4I4CpSzEJq.2026-11-14.functionsInvocations`
+- `branches.TDjFHkIWDmIz8anmxdXl.2026-11-14.firestoreWrites`
+- `branches.TDjFHkIWDmIz8anmxdXl.2026-11-14.functionsInvocations`
+- `branches.YKiCThG29MClKgQs8AJM.2026-11-14.firestoreWrites`
+- `branches.YKiCThG29MClKgQs8AJM.2026-11-14.functionsInvocations`
+- `branches.branch_warehouse.2026-11-14.firestoreWrites`
+- `branches.branch_warehouse.2026-11-14.functionsInvocations`
+- `branches.branchid-pr.2026-11-14.firestoreWrites`
+- `branches.branchid-pr.2026-11-14.functionsInvocations`
+- `branches.djrPNeqnotHu58ANK4UQ.2026-11-14.firestoreReads`
+- `branches.djrPNeqnotHu58ANK4UQ.2026-11-14.firestoreWrites`
+- `branches.djrPNeqnotHu58ANK4UQ.2026-11-14.functionsInvocations`
+- `branches.djrPNeqnotHu58ANK4UQ.2026-11-14.locationPings`
+- `branches.hkoWGO6TvpbFR4NPEWHQ.2026-11-14.firestoreReads`
+- `branches.hkoWGO6TvpbFR4NPEWHQ.2026-11-14.functionsInvocations`
+- `branches.main-branch.2026-11-14.firestoreReads`
+- `branches.main-branch.2026-11-14.firestoreWrites`
+- `branches.main-branch.2026-11-14.functionsInvocations`
+- `branches.main-branch.2026-11-14.locationPings`
+- `branches.nope-branch.2026-11-14.firestoreWrites`
+- `branches.nope-branch.2026-11-14.functionsInvocations`
+- `days.2026-11-14.firestoreReads`
+- `days.2026-11-14.firestoreWrites`
+- `days.2026-11-14.functionsInvocations`
+- `days.2026-11-14.locationPings`
+- `days.2026-11-14.storageUploadBytes`
 
 ## `usageRateCards` (`UsageRateCardDoc`)
 
@@ -2443,7 +2494,7 @@ Typed leaf paths: 22. Documents observed in the census: 0. Stored but untyped pa
 
 ## `users` (`UserDoc`)
 
-Typed leaf paths: 20. Documents observed in the census: 153. Stored but untyped paths: 1.
+Typed leaf paths: 20. Documents observed in the census: 159. Stored but untyped paths: 1.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2474,7 +2525,7 @@ Stored but untyped:
 
 ## `vendors` (`VendorDoc`)
 
-Typed leaf paths: 61. Documents observed in the census: 21. Stored but untyped paths: 4.
+Typed leaf paths: 61. Documents observed in the census: 22. Stored but untyped paths: 4.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|

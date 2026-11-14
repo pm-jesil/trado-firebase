@@ -1,0 +1,3172 @@
+{
+  "version": "1.0.0",
+  "generatedAt": "2026-11-13T19:21:36.964Z",
+  "callables": {
+    "healthCheck": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "healthCheck",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "authLogin": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "authLogin",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "authMe": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "authMe",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "usersUpdateMe": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "usersUpdateMe",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "notificationsRegisterFcmToken": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "notificationsRegisterFcmToken",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "notificationsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "notificationsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "notificationsMarkRead": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "notificationsMarkRead",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "branchContextSwitch": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "branchContextSwitch",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "organizationsCreate": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "organizationsCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "organizationsUpdate": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "organizationsUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "branchesCreate": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "branchesCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "branchesUpdate": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "branchesUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "organizationsDeactivate": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "organizationsDeactivate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "organizationsReactivate": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "organizationsReactivate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "organizationsPreviewDeactivationImpact": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "organizationsPreviewDeactivationImpact",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "organizationsGetSubscriptionHistory": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "organizationsGetSubscriptionHistory",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "organizationsProvisionUser": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "organizationsProvisionUser",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "organizationsTransferOwnership": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "organizationsTransferOwnership",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "branchesDeactivate": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "branchesDeactivate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "plansCreate": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "plansCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "plansUpdate": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "plansUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "plansArchive": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "plansArchive",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "plansDelete": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "plansDelete",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "plansPreviewImpact": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "plansPreviewImpact",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "platformUsersList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "platformUsersList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "platformUsersGet": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "platformUsersGet",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "auditLogsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "auditLogsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reportsGetPlatformOverview": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reportsGetPlatformOverview",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "usageGetPlatformSummary": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "usageGetPlatformSummary",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "usageGetOrganizations": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "usageGetOrganizations",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "usageCalculateDryRunStatement": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "usageCalculateDryRunStatement",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "usageUpdateLimits": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "usageUpdateLimits",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "organizationsSetSubscription": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "organizationsSetSubscription",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "plansList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "plansList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "plansGet": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "plansGet",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "permissionCatalogList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "permissionCatalogList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "modulesList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "modulesList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "taxRegimesList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-analytics-platform-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "taxRegimesList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "sharingPoliciesUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "sharingPoliciesUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "employeesCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "employeesCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "employeesUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "employeesUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "employeesDeactivate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "employeesDeactivate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "rolesCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "rolesCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "rolesUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "rolesUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "departmentsCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "departmentsCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "departmentsUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "departmentsUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "jobRolesCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "jobRolesCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "jobRolesUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "jobRolesUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "teamsCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "teamsCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "teamsUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "teamsUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "teamsAssignMember": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "teamsAssignMember",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "productsCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "productsCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "productsUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "productsUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "categoriesCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "categoriesCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "categoriesUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "categoriesUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "unitsCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "unitsCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "unitsUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "unitsUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "customersCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "customersCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "customersUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "customersUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "vendorsCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "vendorsCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "vendorsUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "vendorsUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "outflowsCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "outflowsCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "billsCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "billsCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "billsFinalize": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "billsFinalize",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "billsUpdateDraft": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "billsUpdateDraft",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "billsVoid": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "billsVoid",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "outflowsVoid": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "outflowsVoid",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "documentsDecide": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "documentsDecide",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "deliveriesCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "deliveriesCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "deliveriesUpdateStatus": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "deliveriesUpdateStatus",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "returnsCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "returnsCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "paymentsCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "paymentsCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "paymentsVoid": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "paymentsVoid",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "recurringExpensesCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "recurringExpensesCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "recurringExpensesUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "recurringExpensesUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "stockAdjust": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "stockAdjust",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reconcileStockBalances": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reconcileStockBalances",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reconcilePartyLedgers": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reconcilePartyLedgers",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reconcileBranchCounts": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reconcileBranchCounts",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "tasksCreate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "tasksCreate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "tasksUpdate": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "tasksUpdate",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "tasksAssign": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "tasksAssign",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "tasksUpdateStatus": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "tasksUpdateStatus",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "tasksDelete": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "tasksDelete",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "locationsRecordPing": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "locationsRecordPing",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "usageRecordClientMetric": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "usageRecordClientMetric",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "imagesCreateUploadSession": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "imagesCreateUploadSession",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "imagesAttach": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "imagesAttach",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "imagesRemove": {
+      "sourceFile": "functions/src/callables/catalog.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "imagesRemove",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "organizationsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "organizationsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "organizationsGet": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "organizationsGet",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "branchesGetDefault": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "branchesGetDefault",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "branchesList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "branchesList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "employeesList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "employeesList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "employeesGet": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "employeesGet",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "rolesList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "rolesList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "departmentsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "departmentsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "jobRolesList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "jobRolesList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "teamsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "teamsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "productsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "productsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "productsGet": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "productsGet",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "categoriesList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "categoriesList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "unitsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "unitsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "customersList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "customersList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "customersGet": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "customersGet",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "vendorsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "vendorsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "vendorsGet": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "vendorsGet",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "outflowsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "outflowsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "outflowsGet": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "outflowsGet",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "billsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "billsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "billsGet": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "billsGet",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "billsPreview": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "billsPreview",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "deliveriesList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "deliveriesList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "deliveriesGet": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "deliveriesGet",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "returnsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "returnsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "paymentsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "paymentsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "stockMovementsList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "stockMovementsList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "productsGetPriceHistory": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "productsGetPriceHistory",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "auditGetEntityHistory": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "auditGetEntityHistory",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "recurringExpensesList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "recurringExpensesList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reportsGetRevenue": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reportsGetRevenue",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reportsGetProfitLoss": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reportsGetProfitLoss",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reportsGetStockValuation": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reportsGetStockValuation",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reportsGetTopEntities": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reportsGetTopEntities",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reportsGetStaffActivity": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reportsGetStaffActivity",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reportsExportCsv": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reportsExportCsv",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reportsGetPartyStatement": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reportsGetPartyStatement",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "reportsGetOutflowSummary": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "reportsGetOutflowSummary",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "tasksList": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "tasksList",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "locationsGetLatest": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "locationsGetLatest",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "locationsGetHistory": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "locationsGetHistory",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "usageGetBranches": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "usageGetBranches",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "usageGetDetail": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "usageGetDetail",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    },
+    "usageGetLimits": {
+      "sourceFile": "functions/src/callables/platform.ts",
+      "schemaFile": "functions/src/validation/schemas.ts",
+      "testSuites": [
+        "functions/scripts/test-tenancy-auth-callables.cjs",
+        "functions/scripts/test-maximal-payload-roundtrip.cjs"
+      ],
+      "documentation": "docs/api-reference.md",
+      "openApiOperationId": "usageGetLimits",
+      "manifestPath": "tests/api/api-manifest.json",
+      "costBudgetDeclared": true,
+      "auditActionMapped": true,
+      "scenarioRowsRequired": [
+        "R-01",
+        "R-02",
+        "R-13",
+        "R-16",
+        "R-28",
+        "R-33"
+      ]
+    }
+  },
+  "triggers": {
+    "onBillWritten": {
+      "sourceFile": "functions/src/index.ts",
+      "testSuite": "functions/scripts/test-event-triggers.cjs",
+      "documentation": "docs/api-reference.md",
+      "scenarioRowsRequired": [
+        "R-06",
+        "R-08",
+        "R-09"
+      ]
+    },
+    "onOutflowWritten": {
+      "sourceFile": "functions/src/index.ts",
+      "testSuite": "functions/scripts/test-event-triggers.cjs",
+      "documentation": "docs/api-reference.md",
+      "scenarioRowsRequired": [
+        "R-06",
+        "R-08",
+        "R-09"
+      ]
+    },
+    "onPaymentWritten": {
+      "sourceFile": "functions/src/index.ts",
+      "testSuite": "functions/scripts/test-event-triggers.cjs",
+      "documentation": "docs/api-reference.md",
+      "scenarioRowsRequired": [
+        "R-06",
+        "R-08",
+        "R-09"
+      ]
+    },
+    "onDeliveryWritten": {
+      "sourceFile": "functions/src/index.ts",
+      "testSuite": "functions/scripts/test-event-triggers.cjs",
+      "documentation": "docs/api-reference.md",
+      "scenarioRowsRequired": [
+        "R-06",
+        "R-08",
+        "R-09"
+      ]
+    },
+    "onStorageObjectFinalized": {
+      "sourceFile": "functions/src/index.ts",
+      "testSuite": "functions/scripts/test-event-triggers.cjs",
+      "documentation": "docs/api-reference.md",
+      "scenarioRowsRequired": [
+        "R-06",
+        "R-08",
+        "R-09"
+      ]
+    },
+    "subscriptionAndUsageSweep": {
+      "sourceFile": "functions/src/index.ts",
+      "testSuite": "functions/scripts/test-event-triggers.cjs",
+      "documentation": "docs/api-reference.md",
+      "scenarioRowsRequired": [
+        "R-06",
+        "R-08",
+        "R-09"
+      ]
+    }
+  },
+  "collections": {
+    "auditLogs/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "System Infrastructure",
+      "type": "root"
+    },
+    "bills/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Operations & Transactions",
+      "type": "root"
+    },
+    "branchUsageDaily/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Analytics & Usage Metering",
+      "type": "root"
+    },
+    "branchUsageMonthly/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Analytics & Usage Metering",
+      "type": "root"
+    },
+    "organizations/{organizationId}/branches/{branchId}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Multi-Branch Architecture",
+      "type": "subcollection"
+    },
+    "categories/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Catalog & Inventory",
+      "type": "root"
+    },
+    "customers/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Parties & Ledgers",
+      "type": "root"
+    },
+    "dailySummaries/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Analytics & Usage Metering",
+      "type": "root"
+    },
+    "deliveries/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Operations & Transactions",
+      "type": "root"
+    },
+    "departments/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "users/{uid}/devices/{deviceId}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "System Infrastructure",
+      "type": "subcollection"
+    },
+    "documentCounters/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "System Infrastructure",
+      "type": "root"
+    },
+    "idempotencyRecords/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "System Infrastructure",
+      "type": "root"
+    },
+    "imageUploadSessions/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "System Infrastructure",
+      "type": "root"
+    },
+    "jobRoles/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "latestLocations/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tasks, Location & Notifications",
+      "type": "root"
+    },
+    "locationPings/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tasks, Location & Notifications",
+      "type": "root"
+    },
+    "membershipBranches/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Multi-Branch Architecture",
+      "type": "root"
+    },
+    "memberships/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "modules/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "monthlySummaries/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Analytics & Usage Metering",
+      "type": "root"
+    },
+    "notificationOutbox/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "notifications/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tasks, Location & Notifications",
+      "type": "root"
+    },
+    "organizationUsageDaily/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Analytics & Usage Metering",
+      "type": "root"
+    },
+    "organizationUsageMonthly/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Analytics & Usage Metering",
+      "type": "root"
+    },
+    "organizations/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "outflows/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Operations & Transactions",
+      "type": "root"
+    },
+    "payments/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Operations & Transactions",
+      "type": "root"
+    },
+    "permissionCatalog/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "platformCostReconciliation/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Analytics & Usage Metering",
+      "type": "root"
+    },
+    "products/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Catalog & Inventory",
+      "type": "root"
+    },
+    "recurringExpenses/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Operations & Transactions",
+      "type": "root"
+    },
+    "returns/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Operations & Transactions",
+      "type": "root"
+    },
+    "roles/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "serials/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Catalog & Inventory",
+      "type": "root"
+    },
+    "stockAdjustmentRequests/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Catalog & Inventory",
+      "type": "root"
+    },
+    "stockBalances/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Catalog & Inventory",
+      "type": "root"
+    },
+    "stockMovements/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Catalog & Inventory",
+      "type": "root"
+    },
+    "subscriptionPlans/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "tasks/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tasks, Location & Notifications",
+      "type": "root"
+    },
+    "taxRegimes/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "teams/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "uniqueKeys/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "System Infrastructure",
+      "type": "root"
+    },
+    "units/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Catalog & Inventory",
+      "type": "root"
+    },
+    "usageCounterShards/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Analytics & Usage Metering",
+      "type": "root"
+    },
+    "usageRateCards/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Analytics & Usage Metering",
+      "type": "root"
+    },
+    "users/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Tenant & RBAC",
+      "type": "root"
+    },
+    "vendors/{id}": {
+      "rulesMatch": "firestore.rules",
+      "rulesTest": "functions/src/test/rules/firestoreRules.test.ts",
+      "domain": "Parties & Ledgers",
+      "type": "root"
+    }
+  }
+}

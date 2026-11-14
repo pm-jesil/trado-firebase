@@ -1,0 +1,306 @@
+{
+  "entity": "employee",
+  "label": "Employee / User",
+  "callables": {
+    "create": "employeesCreate",
+    "update": "employeesUpdate"
+  },
+  "fields": [
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "email",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "format": "email"
+      },
+      "enumValues": [],
+      "uiHint": "email",
+      "example": "Sample email"
+    },
+    {
+      "path": "name",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample name"
+    },
+    {
+      "path": "phone",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "phone",
+      "example": "Sample phone"
+    },
+    {
+      "path": "image.path",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": "Sample image.path"
+    },
+    {
+      "path": "image.contentType",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ],
+      "uiHint": "image_picker",
+      "example": "image/jpeg"
+    },
+    {
+      "path": "image.width",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 10000,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": 1
+    },
+    {
+      "path": "image.height",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 10000,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": 1
+    },
+    {
+      "path": "image.sizeBytes",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 10485760,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": 1
+    },
+    {
+      "path": "image.updatedAt",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": "Sample image.updatedAt"
+    },
+    {
+      "path": "image.thumbnailPath",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": "Sample image.thumbnailPath"
+    },
+    {
+      "path": "uploadId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample uploadId"
+    },
+    {
+      "path": "initialPassword",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "password",
+      "example": "Sample initialPassword"
+    },
+    {
+      "path": "roleId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample roleId"
+    },
+    {
+      "path": "departmentId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample departmentId"
+    },
+    {
+      "path": "jobRoleIds[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample jobRoleIds[]"
+    },
+    {
+      "path": "teamId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample teamId"
+    },
+    {
+      "path": "reportingToIds[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample reportingToIds[]"
+    },
+    {
+      "path": "permissionOverrides.*",
+      "type": "boolean",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "branchIds[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchIds[]"
+    },
+    {
+      "path": "defaultBranchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample defaultBranchId"
+    }
+  ]
+}

@@ -1,0 +1,388 @@
+{
+  "entity": "recurring_expense",
+  "label": "Recurring Expense",
+  "callables": {
+    "create": "recurringExpensesCreate",
+    "update": "recurringExpensesUpdate"
+  },
+  "fields": [
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "name",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 120
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample name"
+    },
+    {
+      "path": "vendorId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample vendorId"
+    },
+    {
+      "path": "payee",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample payee"
+    },
+    {
+      "path": "payeeType",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "vendor",
+        "employee",
+        "other"
+      ],
+      "uiHint": "dropdown",
+      "example": "vendor"
+    },
+    {
+      "path": "payeeMembershipId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample payeeMembershipId"
+    },
+    {
+      "path": "expenseCategoryId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 60
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample expenseCategoryId"
+    },
+    {
+      "path": "lines[].productId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample lines[].productId"
+    },
+    {
+      "path": "lines[].itemName",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 150
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample lines[].itemName"
+    },
+    {
+      "path": "lines[].categoryId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample lines[].categoryId"
+    },
+    {
+      "path": "lines[].quantity",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "lines[].unit",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 30
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample lines[].unit"
+    },
+    {
+      "path": "lines[].unitPrice",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "lines[].discountAmount",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "lines[].taxPercent",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true,
+        "max": 100,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "lines[].addToStock",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "lines[].batch",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample lines[].batch"
+    },
+    {
+      "path": "lines[].expiryDate",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "regex"
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample lines[].expiryDate"
+    },
+    {
+      "path": "lines[].damagedQuantity",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "lines[].damageReason",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 300
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample lines[].damageReason"
+    },
+    {
+      "path": "lines[].serialNumbers[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 64
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample lines[].serialNumbers[]"
+    },
+    {
+      "path": "frequency",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "monthly",
+        "weekly"
+      ],
+      "uiHint": "dropdown",
+      "example": "monthly"
+    },
+    {
+      "path": "dayOfMonth",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 28,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "weekday",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 7,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "startOn",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "format": "regex"
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample startOn"
+    },
+    {
+      "path": "endOn",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "regex"
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample endOn"
+    }
+  ]
+}

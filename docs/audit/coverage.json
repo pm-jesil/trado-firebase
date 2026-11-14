@@ -1,6 +1,6 @@
 {
-  "runId": "cov-ce26ad13",
-  "timestamp": "2026-11-13T16:50:50.816Z",
+  "runId": "cov-d0d86e8e",
+  "timestamp": "2026-11-14T07:43:51.454Z",
   "allPassed": false,
   "sources": {
     "exports": 140,
@@ -18,8 +18,8 @@
     "requestSchemas": 151,
     "documentTypes": 48,
     "collections": 48,
-    "traceFiles": 20,
-    "traces": 1657
+    "traceFiles": 22,
+    "traces": 1724
   },
   "registryFindings": [
     "collection \"platformCostReconciliation\" has no document interface in types/models.ts",
@@ -36,10 +36,10 @@
     "C-1": {
       "id": "C-1",
       "name": "Catalog: stored leaf paths (types ∪ census) catalogued, system-managed or deferred",
-      "numerator": 1044,
-      "denominator": 1052,
-      "ratio": "1044/1052",
-      "coveredByEvidence": 1044,
+      "numerator": 1051,
+      "denominator": 1059,
+      "ratio": "1051/1059",
+      "coveredByEvidence": 1051,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [
@@ -57,14 +57,14 @@
         {
           "collection": "auditLogs",
           "docType": "AuditLogDoc",
-          "storedLeafPaths": 47,
-          "typed": 47,
+          "storedLeafPaths": 54,
+          "typed": 54,
           "censusOnly": 0,
-          "inCatalog": 47,
+          "inCatalog": 54,
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 1452
+          "censusDocs": 1514
         },
         {
           "collection": "bills",
@@ -76,7 +76,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 31
+          "censusDocs": 34
         },
         {
           "collection": "branchUsageDaily",
@@ -112,7 +112,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 71
+          "censusDocs": 74
         },
         {
           "collection": "categories",
@@ -124,7 +124,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 9
+          "censusDocs": 10
         },
         {
           "collection": "customers",
@@ -136,7 +136,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 24
+          "censusDocs": 30
         },
         {
           "collection": "dailySummaries",
@@ -148,7 +148,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 25
+          "censusDocs": 27
         },
         {
           "collection": "deliveries",
@@ -160,7 +160,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 7
+          "censusDocs": 8
         },
         {
           "collection": "departments",
@@ -196,7 +196,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 79
+          "censusDocs": 85
         },
         {
           "collection": "idempotencyRecords",
@@ -208,7 +208,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 109
+          "censusDocs": 111
         },
         {
           "collection": "imageUploadSessions",
@@ -268,7 +268,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 156
+          "censusDocs": 162
         },
         {
           "collection": "memberships",
@@ -280,7 +280,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 145
+          "censusDocs": 151
         },
         {
           "collection": "modules",
@@ -304,7 +304,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 24
+          "censusDocs": 26
         },
         {
           "collection": "notificationOutbox",
@@ -316,7 +316,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 82
+          "censusDocs": 88
         },
         {
           "collection": "notifications",
@@ -328,7 +328,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 100
+          "censusDocs": 109
         },
         {
           "collection": "organizationUsageDaily",
@@ -340,7 +340,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 2,
-          "censusDocs": 94
+          "censusDocs": 75
         },
         {
           "collection": "organizationUsageMonthly",
@@ -364,7 +364,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 57
+          "censusDocs": 60
         },
         {
           "collection": "outflows",
@@ -376,7 +376,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 32
+          "censusDocs": 34
         },
         {
           "collection": "payments",
@@ -388,7 +388,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 46
+          "censusDocs": 50
         },
         {
           "collection": "permissionCatalog",
@@ -424,7 +424,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 63
+          "censusDocs": 67
         },
         {
           "collection": "recurringExpenses",
@@ -496,7 +496,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 47
+          "censusDocs": 51
         },
         {
           "collection": "stockMovements",
@@ -508,7 +508,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 108
+          "censusDocs": 117
         },
         {
           "collection": "subscriptionPlans",
@@ -532,7 +532,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 3
+          "censusDocs": 2
         },
         {
           "collection": "taxRegimes",
@@ -568,7 +568,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 170
+          "censusDocs": 186
         },
         {
           "collection": "units",
@@ -580,7 +580,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 6
+          "censusDocs": 7
         },
         {
           "collection": "usageCounterShards",
@@ -592,7 +592,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 238
+          "censusDocs": 271
         },
         {
           "collection": "usageRateCards",
@@ -616,7 +616,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 153
+          "censusDocs": 159
         },
         {
           "collection": "vendors",
@@ -628,14 +628,14 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 21
+          "censusDocs": 22
         }
       ],
       "collectionsWithoutDocumentType": [
         "platformCostReconciliation"
       ],
-      "descriptions": "917/1044",
-      "censusRun": "census-mwf2szdt"
+      "descriptions": "920/1051",
+      "censusRun": "census-mwg3ltga"
     },
     "C-2": {
       "id": "C-2",
@@ -1615,7 +1615,7 @@
           "unproven": 9
         }
       ],
-      "roundtripRun": "roundtrip-mwf7lcq0"
+      "roundtripRun": "roundtrip-mwg3juag"
     },
     "C-3": {
       "id": "C-3",
@@ -1632,15 +1632,15 @@
     "C-4": {
       "id": "C-4",
       "name": "Bounds and enums: max / max+1 / min / min−1 per bounded leaf, every enum value and one invalid value",
-      "numerator": 3003,
-      "denominator": 3003,
-      "ratio": "3003/3003",
-      "coveredByEvidence": 3003,
+      "numerator": 3011,
+      "denominator": 3011,
+      "ratio": "3011/3011",
+      "coveredByEvidence": 3011,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [],
       "passed": true,
-      "sweepRun": "sweep-mwf7n6ec"
+      "sweepRun": "sweep-mwg3dt8d"
     },
     "C-5": {
       "id": "C-5",
@@ -2538,7 +2538,7 @@
         "usageGetLimits:result.currentMonth (no description)"
       ],
       "passed": false,
-      "returnedButUndocumented": 606,
+      "returnedButUndocumented": 669,
       "returnedButUndocumentedSample": [
         "organizationsList:items[].settings.approvals.modules.expense",
         "organizationsList:items[].settings.approvals.modules.purchase",
@@ -2585,15 +2585,13 @@
     "C-6": {
       "id": "C-6",
       "name": "Exports: runtime-traced success, validation failure, role / plan denial, tenant isolation, idempotent replay; triggers executed",
-      "numerator": 562,
+      "numerator": 564,
       "denominator": 567,
-      "ratio": "562/567",
-      "coveredByEvidence": 562,
+      "ratio": "564/567",
+      "coveredByEvidence": 564,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [
-        "auditGetEntityHistory:denied-role",
-        "auditLogsList:denied-role",
         "usageGetDetail:denied-role",
         "usageGetDetail:denied-plan",
         "usageGetDetail:tenant-isolation"
@@ -2609,13 +2607,17 @@
       "id": "C-7",
       "name": "Guard scope: every guard declares its scope; per-collection guards scan every collection or list the exclusion",
       "numerator": 167,
-      "denominator": 167,
-      "ratio": "167/167",
+      "denominator": 170,
+      "ratio": "167/170",
       "coveredByEvidence": 167,
       "coveredByRegister": 0,
       "registerEntries": [],
-      "uncovered": [],
-      "passed": true,
+      "uncovered": [
+        "scripts/check-flutter-contract.js:scope-declared (no `@guard-scope:` declaration)",
+        "scripts/check-rules-sync.js:scope-declared (no `@guard-scope:` declaration)",
+        "scripts/check-test-quality.js:scope-declared (no `@guard-scope:` declaration)"
+      ],
+      "passed": false,
       "collections": 48,
       "guards": [
         {
@@ -2624,7 +2626,7 @@
           "scanned": 48,
           "excluded": 0,
           "exclusions": [],
-          "scopeRun": "check-data-duplication-mwf7qaag"
+          "scopeRun": "check-data-duplication-mwg3lzq2"
         },
         {
           "guard": "functions/scripts/check-no-any-writes.js",
@@ -2637,7 +2639,7 @@
           "scanned": 48,
           "excluded": 0,
           "exclusions": [],
-          "scopeRun": "check-raw-field-census-mwf2sze0"
+          "scopeRun": "check-raw-field-census-mwg3ltgm"
         },
         {
           "guard": "functions/scripts/check-same-doc-duplicates.cjs",
@@ -2645,7 +2647,7 @@
           "scanned": 48,
           "excluded": 0,
           "exclusions": [],
-          "scopeRun": "check-same-doc-duplicates-mwf7qg5h"
+          "scopeRun": "check-same-doc-duplicates-mwg3mgo5"
         },
         {
           "guard": "functions/scripts/check-stored-url-fields.js",
@@ -2698,6 +2700,10 @@
           "detail": "firestore.indexes.json against the query shapes executed by the emulator suites"
         },
         {
+          "guard": "scripts/check-flutter-contract.js",
+          "scope": "undeclared"
+        },
+        {
           "guard": "scripts/check-gate-conformance.js",
           "scope": "files",
           "detail": "functions/src/callables/*.ts"
@@ -2723,6 +2729,10 @@
           "detail": "functions/src/**\\/*.ts (production source)"
         },
         {
+          "guard": "scripts/check-rules-sync.js",
+          "scope": "undeclared"
+        },
+        {
           "guard": "scripts/check-schema-duplicates.js",
           "scope": "files",
           "detail": "functions/src/validation/*.ts, functions/src/types/*.ts"
@@ -2741,6 +2751,10 @@
           "guard": "scripts/check-test-completeness.js",
           "scope": "artifacts",
           "detail": "tests/api/api-manifest.json against functions/scripts/test-*"
+        },
+        {
+          "guard": "scripts/check-test-quality.js",
+          "scope": "undeclared"
         }
       ]
     },
@@ -2773,7 +2787,7 @@
         "firestore": 10,
         "storage": 3
       },
-      "rulesCoverageRun": "rules-mwf43uhv"
+      "rulesCoverageRun": "rules-mwg2geke"
     },
     "C-10": {
       "id": "C-10",

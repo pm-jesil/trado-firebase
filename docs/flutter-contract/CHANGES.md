@@ -1,0 +1,13 @@
+# Backend Contract Changes (Prompts 60–69)
+
+1. **Unified Response Convention (D-18):**
+   - Single entities returned under entity key (`customer`, `bill`, etc.).
+   - Lists returned under `items: [...]` with `count`, `nextCursor`, and `included`.
+2. **Purchase vs Expense Entity Distinction (Prompt 69 A-3):**
+   - `outflows` collection now cleanly distinguishes `purchase` vs `expense` in activity logs and audit trails.
+3. **ImageRef Migration (D-5, D-15):**
+   - `photoUrl` and `avatarUrl` removed; replaced by `image` (`ImageRef`).
+4. **Operation & Status Tracking in Audit Logs (Prompt 69 A-2, A-4, A-5):**
+   - Activity log rows now return explicit `operation` (`create`, `update`, `delete`, `status_change`), `humanLabel`, `statusBefore`, and `statusAfter`.
+5. **Subscription Limits & Quota Warnings (Prompt 69 G3):**
+   - Support for `hard_block` and `warn_only` policies with `USAGE_LIMIT_EXCEEDED` stable reason.

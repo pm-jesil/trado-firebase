@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "totalDocuments": 72,
+  "totalDocuments": 133,
   "countsByClassification": {
-    "KEEP+UPDATE": 49,
+    "KEEP+UPDATE": 91,
     "REWRITE": 2,
-    "ARCHIVE": 8,
-    "GENERATED": 13
+    "ARCHIVE": 14,
+    "GENERATED": 26
   },
   "documents": [
     {
@@ -31,6 +31,24 @@
       "title": "Trado Architecture Overview",
       "classification": "KEEP+UPDATE",
       "lineCount": 171
+    },
+    {
+      "path": "docs/audit/api-logic-ledger.md",
+      "title": "Trado Architecture — API Logic Audit (Prompt 68 Z3 / B.4 & D-34)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/as-found/2026-11-14-antigravity.md",
+      "title": "Frozen As-Found Baseline: Truth Audit of Prompts 62–66",
+      "classification": "ARCHIVE",
+      "lineCount": 138
+    },
+    {
+      "path": "docs/audit/as-found/2026-11-14-as-found-after-S1-S3.md",
+      "title": "Permanent As-Found Snapshot: as-found-after-S1-S3 (D-29)",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/audit/blast-radius-table.md",
@@ -81,6 +99,42 @@
       "lineCount": 249
     },
     {
+      "path": "docs/audit/documents-audit.md",
+      "title": "Trado Architecture — Documentation Audit (Prompt 68 Z3 / B.9 & D-34)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/drift-leftovers-audit.md",
+      "title": "Trado Architecture — Drift & Leftovers Audit (Prompt 68 Z3 / B.10 & D-34)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/duplication.md",
+      "title": "Trado Architecture — Duplication Audit (Prompt 68 Z3 / B.2 & D-34)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/flutter-gate.md",
+      "title": "Final Backend Gate Verdict — Prompt 69 (G1–G5)",
+      "classification": "ARCHIVE",
+      "lineCount": 96
+    },
+    {
+      "path": "docs/audit/handoff.md",
+      "title": "Trado Engineering Handoff (Appendix E)",
+      "classification": "ARCHIVE",
+      "lineCount": 16
+    },
+    {
+      "path": "docs/audit/implementation-status.md",
+      "title": "Current Implementation Status (Live Delta): Truth Audit of Prompts 62–66",
+      "classification": "ARCHIVE",
+      "lineCount": 138
+    },
+    {
       "path": "docs/audit/issue-ledger.md",
       "title": "Trado Firebase Backend — Master Issue Ledger",
       "classification": "KEEP+UPDATE",
@@ -93,10 +147,28 @@
       "lineCount": null
     },
     {
-      "path": "docs/audit/open-items.md",
-      "title": "Open-items register",
+      "path": "docs/audit/numeric-audit.md",
+      "title": "Trado Architecture — Numeric & Stock Logic Audit (Prompt 68 Z3 / B.7 & D-34)",
       "classification": "GENERATED",
       "lineCount": null
+    },
+    {
+      "path": "docs/audit/obligations.md",
+      "title": "Trado Firebase — Multi-Layer Obligation Register (Prompt 68 Z2 / Prompt 67 A.3)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/open-items.md",
+      "title": "Trado Open Items & Cloud Checklist (Prompt 68 Z-8)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/open-questions.md",
+      "title": "Open Questions & Business Decision Register (Appendix B)",
+      "classification": "ARCHIVE",
+      "lineCount": 111
     },
     {
       "path": "docs/audit/phase-reports-archive.md",
@@ -111,6 +183,18 @@
       "lineCount": null
     },
     {
+      "path": "docs/audit/rules-audit.md",
+      "title": "Trado Architecture — Security Rules Audit (Prompt 68 Z3 / B.6 & D-34)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/run-ledger.md",
+      "title": "Trado Engineering Run Ledger (Appendix E)",
+      "classification": "ARCHIVE",
+      "lineCount": 13
+    },
+    {
       "path": "docs/audit/test-coverage-matrix.md",
       "title": "Trado Backend: Comprehensive Test Coverage Matrix",
       "classification": "KEEP+UPDATE",
@@ -123,10 +207,28 @@
       "lineCount": 75
     },
     {
+      "path": "docs/audit/test-quality-audit.md",
+      "title": "Trado Architecture — Test Quality Guard Audit (Prompt 68 Z3 / B.8 & D-34)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
       "path": "docs/audit/test-refactor-verification-report.md",
       "title": "Trado Firebase Backend: Test Architecture, Feature Coverage, Repository Hygiene & Verification Audit Report",
       "classification": "ARCHIVE",
       "lineCount": 266
+    },
+    {
+      "path": "docs/audit/triggers-audit.md",
+      "title": "Trado Architecture — Triggers & Background Logic Audit (Prompt 68 Z3 / B.5 & D-34)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/audit/update-logic-ledger.md",
+      "title": "Trado Architecture — Update-Logic Audit Ledger (Prompt 68 Z3 / B.3 & D-34)",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/audit-baseline.md",
@@ -145,6 +247,12 @@
       "title": "Trado Data Model & Schema Specification",
       "classification": "KEEP+UPDATE",
       "lineCount": 925
+    },
+    {
+      "path": "docs/decisions/decision-register.md",
+      "title": "Trado Architectural Decision Register (D-1 .. D-35)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 51
     },
     {
       "path": "docs/decisions-log.md",
@@ -261,6 +369,210 @@
       "lineCount": 835
     },
     {
+      "path": "docs/flutter-contract/activity-log.md",
+      "title": "Activity Log & Audit Trail",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 50
+    },
+    {
+      "path": "docs/flutter-contract/CHANGES.md",
+      "title": "Backend Contract Changes (Prompts 60–69)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 14
+    },
+    {
+      "path": "docs/flutter-contract/client-meta-and-idempotency.md",
+      "title": "Client Metadata & Idempotency",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 26
+    },
+    {
+      "path": "docs/flutter-contract/errors.md",
+      "title": "Error Index & Handling",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 26
+    },
+    {
+      "path": "docs/flutter-contract/forms/approval_request.md",
+      "title": "Form Contract: Approval Request (`approval_request`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 8
+    },
+    {
+      "path": "docs/flutter-contract/forms/bill.md",
+      "title": "Form Contract: Bill / POS Sale (`bill`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 29
+    },
+    {
+      "path": "docs/flutter-contract/forms/branch.md",
+      "title": "Form Contract: Branch (`branch`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 35
+    },
+    {
+      "path": "docs/flutter-contract/forms/category.md",
+      "title": "Form Contract: Category (`category`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 14
+    },
+    {
+      "path": "docs/flutter-contract/forms/customer.md",
+      "title": "Form Contract: Customer (`customer`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 66
+    },
+    {
+      "path": "docs/flutter-contract/forms/delivery.md",
+      "title": "Form Contract: Delivery (`delivery`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 27
+    },
+    {
+      "path": "docs/flutter-contract/forms/department.md",
+      "title": "Form Contract: Department (`department`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 13
+    },
+    {
+      "path": "docs/flutter-contract/forms/employee.md",
+      "title": "Form Contract: Employee / User (`employee`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 31
+    },
+    {
+      "path": "docs/flutter-contract/forms/expense.md",
+      "title": "Form Contract: Expense (Outflow) (`expense`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 41
+    },
+    {
+      "path": "docs/flutter-contract/forms/job_role.md",
+      "title": "Form Contract: Job Role (`job_role`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 13
+    },
+    {
+      "path": "docs/flutter-contract/forms/organization.md",
+      "title": "Form Contract: Organization (`organization`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 90
+    },
+    {
+      "path": "docs/flutter-contract/forms/payment.md",
+      "title": "Form Contract: Payment (`payment`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 25
+    },
+    {
+      "path": "docs/flutter-contract/forms/plan.md",
+      "title": "Form Contract: Subscription Plan (`plan`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 21
+    },
+    {
+      "path": "docs/flutter-contract/forms/product.md",
+      "title": "Form Contract: Product (`product`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 70
+    },
+    {
+      "path": "docs/flutter-contract/forms/purchase.md",
+      "title": "Form Contract: Purchase (Outflow) (`purchase`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 41
+    },
+    {
+      "path": "docs/flutter-contract/forms/recurring_expense.md",
+      "title": "Form Contract: Recurring Expense (`recurring_expense`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 36
+    },
+    {
+      "path": "docs/flutter-contract/forms/return.md",
+      "title": "Form Contract: Return (`return`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 22
+    },
+    {
+      "path": "docs/flutter-contract/forms/role.md",
+      "title": "Form Contract: Custom Role (`role`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 15
+    },
+    {
+      "path": "docs/flutter-contract/forms/stock_adjustment.md",
+      "title": "Form Contract: Stock Adjustment / Wastage (`stock_adjustment`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 16
+    },
+    {
+      "path": "docs/flutter-contract/forms/task.md",
+      "title": "Form Contract: Task (`task`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 18
+    },
+    {
+      "path": "docs/flutter-contract/forms/team.md",
+      "title": "Form Contract: Team (`team`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 14
+    },
+    {
+      "path": "docs/flutter-contract/forms/unit.md",
+      "title": "Form Contract: Unit (`unit`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 17
+    },
+    {
+      "path": "docs/flutter-contract/forms/vendor.md",
+      "title": "Form Contract: Vendor (`vendor`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 65
+    },
+    {
+      "path": "docs/flutter-contract/permissions.md",
+      "title": "Permission Catalog & UI Gating",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 138
+    },
+    {
+      "path": "docs/flutter-contract/README.md",
+      "title": "Trado Flutter Contract Pack (v1.0.0)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 25
+    },
+    {
+      "path": "docs/flutter-contract/responses.md",
+      "title": "Response Conventions (D-18)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 40
+    },
+    {
+      "path": "docs/flutter-contract/serialization.md",
+      "title": "Data Serialization & Type Conventions",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 25
+    },
+    {
+      "path": "docs/flutter-contract/state-machines.md",
+      "title": "Document State Machines & Status Transitions",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 14
+    },
+    {
+      "path": "docs/flutter-contract/SUMMARY.md",
+      "title": "Trado Flutter Backend Contract — Summary Cheatsheet",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 100
+    },
+    {
+      "path": "docs/flutter-contract/usage-limits.md",
+      "title": "Subscription Usage Limits & Real-Time Warnings",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 26
+    },
+    {
       "path": "docs/generated/contract-changes.md",
       "title": "Trado API Contract Changes & Naming Consolidations (D-7)",
       "classification": "GENERATED",
@@ -307,6 +619,42 @@
       "title": "Trado Permissions, Roles & Privilege Matrix",
       "classification": "KEEP+UPDATE",
       "lineCount": 262
+    },
+    {
+      "path": "docs/process/ask-protocol.md",
+      "title": "Ask-Don't-Guess Protocol (D-32)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 34
+    },
+    {
+      "path": "docs/process/change-checklist.md",
+      "title": "Change Checklist & Definition of Done (D-30)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 23
+    },
+    {
+      "path": "docs/process/engineering-rules.md",
+      "title": "Engineering Rules (Binding: R1–R4 & Evidence Standards)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 26
+    },
+    {
+      "path": "docs/process/handoff-protocol.md",
+      "title": "Handoff and Session Lifecycle Protocol (Appendix E)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 27
+    },
+    {
+      "path": "docs/process/testing-standard.md",
+      "title": "Testing Standard (Part T & D-31)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 24
+    },
+    {
+      "path": "docs/process/update-logic-checklist.md",
+      "title": "Update Logic Checklist (Appendix D: U-1 .. U-15)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 28
     },
     {
       "path": "docs/process/verification.md",
@@ -373,6 +721,24 @@
       "title": "Trado Security, Rules & Permissions Model",
       "classification": "KEEP+UPDATE",
       "lineCount": 204
+    },
+    {
+      "path": "docs/testing/flows.md",
+      "title": "Trado Testing Engine — End-to-End User Flow Catalog (Prompt 67 T.2)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/testing/scenario-matrix.md",
+      "title": "Trado Testing Engine — Real-World Scenario Matrix (Prompt 67 T.4 & Appendix C)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/testing/scenario-taxonomy.md",
+      "title": "Real-World Scenario Taxonomy (Appendix C: R-01 .. R-40)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 21
     },
     {
       "path": "docs/testing-guide.md",

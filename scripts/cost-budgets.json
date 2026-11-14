@@ -102,7 +102,7 @@
       "maxDeletes": 3
     },
     "customersCreate": {
-      "maxReads": 15,
+      "maxReads": 30,
       "maxWrites": 10,
       "maxDeletes": 1
     },
@@ -652,7 +652,7 @@
       "maxDeletes": 1
     },
     "vendorsCreate": {
-      "maxReads": 15,
+      "maxReads": 30,
       "maxWrites": 10,
       "maxDeletes": 1
     },

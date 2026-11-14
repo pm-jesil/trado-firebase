@@ -1,0 +1,298 @@
+{
+  "entity": "bill",
+  "label": "Bill / POS Sale",
+  "callables": {
+    "create": "billsCreate",
+    "update": "billsUpdateDraft"
+  },
+  "fields": [
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "salesMode",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "pos",
+        "b2b",
+        "both"
+      ],
+      "uiHint": "dropdown",
+      "example": "pos"
+    },
+    {
+      "path": "documentType",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "invoice",
+        "receipt",
+        "delivery_challan",
+        "proforma",
+        "quotation",
+        "sales_order"
+      ],
+      "uiHint": "dropdown",
+      "example": "invoice"
+    },
+    {
+      "path": "status",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "draft",
+        "active"
+      ],
+      "uiHint": "date_picker",
+      "example": "draft"
+    },
+    {
+      "path": "customerId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample customerId"
+    },
+    {
+      "path": "walkInCustomer.name",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample walkInCustomer.name"
+    },
+    {
+      "path": "walkInCustomer.phone",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 20
+      },
+      "enumValues": [],
+      "uiHint": "phone",
+      "example": "Sample walkInCustomer.phone"
+    },
+    {
+      "path": "walkInCustomer.taxId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 30
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample walkInCustomer.taxId"
+    },
+    {
+      "path": "walkInCustomer.billingAddress",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample walkInCustomer.billingAddress"
+    },
+    {
+      "path": "items[].productId",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample items[].productId"
+    },
+    {
+      "path": "items[].quantity",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "items[].unitPriceOverride",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "items[].discountValue",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "items[].unit",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample items[].unit"
+    },
+    {
+      "path": "items[].serialNumbers[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 64
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample items[].serialNumbers[]"
+    },
+    {
+      "path": "discountTotal",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "paidAmount",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "paymentMethod",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "cash",
+        "card",
+        "upi",
+        "bank_transfer",
+        "cheque",
+        "other"
+      ],
+      "uiHint": "dropdown",
+      "example": "cash"
+    },
+    {
+      "path": "notes",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 1000
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample notes"
+    }
+  ]
+}

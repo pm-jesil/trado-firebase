@@ -15,145 +15,145 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `read_sensitive` | 1 |
 | `system` | 6 |
 
-| Export | Action | Category | Primary collection | Reason fields |
-|---|---|---|---|---|
-| `auditGetEntityHistory` | `audit.get_entity_history` | none | — | — |
-| `auditLogsList` | `audit_log.list` | none | `auditLogs` | — |
-| `authLogin` | `auth.login` | auth | — | — |
-| `authMe` | `auth.me` | auth | — | — |
-| `billsCreate` | `bill.create` | mutation | `bills` | `notes` |
-| `billsFinalize` | `bill.finalize` | mutation | `bills` | — |
-| `billsGet` | `bill.get` | none | `bills` | — |
-| `billsList` | `bill.list` | none | `bills` | — |
-| `billsPreview` | `bill.preview` | none | — | `notes` |
-| `billsUpdateDraft` | `bill.update_draft` | mutation | `bills` | `notes` |
-| `billsVoid` | `bill.void` | mutation | `bills` | `reason` |
-| `branchContextSwitch` | `branch.context_switch` | mutation | `branches` | — |
-| `branchesCreate` | `branch.create` | mutation | `branches` | — |
-| `branchesDeactivate` | `branch.deactivate` | mutation | `branches` | `reason` |
-| `branchesGetDefault` | `branch.get_default` | none | `branches` | — |
-| `branchesList` | `branch.list` | none | `branches` | — |
-| `branchesUpdate` | `branch.update` | mutation | `branches` | — |
-| `categoriesCreate` | `category.create` | mutation | `categories` | — |
-| `categoriesList` | `category.list` | none | `categories` | — |
-| `categoriesUpdate` | `category.update` | mutation | `categories` | — |
-| `customersCreate` | `customer.create` | mutation | `customers` | `duplicateOverrideReason` |
-| `customersGet` | `customer.get` | none | `customers` | — |
-| `customersList` | `customer.list` | none | `customers` | — |
-| `customersUpdate` | `customer.update` | mutation | `customers` | `duplicateOverrideReason` |
-| `deliveriesCreate` | `delivery.create` | mutation | `deliveries` | `notes` |
-| `deliveriesGet` | `delivery.get` | none | `deliveries` | — |
-| `deliveriesList` | `delivery.list` | none | `deliveries` | — |
-| `deliveriesUpdateStatus` | `delivery.update_status` | mutation | `deliveries` | `notes` |
-| `departmentsCreate` | `department.create` | mutation | `departments` | — |
-| `departmentsList` | `department.list` | none | `departments` | — |
-| `departmentsUpdate` | `department.update` | mutation | `departments` | — |
-| `documentsDecide` | `document.decide` | mutation | — | `decision`, `reason` |
-| `employeesCreate` | `employee.create` | mutation | `memberships` | — |
-| `employeesDeactivate` | `employee.deactivate` | mutation | `memberships` | `reason` |
-| `employeesGet` | `employee.get` | none | `memberships` | — |
-| `employeesList` | `employee.list` | none | `memberships` | — |
-| `employeesUpdate` | `employee.update` | mutation | `memberships` | — |
-| `healthCheck` | `health.check` | none | — | — |
-| `imagesAttach` | `image.attach` | file | — | — |
-| `imagesCreateUploadSession` | `image.create_upload_session` | file | — | — |
-| `imagesRemove` | `image.remove` | file | — | — |
-| `jobRolesCreate` | `job_role.create` | mutation | `jobRoles` | — |
-| `jobRolesList` | `job_role.list` | none | `jobRoles` | — |
-| `jobRolesUpdate` | `job_role.update` | mutation | `jobRoles` | — |
-| `locationsGetHistory` | `location.get_history` | none | — | — |
-| `locationsGetLatest` | `location.get_latest` | none | — | — |
-| `locationsRecordPing` | `location.record_ping` | mutation | — | — |
-| `modulesList` | `module.list` | none | `modules` | — |
-| `notificationsList` | `notification.list` | none | `notifications` | — |
-| `notificationsMarkRead` | `notification.mark_read` | mutation | `notifications` | — |
-| `notificationsRegisterFcmToken` | `notification.register_fcm_token` | mutation | — | — |
-| `onBillWritten` | `bill.derived_update` | system | — | — |
-| `onDeliveryWritten` | `delivery.derived_update` | system | — | — |
-| `onOutflowWritten` | `outflow.derived_update` | system | — | — |
-| `onPaymentWritten` | `payment.derived_update` | system | — | — |
-| `onStorageObjectFinalized` | `storage_object.finalize` | system | — | — |
-| `organizationsCreate` | `organization.create` | admin | `organizations` | `planId` |
-| `organizationsDeactivate` | `organization.deactivate` | admin | `organizations` | `reason` |
-| `organizationsGet` | `organization.get` | none | `organizations` | — |
-| `organizationsGetSubscriptionHistory` | `organization.get_subscription_history` | none | — | — |
-| `organizationsList` | `organization.list` | admin | `organizations` | — |
-| `organizationsPreviewDeactivationImpact` | `organization.preview_deactivation_impact` | admin | `organizations` | — |
-| `organizationsProvisionUser` | `organization.provision_user` | admin | `organizations` | `reason` |
-| `organizationsReactivate` | `organization.reactivate` | admin | `organizations` | `reason` |
-| `organizationsSetSubscription` | `organization.set_subscription` | admin | `organizations` | `action`, `planId`, `reason` |
-| `organizationsTransferOwnership` | `organization.transfer_ownership` | mutation | `organizations` | `reason` |
-| `organizationsUpdate` | `organization.update` | mutation | `organizations` | — |
-| `outflowsCreate` | `outflow.create` | mutation | `outflows` | `notes` |
-| `outflowsGet` | `outflow.get` | none | `outflows` | — |
-| `outflowsList` | `outflow.list` | none | `outflows` | — |
-| `outflowsVoid` | `outflow.void` | mutation | `outflows` | `reason` |
-| `paymentsCreate` | `payment.create` | mutation | `payments` | `notes` |
-| `paymentsList` | `payment.list` | none | `payments` | — |
-| `paymentsVoid` | `payment.void` | mutation | `payments` | `reason` |
-| `permissionCatalogList` | `permission_catalog.list` | none | `permissionCatalog` | — |
-| `plansArchive` | `plan.archive` | admin | `subscriptionPlans` | `reason` |
-| `plansCreate` | `plan.create` | admin | `subscriptionPlans` | — |
-| `plansDelete` | `plan.delete` | admin | `subscriptionPlans` | — |
-| `plansGet` | `plan.get` | none | `subscriptionPlans` | — |
-| `plansList` | `plan.list` | none | `subscriptionPlans` | — |
-| `plansPreviewImpact` | `plan.preview_impact` | admin | `subscriptionPlans` | — |
-| `plansUpdate` | `plan.update` | admin | `subscriptionPlans` | — |
-| `platformUsersGet` | `platform.users_get` | admin | `users` | — |
-| `platformUsersList` | `platform.users_list` | admin | `users` | — |
-| `productsCreate` | `product.create` | mutation | `products` | `taxExemptionReason` |
-| `productsGet` | `product.get` | none | `products` | — |
-| `productsGetPriceHistory` | `product.get_price_history` | none | `products` | — |
-| `productsList` | `product.list` | none | `products` | — |
-| `productsUpdate` | `product.update` | mutation | `products` | `taxExemptionReason` |
-| `reconcileBranchCounts` | `reconcile.branch_counts` | mutation | — | — |
-| `reconcilePartyLedgers` | `reconcile.party_ledgers` | mutation | — | — |
-| `reconcileStockBalances` | `reconcile.stock_balances` | mutation | — | — |
-| `recurringExpensesCreate` | `recurring_expense.create` | mutation | `recurringExpenses` | — |
-| `recurringExpensesList` | `recurring_expense.list` | none | `recurringExpenses` | — |
-| `recurringExpensesUpdate` | `recurring_expense.update` | mutation | `recurringExpenses` | — |
-| `reportsExportCsv` | `report.export_csv` | export | — | — |
-| `reportsGetOutflowSummary` | `report.get_outflow_summary` | read_sensitive | — | — |
-| `reportsGetPartyStatement` | `report.get_party_statement` | export | — | — |
-| `reportsGetPlatformOverview` | `report.get_platform_overview` | admin | — | — |
-| `reportsGetProfitLoss` | `report.get_profit_loss` | none | — | — |
-| `reportsGetRevenue` | `report.get_revenue` | none | — | — |
-| `reportsGetStaffActivity` | `report.get_staff_activity` | none | — | — |
-| `reportsGetStockValuation` | `report.get_stock_valuation` | none | — | — |
-| `reportsGetTopEntities` | `report.get_top_entities` | none | — | — |
-| `returnsCreate` | `return.create` | mutation | `returns` | `notes` |
-| `returnsList` | `return.list` | none | `returns` | — |
-| `rolesCreate` | `role.create` | mutation | `roles` | — |
-| `rolesList` | `role.list` | none | `roles` | — |
-| `rolesUpdate` | `role.update` | mutation | `roles` | — |
-| `sharingPoliciesUpdate` | `sharing.policies_update` | mutation | — | — |
-| `stockAdjust` | `stock.adjust` | mutation | — | `reason`, `reasonCode` |
-| `stockMovementsList` | `stock_movement.list` | none | `stockMovements` | — |
-| `subscriptionAndUsageSweep` | `subscription.sweep` | system | — | — |
-| `tasksAssign` | `task.assign` | mutation | `tasks` | — |
-| `tasksCreate` | `task.create` | mutation | `tasks` | — |
-| `tasksDelete` | `task.delete` | mutation | `tasks` | — |
-| `tasksList` | `task.list` | none | `tasks` | — |
-| `tasksUpdate` | `task.update` | mutation | `tasks` | — |
-| `tasksUpdateStatus` | `task.update_status` | mutation | `tasks` | — |
-| `taxRegimesList` | `tax_regime.list` | none | `taxRegimes` | — |
-| `teamsAssignMember` | `team.assign_member` | mutation | `teams` | — |
-| `teamsCreate` | `team.create` | mutation | `teams` | — |
-| `teamsList` | `team.list` | none | `teams` | — |
-| `teamsUpdate` | `team.update` | mutation | `teams` | — |
-| `unitsCreate` | `unit.create` | mutation | `units` | — |
-| `unitsList` | `unit.list` | none | `units` | — |
-| `unitsUpdate` | `unit.update` | mutation | `units` | — |
-| `usageCalculateDryRunStatement` | `usage.calculate_dry_run_statement` | export | — | — |
-| `usageGetBranches` | `usage.get_branches` | admin | — | — |
-| `usageGetDetail` | `usage.get_detail` | none | — | — |
-| `usageGetLimits` | `usage.get_limits` | none | — | — |
-| `usageGetOrganizations` | `usage.get_organizations` | admin | — | — |
-| `usageGetPlatformSummary` | `usage.get_platform_summary` | admin | — | — |
-| `usageRecordClientMetric` | `usage.record_client_metric` | mutation | — | — |
-| `usageUpdateLimits` | `usage.update_limits` | admin | — | — |
-| `usersUpdateMe` | `user.update_me` | mutation | `users` | — |
-| `vendorsCreate` | `vendor.create` | mutation | `vendors` | `duplicateOverrideReason` |
-| `vendorsGet` | `vendor.get` | none | `vendors` | — |
-| `vendorsList` | `vendor.list` | none | `vendors` | — |
-| `vendorsUpdate` | `vendor.update` | mutation | `vendors` | `duplicateOverrideReason` |
+| Code | Action | Entity Type | Verb | Display Key | Status Tracked | Audit Before | Category | Primary Collection | Reason Fields |
+|---|---|---|---|---|---|---|---|---|---|
+| `auditGetEntityHistory` | `audit.get_entity_history` | `audit` | `get_entity_history` | `audit.action.audit.get_entity_history` | No | No | none | — | — |
+| `auditLogsList` | `audit_log.list` | `audit_log` | `list` | `audit.action.audit_log.list` | No | No | none | `auditLogs` | — |
+| `authLogin` | `auth.login` | `auth` | `login` | `audit.action.auth.login` | No | No | auth | — | — |
+| `authMe` | `auth.me` | `auth` | `me` | `audit.action.auth.me` | No | No | auth | — | — |
+| `billsCreate` | `bill.create` | `bill` | `create` | `audit.action.bill.create` | Yes | Yes | mutation | `bills` | `notes` |
+| `billsFinalize` | `bill.finalize` | `bill` | `finalize` | `audit.action.bill.finalize` | Yes | Yes | mutation | `bills` | — |
+| `billsGet` | `bill.get` | `bill` | `get` | `audit.action.bill.get` | Yes | No | none | `bills` | — |
+| `billsList` | `bill.list` | `bill` | `list` | `audit.action.bill.list` | Yes | No | none | `bills` | — |
+| `billsPreview` | `bill.preview` | `bill` | `preview` | `audit.action.bill.preview` | Yes | No | none | — | `notes` |
+| `billsUpdateDraft` | `bill.update_draft` | `bill` | `update_draft` | `audit.action.bill.update_draft` | Yes | Yes | mutation | `bills` | `notes` |
+| `billsVoid` | `bill.void` | `bill` | `void` | `audit.action.bill.void` | Yes | Yes | mutation | `bills` | `reason` |
+| `branchContextSwitch` | `branch.context_switch` | `branch` | `context_switch` | `audit.action.branch.context_switch` | No | Yes | mutation | `branches` | — |
+| `branchesCreate` | `branch.create` | `branch` | `create` | `audit.action.branch.create` | No | Yes | mutation | `branches` | — |
+| `branchesDeactivate` | `branch.deactivate` | `branch` | `deactivate` | `audit.action.branch.deactivate` | No | Yes | mutation | `branches` | `reason` |
+| `branchesGetDefault` | `branch.get_default` | `branch` | `get_default` | `audit.action.branch.get_default` | No | No | none | `branches` | — |
+| `branchesList` | `branch.list` | `branch` | `list` | `audit.action.branch.list` | No | No | none | `branches` | — |
+| `branchesUpdate` | `branch.update` | `branch` | `update` | `audit.action.branch.update` | No | Yes | mutation | `branches` | — |
+| `categoriesCreate` | `category.create` | `category` | `create` | `audit.action.category.create` | No | Yes | mutation | `categories` | — |
+| `categoriesList` | `category.list` | `category` | `list` | `audit.action.category.list` | No | No | none | `categories` | — |
+| `categoriesUpdate` | `category.update` | `category` | `update` | `audit.action.category.update` | No | Yes | mutation | `categories` | — |
+| `customersCreate` | `customer.create` | `customer` | `create` | `audit.action.customer.create` | No | Yes | mutation | `customers` | `duplicateOverrideReason` |
+| `customersGet` | `customer.get` | `customer` | `get` | `audit.action.customer.get` | No | No | none | `customers` | — |
+| `customersList` | `customer.list` | `customer` | `list` | `audit.action.customer.list` | No | No | none | `customers` | — |
+| `customersUpdate` | `customer.update` | `customer` | `update` | `audit.action.customer.update` | No | Yes | mutation | `customers` | `duplicateOverrideReason` |
+| `deliveriesCreate` | `delivery.create` | `delivery` | `create` | `audit.action.delivery.create` | Yes | Yes | mutation | `deliveries` | `notes` |
+| `deliveriesGet` | `delivery.get` | `delivery` | `get` | `audit.action.delivery.get` | Yes | No | none | `deliveries` | — |
+| `deliveriesList` | `delivery.list` | `delivery` | `list` | `audit.action.delivery.list` | Yes | No | none | `deliveries` | — |
+| `deliveriesUpdateStatus` | `delivery.update_status` | `delivery` | `update_status` | `audit.action.delivery.update_status` | Yes | Yes | mutation | `deliveries` | `notes` |
+| `departmentsCreate` | `department.create` | `department` | `create` | `audit.action.department.create` | No | Yes | mutation | `departments` | — |
+| `departmentsList` | `department.list` | `department` | `list` | `audit.action.department.list` | No | No | none | `departments` | — |
+| `departmentsUpdate` | `department.update` | `department` | `update` | `audit.action.department.update` | No | Yes | mutation | `departments` | — |
+| `documentsDecide` | `document.decide` | `document` | `decide` | `audit.action.document.decide` | No | Yes | mutation | — | `decision`, `reason` |
+| `employeesCreate` | `employee.create` | `employee` | `create` | `audit.action.employee.create` | No | Yes | mutation | `memberships` | — |
+| `employeesDeactivate` | `employee.deactivate` | `employee` | `deactivate` | `audit.action.employee.deactivate` | No | Yes | mutation | `memberships` | `reason` |
+| `employeesGet` | `employee.get` | `employee` | `get` | `audit.action.employee.get` | No | No | none | `memberships` | — |
+| `employeesList` | `employee.list` | `employee` | `list` | `audit.action.employee.list` | No | No | none | `memberships` | — |
+| `employeesUpdate` | `employee.update` | `employee` | `update` | `audit.action.employee.update` | No | Yes | mutation | `memberships` | — |
+| `healthCheck` | `health.check` | `health` | `check` | `audit.action.health.check` | No | No | none | — | — |
+| `imagesAttach` | `image.attach` | `image` | `attach` | `audit.action.image.attach` | No | No | file | — | — |
+| `imagesCreateUploadSession` | `image.create_upload_session` | `image` | `create_upload_session` | `audit.action.image.create_upload_session` | No | No | file | — | — |
+| `imagesRemove` | `image.remove` | `image` | `remove` | `audit.action.image.remove` | No | No | file | — | — |
+| `jobRolesCreate` | `job_role.create` | `job_role` | `create` | `audit.action.job_role.create` | No | Yes | mutation | `jobRoles` | — |
+| `jobRolesList` | `job_role.list` | `job_role` | `list` | `audit.action.job_role.list` | No | No | none | `jobRoles` | — |
+| `jobRolesUpdate` | `job_role.update` | `job_role` | `update` | `audit.action.job_role.update` | No | Yes | mutation | `jobRoles` | — |
+| `locationsGetHistory` | `location.get_history` | `location` | `get_history` | `audit.action.location.get_history` | No | No | none | — | — |
+| `locationsGetLatest` | `location.get_latest` | `location` | `get_latest` | `audit.action.location.get_latest` | No | No | none | — | — |
+| `locationsRecordPing` | `location.record_ping` | `location` | `record_ping` | `audit.action.location.record_ping` | No | Yes | mutation | — | — |
+| `modulesList` | `module.list` | `module` | `list` | `audit.action.module.list` | No | No | none | `modules` | — |
+| `notificationsList` | `notification.list` | `notification` | `list` | `audit.action.notification.list` | No | No | none | `notifications` | — |
+| `notificationsMarkRead` | `notification.mark_read` | `notification` | `mark_read` | `audit.action.notification.mark_read` | No | Yes | mutation | `notifications` | — |
+| `notificationsRegisterFcmToken` | `notification.register_fcm_token` | `notification` | `register_fcm_token` | `audit.action.notification.register_fcm_token` | No | Yes | mutation | — | — |
+| `onBillWritten` | `bill.derived_update` | `bill` | `derived_update` | `audit.action.bill.derived_update` | Yes | No | system | — | — |
+| `onDeliveryWritten` | `delivery.derived_update` | `delivery` | `derived_update` | `audit.action.delivery.derived_update` | Yes | No | system | — | — |
+| `onOutflowWritten` | `outflow.derived_update` | `outflow` | `derived_update` | `audit.action.outflow.derived_update` | Yes | No | system | — | — |
+| `onPaymentWritten` | `payment.derived_update` | `payment` | `derived_update` | `audit.action.payment.derived_update` | No | No | system | — | — |
+| `onStorageObjectFinalized` | `storage_object.finalize` | `storage_object` | `finalize` | `audit.action.storage_object.finalize` | Yes | No | system | — | — |
+| `organizationsCreate` | `organization.create` | `organization` | `create` | `audit.action.organization.create` | No | No | admin | `organizations` | `planId` |
+| `organizationsDeactivate` | `organization.deactivate` | `organization` | `deactivate` | `audit.action.organization.deactivate` | No | No | admin | `organizations` | `reason` |
+| `organizationsGet` | `organization.get` | `organization` | `get` | `audit.action.organization.get` | No | No | none | `organizations` | — |
+| `organizationsGetSubscriptionHistory` | `organization.get_subscription_history` | `organization` | `get_subscription_history` | `audit.action.organization.get_subscription_history` | No | No | none | — | — |
+| `organizationsList` | `organization.list` | `organization` | `list` | `audit.action.organization.list` | No | No | admin | `organizations` | — |
+| `organizationsPreviewDeactivationImpact` | `organization.preview_deactivation_impact` | `organization` | `preview_deactivation_impact` | `audit.action.organization.preview_deactivation_impact` | No | No | admin | `organizations` | — |
+| `organizationsProvisionUser` | `organization.provision_user` | `organization` | `provision_user` | `audit.action.organization.provision_user` | No | No | admin | `organizations` | `reason` |
+| `organizationsReactivate` | `organization.reactivate` | `organization` | `reactivate` | `audit.action.organization.reactivate` | No | No | admin | `organizations` | `reason` |
+| `organizationsSetSubscription` | `organization.set_subscription` | `organization` | `set_subscription` | `audit.action.organization.set_subscription` | No | No | admin | `organizations` | `action`, `planId`, `reason` |
+| `organizationsTransferOwnership` | `organization.transfer_ownership` | `organization` | `transfer_ownership` | `audit.action.organization.transfer_ownership` | No | Yes | mutation | `organizations` | `reason` |
+| `organizationsUpdate` | `organization.update` | `organization` | `update` | `audit.action.organization.update` | No | Yes | mutation | `organizations` | — |
+| `outflowsCreate` | `outflow.create` | `outflow` | `create` | `audit.action.outflow.create` | Yes | Yes | mutation | `outflows` | `notes` |
+| `outflowsGet` | `outflow.get` | `outflow` | `get` | `audit.action.outflow.get` | Yes | No | none | `outflows` | — |
+| `outflowsList` | `outflow.list` | `outflow` | `list` | `audit.action.outflow.list` | Yes | No | none | `outflows` | — |
+| `outflowsVoid` | `outflow.void` | `outflow` | `void` | `audit.action.outflow.void` | Yes | Yes | mutation | `outflows` | `reason` |
+| `paymentsCreate` | `payment.create` | `payment` | `create` | `audit.action.payment.create` | No | Yes | mutation | `payments` | `notes` |
+| `paymentsList` | `payment.list` | `payment` | `list` | `audit.action.payment.list` | No | No | none | `payments` | — |
+| `paymentsVoid` | `payment.void` | `payment` | `void` | `audit.action.payment.void` | Yes | Yes | mutation | `payments` | `reason` |
+| `permissionCatalogList` | `permission_catalog.list` | `permission_catalog` | `list` | `audit.action.permission_catalog.list` | No | No | none | `permissionCatalog` | — |
+| `plansArchive` | `plan.archive` | `plan` | `archive` | `audit.action.plan.archive` | No | No | admin | `subscriptionPlans` | `reason` |
+| `plansCreate` | `plan.create` | `plan` | `create` | `audit.action.plan.create` | No | No | admin | `subscriptionPlans` | — |
+| `plansDelete` | `plan.delete` | `plan` | `delete` | `audit.action.plan.delete` | No | No | admin | `subscriptionPlans` | — |
+| `plansGet` | `plan.get` | `plan` | `get` | `audit.action.plan.get` | No | No | none | `subscriptionPlans` | — |
+| `plansList` | `plan.list` | `plan` | `list` | `audit.action.plan.list` | No | No | none | `subscriptionPlans` | — |
+| `plansPreviewImpact` | `plan.preview_impact` | `plan` | `preview_impact` | `audit.action.plan.preview_impact` | No | No | admin | `subscriptionPlans` | — |
+| `plansUpdate` | `plan.update` | `plan` | `update` | `audit.action.plan.update` | No | No | admin | `subscriptionPlans` | — |
+| `platformUsersGet` | `platform.users_get` | `platform` | `users_get` | `audit.action.platform.users_get` | No | No | admin | `users` | — |
+| `platformUsersList` | `platform.users_list` | `platform` | `users_list` | `audit.action.platform.users_list` | No | No | admin | `users` | — |
+| `productsCreate` | `product.create` | `product` | `create` | `audit.action.product.create` | No | Yes | mutation | `products` | `taxExemptionReason` |
+| `productsGet` | `product.get` | `product` | `get` | `audit.action.product.get` | No | No | none | `products` | — |
+| `productsGetPriceHistory` | `product.get_price_history` | `product` | `get_price_history` | `audit.action.product.get_price_history` | No | No | none | `products` | — |
+| `productsList` | `product.list` | `product` | `list` | `audit.action.product.list` | No | No | none | `products` | — |
+| `productsUpdate` | `product.update` | `product` | `update` | `audit.action.product.update` | No | Yes | mutation | `products` | `taxExemptionReason` |
+| `reconcileBranchCounts` | `reconcile.branch_counts` | `reconcile` | `branch_counts` | `audit.action.reconcile.branch_counts` | No | Yes | mutation | — | — |
+| `reconcilePartyLedgers` | `reconcile.party_ledgers` | `reconcile` | `party_ledgers` | `audit.action.reconcile.party_ledgers` | No | Yes | mutation | — | — |
+| `reconcileStockBalances` | `reconcile.stock_balances` | `reconcile` | `stock_balances` | `audit.action.reconcile.stock_balances` | No | Yes | mutation | — | — |
+| `recurringExpensesCreate` | `recurring_expense.create` | `recurring_expense` | `create` | `audit.action.recurring_expense.create` | No | Yes | mutation | `recurringExpenses` | — |
+| `recurringExpensesList` | `recurring_expense.list` | `recurring_expense` | `list` | `audit.action.recurring_expense.list` | No | No | none | `recurringExpenses` | — |
+| `recurringExpensesUpdate` | `recurring_expense.update` | `recurring_expense` | `update` | `audit.action.recurring_expense.update` | No | Yes | mutation | `recurringExpenses` | — |
+| `reportsExportCsv` | `report.export_csv` | `report` | `export_csv` | `audit.action.report.export_csv` | No | No | export | — | — |
+| `reportsGetOutflowSummary` | `report.get_outflow_summary` | `report` | `get_outflow_summary` | `audit.action.report.get_outflow_summary` | No | No | read_sensitive | — | — |
+| `reportsGetPartyStatement` | `report.get_party_statement` | `report` | `get_party_statement` | `audit.action.report.get_party_statement` | No | No | export | — | — |
+| `reportsGetPlatformOverview` | `report.get_platform_overview` | `report` | `get_platform_overview` | `audit.action.report.get_platform_overview` | No | No | admin | — | — |
+| `reportsGetProfitLoss` | `report.get_profit_loss` | `report` | `get_profit_loss` | `audit.action.report.get_profit_loss` | No | No | none | — | — |
+| `reportsGetRevenue` | `report.get_revenue` | `report` | `get_revenue` | `audit.action.report.get_revenue` | No | No | none | — | — |
+| `reportsGetStaffActivity` | `report.get_staff_activity` | `report` | `get_staff_activity` | `audit.action.report.get_staff_activity` | No | No | none | — | — |
+| `reportsGetStockValuation` | `report.get_stock_valuation` | `report` | `get_stock_valuation` | `audit.action.report.get_stock_valuation` | No | No | none | — | — |
+| `reportsGetTopEntities` | `report.get_top_entities` | `report` | `get_top_entities` | `audit.action.report.get_top_entities` | No | No | none | — | — |
+| `returnsCreate` | `return.create` | `return` | `create` | `audit.action.return.create` | No | Yes | mutation | `returns` | `notes` |
+| `returnsList` | `return.list` | `return` | `list` | `audit.action.return.list` | No | No | none | `returns` | — |
+| `rolesCreate` | `role.create` | `role` | `create` | `audit.action.role.create` | No | Yes | mutation | `roles` | — |
+| `rolesList` | `role.list` | `role` | `list` | `audit.action.role.list` | No | No | none | `roles` | — |
+| `rolesUpdate` | `role.update` | `role` | `update` | `audit.action.role.update` | No | Yes | mutation | `roles` | — |
+| `sharingPoliciesUpdate` | `sharing.policies_update` | `sharing` | `policies_update` | `audit.action.sharing.policies_update` | No | Yes | mutation | — | — |
+| `stockAdjust` | `stock.adjust` | `stock` | `adjust` | `audit.action.stock.adjust` | No | Yes | mutation | — | `reason`, `reasonCode` |
+| `stockMovementsList` | `stock_movement.list` | `stock_movement` | `list` | `audit.action.stock_movement.list` | No | No | none | `stockMovements` | — |
+| `subscriptionAndUsageSweep` | `subscription.sweep` | `subscription` | `sweep` | `audit.action.subscription.sweep` | No | No | system | — | — |
+| `tasksAssign` | `task.assign` | `task` | `assign` | `audit.action.task.assign` | Yes | Yes | mutation | `tasks` | — |
+| `tasksCreate` | `task.create` | `task` | `create` | `audit.action.task.create` | Yes | Yes | mutation | `tasks` | — |
+| `tasksDelete` | `task.delete` | `task` | `delete` | `audit.action.task.delete` | Yes | Yes | mutation | `tasks` | — |
+| `tasksList` | `task.list` | `task` | `list` | `audit.action.task.list` | Yes | No | none | `tasks` | — |
+| `tasksUpdate` | `task.update` | `task` | `update` | `audit.action.task.update` | Yes | Yes | mutation | `tasks` | — |
+| `tasksUpdateStatus` | `task.update_status` | `task` | `update_status` | `audit.action.task.update_status` | Yes | Yes | mutation | `tasks` | — |
+| `taxRegimesList` | `tax_regime.list` | `tax_regime` | `list` | `audit.action.tax_regime.list` | No | No | none | `taxRegimes` | — |
+| `teamsAssignMember` | `team.assign_member` | `team` | `assign_member` | `audit.action.team.assign_member` | No | Yes | mutation | `teams` | — |
+| `teamsCreate` | `team.create` | `team` | `create` | `audit.action.team.create` | No | Yes | mutation | `teams` | — |
+| `teamsList` | `team.list` | `team` | `list` | `audit.action.team.list` | No | No | none | `teams` | — |
+| `teamsUpdate` | `team.update` | `team` | `update` | `audit.action.team.update` | No | Yes | mutation | `teams` | — |
+| `unitsCreate` | `unit.create` | `unit` | `create` | `audit.action.unit.create` | No | Yes | mutation | `units` | — |
+| `unitsList` | `unit.list` | `unit` | `list` | `audit.action.unit.list` | No | No | none | `units` | — |
+| `unitsUpdate` | `unit.update` | `unit` | `update` | `audit.action.unit.update` | No | Yes | mutation | `units` | — |
+| `usageCalculateDryRunStatement` | `usage.calculate_dry_run_statement` | `usage` | `calculate_dry_run_statement` | `audit.action.usage.calculate_dry_run_statement` | No | No | export | — | — |
+| `usageGetBranches` | `usage.get_branches` | `usage` | `get_branches` | `audit.action.usage.get_branches` | No | No | admin | — | — |
+| `usageGetDetail` | `usage.get_detail` | `usage` | `get_detail` | `audit.action.usage.get_detail` | No | No | none | — | — |
+| `usageGetLimits` | `usage.get_limits` | `usage` | `get_limits` | `audit.action.usage.get_limits` | No | No | none | — | — |
+| `usageGetOrganizations` | `usage.get_organizations` | `usage` | `get_organizations` | `audit.action.usage.get_organizations` | No | No | admin | — | — |
+| `usageGetPlatformSummary` | `usage.get_platform_summary` | `usage` | `get_platform_summary` | `audit.action.usage.get_platform_summary` | No | No | admin | — | — |
+| `usageRecordClientMetric` | `usage.record_client_metric` | `usage` | `record_client_metric` | `audit.action.usage.record_client_metric` | No | Yes | mutation | — | — |
+| `usageUpdateLimits` | `usage.update_limits` | `usage` | `update_limits` | `audit.action.usage.update_limits` | No | No | admin | — | — |
+| `usersUpdateMe` | `user.update_me` | `user` | `update_me` | `audit.action.user.update_me` | No | Yes | mutation | `users` | — |
+| `vendorsCreate` | `vendor.create` | `vendor` | `create` | `audit.action.vendor.create` | No | Yes | mutation | `vendors` | `duplicateOverrideReason` |
+| `vendorsGet` | `vendor.get` | `vendor` | `get` | `audit.action.vendor.get` | No | No | none | `vendors` | — |
+| `vendorsList` | `vendor.list` | `vendor` | `list` | `audit.action.vendor.list` | No | No | none | `vendors` | — |
+| `vendorsUpdate` | `vendor.update` | `vendor` | `update` | `audit.action.vendor.update` | No | Yes | mutation | `vendors` | `duplicateOverrideReason` |

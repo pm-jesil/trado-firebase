@@ -1,0 +1,9 @@
+{
+  "entity": "approval_request",
+  "label": "Approval Request",
+  "callables": {
+    "create": "approvalsDecide",
+    "update": "approvalsList"
+  },
+  "fields": []
+}

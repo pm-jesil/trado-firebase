@@ -500,10 +500,13 @@ export const GetPlatformUserSchema = z.strictObject({
 
 export const ListAuditLogsSchema = z.strictObject({
   organizationId: z.string().trim().optional(),
+  branchId: z.string().trim().optional(),
   actorUserId: z.string().trim().optional(),
   entityType: z.string().trim().optional(),
   entityId: z.string().trim().optional(),
   action: z.string().trim().optional(),
+  operation: z.enum(["create", "update", "delete", "status_change"]).optional(),
+  status: z.string().trim().optional(),
   outcome: z.enum(["success", "denied", "failed", "all"]).default("all").optional(),
   category: z.enum(["mutation", "read_sensitive", "export", "auth", "file", "security", "admin", "system"]).optional(),
   deviceId: z.string().trim().min(1).max(128).optional(),
@@ -1505,6 +1508,9 @@ export const EntityHistorySchema = z.strictObject({
     "vendor",
     "bill",
     "outflow",
+    "purchase",
+    "expense",
+    "wastage",
     "employee",
     "organization",
     "team",

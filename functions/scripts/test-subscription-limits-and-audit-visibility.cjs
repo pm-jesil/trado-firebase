@@ -348,36 +348,42 @@ async function run() {
   // ---------------------------------------------------------------------------
   console.log("\n[B.3] Deep Inspection of Audit Event Attributes for Every Entity:");
 
-  // 1. Verify Purchase Outflow Log
+  // 1. Verify Purchase Outflow Log (distinct from expense per A-3)
   const purchaseLog = ownerLogs.items.find((l) => l.entityId === purchaseId || (l.targets && l.targets.some((t) => t.id === purchaseId)));
   assert.ok(purchaseLog, `Must record audit event for purchase ${purchaseId}`);
-  assert.equal(purchaseLog.action, "outflow.create", "Action must be outflow.create");
+  assert.equal(purchaseLog.action, "purchase.create", "Action must be purchase.create per A-3");
   assert.equal(purchaseLog.actorUid, orgOwner.ownerUserId, "Actor must be Org Owner");
-  assert.equal(purchaseLog.entityType, "outflow", "Entity type must be outflow");
+  assert.equal(purchaseLog.entityType, "purchase", "Entity type must be purchase per A-3");
+  assert.equal(purchaseLog.operation, "create", "Operation must be create per A-4");
   assert.ok(purchaseLog.timestamp, "Must carry timestamp");
   assert.ok(purchaseLog.occurredLocalDate, "Must carry local date");
-  ok(`✓ Purchase Log verified: Action="${purchaseLog.action}", Who="${purchaseLog.actorUid}", What="${purchaseLog.entityType}", ID="${purchaseId}", Status="success"`);
+  ok(`✓ Purchase Log verified: Action="${purchaseLog.action}", Who="${purchaseLog.actorUid}", What="${purchaseLog.entityType}", ID="${purchaseId}", Operation="${purchaseLog.operation}"`);
 
-  // 2. Verify Expense Outflow Log (created by Staff 1)
+  // 2. Verify Expense Outflow Log (distinct from purchase per A-3)
   const expenseLog = ownerLogs.items.find((l) => l.entityId === expenseId || (l.targets && l.targets.some((t) => t.id === expenseId)));
   assert.ok(expenseLog, `Must record audit event for expense ${expenseId}`);
-  assert.equal(expenseLog.action, "outflow.create", "Action must be outflow.create");
+  assert.equal(expenseLog.action, "expense.create", "Action must be expense.create per A-3");
   assert.equal(expenseLog.actorUid, staff1.userId, "Actor must be Staff 1");
-  assert.equal(expenseLog.entityType, "outflow", "Entity type must be outflow");
-  ok(`✓ Expense Log verified: Action="${expenseLog.action}", Who="${expenseLog.actorUid}" (Staff 1), What="${expenseLog.entityType}", ID="${expenseId}"`);
+  assert.equal(expenseLog.entityType, "expense", "Entity type must be expense per A-3");
+  assert.equal(expenseLog.operation, "create", "Operation must be create per A-4");
+  ok(`✓ Expense Log verified: Action="${expenseLog.action}", Who="${expenseLog.actorUid}" (Staff 1), What="${expenseLog.entityType}", ID="${expenseId}", Operation="${expenseLog.operation}"`);
 
   // 3. Verify Sale / Bill Creation Log (created by Staff 1)
-  const billCreateLog = ownerLogs.items.find((l) => l.action === "bill.create" && (l.entityId === billId || (l.targets && l.targets.some((t) => t.id === billId))));
-  assert.ok(billCreateLog, `Must record 'bill.create' action for bill ${billId}`);
+  const billCreateLog = ownerLogs.items.find((l) => (l.action === "bill.create" || l.action === "sale.create") && (l.entityId === billId || (l.targets && l.targets.some((t) => t.id === billId))));
+  assert.ok(billCreateLog, `Must record bill create action for bill ${billId}`);
   assert.equal(billCreateLog.actorUid, staff1.userId, "Log must record Staff 1 as actor");
   assert.equal(billCreateLog.entityType, "bill", "Log must identify entity as 'bill'");
+  assert.equal(billCreateLog.operation, "create", "Operation must be create per A-4");
   assert.ok(billCreateLog.timestamp, "Must carry timestamp");
   ok(`✓ Bill Create Log verified: Action="${billCreateLog.action}", Who="${billCreateLog.actorUid}" (Staff 1), What="${billCreateLog.entityType}", ID="${billId}"`);
 
   // 4. Verify Sale / Bill Finalize Log (finalized by Org Owner)
-  const billFinalizeLog = ownerLogs.items.find((l) => l.action === "bill.finalize" && (l.entityId === billId || (l.targets && l.targets.some((t) => t.id === billId))));
+  const billFinalizeLog = ownerLogs.items.find((l) => (l.action === "bill.finalize" || l.action === "sale.finalize") && (l.entityId === billId || (l.targets && l.targets.some((t) => t.id === billId))));
   assert.ok(billFinalizeLog, `Must record 'bill.finalize' action for bill ${billId}`);
   assert.equal(billFinalizeLog.actorUid, orgOwner.ownerUserId, "Log must record Org Owner as actor");
+  assert.equal(billFinalizeLog.operation, "status_change", "Operation must be status_change per A-4");
+  assert.equal(billFinalizeLog.statusBefore, "draft", "Status before must be draft per A-5");
+  assert.equal(billFinalizeLog.statusAfter, "active", "Status after must be active per A-5");
   assert.ok(Array.isArray(billFinalizeLog.changes), "Log must record field changes");
   const statusChange = billFinalizeLog.changes.find((c) => c.field === "status");
   if (statusChange) {

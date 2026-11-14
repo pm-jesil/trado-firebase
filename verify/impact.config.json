@@ -106,6 +106,30 @@
     {
       "glob": "functions/scripts/helpers/runtime-callable-traces.jsonl",
       "reason": "legacy append-only trace log of earlier runs; no longer written or read"
+    },
+    {
+      "glob": "scripts/audit/**",
+      "reason": "audit report generators; offline tools producing docs/audit artifacts"
+    },
+    {
+      "glob": "scripts/testing/generate-flows-and-scenarios.js",
+      "reason": "testing flow and scenario catalog generator"
+    },
+    {
+      "glob": "docs/audit/metering-overhead.json",
+      "reason": "output of metering overhead benchmark"
+    },
+    {
+      "glob": "docs/audit/as-found/**",
+      "reason": "frozen as-found snapshot directory; baseline audit evidence"
+    },
+    {
+      "glob": "scripts/docs-attest.js",
+      "reason": "interactive documentation attestation CLI script (npm run docs:attest)"
+    },
+    {
+      "glob": "scripts/generate-flutter-contract.js",
+      "reason": "Flutter contract pack generator (D-35; checked by static:flutter-contract)"
     }
   ],
   "globalInvalidators": [

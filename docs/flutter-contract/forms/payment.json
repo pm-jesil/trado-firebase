@@ -1,0 +1,242 @@
+{
+  "entity": "payment",
+  "label": "Payment",
+  "callables": {
+    "create": "paymentsCreate",
+    "update": "paymentsVoid"
+  },
+  "fields": [
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "direction",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "in",
+        "out"
+      ],
+      "uiHint": "dropdown",
+      "example": "in"
+    },
+    {
+      "path": "partyType",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "customer",
+        "vendor",
+        "employee",
+        "other"
+      ],
+      "uiHint": "dropdown",
+      "example": "customer"
+    },
+    {
+      "path": "partyId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample partyId"
+    },
+    {
+      "path": "partyName",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample partyName"
+    },
+    {
+      "path": "amount",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "method",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "cash",
+        "card",
+        "upi",
+        "bank_transfer",
+        "cheque",
+        "other"
+      ],
+      "uiHint": "dropdown",
+      "example": "cash"
+    },
+    {
+      "path": "referenceId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample referenceId"
+    },
+    {
+      "path": "referenceModel",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {},
+      "enumValues": [
+        "bill",
+        "outflow"
+      ],
+      "uiHint": "dropdown",
+      "example": "bill"
+    },
+    {
+      "path": "notes",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample notes"
+    },
+    {
+      "path": "gateway.externalReference",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample gateway.externalReference"
+    },
+    {
+      "path": "gateway.gatewayProvider",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 50
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample gateway.gatewayProvider"
+    },
+    {
+      "path": "gateway.gatewayStatus",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "initiated",
+        "authorized",
+        "captured",
+        "failed",
+        "refunded"
+      ],
+      "uiHint": "date_picker",
+      "example": "initiated"
+    },
+    {
+      "path": "gateway.cardBrand",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 20
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample gateway.cardBrand"
+    },
+    {
+      "path": "gateway.cardLast4",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "regex"
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample gateway.cardLast4"
+    }
+  ]
+}

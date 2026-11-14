@@ -379,6 +379,13 @@ export interface AuditLogDoc {
   details?: Record<string, unknown>; // reason fields of the request (registry inputFields), redacted
   ops?: { reads: number; writes: number; deletes: number }; // operations of the request at commit
   suppressedSincePrevious?: number; // rate-limited security events folded into this one
+  operation?: "create" | "update" | "delete" | "status_change";
+  statusBefore?: string | null;
+  statusAfter?: string | null;
+  humanLabel?: string | null;
+  amount?: number | null;
+  currency?: string | null;
+  branchId?: string | null;
   expireAt: Timestamp; // TTL (system setting AUDIT_RETENTION_MONTHS, default 24)
 }
 
