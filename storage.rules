@@ -11,19 +11,20 @@ service firebase.storage {
       return isAuthenticated() && request.auth.uid == uid;
     }
     
-    function isValidImage(maxBytes) {
+    function isValidUpload(maxBytes) {
       return request.resource.size > 0
         && request.resource.size <= maxBytes
         && (request.resource.contentType == 'image/jpeg'
             || request.resource.contentType == 'image/png'
-            || request.resource.contentType == 'image/webp');
+            || request.resource.contentType == 'image/webp'
+            || request.resource.contentType == 'application/pdf');
     }
     
     // Client temporary uploads: tmp/{scope}/{uid}/{uploadId}
     // Scope is organizationId or "platform"
     match /tmp/{scope}/{uid}/{uploadId} {
       allow read: if isOwner(uid);
-      allow write: if isOwner(uid) && isValidImage(5 * 1024 * 1024);
+      allow write: if isOwner(uid) && isValidUpload(5 * 1024 * 1024);
     }
     
     // Permanent asset paths are written exclusively by server-side Cloud Functions (Admin SDK)

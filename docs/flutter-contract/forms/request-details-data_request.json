@@ -1,0 +1,58 @@
+{
+  "category": "data_request",
+  "schemaName": "DataRequestDetailsSchema",
+  "fields": [
+    {
+      "path": "type",
+      "type": "enum",
+      "required": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "export",
+        "correction",
+        "deletion"
+      ],
+      "uiHint": "dropdown",
+      "example": "export"
+    },
+    {
+      "path": "scope",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 1000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample scope"
+    },
+    {
+      "path": "reason",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 10,
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample reason"
+    },
+    {
+      "path": "confirmationText",
+      "type": "string",
+      "required": false,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample confirmationText"
+    }
+  ]
+}

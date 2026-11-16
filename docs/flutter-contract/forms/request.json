@@ -1,0 +1,303 @@
+{
+  "entity": "request",
+  "label": "Request / Support Ticket",
+  "callables": {
+    "create": "requestsCreate",
+    "update": "requestsUpdate"
+  },
+  "fields": [
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "audience",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "platform",
+        "organization"
+      ],
+      "uiHint": "dropdown",
+      "example": "platform"
+    },
+    {
+      "path": "category",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "plan_change",
+        "limit_increase",
+        "module_request",
+        "billing_query",
+        "org_profile_change",
+        "ownership_transfer",
+        "bug_report",
+        "data_issue",
+        "feature_request",
+        "improvement",
+        "support_question",
+        "other",
+        "data_request",
+        "security_concern",
+        "access_request"
+      ],
+      "uiHint": "date_picker",
+      "example": "plan_change"
+    },
+    {
+      "path": "title",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 3,
+        "maxLength": 120
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample title"
+    },
+    {
+      "path": "description",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 3,
+        "maxLength": 5000
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample description"
+    },
+    {
+      "path": "details.*",
+      "type": "unknown",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample details.*"
+    },
+    {
+      "path": "priority",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "low",
+        "normal",
+        "high",
+        "urgent"
+      ],
+      "uiHint": "dropdown",
+      "example": "low"
+    },
+    {
+      "path": "severity",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "minor",
+        "major",
+        "critical"
+      ],
+      "uiHint": "dropdown",
+      "example": "minor"
+    },
+    {
+      "path": "relatedEntity.type",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 50
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample relatedEntity.type"
+    },
+    {
+      "path": "relatedEntity.id",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample relatedEntity.id"
+    },
+    {
+      "path": "relatedEntity.label",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 120
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample relatedEntity.label"
+    },
+    {
+      "path": "attachments[].storagePath",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample attachments[].storagePath"
+    },
+    {
+      "path": "attachments[].filename",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 255
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample attachments[].filename"
+    },
+    {
+      "path": "attachments[].mimeType",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "application/pdf"
+      ],
+      "uiHint": "date_picker",
+      "example": "image/jpeg"
+    },
+    {
+      "path": "attachments[].sizeBytes",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": false,
+        "max": 5242880,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": 1
+    },
+    {
+      "path": "attachments[].uploadedAt",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "datetime"
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample attachments[].uploadedAt"
+    },
+    {
+      "path": "labels[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample labels[]"
+    },
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    },
+    {
+      "path": "clientRequestId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample clientRequestId"
+    }
+  ]
+}

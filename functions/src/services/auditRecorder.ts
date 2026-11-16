@@ -32,6 +32,7 @@ export const AUDIT_EXCLUDED_COLLECTIONS: Record<string, string> = {
   idempotencyRecords: "replay cache of the request",
   uniqueKeys: "natural-key lock written with the entity",
   documentCounters: "document-number counter written with the document",
+  counters: "document sequence counters written with the document",
   notificationOutbox: "delivery queue",
   notifications: "message to a user, not business state",
   dailySummaries: "R3 rollup, recomputed by reconcile",
@@ -200,7 +201,7 @@ export function recordCommitEvent(writes: PendingWrite[], append: (path: string,
   const statusBefore = (bData.status || null) as string | null;
 
   // Derive human label (A-7)
-  const humanLabel = ((pData.billNumber || pData.invoiceNumber || pData.number || pData.name || pData.sku || pData.code || bData.billNumber || bData.invoiceNumber || bData.name || null) as string | null);
+  const humanLabel = ((pData.requestNumber || pData.billNumber || pData.invoiceNumber || pData.number || pData.name || pData.sku || pData.code || bData.requestNumber || bData.billNumber || bData.invoiceNumber || bData.name || null) as string | null);
 
   // Derive amount and currency (A-2)
   const amount = ((pData.totalAmount ?? pData.amount ?? pData.totalPaise ?? bData.totalAmount ?? bData.amount ?? null) as number | null);

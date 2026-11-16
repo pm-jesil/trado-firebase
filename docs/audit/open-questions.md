@@ -12,6 +12,18 @@ Questions raised when business semantics require owner clarification. Answered q
 | **Q-6** | Verification enforcement outside agent turns | `OPEN` | Z4 | Tooling & CI | Both Claude hook and pre-commit step |
 | **Q-7** | External rules consolidation | `OPEN` | C.1 | Rules Sync | Request owner to paste any external instructions |
 | **Q-8** | End-to-end user flow catalog confirmation | `OPEN` | T.2, Z-14 | User Flow Testing | Confirm 12 core flows in `docs/testing/flows.md` |
+| **Q-RQ1** | Request audiences (platform vs organization) | `RESOLVED` | RB2, RB3 | Requests Data Model | ACCEPT (both platform and organization audiences) (A-06) |
+| **Q-RQ2** | 15-category taxonomy | `RESOLVED` | RB2, RB3 | Requests Schemas | ACCEPT (15 categories in 7 groups per Appendix A) (A-07) |
+| **Q-RQ3** | Two-step apply for approved changes | `RESOLVED` | RB4 | Requests Apply Logic | ACCEPT (approved -> applied 2nd step) (A-08) |
+| **Q-RQ4** | Tenant plan prices visibility | `RESOLVED` | RB3, RB6 | Plan Catalog | ACCEPT (show prices only if `showPriceToTenants` true) (A-09) |
+| **Q-RQ5** | SLA targets & pause states | `RESOLVED` | RB4, RB5 | SLA Engine | ACCEPT (calendar hours IST, paused in needs_info/on_hold) (A-10) |
+| **Q-RQ6** | Attachment types and limits | `RESOLVED` | RB2, RB3 | Storage & Attachments | ACCEPT (images + PDF, max 5 per request, 5MB each) (A-11) |
+| **Q-RQ8** | Request retention policy | `RESOLVED` | RB5 | Lifecycle & Retention | ACCEPT (5 years post-closure) (A-12) |
+| **Q-RQ9** | Platform request handling roles | `RESOLVED` | RB4 | Platform Inbox & RBAC | ACCEPT (Super Admin only now, support agent designed) (A-13) |
+| **Q-RQ10** | Request rate and volume limits | `RESOLVED` | RB3 | Abuse Prevention | ACCEPT (10 open/user, 50/org, 10/hr, 1 plan_change/org) (A-14) |
+| **Q-RQ11** | Bug report diagnostics opt-in | `RESOLVED` | RB3 | Bug Reports | ACCEPT (diagnostics require explicit user opt-in) (A-15) |
+| **Q-RQ12** | Existing orgs permission migration | `RESOLVED` | RB6 | Database Migration | ACCEPT (idempotent migration to system roles) (A-16) |
+| **Q-RQ13** | Dark launch feature flag | `RESOLVED` | RB3, RB4 | Feature Gate | ACCEPT (`requestsEnabled = false` default) (A-17) |
 
 ---
 

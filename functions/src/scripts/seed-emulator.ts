@@ -199,6 +199,29 @@ export async function seedReferenceData(db: Firestore): Promise<void> {
     });
   }
   console.log(`✓ Seeded ${DEFAULT_JOB_ROLES.length} default job roles.`);
+
+  // 1g. Platform Settings for Requests Module (Prompt 74)
+  await db.collection("platformSettings").doc("requests").set({
+    requestsEnabled: true,
+    sla: {
+      urgent: { firstResponseHours: 1, resolutionHours: 4 },
+      high: { firstResponseHours: 4, resolutionHours: 8 },
+      normal: { firstResponseHours: 8, resolutionHours: 24 },
+      low: { firstResponseHours: 24, resolutionHours: 72 },
+    },
+    limits: {
+      maxOpenPerUser: 10,
+      maxOpenPerOrg: 50,
+      maxCreationsPerHourPerUser: 10,
+    },
+    autoCloseDays: 7,
+    reopenWindowDays: 30,
+    needsInfoReminderDays: 7,
+    needsInfoAutoCancelDays: 14,
+    updatedAt: new Date().toISOString(),
+    updatedBy: "system",
+  });
+  console.log("✓ Seeded platformSettings/requests.");
 }
 
 // Helper: Ensure or create an Auth user

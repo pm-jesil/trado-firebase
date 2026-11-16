@@ -1,0 +1,9 @@
+# Request Details Schema: `support_question`
+
+**Schema Name:** `SupportQuestionDetailsSchema`  
+**Form Target:** `requestsCreate` / `requestsUpdate` (details payload)
+
+| Field Path | Type | Required | UI Hint | Bounds / Enums | Example |
+|---|---|---|---|---|---|
+| `topic` | `enum` | **Yes** | `dropdown` | Enum: `how_to`, `account`, `billing`, `other` | `how_to` |
+| `question` | `string` | **Yes** | `text` | {"minLength":5,"maxLength":5000} | `Sample question` |

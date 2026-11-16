@@ -1,0 +1,60 @@
+{
+  "category": "billing_query",
+  "schemaName": "BillingQueryDetailsSchema",
+  "fields": [
+    {
+      "path": "subject",
+      "type": "enum",
+      "required": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "invoice",
+        "payment",
+        "charge",
+        "other"
+      ],
+      "uiHint": "dropdown",
+      "example": "invoice"
+    },
+    {
+      "path": "reference",
+      "type": "string",
+      "required": false,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample reference"
+    },
+    {
+      "path": "amount",
+      "type": "number",
+      "required": false,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "description",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 5000
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample description"
+    }
+  ]
+}

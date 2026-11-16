@@ -1,0 +1,8 @@
+# Request Details Schema: `other`
+
+**Schema Name:** `OtherDetailsSchema`  
+**Form Target:** `requestsCreate` / `requestsUpdate` (details payload)
+
+| Field Path | Type | Required | UI Hint | Bounds / Enums | Example |
+|---|---|---|---|---|---|
+| `detailsText` | `string` | **Yes** | `text` | {"minLength":5,"maxLength":5000} | `Sample detailsText` |

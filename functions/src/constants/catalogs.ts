@@ -238,6 +238,12 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
       AppPermissions.TASK_UPDATE,
       AppPermissions.TASK_ASSIGN,
       AppPermissions.LOCATION_VIEW_ALL,
+      AppPermissions.REQUEST_CREATE,
+      AppPermissions.REQUEST_CREATE_SENSITIVE,
+      AppPermissions.REQUEST_READ_OWN,
+      AppPermissions.REQUEST_READ_ORG,
+      AppPermissions.REQUEST_COMMENT,
+      AppPermissions.REQUEST_MANAGE_ORG,
     ],
   },
   {
@@ -249,6 +255,9 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
     permissions: [
       AppPermissions.ORG_VIEW,
       AppPermissions.AUDIT_READ_OWN,
+      AppPermissions.REQUEST_CREATE,
+      AppPermissions.REQUEST_READ_OWN,
+      AppPermissions.REQUEST_COMMENT,
     ],
   },
   {
@@ -273,6 +282,9 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
       AppPermissions.RETURN_CREATE,
       AppPermissions.RETURN_VIEW,
       AppPermissions.NOTIFICATION_VIEW,
+      AppPermissions.REQUEST_CREATE,
+      AppPermissions.REQUEST_READ_OWN,
+      AppPermissions.REQUEST_COMMENT,
     ],
   },
   {
@@ -290,6 +302,9 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
       AppPermissions.TASK_VIEW,
       AppPermissions.TASK_UPDATE,
       AppPermissions.NOTIFICATION_VIEW,
+      AppPermissions.REQUEST_CREATE,
+      AppPermissions.REQUEST_READ_OWN,
+      AppPermissions.REQUEST_COMMENT,
     ],
   },
   {
@@ -309,6 +324,9 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
       AppPermissions.STOCK_VIEW,
       AppPermissions.STOCK_ADJUST,
       AppPermissions.NOTIFICATION_VIEW,
+      AppPermissions.REQUEST_CREATE,
+      AppPermissions.REQUEST_READ_OWN,
+      AppPermissions.REQUEST_COMMENT,
     ],
   },
   {
@@ -363,6 +381,12 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
       AppPermissions.TASK_UPDATE,
       AppPermissions.TASK_ASSIGN,
       AppPermissions.NOTIFICATION_VIEW,
+      AppPermissions.REQUEST_CREATE,
+      AppPermissions.REQUEST_CREATE_SENSITIVE,
+      AppPermissions.REQUEST_READ_OWN,
+      AppPermissions.REQUEST_READ_ORG,
+      AppPermissions.REQUEST_COMMENT,
+      AppPermissions.REQUEST_MANAGE_ORG,
     ],
   },
 ];

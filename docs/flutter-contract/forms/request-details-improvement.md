@@ -1,0 +1,10 @@
+# Request Details Schema: `improvement`
+
+**Schema Name:** `ImprovementDetailsSchema`  
+**Form Target:** `requestsCreate` / `requestsUpdate` (details payload)
+
+| Field Path | Type | Required | UI Hint | Bounds / Enums | Example |
+|---|---|---|---|---|---|
+| `area` | `string` | **Yes** | `text` | {"minLength":2,"maxLength":100} | `Sample area` |
+| `currentBehaviour` | `string` | **Yes** | `text` | {"minLength":5,"maxLength":2000} | `Sample currentBehaviour` |
+| `suggestedBehaviour` | `string` | **Yes** | `text` | {"minLength":5,"maxLength":2000} | `Sample suggestedBehaviour` |

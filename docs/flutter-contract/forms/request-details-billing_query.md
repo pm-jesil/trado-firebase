@@ -1,0 +1,11 @@
+# Request Details Schema: `billing_query`
+
+**Schema Name:** `BillingQueryDetailsSchema`  
+**Form Target:** `requestsCreate` / `requestsUpdate` (details payload)
+
+| Field Path | Type | Required | UI Hint | Bounds / Enums | Example |
+|---|---|---|---|---|---|
+| `subject` | `enum` | **Yes** | `dropdown` | Enum: `invoice`, `payment`, `charge`, `other` | `invoice` |
+| `reference` | `string` | No | `text` | {"maxLength":100} | `Sample reference` |
+| `amount` | `number` | No | `money_paise` | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
+| `description` | `string` | **Yes** | `textarea` | {"minLength":5,"maxLength":5000} | `Sample description` |

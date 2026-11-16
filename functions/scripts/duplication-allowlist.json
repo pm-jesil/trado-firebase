@@ -628,6 +628,73 @@
       "owner": "vendors",
       "reason": "Structured contact persons list capped at 20 by ContactPersonArraySchema in Zod input, keeping the document far below the 1 MiB limit.",
       "cap": 20
+    },
+    {
+      "id": "DUP-074",
+      "kind": "OWNED",
+      "collection": "requests",
+      "field": "requester.roleLabel",
+      "owner": "requests",
+      "reason": "Snapshot of requester role label at creation time for display in ticket header without role hydration."
+    },
+    {
+      "id": "DUP-075",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "requests",
+      "field": "attachments",
+      "owner": "requests",
+      "reason": "Request attachments array capped at 5 in RequestAttachmentSchema, keeping ticket document small.",
+      "cap": 5
+    },
+    {
+      "id": "DUP-076",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "requests",
+      "field": "labels",
+      "owner": "requests",
+      "reason": "Request categorization labels array capped at 10 in CreateRequestSchema.",
+      "cap": 10
+    },
+    {
+      "id": "DUP-077",
+      "kind": "OWNED",
+      "collection": "requests",
+      "field": "organizationName",
+      "owner": "requests",
+      "reason": "Snapshot of organization name at creation time for platform request inbox without cross-tenant joins."
+    },
+    {
+      "id": "DUP-078",
+      "kind": "R4",
+      "collection": "requests",
+      "field": "requestId",
+      "owner": "requests",
+      "reason": "Document self ID stored on ticket record for query filtering and client reference."
+    },
+    {
+      "id": "DUP-079",
+      "kind": "OWNED",
+      "collection": "activity",
+      "field": "author.roleLabel",
+      "owner": "requests",
+      "reason": "Snapshot of author role label at activity creation time for timeline rendering without role hydration."
+    },
+    {
+      "id": "DUP-080",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "activity",
+      "field": "attachments",
+      "owner": "requests",
+      "reason": "Activity comment attachments array capped at 5 in RequestAttachmentSchema.",
+      "cap": 5
+    },
+    {
+      "id": "DUP-081",
+      "kind": "R4",
+      "collection": "activity",
+      "field": "activityId",
+      "owner": "requests",
+      "reason": "Document self ID stored on timeline entry record for client reference and deduplication."
     }
   ]
 }

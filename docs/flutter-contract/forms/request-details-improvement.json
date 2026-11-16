@@ -1,0 +1,45 @@
+{
+  "category": "improvement",
+  "schemaName": "ImprovementDetailsSchema",
+  "fields": [
+    {
+      "path": "area",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample area"
+    },
+    {
+      "path": "currentBehaviour",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample currentBehaviour"
+    },
+    {
+      "path": "suggestedBehaviour",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample suggestedBehaviour"
+    }
+  ]
+}

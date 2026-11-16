@@ -1,0 +1,34 @@
+{
+  "category": "support_question",
+  "schemaName": "SupportQuestionDetailsSchema",
+  "fields": [
+    {
+      "path": "topic",
+      "type": "enum",
+      "required": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "how_to",
+        "account",
+        "billing",
+        "other"
+      ],
+      "uiHint": "dropdown",
+      "example": "how_to"
+    },
+    {
+      "path": "question",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 5000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample question"
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "category": "bug_report",
+  "schemaName": "BugReportDetailsSchema",
+  "fields": [
+    {
+      "path": "area",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample area"
+    },
+    {
+      "path": "stepsToReproduce",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 5000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample stepsToReproduce"
+    },
+    {
+      "path": "expected",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample expected"
+    },
+    {
+      "path": "actual",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample actual"
+    },
+    {
+      "path": "severity",
+      "type": "enum",
+      "required": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "minor",
+        "major",
+        "critical"
+      ],
+      "uiHint": "dropdown",
+      "example": "minor"
+    },
+    {
+      "path": "frequency",
+      "type": "enum",
+      "required": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "always",
+        "often",
+        "sometimes",
+        "once"
+      ],
+      "uiHint": "dropdown",
+      "example": "always"
+    },
+    {
+      "path": "diagnosticsOptIn",
+      "type": "boolean",
+      "required": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "diagnostics.*",
+      "type": "unknown",
+      "required": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample diagnostics.*"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
-# Trado Architectural Decision Register (D-1 .. D-35)
+# Trado Architectural Decision Register (D-1 .. D-45)
 
-Generated at: 2026-11-14T05:30:00.000Z  
-Total decisions: **35** (All Active)  
+Generated at: 2026-11-15T12:20:00.000Z  
+Total decisions: **45** (All Active)  
 
 | ID | Title | Prompt | Status | Enforced By | Description |
 |---|---|---|---|---|---|
@@ -40,6 +40,16 @@ Total decisions: **35** (All Active)
 | **D-33** | **Single Canonical Rule File** | 67 | `active` | `scripts/check-rules-sync.js` | AGENTS.md is the single authoritative rule file; CLAUDE.md is a thin adapter referencing it. |
 | **D-34** | **A Zero is a Claim** | 68 | `active` | `scripts/check-rules-sync.js` | Every "0 findings / violations" result must report examined count, counted D-17 exclusions with reasons, and the seeded defect proving the check can fail; otherwise UNVERIFIED. |
 | **D-35** | **Flutter Contract Generated** | 69 | `active` | `scripts/check-flutter-contract.js` | The Flutter contract is generated, never hand-written, from schemas, registry, and catalogs; freshness enforced by coupling guard and emulator execution. |
+| **D-36** | **Platform-Domain Request Exemption** | 74 | `active` | `functions/src/services/contextResolver.ts` | A request is a platform-domain document, not tenant data: Super Admin may transition it despite SUPER_ADMIN_TENANT_FORBIDDEN gate rule. |
+| **D-37** | **Atomic State Machine (Compare-and-Set)** | 74 | `active` | `functions/src/services/requestsService.ts` | One state machine, two kinds (approval/work). Every transition is compare-and-set on expectedStatus; single entry point requestsTransition. |
+| **D-38** | **Internal Notes Never Leave Platform** | 74 | `active` | `functions/src/services/requestsService.ts` | Internal notes (visibility: internal) are stripped by the data access layer for all tenant read paths. |
+| **D-39** | **Shared Internal Service for Apply** | 74 | `active` | `functions/src/callables/requests.ts` | Apply invokes shared internal domain functions in one commit with request status change and audit entry; never a callable calling a callable. |
+| **D-40** | **Two Histories, One Commit** | 74 | `active` | `functions/src/services/auditRecorder.ts` | User-visible timeline (requests/{id}/activity) and canonical audit entry (auditLogs) are both committed in the same database commit. |
+| **D-41** | **Static Category Detail Schemas** | 74 | `active` | `functions/src/validation/schemas.ts` | Request categories and detail schemas are static code exported to Flutter contract pack; no dynamic server-driven forms. |
+| **D-42** | **Deterministic SLA Clock with Pauses** | 74 | `active` | `functions/src/services/requestsService.ts` | SLA clock pauses in needs_info and on_hold; arithmetic calculated via injected Clock interface for test repeatability. |
+| **D-43** | **One Open Plan Change per Tenant** | 74 | `active` | `functions/src/services/requestsService.ts` | An organization may have at most one open plan_change request; duplicates fail with REQUEST_DUPLICATE_OPEN. |
+| **D-44** | **Server-Computed Blocker Guards** | 74 | `active` | `functions/src/services/requestsService.ts` | Plan-change apply is guarded by server-computed blockers (usage, branches, staff, modules); override requires explicit permission and reason. |
+| **D-45** | **Idempotent Notification Dispatch** | 74 | `active` | `functions/src/triggers/eventTriggers.ts` | Trigger dispatch writes delivery marker keyed by event ID in same transaction, guaranteeing at-most-once delivery under retry. |
 
 ## Answered Business Decisions (A-n)
 
@@ -48,3 +58,17 @@ Total decisions: **35** (All Active)
 | **A-01** | Operations limits support both `warn_only` and `hard_block` modes with distinct error codes. | 2026-11-13 | `usageMetering.ts` |
 | **A-02** | `audit:read_own` restricts queries strictly to `actorUid == callerUid` with `ownActivityOnly: true`. | 2026-11-13 | `history.ts` |
 | **A-03** | `AGENTS.md` is canonical for all tools; `CLAUDE.md` contains `@AGENTS.md` thin adapter. | 2026-11-14 | `AGENTS.md` |
+| **A-04** | Super-Admin-only organization fields for `org_profile_change`: `name`, `businessType`, `businessCategory`, `financialYearStartMonth`, `moduleToggles`, `salesChannels`, `timezone`, `showCostToTenant` (derived from `ORGANIZATION_FIELD_POLICY` in `functions/src/callables/organizations.ts:65-76`). | 2026-11-15 | `schemas.ts`, `requests.ts` |
+| **A-05** | Notification mechanism: In-app timeline (`requests/{id}/activity`), unread indicators, in-app notification records (`notifications` collection), and FCM push via existing `notificationService`. No external email service exists; email integration deferred until owner provisions a provider. | 2026-11-15 | `eventTriggers.ts`, `notificationService.ts` |
+| **A-06** | Request audiences: Both `platform` (handled by Super Admin) and `organization` (handled by tenant Owner/Manager) audiences supported in single `requests` collection. | 2026-11-15 | `models.ts`, `schemas.ts`, `requests.ts` |
+| **A-07** | Taxonomy: 15 categories across 7 groups with designated approval/work kinds per Appendix A. | 2026-11-15 | `models.ts`, `schemas.ts` |
+| **A-08** | Apply model: Explicit 2nd step (`approved -> applied`) for automated categories (`plan_change`, `limit_increase`, `module_request`); manual apply record for other approvals. | 2026-11-15 | `requests.ts`, `requestsService.ts` |
+| **A-09** | Plan price visibility: Plan prices hidden from tenant catalog unless `showPriceToTenants === true` on plan record. | 2026-11-15 | `plans.ts`, `schemas.ts` |
+| **A-10** | SLA targets: Appendix C calendar hours (IST), clock paused in `needs_info` and `on_hold`. | 2026-11-15 | `requestsService.ts`, `scheduled.ts` |
+| **A-11** | Attachments: Images (JPEG, PNG, WebP) and PDF, up to 5 per request, max 5 MB each. | 2026-11-15 | `storage.rules`, `schemas.ts` |
+| **A-12** | Request retention: 5 years post closure, no client hard-delete callable. | 2026-11-15 | `requestsService.ts` |
+| **A-13** | Platform handlers: Super Admin handles platform requests in v1; support agent permissions separated but role unseeded. | 2026-11-15 | `permissions.ts`, `catalogs.ts` |
+| **A-14** | Volume limits: 10 open/user, 50/org, 10/user/hr, 1 open plan_change/org enforced in transaction. | 2026-11-15 | `requestsService.ts` |
+| **A-15** | Bug report diagnostics: Strictly opt-in (`diagnosticsOptIn: true`) without payloads or PII. | 2026-11-15 | `schemas.ts` |
+| **A-16** | Role migration: Idempotent script with `--dry-run` default updating system roles in `roles` collection. | 2026-11-15 | `migrate-requests-permissions.ts` |
+| **A-17** | Dark launch: `platformSettings/requests.requestsEnabled` defaults to `false`; callables return `FEATURE_DISABLED` while off. | 2026-11-15 | `requests.ts`, `requestsService.ts` |

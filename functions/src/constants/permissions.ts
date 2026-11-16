@@ -19,6 +19,12 @@ export const AppPermissions = {
   PLATFORM_USERS_VIEW: "platform:users:view",
   PLATFORM_USERS_MANAGE: "platform:users:manage",
   PLATFORM_AUDIT_VIEW: "platform:audit:view",
+  PLATFORM_REQUESTS_READ: "platform:requests_read",
+  PLATFORM_REQUESTS_MANAGE: "platform:requests_manage",
+  PLATFORM_REQUESTS_APPLY: "platform:requests_apply",
+  PLATFORM_REQUESTS_INTERNAL_NOTES: "platform:requests_internal_notes",
+  PLATFORM_REQUESTS_OVERRIDE_BLOCKERS: "platform:requests_override_blockers",
+  PLATFORM_REQUESTS_CONFIGURE: "platform:requests_configure",
 
   // Organization Level
   ORG_VIEW: "org:view",
@@ -162,6 +168,14 @@ export const AppPermissions = {
 
   // Notifications
   NOTIFICATION_VIEW: "notification:view",
+
+  // Requests & Support Desk
+  REQUEST_CREATE: "requests:create",
+  REQUEST_CREATE_SENSITIVE: "requests:create_sensitive",
+  REQUEST_READ_OWN: "requests:read_own",
+  REQUEST_READ_ORG: "requests:read_org",
+  REQUEST_COMMENT: "requests:comment",
+  REQUEST_MANAGE_ORG: "requests:manage_org",
 } as const;
 
 export type PermissionCode = typeof AppPermissions[keyof typeof AppPermissions] | string;

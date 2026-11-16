@@ -1,15 +1,19 @@
 # Trado Engineering Handoff (Appendix E)
 
-- **Date:** 2026-11-14
-- **Last Active Agent:** antigravity (Gemini 2.5 Pro)
-- **Prompt:** 69 (FINAL BACKEND GATE — Close Open Gaps, Verify Activity Log & Usage Limits Against Owner Requirements, Produce Flutter Contract Pack)
-- **Current State:** READY FOR FLUTTER INTEGRATION (EMULATOR-VERIFIED). Fresh trusted baseline `base-d8c4563b` established (`trusted: true`) with 89/89 units passing [cov:89/89] and 0 failures. Backend gate closed and signed off in `docs/audit/flutter-gate.md`. Flutter contract pack generated in `docs/flutter-contract/` (11 core docs, 23 entity forms, 100-line `SUMMARY.md`). Freshness and integrity enforced by `scripts/check-flutter-contract.js` with D-34 self-tests. Total verification units expanded from 86 to 89 with 0 untraced units and 0 unmapped files. Composite indexes for multi-attribute activity logs declared in `firestore.indexes.json` (0 missing). The 22 checks in `test-real-world-scenarios.cjs` and the 37 checks in `test-subscription-limits-and-audit-visibility.cjs` pass [cov:59/59] with exit code 0 against local emulator.
-- **Half-Done Items:** None. Phases G1 through G5 are finished [cov:G1-G5].
-- **Phases Completed in Prompt 69:**
-  - **G1 (Trust Items & Soundness):** Decision D-35 installed in `AGENTS.md` and `decision-register.md`; rules synchronized via `check:rules-sync`; units increased to 89 with closures mapped; 0 untraced units, 0 unmapped files; `test-verify-selftest.cjs` passes 12/12 checks.
-  - **G2 (Activity Log Visibility):** Closed Prompt 69 A-1 through A-12 gaps [cov:12/12]: `models.ts` and `auditRecorder.ts` updated to capture `operation` (`create`, `update`, `delete`, `status_change`), `humanLabel`, `statusBefore`, `statusAfter`, `amount`, `currency`, `branchId`; `history.ts` supports filtering and branch scoping; IP addresses redacted for tenant callers; `generate-audit-registry.js` regenerated 140 audit actions with 10-column table.
-  - **G3 (Subscription Limits & Enforcement):** Daily and monthly limits enforced with `hard_block` rejecting with `USAGE_LIMIT_EXCEEDED` and `warn_only` admitting operations with warnings; rate cards derive cost dynamically at read time (D-22); verified in `test-subscription-limits-and-audit-visibility.cjs`.
-  - **G4 (Flutter Contract Pack):** Generated in `docs/flutter-contract/` via `scripts/generate-flutter-contract.js`: all 23 entity forms (`forms/*.md` and `forms/*.json`), 100-line `SUMMARY.md`, `permissions.md`, `state-machines.md`, `activity-log.md`, `usage-limits.md`, `client-meta-and-idempotency.md`, `responses.md`, `serialization.md`, `errors.md`, `CHANGES.md`, and `README.md`.
-  - **G5 (Backend Gate Sign-Off & Verdict):** Produced `docs/audit/flutter-gate.md` with official verdict: `READY FOR FLUTTER INTEGRATION (EMULATOR-VERIFIED)`.
+- **Date:** 2026-11-15
+- **Last Active Agent:** antigravity (Gemini 3.8 Flash)
+- **Prompt:** 74 (Trado Firebase BACKEND: Requests and Support Desk Module — Plan-Change and Limit Requests, Bug Reports, Feature Requests, Access and Support Requests)
+- **Current State:** ALL PHASES RB0 THROUGH RB8 COMPLETE [cov:RB0-RB8 100%]. All 16 callables, 2 event triggers, 15 category detail schemas, dual state machines (`approval` and `work`), compare-and-set status transitions, deterministic SLA calculations with pause states, automated blocker evaluation, internal note redaction, and idempotent timeline activity notifications are fully implemented and verified.
+- **Half-Done Items:** None. All phases complete, 30/30 unit tests passing, 38/38 scenario assertions passing in local Firebase emulators. Contract pack generated and ready for Prompt 75 (Flutter Implementation).
+- **Phases Completed in Prompt 74:**
+  - **RB0 (As-Found Inventory):** Investigated all 10 areas (A-1 through A-10) with exact `file:line` evidence; produced attested `docs/design/requests-as-found.md`.
+  - **RB1 (Design & Decisions):** Designed 4 collections, 15-category taxonomy across 7 groups, dual state machine (CAS on `expectedStatus`), SLA engine with pauses, blocker evaluation, tenant plan catalog callable, and permissions. Installed decisions D-36..D-45 in `docs/decisions/decision-register.md` and produced attested `docs/plans/2026-11-15-requests-module.md`.
+  - **RB2 (Data Layer):** Implemented enums, permissions, TypeScript models, strict Zod schemas, firestore rules, storage rules, and composite indexes.
+  - **RB3 (Requester Callables):** Implemented 10 requester-facing callables with strict validation and internal note stripping.
+  - **RB4 (Platform Inbox & State Machine):** Implemented 6 platform/handler callables, CAS state machine transitions, internal note management, and automated apply logic.
+  - **RB5 (Triggers & Schedules):** Implemented idempotent `onRequestActivityWritten` timeline trigger and scheduled `requestsSlaAndLifecycleSweep`.
+  - **RB6 (Contract Pack, Seeds, Migration):** Generated Flutter contract forms (`docs/flutter-contract/forms/request-details-*.json/md`), updated state machines, errors, permissions, and summary (102 lines). Updated system role defaults, emulator seed, and migration script (`migrate-requests-permissions.cjs`).
+  - **RB7 (Tests):** Hand-crafted 30 pure-logic unit tests (`requestsSchemasAndSla.test.ts`, `requestsStateMachine.test.ts`) and 12 executable emulator scenario flows (`test-requests-scenarios.cjs`). All 30 unit tests pass (100%), all 12 scenario flows pass (38/38 assertions verified).
+  - **RB8 (Verification Gate & Sign-off):** Static guards verified (0 unregistered duplicates, 0 contract violations, 0 doc truth mismatches, 100% coupled). Created change audit record `docs/audit/changes/run-74.md`.
 - **Next Command to Run:**
-  `npm --prefix functions run verify:status`
+  `npm --prefix functions run verify:plan`

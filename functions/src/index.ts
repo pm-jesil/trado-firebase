@@ -270,6 +270,26 @@ export {
   notificationsMarkRead,
 } from "./callables/notifications.js";
 
+// Requests & Support Desk Module (Prompt 74, D-36..D-45)
+export {
+  requestsMeta,
+  plansCatalogList,
+  requestsCreate,
+  requestsUpdate,
+  requestsAddComment,
+  requestsTransition,
+  requestsGet,
+  requestsList,
+  requestsActivityList,
+  requestsCounts,
+  requestsInboxList,
+  requestsInboxCounts,
+  requestsAssign,
+  requestsSetPriority,
+  requestsAddInternalNote,
+  requestsApply,
+} from "./callables/requests.js";
+
 // Super Admin Usage Metering & Platform Consumption
 export {
   usageGetPlatformSummary,
@@ -288,8 +308,12 @@ export {
   onOutflowWritten,
   onPaymentWritten,
   onDeliveryWritten,
+  onRequestActivityWritten,
 } from "./triggers/eventTriggers.js";
 
 // Scheduled Functions
-export { subscriptionAndUsageSweep } from "./triggers/scheduled.js";
+export {
+  subscriptionAndUsageSweep,
+  requestsSlaAndLifecycleSweep,
+} from "./triggers/scheduled.js";
 

@@ -36,6 +36,7 @@ const REQUIRED_ENTITIES = [
   "category", "unit", "bill", "purchase", "expense", "payment",
   "delivery", "return", "stock_adjustment", "task", "role", "job_role",
   "department", "team", "approval_request", "recurring_expense", "plan",
+  "request",
 ];
 
 function runCheck(isTestMode = false) {

@@ -1,0 +1,65 @@
+{
+  "category": "access_request",
+  "schemaName": "AccessRequestDetailsSchema",
+  "fields": [
+    {
+      "path": "permissionKeys[]",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample permissionKeys[]"
+    },
+    {
+      "path": "roleId",
+      "type": "string",
+      "required": false,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample roleId"
+    },
+    {
+      "path": "branchId",
+      "type": "string",
+      "required": false,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "reason",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample reason"
+    },
+    {
+      "path": "until",
+      "type": "string",
+      "required": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample until"
+    }
+  ]
+}

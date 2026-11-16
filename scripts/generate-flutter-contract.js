@@ -51,6 +51,7 @@ const ENTITY_CONFIG = [
   { name: "approval_request", label: "Approval Request", createCallable: "approvalsDecide", updateCallable: "approvalsList", schemas: ["DecideApprovalSchema"] },
   { name: "recurring_expense", label: "Recurring Expense", createCallable: "recurringExpensesCreate", updateCallable: "recurringExpensesUpdate", schemas: ["CreateRecurringExpenseSchema", "UpdateRecurringExpenseSchema"] },
   { name: "plan", label: "Subscription Plan", createCallable: "plansCreate", updateCallable: "plansUpdate", schemas: ["CreatePlanSchema", "UpdatePlanSchema"] },
+  { name: "request", label: "Request / Support Ticket", createCallable: "requestsCreate", updateCallable: "requestsUpdate", schemas: ["CreateRequestSchema", "UpdateRequestSchema"] },
 ];
 
 console.log("Generating Flutter Contract Pack...");
@@ -139,6 +140,65 @@ for (const ent of ENTITY_CONFIG) {
     "",
   ];
   fs.writeFileSync(path.join(FORMS_DIR, `${ent.name}.md`), mdLines.join("\n"));
+}
+
+// 1b. Generate category details forms for 15 request categories (D-41)
+const CATEGORY_SCHEMAS = {
+  plan_change: "PlanChangeDetailsSchema",
+  limit_increase: "LimitIncreaseDetailsSchema",
+  module_request: "ModuleRequestDetailsSchema",
+  org_profile_change: "OrgProfileChangeDetailsSchema",
+  ownership_transfer: "OwnershipTransferDetailsSchema",
+  data_request: "DataRequestDetailsSchema",
+  access_request: "AccessRequestDetailsSchema",
+  billing_query: "BillingQueryDetailsSchema",
+  bug_report: "BugReportDetailsSchema",
+  data_issue: "DataIssueDetailsSchema",
+  feature_request: "FeatureRequestDetailsSchema",
+  improvement: "ImprovementDetailsSchema",
+  support_question: "SupportQuestionDetailsSchema",
+  other: "OtherDetailsSchema",
+  security_concern: "SecurityConcernDetailsSchema",
+};
+
+for (const [category, schemaName] of Object.entries(CATEGORY_SCHEMAS)) {
+  const schema = schemas[schemaName] || { leaves: [] };
+  const fields = schema.leaves.map((leaf) => {
+    const hint = uiHint(leaf.path, leaf.type, leaf.bounds);
+    return {
+      path: leaf.path,
+      type: leaf.type,
+      required: leaf.required,
+      nullable: leaf.nullable,
+      bounds: leaf.bounds || {},
+      enumValues: leaf.enumValues || [],
+      uiHint: hint,
+      example: leaf.type === "number" ? (hint === "money_paise" ? 2500 : 1) : leaf.type === "boolean" ? true : leaf.type === "enum" ? (leaf.enumValues[0] || "active") : `Sample ${leaf.path}`,
+    };
+  });
+
+  const jsonContent = {
+    category,
+    schemaName,
+    fields,
+  };
+  fs.writeFileSync(path.join(FORMS_DIR, `request-details-${category}.json`), JSON.stringify(jsonContent, null, 2));
+
+  const mdLines = [
+    `# Request Details Schema: \`${category}\``,
+    "",
+    `**Schema Name:** \`${schemaName}\`  `,
+    `**Form Target:** \`requestsCreate\` / \`requestsUpdate\` (details payload)`,
+    "",
+    `| Field Path | Type | Required | UI Hint | Bounds / Enums | Example |`,
+    `|---|---|---|---|---|---|`,
+    ...fields.map((f) => {
+      const boundsStr = f.enumValues?.length ? `Enum: \`${f.enumValues.join("`, `")}\`` : f.bounds ? JSON.stringify(f.bounds) : "—";
+      return `| \`${f.path}\` | \`${f.type}\` | ${f.required ? "**Yes**" : "No"} | \`${f.uiHint}\` | ${boundsStr} | \`${f.example}\` |`;
+    }),
+    "",
+  ];
+  fs.writeFileSync(path.join(FORMS_DIR, `request-details-${category}.md`), mdLines.join("\n"));
 }
 
 // 2. F-1: README.md
@@ -265,6 +325,22 @@ When a callable fails, the Firebase SDK throws a \`FirebaseFunctionsException\`.
 | \`STALE_WRITE\` | \`aborted\` | Optimistic concurrency conflict | Yes | Reload document and retry mutation |
 | \`INVALID_ARGUMENT\` | \`invalid-argument\` | Schema validation failure | No | Show field-level form validation error |
 | \`UNKNOWN_FIELD\` | \`invalid-argument\` | Client sent unrecognized schema attribute | No | Ensure client payload matches contract |
+| \`FEATURE_DISABLED\` | \`failed-precondition\` | Feature toggle is disabled globally or for tenant | No | Show feature unavailable notice |
+| \`REQUEST_NOT_FOUND\` | \`not-found\` | Request ID does not exist or access denied | No | Show request not found |
+| \`REQUEST_CATEGORY_FORBIDDEN\` | \`permission-denied\` | Caller lacks permission for category (e.g. sensitive) | No | Restrict category in UI |
+| \`REQUEST_DETAILS_INVALID\` | \`invalid-argument\` | Request detail payload failed category schema | No | Show field validation error |
+| \`REQUEST_INVALID_TRANSITION\` | \`failed-precondition\` | Action not permitted from current status | No | Refresh status and update actions |
+| \`REQUEST_STALE_STATUS\` | \`aborted\` | Optimistic concurrency conflict on expectedStatus/version | Yes | Refresh request and prompt retry |
+| \`REQUEST_DUPLICATE_OPEN\` | \`already-exists\` | Organization already has an open plan_change request | No | Guide user to existing open request |
+| \`REQUEST_LIMIT_REACHED\` | \`resource-exhausted\` | Open request volume limit reached (user: 10, org: 50) | No | Prompt user to resolve existing requests |
+| \`REQUEST_RATE_LIMITED\` | \`resource-exhausted\` | Hourly creation limit reached (10 requests/hour) | Yes | Display cooldown message |
+| \`REQUEST_ATTACHMENT_INVALID\` | \`invalid-argument\` | Attachment exceeds size/count limit or invalid mime | No | Validate files before upload |
+| \`REQUEST_NOT_APPROVED\` | \`failed-precondition\` | Cannot apply request that is not in approved status | No | Ensure request is approved first |
+| \`REQUEST_ALREADY_APPLIED\` | \`failed-precondition\` | Request has already been applied | No | Show already applied message |
+| \`REQUEST_APPLY_BLOCKED\` | \`failed-precondition\` | Target plan capacity exceeded by current usage/resources | No | Show blocker items and override option |
+| \`REQUEST_PLAN_UNAVAILABLE\` | \`not-found\` | Target plan does not exist or is inactive | No | Prompt user to choose available plan |
+| \`REQUEST_REOPEN_WINDOW_CLOSED\` | \`failed-precondition\` | Reopen window (30 days post-resolution) has elapsed | No | Prompt user to open a new request |
+| \`REQUEST_ASSIGNEE_INVALID\` | \`invalid-argument\` | Assigned user is not a valid platform operator | No | Select valid assignee from list |
 `;
 fs.writeFileSync(path.join(OUT_DIR, "errors.md"), errorsMd);
 
@@ -307,6 +383,8 @@ Derived directly from backend transaction validators.
 | **task** | \`todo\` | \`todo\` → \`in_progress\`<br>\`in_progress\` → \`completed\` / \`cancelled\` | \`completed\`, \`cancelled\` | \`tasksCreate\`, \`tasksUpdateStatus\` |
 | **membership** | \`active\` | \`active\` → \`deactivated\` | \`deactivated\` | \`employeesDeactivate\` |
 | **organization** | \`active\` | \`active\` → \`deactivated\` → \`reactivated\` / \`suspended\` | \`suspended\` | \`organizationsDeactivate\`, \`organizationsReactivate\` |
+| **request-approval** | \`submitted\` | \`submitted\` → \`in_review\`, \`needs_info\`, \`on_hold\`, \`approved\`, \`rejected\`, \`cancelled\`<br>\`in_review\` → \`needs_info\`, \`on_hold\`, \`approved\`, \`rejected\`, \`cancelled\`<br>\`needs_info\` → \`in_review\`, \`cancelled\`<br>\`on_hold\` → \`in_review\`, \`cancelled\`<br>\`approved\` → \`applied\` | \`rejected\`, \`applied\`, \`cancelled\` | \`requestsCreate\`, \`requestsTransition\`, \`requestsApply\` |
+| **request-work** | \`submitted\` | \`submitted\` → \`in_review\`, \`in_progress\`, \`needs_info\`, \`on_hold\`, \`resolved\`, \`declined\`, \`cancelled\`<br>\`in_review\` → \`in_progress\`, \`needs_info\`, \`on_hold\`, \`resolved\`, \`declined\`, \`cancelled\`<br>\`in_progress\` → \`needs_info\`, \`on_hold\`, \`resolved\`, \`declined\`, \`cancelled\`<br>\`needs_info\` → \`in_review\`, \`cancelled\`<br>\`on_hold\` → \`in_review\`, \`cancelled\`<br>\`resolved\` → \`closed\`, \`in_review\`<br>\`closed\` → \`in_review\` | \`declined\`, \`closed\`, \`cancelled\` | \`requestsCreate\`, \`requestsTransition\` |
 `;
 fs.writeFileSync(path.join(OUT_DIR, "state-machines.md"), stateMachinesMd);
 
@@ -435,6 +513,14 @@ const changesMd = `# Backend Contract Changes (Prompts 60–69)
    - Activity log rows now return explicit \`operation\` (\`create\`, \`update\`, \`delete\`, \`status_change\`), \`humanLabel\`, \`statusBefore\`, and \`statusAfter\`.
 5. **Subscription Limits & Quota Warnings (Prompt 69 G3):**
    - Support for \`hard_block\` and \`warn_only\` policies with \`USAGE_LIMIT_EXCEEDED\` stable reason.
+6. **Requests & Support Desk Module (Prompt 74, D-36..D-45):**
+   - 15 request categories across 7 groups with designated approval/work state machines.
+   - 16 new Cloud Function callables across requester operations and platform Super Admin inbox.
+   - Atomic state transitions (\`requestsTransition\`) with compare-and-set on \`expectedStatus\`.
+   - Internal notes strictly stripped for tenant audience (\`visibility: "internal"\`).
+   - Automated plan change apply engine with usage/branch/user blocker evaluation.
+   - Event trigger \`onRequestActivityWritten\` with idempotent notification dispatch.
+   - Scheduled SLA and lifecycle sweep (\`requestsSlaAndLifecycleSweep\`).
 `;
 fs.writeFileSync(path.join(OUT_DIR, "CHANGES.md"), changesMd);
 
@@ -466,6 +552,7 @@ summaryLines.push(
   "- **delivery:** `pending` → `assigned` → `in_transit` → `delivered` / `failed` / `cancelled`",
   "- **return:** `pending` → `completed` / `rejected`",
   "- **task:** `todo` → `in_progress` → `completed` / `cancelled`",
+  "- **request:** `submitted` → `in_review` → `approved` → `applied` (approval) / `submitted` → `in_progress` → `resolved` → `closed` (work)",
   "",
   "## 4. Activity Logs (`auditLogsList`)",
   "- **Filters:** `actorUserId`, `entityType`, `entityId`, `operation`, `status`, `branchId`, `from`, `to`, `limit`, `cursor`.",

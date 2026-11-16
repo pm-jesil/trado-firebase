@@ -1,0 +1,79 @@
+{
+  "category": "feature_request",
+  "schemaName": "FeatureRequestDetailsSchema",
+  "fields": [
+    {
+      "path": "problem",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 10,
+        "maxLength": 5000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample problem"
+    },
+    {
+      "path": "businessImpact",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 10,
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample businessImpact"
+    },
+    {
+      "path": "area",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample area"
+    },
+    {
+      "path": "proposedSolution",
+      "type": "string",
+      "required": false,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 5000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample proposedSolution"
+    },
+    {
+      "path": "neededBy",
+      "type": "string",
+      "required": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample neededBy"
+    },
+    {
+      "path": "alternatives",
+      "type": "string",
+      "required": false,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample alternatives"
+    }
+  ]
+}

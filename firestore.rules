@@ -70,6 +70,20 @@ service cloud.firestore {
       allow read: if catalog in ['categories', 'units'] && isGlobalCatalog();
     }
 
+    // --- Requests & Platform Governance (Callable-only, D-36..D-45) ---
+    match /requests/{requestId} {
+      allow read, write: if false;
+      match /activity/{activityId} {
+        allow read, write: if false;
+      }
+    }
+    match /counters/{counterId} {
+      allow read, write: if false;
+    }
+    match /platformSettings/{settingId} {
+      allow read, write: if false;
+    }
+
     // --- Everything else is callable-only (No direct client access) ---
     match /{document=**} {
       allow read, write: if false;

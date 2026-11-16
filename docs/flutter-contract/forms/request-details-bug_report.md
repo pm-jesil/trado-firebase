@@ -1,0 +1,15 @@
+# Request Details Schema: `bug_report`
+
+**Schema Name:** `BugReportDetailsSchema`  
+**Form Target:** `requestsCreate` / `requestsUpdate` (details payload)
+
+| Field Path | Type | Required | UI Hint | Bounds / Enums | Example |
+|---|---|---|---|---|---|
+| `area` | `string` | **Yes** | `text` | {"minLength":2,"maxLength":100} | `Sample area` |
+| `stepsToReproduce` | `string` | **Yes** | `text` | {"minLength":5,"maxLength":5000} | `Sample stepsToReproduce` |
+| `expected` | `string` | **Yes** | `text` | {"minLength":2,"maxLength":2000} | `Sample expected` |
+| `actual` | `string` | **Yes** | `text` | {"minLength":2,"maxLength":2000} | `Sample actual` |
+| `severity` | `enum` | **Yes** | `dropdown` | Enum: `minor`, `major`, `critical` | `minor` |
+| `frequency` | `enum` | No | `dropdown` | Enum: `always`, `often`, `sometimes`, `once` | `always` |
+| `diagnosticsOptIn` | `boolean` | No | `switch` | {} | `true` |
+| `diagnostics.*` | `unknown` | **Yes** | `text` | {} | `Sample diagnostics.*` |

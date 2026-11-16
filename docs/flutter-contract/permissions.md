@@ -1,6 +1,6 @@
 # Permission Catalog & UI Gating
 
-Total permissions: **117**
+Total permissions: **129**
 
 ## Permission Key Directory
 | Permission Constant | Wire Key | Category |
@@ -17,6 +17,12 @@ Total permissions: **117**
 | `PLATFORM_USERS_VIEW` | `platform:users:view` | `platform` |
 | `PLATFORM_USERS_MANAGE` | `platform:users:manage` | `platform` |
 | `PLATFORM_AUDIT_VIEW` | `platform:audit:view` | `platform` |
+| `PLATFORM_REQUESTS_READ` | `platform:requests_read` | `platform` |
+| `PLATFORM_REQUESTS_MANAGE` | `platform:requests_manage` | `platform` |
+| `PLATFORM_REQUESTS_APPLY` | `platform:requests_apply` | `platform` |
+| `PLATFORM_REQUESTS_INTERNAL_NOTES` | `platform:requests_internal_notes` | `platform` |
+| `PLATFORM_REQUESTS_OVERRIDE_BLOCKERS` | `platform:requests_override_blockers` | `platform` |
+| `PLATFORM_REQUESTS_CONFIGURE` | `platform:requests_configure` | `platform` |
 | `ORG_VIEW` | `org:view` | `org` |
 | `ORG_UPDATE` | `org:update` | `org` |
 | `ORG_SETTINGS` | `org:settings` | `org` |
@@ -122,6 +128,12 @@ Total permissions: **117**
 | `LOCATION_VIEW_ALL` | `location:view_all` | `location` |
 | `LOCATION_MANAGE` | `location:manage` | `location` |
 | `NOTIFICATION_VIEW` | `notification:view` | `notification` |
+| `REQUEST_CREATE` | `requests:create` | `requests` |
+| `REQUEST_CREATE_SENSITIVE` | `requests:create_sensitive` | `requests` |
+| `REQUEST_READ_OWN` | `requests:read_own` | `requests` |
+| `REQUEST_READ_ORG` | `requests:read_org` | `requests` |
+| `REQUEST_COMMENT` | `requests:comment` | `requests` |
+| `REQUEST_MANAGE_ORG` | `requests:manage_org` | `requests` |
 
 ## UI Gating in Flutter
 Every client session receives effective permissions inside the `authMe` bootstrap payload.

@@ -1,0 +1,69 @@
+{
+  "category": "limit_increase",
+  "schemaName": "LimitIncreaseDetailsSchema",
+  "fields": [
+    {
+      "path": "metric",
+      "type": "enum",
+      "required": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "firestoreReads",
+        "firestoreWrites",
+        "firestoreDeletes",
+        "functionsInvocations",
+        "functionsErrors",
+        "functionsExecutionMs",
+        "storageUploadBytes",
+        "storageDownloadBytes",
+        "storageOperations",
+        "authOperations",
+        "fcmDispatches",
+        "locationPings"
+      ],
+      "uiHint": "dropdown",
+      "example": "firestoreReads"
+    },
+    {
+      "path": "period",
+      "type": "enum",
+      "required": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "daily",
+        "monthly"
+      ],
+      "uiHint": "dropdown",
+      "example": "daily"
+    },
+    {
+      "path": "requestedLimit",
+      "type": "number",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "reason",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample reason"
+    }
+  ]
+}

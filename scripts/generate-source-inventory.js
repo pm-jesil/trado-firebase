@@ -76,6 +76,12 @@ const CLASSIFICATION_DEFINITIONS = {
       "usageCalculateDryRunStatement",
       "usageUpdateLimits",
       "organizationsSetSubscription",
+      "requestsInboxList",
+      "requestsInboxCounts",
+      "requestsAssign",
+      "requestsSetPriority",
+      "requestsAddInternalNote",
+      "requestsApply",
     ],
   },
   REFERENCE_DATA: {
@@ -148,6 +154,12 @@ const CLASSIFICATION_DEFINITIONS = {
         "imagesAttach",
         "imagesRemove",
       ],
+      "Requests & Support Desk": [
+        "requestsCreate",
+        "requestsUpdate",
+        "requestsAddComment",
+        "requestsTransition",
+      ],
     },
   },
   FILTER_OPTIONAL_TENANT: {
@@ -185,6 +197,12 @@ const CLASSIFICATION_DEFINITIONS = {
         "productsGetPriceHistory",
         "auditGetEntityHistory",
         "recurringExpensesList",
+        "plansCatalogList",
+        "requestsGet",
+        "requestsList",
+        "requestsActivityList",
+        "requestsCounts",
+        "requestsMeta",
       ],
       "Reports & Telemetry": [
         "reportsGetRevenue",
@@ -278,6 +296,30 @@ const TRIGGER_DEFINITIONS = [
     ],
     idempotency: "Every notification guarded by reserveIdempotency (scheduled.notify); safe to re-run",
   },
+  {
+    name: "onRequestActivityWritten",
+    documentPath: "requests/{requestId}/activity/{activityId}",
+    region: "asia-south1",
+    eventType: "onDocumentWritten",
+    sideEffects: [
+      "Detects public activity (comments, status changes) on requests",
+      "Dispatches request_updated notification to requester or assignee",
+      "Idempotent delivery marker keyed by event.id (D-45)",
+    ],
+    idempotency: "Guaranteed by reserveIdempotency in idempotencyRecords",
+  },
+  {
+    name: "requestsSlaAndLifecycleSweep",
+    documentPath: "(scheduled: every 15 minutes Asia/Kolkata)",
+    region: "asia-south1",
+    eventType: "onSchedule",
+    sideEffects: [
+      "Evaluates SLA status (at_risk, breached) for open requests",
+      "Auto-closes requests resolved for >= 7 days",
+      "Auto-cancels requests in needs_info for >= 14 days",
+    ],
+    idempotency: "Status guards and activity stamps; safe on rerun",
+  },
 ];
 
 // Concrete Firestore collections — DERIVED from the source (every db.collection("…") /
@@ -332,7 +374,11 @@ const COLLECTION_DOMAINS = {
   "serials": "Catalog & Inventory",
   "stockAdjustmentRequests": "Catalog & Inventory",
   "recurringExpenses": "Operations & Transactions",
-  "imageUploadSessions": "System Infrastructure"
+  "imageUploadSessions": "System Infrastructure",
+  "requests": "Support & Requests Desk",
+  "requests/activity": "Support & Requests Desk",
+  "counters": "System Infrastructure",
+  "platformSettings": "System Infrastructure",
 };
 
 function deriveCollections() {
@@ -349,10 +395,15 @@ function deriveCollections() {
   walk(path.join(ROOT, "functions/src"));
   const out = [];
   for (const name of Array.from(names).sort()) {
-    const key = name === "branches" ? "organizations/branches" : name === "devices" ? "users/devices" : name;
+    const key = name === "branches" ? "organizations/branches"
+      : name === "devices" ? "users/devices"
+      : name === "activity" ? "requests/activity"
+      : name;
     if (!COLLECTION_DOMAINS[key]) throw new Error(`Collection "${key}" used in source has no domain label in COLLECTION_DOMAINS`);
     const pathTpl = key === "organizations/branches" ? "organizations/{organizationId}/branches/{branchId}"
-      : key === "users/devices" ? "users/{uid}/devices/{deviceId}" : `${key}/{id}`;
+      : key === "users/devices" ? "users/{uid}/devices/{deviceId}"
+      : key === "requests/activity" ? "requests/{requestId}/activity/{activityId}"
+      : `${key}/{id}`;
     out.push({ path: pathTpl, type: key.includes("/") ? "subcollection" : "root", domain: COLLECTION_DOMAINS[key] });
   }
   return out;

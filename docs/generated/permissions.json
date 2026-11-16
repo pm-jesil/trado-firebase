@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-13T10:04:05.664Z",
-  "totalPermissions": 117,
+  "generatedAt": "2026-11-15T13:00:18.452Z",
+  "totalPermissions": 129,
   "permissions": [
     {
       "name": "ALL",
@@ -104,6 +104,60 @@
     {
       "name": "PLATFORM_AUDIT_VIEW",
       "code": "platform:audit:view",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_REQUESTS_READ",
+      "code": "platform:requests_read",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_REQUESTS_MANAGE",
+      "code": "platform:requests_manage",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_REQUESTS_APPLY",
+      "code": "platform:requests_apply",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_REQUESTS_INTERNAL_NOTES",
+      "code": "platform:requests_internal_notes",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_REQUESTS_OVERRIDE_BLOCKERS",
+      "code": "platform:requests_override_blockers",
+      "module": "platform",
+      "isPlatform": true,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "PLATFORM_REQUESTS_CONFIGURE",
+      "code": "platform:requests_configure",
       "module": "platform",
       "isPlatform": true,
       "allowedRoles": [
@@ -1207,6 +1261,84 @@
         "role_cashier",
         "role_rider",
         "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "REQUEST_CREATE",
+      "code": "requests:create",
+      "module": "requests",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_employee",
+        "role_cashier",
+        "role_rider",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "REQUEST_CREATE_SENSITIVE",
+      "code": "requests:create_sensitive",
+      "module": "requests",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "REQUEST_READ_OWN",
+      "code": "requests:read_own",
+      "module": "requests",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_employee",
+        "role_cashier",
+        "role_rider",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "REQUEST_READ_ORG",
+      "code": "requests:read_org",
+      "module": "requests",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "REQUEST_COMMENT",
+      "code": "requests:comment",
+      "module": "requests",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_employee",
+        "role_cashier",
+        "role_rider",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "REQUEST_MANAGE_ORG",
+      "code": "requests:manage_org",
+      "module": "requests",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
         "role_store_manager"
       ]
     }

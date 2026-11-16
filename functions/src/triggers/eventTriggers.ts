@@ -11,7 +11,8 @@ import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import { db } from "../services/firebase.js";
 import { recordBillSummary, recordOutflowSummary } from "../services/summaryService.js";
 import { createAndDispatchNotification } from "../services/notificationService.js";
-import { BillDoc, OutflowDoc, PaymentDoc, DeliveryDoc, ProductDoc } from "../types/models.js";
+import { reserveIdempotency } from "../services/idempotency.js";
+import { BillDoc, OutflowDoc, PaymentDoc, DeliveryDoc, ProductDoc, RequestDoc, RequestActivityDoc } from "../types/models.js";
 import { withTriggerContext, organizationOfDocumentEvent } from "../services/systemContext.js";
 import { BillStatus, OutflowKind, OutflowStatus, DocumentType } from "../constants/enums.js";
 
@@ -35,71 +36,71 @@ export const onBillWritten = onDocumentWritten(
     if ((isNew && isNowActive) || justFinalized) {
       await recordBillSummary(bill);
 
-        // Check low-stock threshold for items
-        if (Array.isArray(bill.items)) {
-          for (const item of bill.items) {
-            try {
-              const prodRef = db.collection("products").doc(item.productId);
-              const prodSnap = await prodRef.get();
-              if (prodSnap.exists) {
-                const prod = prodSnap.data() as ProductDoc;
-                const threshold = prod.lowStockThreshold ?? 10;
-                if (prod.currentStock <= threshold) {
-                  const orgAdminsSnap = await db
-                    .collection("memberships")
-                    .where("organizationId", "==", bill.organizationId)
-                    .where("isPrimary", "==", true)
-                    .limit(1)
-                    .get();
+      // Check low-stock threshold for items
+      if (Array.isArray(bill.items)) {
+        for (const item of bill.items) {
+          try {
+            const prodRef = db.collection("products").doc(item.productId);
+            const prodSnap = await prodRef.get();
+            if (prodSnap.exists) {
+              const prod = prodSnap.data() as ProductDoc;
+              const threshold = prod.lowStockThreshold ?? 10;
+              if (prod.currentStock <= threshold) {
+                const orgAdminsSnap = await db
+                  .collection("memberships")
+                  .where("organizationId", "==", bill.organizationId)
+                  .where("isPrimary", "==", true)
+                  .limit(1)
+                  .get();
 
-                  if (!orgAdminsSnap.empty) {
-                    const adminData = orgAdminsSnap.docs[0].data();
-                    await createAndDispatchNotification({
-                      organizationId: bill.organizationId,
-                      userId: adminData.userId,
-                      membershipId: orgAdminsSnap.docs[0].id,
-                      type: "low_stock",
-                      title: "Low Stock Alert",
-                      body: `Product "${prod.name}" has reached low stock level (${prod.currentStock} remaining).`,
-                      relatedEntityType: "product",
-                      relatedEntityId: item.productId,
-                    });
-                  }
+                if (!orgAdminsSnap.empty) {
+                  const adminData = orgAdminsSnap.docs[0].data();
+                  await createAndDispatchNotification({
+                    organizationId: bill.organizationId,
+                    userId: adminData.userId,
+                    membershipId: orgAdminsSnap.docs[0].id,
+                    type: "low_stock",
+                    title: "Low Stock Alert",
+                    body: `Product "${prod.name}" has reached low stock level (${prod.currentStock} remaining).`,
+                    relatedEntityType: "product",
+                    relatedEntityId: item.productId,
+                  });
                 }
               }
-            } catch {
-              // Non-blocking
             }
+          } catch {
+            // Non-blocking
           }
-        }
-
-        // Dispatch bill_created notification to org admin
-        try {
-          const orgAdminsSnap = await db
-            .collection("memberships")
-            .where("organizationId", "==", bill.organizationId)
-            .where("isPrimary", "==", true)
-            .limit(1)
-            .get();
-
-          if (!orgAdminsSnap.empty) {
-            const adminData = orgAdminsSnap.docs[0].data();
-            await createAndDispatchNotification({
-              organizationId: bill.organizationId,
-              userId: adminData.userId,
-              membershipId: orgAdminsSnap.docs[0].id,
-              type: "bill_created",
-              title: "New Bill Created",
-              body: `Invoice ${bill.billNumber || event.params.billId} for Rs ${bill.totalAmount} was generated.`,
-              relatedEntityType: "bill",
-              relatedEntityId: event.params.billId,
-            });
-          }
-        } catch {
-          // Non-blocking
         }
       }
-    })
+
+      // Dispatch bill_created notification to org admin
+      try {
+        const orgAdminsSnap = await db
+          .collection("memberships")
+          .where("organizationId", "==", bill.organizationId)
+          .where("isPrimary", "==", true)
+          .limit(1)
+          .get();
+
+        if (!orgAdminsSnap.empty) {
+          const adminData = orgAdminsSnap.docs[0].data();
+          await createAndDispatchNotification({
+            organizationId: bill.organizationId,
+            userId: adminData.userId,
+            membershipId: orgAdminsSnap.docs[0].id,
+            type: "bill_created",
+            title: "New Bill Created",
+            body: `Invoice ${bill.billNumber || event.params.billId} for Rs ${bill.totalAmount} was generated.`,
+            relatedEntityType: "bill",
+            relatedEntityId: event.params.billId,
+          });
+        }
+      } catch {
+        // Non-blocking
+      }
+    }
+  })
 );
 
 /**
@@ -226,3 +227,67 @@ export const onDeliveryWritten = onDocumentWritten(
     }
   })
 );
+
+/**
+ * 5. onRequestActivityWritten
+ * Dispatches notifications on public activity (comments, status changes).
+ * Idempotent delivery marker keyed by event.id (D-45).
+ */
+export const onRequestActivityWritten = onDocumentWritten(
+  { document: "requests/{requestId}/activity/{activityId}", region: "asia-south1" },
+  withTriggerContext("onRequestActivityWritten", () => null, async (event) => {
+    const after = event.data?.after;
+    if (!after || !after.exists) return; // Deleted
+    const before = event.data?.before;
+    if (before && before.exists) return; // Only process new activity records
+
+    const activity = after.data() as RequestActivityDoc;
+    // D-38: internal notes never notify tenants
+    if (activity.visibility === "internal") return;
+
+    const requestId = event.params.requestId;
+    const reqSnap = await db.collection("requests").doc(requestId).get();
+    if (!reqSnap.exists) return;
+    const requestDoc = reqSnap.data() as RequestDoc;
+
+    const reservation = await reserveIdempotency({
+      scope: requestDoc.organizationId || "platform",
+      actorUid: "system",
+      operation: "trigger.requestActivity",
+      clientKey: event.id,
+      payload: { requestId, activityId: event.params.activityId },
+    });
+    if (reservation.isDuplicate) return;
+
+    // Determine recipient: if author is requester, notify assignee;
+    // if author is platform/manager, notify requester.
+    const isAuthorRequester = activity.author.uid === requestDoc.requester.uid;
+    const recipientUid = isAuthorRequester ? (requestDoc.assignee?.uid || null) : requestDoc.requester.uid;
+
+    if (recipientUid) {
+      try {
+        await createAndDispatchNotification({
+          organizationId: requestDoc.organizationId,
+          userId: recipientUid,
+          membershipId: recipientUid,
+          type: "request_updated",
+          title: `Update on ${requestDoc.requestNumber}`,
+          body: activity.content || `Request ${requestDoc.requestNumber} status changed to ${requestDoc.status}.`,
+          relatedEntityType: "request",
+          relatedEntityId: requestId,
+        });
+      } catch {
+        // Non-blocking notification dispatch
+      }
+    }
+
+    if (reservation.recordId) {
+      await db.collection("idempotencyRecords").doc(reservation.recordId).update({
+        status: "succeeded",
+        result: { dispatched: !!recipientUid },
+        updatedAt: new Date().toISOString(),
+      });
+    }
+  })
+);
+

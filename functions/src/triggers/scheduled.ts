@@ -22,6 +22,9 @@ import { reserveIdempotency } from "../services/idempotency.js";
 import { createAndDispatchNotification } from "../services/notificationService.js";
 import { withScheduledContext, forTargetOrg } from "../services/systemContext.js";
 import { generateDueRecurringExpenses } from "../callables/recurringExpenses.js";
+import { RequestDoc, RequestActivityDoc } from "../types/models.js";
+import { RequestStatus } from "../constants/enums.js";
+import { evaluateSlaState } from "../services/requestsService.js";
 
 const REMINDER_DAYS = [7, 3, 1];
 
@@ -128,3 +131,135 @@ export const subscriptionAndUsageSweep = onSchedule(
     console.log("[sweep] subscription & usage sweep complete", result);
   })
 );
+
+export interface RequestsSweepResult {
+  requestsScanned: number;
+  slaUpdated: number;
+  autoClosed: number;
+  autoCancelled: number;
+}
+
+/**
+ * Sweeps open requests for SLA breaches/warnings and lifecycle auto-close (T-2, T-3, T-4).
+ * Exported so it can be invoked deterministically in tests with a custom timestamp.
+ */
+export async function runRequestsSlaAndLifecycleSweep(nowMs: number = Date.now()): Promise<RequestsSweepResult> {
+  const result: RequestsSweepResult = {
+    requestsScanned: 0,
+    slaUpdated: 0,
+    autoClosed: 0,
+    autoCancelled: 0,
+  };
+
+  const now = new Date(nowMs);
+  const nowIso = now.toISOString();
+
+  // 1. SLA State Evaluation & Needs-Info auto-cancel
+  const openSnap = await db.collection("requests")
+    .where("status", "in", [
+      RequestStatus.SUBMITTED,
+      RequestStatus.IN_REVIEW,
+      RequestStatus.NEEDS_INFO,
+      RequestStatus.IN_PROGRESS,
+    ])
+    .get();
+
+  for (const doc of openSnap.docs) {
+    result.requestsScanned++;
+    const req = doc.data() as RequestDoc;
+
+    // Check Needs-Info timeout: 14 days without response -> cancel (reason no_response)
+    if (req.status === RequestStatus.NEEDS_INFO) {
+      const changedAt = new Date(req.statusChangedAt).getTime();
+      if (nowMs - changedAt > 14 * 86400000) {
+        await doc.ref.update({
+          status: RequestStatus.CANCELLED,
+          statusReason: "no_response",
+          statusChangedAt: nowIso,
+          updatedAt: nowIso,
+          lastActivityAt: nowIso,
+        });
+
+        const actRef = doc.ref.collection("activity").doc();
+        const act: RequestActivityDoc = {
+          activityId: actRef.id,
+          requestId: req.requestId,
+          type: "status_change",
+          visibility: "public",
+          author: {
+            uid: "system",
+            name: "System",
+            roleLabel: "Automated",
+            isPlatform: true,
+          },
+          content: "Auto-cancelled: no response from requester within 14 days.",
+          createdAt: nowIso,
+        };
+        await actRef.set(act);
+        result.autoCancelled++;
+        continue;
+      }
+    }
+
+    // SLA State update
+    const evaluatedSla = evaluateSlaState(req, now);
+    if (evaluatedSla !== req.slaState) {
+      await doc.ref.update({
+        slaState: evaluatedSla,
+        updatedAt: nowIso,
+      });
+      result.slaUpdated++;
+    }
+  }
+
+  // 2. Auto-close resolved requests older than 7 days (T-3)
+  const resolvedSnap = await db.collection("requests")
+    .where("status", "==", RequestStatus.RESOLVED)
+    .get();
+
+  for (const doc of resolvedSnap.docs) {
+    result.requestsScanned++;
+    const req = doc.data() as RequestDoc;
+    const resolvedTime = req.resolvedAt ? new Date(req.resolvedAt).getTime() : new Date(req.statusChangedAt).getTime();
+
+    if (nowMs - resolvedTime >= 7 * 86400000) {
+      await doc.ref.update({
+        status: RequestStatus.CLOSED,
+        statusReason: "auto_close",
+        closedAt: nowIso,
+        statusChangedAt: nowIso,
+        updatedAt: nowIso,
+        lastActivityAt: nowIso,
+      });
+
+      const actRef = doc.ref.collection("activity").doc();
+      const act: RequestActivityDoc = {
+        activityId: actRef.id,
+        requestId: req.requestId,
+        type: "status_change",
+        visibility: "public",
+        author: {
+          uid: "system",
+          name: "System",
+          roleLabel: "Automated",
+          isPlatform: true,
+        },
+        content: "Auto-closed: 7 days elapsed since resolution.",
+        createdAt: nowIso,
+      };
+      await actRef.set(act);
+      result.autoClosed++;
+    }
+  }
+
+  return result;
+}
+
+export const requestsSlaAndLifecycleSweep = onSchedule(
+  { schedule: "every 15 minutes", region: "asia-south1" },
+  withScheduledContext("requestsSlaAndLifecycleSweep", async () => {
+    const res = await runRequestsSlaAndLifecycleSweep();
+    console.log("[requests-sweep] requests SLA and lifecycle sweep complete", res);
+  })
+);
+

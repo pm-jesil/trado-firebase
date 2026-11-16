@@ -1,0 +1,45 @@
+{
+  "category": "module_request",
+  "schemaName": "ModuleRequestDetailsSchema",
+  "fields": [
+    {
+      "path": "moduleKey",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 50
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample moduleKey"
+    },
+    {
+      "path": "action",
+      "type": "enum",
+      "required": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "enable",
+        "disable"
+      ],
+      "uiHint": "dropdown",
+      "example": "enable"
+    },
+    {
+      "path": "reason",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample reason"
+    }
+  ]
+}

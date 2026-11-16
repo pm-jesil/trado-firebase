@@ -251,3 +251,112 @@ export const WRITE_OFF_REASONS: ReadonlySet<string> = new Set([
   StockAdjustmentReason.DAMAGED_ON_RECEIPT,
 ]);
 
+export enum RequestCategory {
+  PLAN_CHANGE = "plan_change",
+  LIMIT_INCREASE = "limit_increase",
+  MODULE_REQUEST = "module_request",
+  BILLING_QUERY = "billing_query",
+  ORG_PROFILE_CHANGE = "org_profile_change",
+  OWNERSHIP_TRANSFER = "ownership_transfer",
+  BUG_REPORT = "bug_report",
+  DATA_ISSUE = "data_issue",
+  FEATURE_REQUEST = "feature_request",
+  IMPROVEMENT = "improvement",
+  SUPPORT_QUESTION = "support_question",
+  OTHER = "other",
+  DATA_REQUEST = "data_request",
+  SECURITY_CONCERN = "security_concern",
+  ACCESS_REQUEST = "access_request",
+}
+
+export enum RequestAudience {
+  PLATFORM = "platform",
+  ORGANIZATION = "organization",
+}
+
+export enum RequestKind {
+  APPROVAL = "approval",
+  WORK = "work",
+}
+
+export enum RequestPriority {
+  LOW = "low",
+  NORMAL = "normal",
+  HIGH = "high",
+  URGENT = "urgent",
+}
+
+export enum RequestSeverity {
+  MINOR = "minor",
+  MAJOR = "major",
+  CRITICAL = "critical",
+}
+
+export enum RequestStatus {
+  SUBMITTED = "submitted",
+  IN_REVIEW = "in_review",
+  NEEDS_INFO = "needs_info",
+  ON_HOLD = "on_hold",
+  APPROVED = "approved",
+  APPLIED = "applied",
+  REJECTED = "rejected",
+  IN_PROGRESS = "in_progress",
+  RESOLVED = "resolved",
+  DECLINED = "declined",
+  CLOSED = "closed",
+  CANCELLED = "cancelled",
+}
+
+export enum SlaState {
+  ON_TRACK = "on_track",
+  AT_RISK = "at_risk",
+  BREACHED = "breached",
+  PAUSED = "paused",
+}
+
+export enum RequestAction {
+  START_REVIEW = "start_review",
+  REQUEST_INFO = "request_info",
+  RESPOND = "respond",
+  HOLD = "hold",
+  RESUME = "resume",
+  APPROVE = "approve",
+  REJECT = "reject",
+  APPLY = "apply",
+  START_WORK = "start_work",
+  RESOLVE = "resolve",
+  DECLINE = "decline",
+  CLOSE = "close",
+  REOPEN = "reopen",
+  CANCEL = "cancel",
+}
+
+export enum RequestResolutionType {
+  FIXED = "fixed",
+  ANSWERED = "answered",
+  IMPLEMENTED = "implemented",
+  DUPLICATE = "duplicate",
+  CANNOT_REPRODUCE = "cannot_reproduce",
+  WORKAROUND = "workaround",
+}
+
+export enum RequestReason {
+  FEATURE_DISABLED = "FEATURE_DISABLED",
+  REQUEST_NOT_FOUND = "REQUEST_NOT_FOUND",
+  REQUEST_CATEGORY_FORBIDDEN = "REQUEST_CATEGORY_FORBIDDEN",
+  REQUEST_DETAILS_INVALID = "REQUEST_DETAILS_INVALID",
+  REQUEST_INVALID_TRANSITION = "REQUEST_INVALID_TRANSITION",
+  REQUEST_STALE_STATUS = "REQUEST_STALE_STATUS",
+  REQUEST_DUPLICATE_OPEN = "REQUEST_DUPLICATE_OPEN",
+  REQUEST_LIMIT_REACHED = "REQUEST_LIMIT_REACHED",
+  REQUEST_RATE_LIMITED = "REQUEST_RATE_LIMITED",
+  REQUEST_ATTACHMENT_INVALID = "REQUEST_ATTACHMENT_INVALID",
+  REQUEST_NOT_APPROVED = "REQUEST_NOT_APPROVED",
+  REQUEST_ALREADY_APPLIED = "REQUEST_ALREADY_APPLIED",
+  REQUEST_APPLY_BLOCKED = "REQUEST_APPLY_BLOCKED",
+  REQUEST_PLAN_UNAVAILABLE = "REQUEST_PLAN_UNAVAILABLE",
+  REQUEST_REOPEN_WINDOW_CLOSED = "REQUEST_REOPEN_WINDOW_CLOSED",
+  REQUEST_ASSIGNEE_INVALID = "REQUEST_ASSIGNEE_INVALID",
+}
+
+

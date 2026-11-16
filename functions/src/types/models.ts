@@ -34,6 +34,15 @@ import {
   SubscriptionStatus,
   SalesChannel,
   StockAdjustmentReason,
+  RequestCategory,
+  type RequestAudience,
+  type RequestKind,
+  type RequestPriority,
+  type RequestSeverity,
+  RequestStatus,
+  type SlaState,
+  type RequestAction,
+  type RequestResolutionType,
 } from "../constants/enums.js";
 
 /**
@@ -298,6 +307,8 @@ export interface SubscriptionPlanDoc {
   usageLimits?: UsageLimitsConfig; // Plan baseline usage thresholds & limits
   isActive: boolean;
   isArchived?: boolean; // set by the plan archive callable; archived plans cannot be assigned
+  isPublic?: boolean; // visible in tenant plans catalog (D-35, Prompt 74)
+  showPriceToTenants?: boolean; // whether tenants can see price (Q-RQ4 / A-09)
   createdAt?: string;
   createdBy?: string;
   updatedAt?: string;
@@ -1062,6 +1073,7 @@ export type NotificationType =
   | "bill_created"
   | "outflow_recorded"
   | "account_updated"
+  | "request_updated"
   | "usage_warning";
 
 /**
@@ -1404,3 +1416,138 @@ export interface ImageUploadSessionDoc {
   attachedAt?: string; // set by attachUploadedImage when the upload is attached
   finalPath?: string; // storage path of the processed image, set on attach
 }
+
+/**
+ * Request Attachment Ref
+ */
+export interface RequestAttachment {
+  storagePath: string;
+  filename: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedAt?: string;
+}
+
+/**
+ * 24. requests/{requestId} (Prompt 74, D-36..D-45)
+ * Platform-domain request document. Never holds internal notes (D-38).
+ */
+export interface RequestDoc {
+  requestId: string;
+  requestNumber: string; // REQ-YYYY-000123
+  audience: RequestAudience | "platform" | "organization";
+  category: RequestCategory;
+  kind: RequestKind | "approval" | "work";
+  title: string;
+  description: string;
+  details: Record<string, unknown>;
+  priority: RequestPriority | "low" | "normal" | "high" | "urgent";
+  severity?: RequestSeverity | "minor" | "major" | "critical";
+  status: RequestStatus;
+  statusReason?: string | null;
+  statusChangedAt: string;
+  requester: {
+    uid: string;
+    name: string;
+    roleLabel: string;
+  };
+  organizationId: string;
+  branchId?: string | null;
+  relatedEntity?: {
+    type: string;
+    id: string;
+    label: string;
+  } | null;
+  assignee?: {
+    uid: string;
+    name: string;
+  } | null;
+  attachments: RequestAttachment[];
+  labels: string[];
+  idempotencyKey?: string | null;
+  version: number;
+  createdAt: string;
+  updatedAt: string;
+  lastActivityAt: string;
+  lastActivityBy: {
+    uid: string;
+    name: string;
+    isPlatform: boolean;
+  };
+  firstResponseDueAt: string;
+  resolutionDueAt: string;
+  firstResponseAt?: string | null;
+  slaState: SlaState | "on_track" | "at_risk" | "breached" | "paused";
+  slaPausedAt?: string | null;
+  slaTotalPausedMs: number;
+  resolvedAt?: string | null;
+  closedAt?: string | null;
+  resumeOn?: string | null;
+  appliedAt?: string | null;
+  appliedBy?: string | null;
+  applyResult?: Record<string, unknown> | null;
+  organizationName: string;
+  requesterName: string;
+  currentPlanName?: string | null;
+  requestedPlanName?: string | null;
+}
+
+export type { RequestAction, RequestResolutionType };
+
+/**
+ * 25. requests/{requestId}/activity/{activityId}
+ * Timeline entry. Visibility 'internal' is stripped for tenants (D-38).
+ */
+export interface RequestActivityDoc {
+  activityId: string;
+  requestId: string;
+  type: "comment" | "status_change" | "assignment" | "priority_change" | "apply" | "system";
+  visibility: "public" | "internal";
+  author: {
+    uid: string;
+    name: string;
+    roleLabel: string;
+    isPlatform: boolean;
+  };
+  content?: string | null;
+  details?: Record<string, unknown> | null;
+  attachments?: RequestAttachment[];
+  createdAt: string;
+}
+
+/**
+ * 26. counters/{counterId}
+ * Per-year sequential counter for request numbers (e.g. counters/requests).
+ */
+export interface RequestCounterDoc {
+  year: number;
+  currentSequence: number;
+  updatedAt: string;
+}
+
+/**
+ * 27. platformSettings/{settingId}
+ * Global requests module settings (e.g. platformSettings/requests).
+ */
+export interface PlatformSettingsRequestsDoc {
+  requestsEnabled: boolean;
+  sla: {
+    urgent: { firstResponseHours: number; resolutionHours: number };
+    high: { firstResponseHours: number; resolutionHours: number };
+    normal: { firstResponseHours: number; resolutionHours: number };
+    low: { firstResponseHours: number; resolutionHours: number };
+  };
+  limits: {
+    maxOpenPerUser: number;
+    maxOpenPerOrg: number;
+    maxCreationsPerHourPerUser: number;
+  };
+  autoCloseDays: number;
+  reopenWindowDays: number;
+  needsInfoReminderDays: number;
+  needsInfoAutoCancelDays: number;
+  categoryAvailability?: Record<string, boolean>;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+

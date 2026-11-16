@@ -1,20 +1,20 @@
 {
   "projectId": "trado-x",
   "region": "asia-south1",
-  "totalExports": 140,
+  "totalExports": 158,
   "summary": {
-    "callableCount": 134,
-    "triggerCount": 6,
-    "concreteCollectionsCount": 48,
+    "callableCount": 150,
+    "triggerCount": 8,
+    "concreteCollectionsCount": 52,
     "categoryCounts": {
       "PUBLIC_AUTH_ADAPTER": 2,
       "CALLER_IDENTITY": 5,
       "CONTEXT_SELECTION": 1,
       "ORGANIZATION_ONBOARDING": 4,
-      "PLATFORM_SUPER_ADMIN": 21,
+      "PLATFORM_SUPER_ADMIN": 27,
       "REFERENCE_DATA": 5,
-      "DERIVED_TENANT_OPERATION": 51,
-      "FILTER_OPTIONAL_TENANT": 45
+      "DERIVED_TENANT_OPERATION": 55,
+      "FILTER_OPTIONAL_TENANT": 51
     },
     "subgroupCounts": {
       "DERIVED_TENANT_OPERATION": {
@@ -23,10 +23,11 @@
         "Transactions & Operations": 14,
         "Stock & Reconciliation": 4,
         "Tasks & Telemetry": 7,
-        "Media & Assets": 3
+        "Media & Assets": 3,
+        "Requests & Support Desk": 4
       },
       "FILTER_OPTIONAL_TENANT": {
-        "Entities & Catalog Lists": 31,
+        "Entities & Catalog Lists": 37,
         "Reports & Telemetry": 11,
         "Usage & Quotas": 3
       }
@@ -101,9 +102,38 @@
         "Sends server-observed usage warnings (>= warning threshold) to Owners"
       ],
       "idempotency": "Every notification guarded by reserveIdempotency (scheduled.notify); safe to re-run"
+    },
+    {
+      "name": "onRequestActivityWritten",
+      "documentPath": "requests/{requestId}/activity/{activityId}",
+      "region": "asia-south1",
+      "eventType": "onDocumentWritten",
+      "sideEffects": [
+        "Detects public activity (comments, status changes) on requests",
+        "Dispatches request_updated notification to requester or assignee",
+        "Idempotent delivery marker keyed by event.id (D-45)"
+      ],
+      "idempotency": "Guaranteed by reserveIdempotency in idempotencyRecords"
+    },
+    {
+      "name": "requestsSlaAndLifecycleSweep",
+      "documentPath": "(scheduled: every 15 minutes Asia/Kolkata)",
+      "region": "asia-south1",
+      "eventType": "onSchedule",
+      "sideEffects": [
+        "Evaluates SLA status (at_risk, breached) for open requests",
+        "Auto-closes requests resolved for >= 7 days",
+        "Auto-cancels requests in needs_info for >= 14 days"
+      ],
+      "idempotency": "Status guards and activity stamps; safe on rerun"
     }
   ],
   "concreteCollections": [
+    {
+      "path": "requests/{requestId}/activity/{activityId}",
+      "type": "subcollection",
+      "domain": "Support & Requests Desk"
+    },
     {
       "path": "auditLogs/{id}",
       "type": "root",
@@ -133,6 +163,11 @@
       "path": "categories/{id}",
       "type": "root",
       "domain": "Catalog & Inventory"
+    },
+    {
+      "path": "counters/{id}",
+      "type": "root",
+      "domain": "System Infrastructure"
     },
     {
       "path": "customers/{id}",
@@ -255,6 +290,11 @@
       "domain": "Analytics & Usage Metering"
     },
     {
+      "path": "platformSettings/{id}",
+      "type": "root",
+      "domain": "System Infrastructure"
+    },
+    {
       "path": "products/{id}",
       "type": "root",
       "domain": "Catalog & Inventory"
@@ -263,6 +303,11 @@
       "path": "recurringExpenses/{id}",
       "type": "root",
       "domain": "Operations & Transactions"
+    },
+    {
+      "path": "requests/{id}",
+      "type": "root",
+      "domain": "Support & Requests Desk"
     },
     {
       "path": "returns/{id}",
@@ -401,7 +446,13 @@
         "usageGetOrganizations",
         "usageCalculateDryRunStatement",
         "usageUpdateLimits",
-        "organizationsSetSubscription"
+        "organizationsSetSubscription",
+        "requestsInboxList",
+        "requestsInboxCounts",
+        "requestsAssign",
+        "requestsSetPriority",
+        "requestsAddInternalNote",
+        "requestsApply"
       ]
     },
     "REFERENCE_DATA": {
@@ -479,6 +530,12 @@
           "imagesCreateUploadSession",
           "imagesAttach",
           "imagesRemove"
+        ],
+        "Requests & Support Desk": [
+          "requestsCreate",
+          "requestsUpdate",
+          "requestsAddComment",
+          "requestsTransition"
         ]
       }
     },
@@ -516,7 +573,13 @@
           "stockMovementsList",
           "productsGetPriceHistory",
           "auditGetEntityHistory",
-          "recurringExpensesList"
+          "recurringExpensesList",
+          "plansCatalogList",
+          "requestsGet",
+          "requestsList",
+          "requestsActivityList",
+          "requestsCounts",
+          "requestsMeta"
         ],
         "Reports & Telemetry": [
           "reportsGetRevenue",

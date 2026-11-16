@@ -1,0 +1,53 @@
+{
+  "category": "ownership_transfer",
+  "schemaName": "OwnershipTransferDetailsSchema",
+  "fields": [
+    {
+      "path": "newOwnerUserId",
+      "type": "string",
+      "required": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample newOwnerUserId"
+    },
+    {
+      "path": "newOwnerEmail",
+      "type": "string",
+      "required": false,
+      "nullable": false,
+      "bounds": {
+        "format": "email"
+      },
+      "enumValues": [],
+      "uiHint": "email",
+      "example": "Sample newOwnerEmail"
+    },
+    {
+      "path": "effectiveFrom",
+      "type": "string",
+      "required": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample effectiveFrom"
+    },
+    {
+      "path": "reason",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 10,
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample reason"
+    }
+  ]
+}

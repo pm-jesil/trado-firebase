@@ -83,6 +83,14 @@ import {
   StockAdjustmentReason,
   SalesChannel,
   SubscriptionStatus,
+  RequestCategory,
+  RequestAudience,
+  RequestPriority,
+  RequestSeverity,
+  RequestStatus,
+  SlaState,
+  RequestAction,
+  RequestResolutionType,
 } from "../constants/enums.js";
 
 export const AuthLoginSchema = z.strictObject({
@@ -1629,3 +1637,333 @@ export const UpdateMeSchema = z.strictObject({
   uploadId: z.string().trim().optional(),
   clientRequestId: z.string().min(8).max(128).optional(),
 });
+
+// ── Requests & Support Desk Module (Prompt 74, D-36..D-45) ──────────────
+
+export const RequestAttachmentSchema = z.strictObject({
+  storagePath: z.string().trim().min(5).max(500),
+  filename: z.string().trim().min(1).max(255),
+  mimeType: z.enum(["image/jpeg", "image/png", "image/webp", "application/pdf"]),
+  sizeBytes: z.number().int().positive().max(5 * 1024 * 1024),
+  uploadedAt: z.string().datetime().optional(),
+});
+
+export const PlanChangeDetailsSchema = z.strictObject({
+  requestedPlanId: z.string().trim().min(1).max(100),
+  billingPeriod: z.enum(["monthly", "yearly"]).optional(),
+  effectiveFrom: z.string().trim().optional(),
+  reason: z.string().trim().min(10).max(2000),
+});
+
+export const LimitIncreaseDetailsSchema = z.strictObject({
+  metric: z.enum([
+    "firestoreReads",
+    "firestoreWrites",
+    "firestoreDeletes",
+    "functionsInvocations",
+    "functionsErrors",
+    "functionsExecutionMs",
+    "storageUploadBytes",
+    "storageDownloadBytes",
+    "storageOperations",
+    "authOperations",
+    "fcmDispatches",
+    "locationPings",
+  ]),
+  period: z.enum(["daily", "monthly"]),
+  requestedLimit: z.number().int().positive(),
+  reason: z.string().trim().min(5).max(2000),
+});
+
+export const ModuleRequestDetailsSchema = z.strictObject({
+  moduleKey: z.string().trim().min(2).max(50),
+  action: z.enum(["enable", "disable"]),
+  reason: z.string().trim().min(5).max(2000),
+});
+
+export const BillingQueryDetailsSchema = z.strictObject({
+  subject: z.enum(["invoice", "payment", "charge", "other"]),
+  reference: z.string().trim().max(100).optional(),
+  amount: z.number().int().nonnegative().optional(), // minor paise
+  description: z.string().trim().min(5).max(5000),
+});
+
+export const OrgProfileChangeDetailsSchema = z.strictObject({
+  field: z.enum([
+    "name",
+    "businessType",
+    "businessCategory",
+    "financialYearStartMonth",
+    "moduleToggles",
+    "salesChannels",
+    "timezone",
+    "showCostToTenant",
+  ]),
+  proposedValue: z.unknown(),
+  reason: z.string().trim().min(5).max(2000),
+});
+
+export const OwnershipTransferDetailsSchema = z.strictObject({
+  newOwnerUserId: z.string().trim().min(2).optional(),
+  newOwnerEmail: z.string().trim().email().toLowerCase().optional(),
+  effectiveFrom: z.string().trim().optional(),
+  reason: z.string().trim().min(10).max(2000),
+}).refine((d) => Boolean(d.newOwnerUserId || d.newOwnerEmail), {
+  message: "Either newOwnerUserId or newOwnerEmail must be provided",
+  path: ["newOwnerUserId"],
+});
+
+export const BugReportDetailsSchema = z.strictObject({
+  area: z.string().trim().min(2).max(100),
+  stepsToReproduce: z.string().trim().min(5).max(5000),
+  expected: z.string().trim().min(2).max(2000),
+  actual: z.string().trim().min(2).max(2000),
+  severity: z.nativeEnum(RequestSeverity),
+  frequency: z.enum(["always", "often", "sometimes", "once"]).optional(),
+  diagnosticsOptIn: z.boolean().default(false),
+  diagnostics: z.record(z.string(), z.unknown()).optional(),
+}).refine((d) => d.diagnosticsOptIn || !d.diagnostics, {
+  message: "diagnostics requires diagnosticsOptIn to be true (D-27, A-15)",
+  path: ["diagnostics"],
+});
+
+export const DataIssueDetailsSchema = z.strictObject({
+  entityType: z.string().trim().min(2).max(100),
+  entityId: z.string().trim().max(128).optional(),
+  whatIsWrong: z.string().trim().min(5).max(2000),
+  expected: z.string().trim().min(2).max(2000),
+});
+
+export const FeatureRequestDetailsSchema = z.strictObject({
+  problem: z.string().trim().min(10).max(5000),
+  businessImpact: z.string().trim().min(10).max(2000),
+  area: z.string().trim().min(2).max(100),
+  proposedSolution: z.string().trim().max(5000).optional(),
+  neededBy: z.string().trim().optional(),
+  alternatives: z.string().trim().max(2000).optional(),
+});
+
+export const ImprovementDetailsSchema = z.strictObject({
+  area: z.string().trim().min(2).max(100),
+  currentBehaviour: z.string().trim().min(5).max(2000),
+  suggestedBehaviour: z.string().trim().min(5).max(2000),
+});
+
+export const SupportQuestionDetailsSchema = z.strictObject({
+  topic: z.enum(["how_to", "account", "billing", "other"]),
+  question: z.string().trim().min(5).max(5000),
+});
+
+export const OtherDetailsSchema = z.strictObject({
+  detailsText: z.string().trim().min(5).max(5000),
+});
+
+export const DataRequestDetailsSchema = z.strictObject({
+  type: z.enum(["export", "correction", "deletion"]),
+  scope: z.string().trim().min(5).max(1000),
+  reason: z.string().trim().min(10).max(2000),
+  confirmationText: z.string().trim().max(100).optional(),
+}).refine((d) => d.type !== "deletion" || (typeof d.confirmationText === "string" && d.confirmationText.length >= 4), {
+  message: "confirmationText is required for deletion request",
+  path: ["confirmationText"],
+});
+
+export const SecurityConcernDetailsSchema = z.strictObject({
+  description: z.string().trim().min(10).max(5000),
+  whenNoticed: z.string().trim().optional(),
+  suspectedImpact: z.string().trim().max(2000).optional(),
+});
+
+export const AccessRequestDetailsSchema = z.strictObject({
+  permissionKeys: z.array(z.string().trim().min(2)).max(50).optional(),
+  roleId: z.string().trim().max(100).optional(),
+  branchId: z.string().trim().max(100).optional(),
+  reason: z.string().trim().min(5).max(2000),
+  until: z.string().trim().optional(),
+}).refine((d) => Boolean((d.permissionKeys && d.permissionKeys.length > 0) || d.roleId), {
+  message: "Either permissionKeys or roleId must be provided",
+  path: ["permissionKeys"],
+});
+
+export const CATEGORY_DETAILS_SCHEMAS = {
+  [RequestCategory.PLAN_CHANGE]: PlanChangeDetailsSchema,
+  [RequestCategory.LIMIT_INCREASE]: LimitIncreaseDetailsSchema,
+  [RequestCategory.MODULE_REQUEST]: ModuleRequestDetailsSchema,
+  [RequestCategory.BILLING_QUERY]: BillingQueryDetailsSchema,
+  [RequestCategory.ORG_PROFILE_CHANGE]: OrgProfileChangeDetailsSchema,
+  [RequestCategory.OWNERSHIP_TRANSFER]: OwnershipTransferDetailsSchema,
+  [RequestCategory.BUG_REPORT]: BugReportDetailsSchema,
+  [RequestCategory.DATA_ISSUE]: DataIssueDetailsSchema,
+  [RequestCategory.FEATURE_REQUEST]: FeatureRequestDetailsSchema,
+  [RequestCategory.IMPROVEMENT]: ImprovementDetailsSchema,
+  [RequestCategory.SUPPORT_QUESTION]: SupportQuestionDetailsSchema,
+  [RequestCategory.OTHER]: OtherDetailsSchema,
+  [RequestCategory.DATA_REQUEST]: DataRequestDetailsSchema,
+  [RequestCategory.SECURITY_CONCERN]: SecurityConcernDetailsSchema,
+  [RequestCategory.ACCESS_REQUEST]: AccessRequestDetailsSchema,
+} as const;
+
+export const CreateRequestSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  audience: z.nativeEnum(RequestAudience).optional(),
+  category: z.nativeEnum(RequestCategory),
+  title: z.string().trim().min(3).max(120),
+  description: z.string().trim().min(3).max(5000),
+  details: z.record(z.string(), z.unknown()),
+  priority: z.nativeEnum(RequestPriority).optional(),
+  severity: z.nativeEnum(RequestSeverity).optional(),
+  relatedEntity: z.strictObject({
+    type: z.string().trim().min(2).max(50),
+    id: z.string().trim().min(1).max(128),
+    label: z.string().trim().min(1).max(120),
+  }).optional(),
+  attachments: z.array(RequestAttachmentSchema).max(5).default([]).optional(),
+  labels: z.array(z.string().trim().min(1).max(50)).max(10).default([]).optional(),
+  idempotencyKey: z.string().trim().min(8).max(128).optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const UpdateRequestSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  requestId: z.string().trim().min(2),
+  title: z.string().trim().min(3).max(120).optional(),
+  description: z.string().trim().min(3).max(5000).optional(),
+  details: z.record(z.string(), z.unknown()).optional(),
+  attachments: z.array(RequestAttachmentSchema).max(5).optional(),
+  expectedVersion: z.number().int().positive(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const AddRequestCommentSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  requestId: z.string().trim().min(2),
+  content: z.string().trim().min(1).max(5000),
+  attachments: z.array(RequestAttachmentSchema).max(5).optional(),
+  idempotencyKey: z.string().trim().min(8).max(128).optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const TransitionRequestSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  requestId: z.string().trim().min(2),
+  action: z.nativeEnum(RequestAction),
+  expectedStatus: z.nativeEnum(RequestStatus),
+  reason: z.string().trim().max(2000).optional(),
+  note: z.string().trim().max(5000).optional(),
+  resumeOn: z.string().trim().optional(),
+  resolutionType: z.nativeEnum(RequestResolutionType).optional(),
+  duplicateOf: z.string().trim().optional(),
+  overrideReason: z.string().trim().max(2000).optional(),
+  effectiveFrom: z.string().trim().optional(),
+  idempotencyKey: z.string().trim().min(8).max(128).optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const GetRequestSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  requestId: z.string().trim().min(2),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const ListRequestsSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  scope: z.enum(["mine", "organization"]).default("mine").optional(),
+  audience: z.nativeEnum(RequestAudience).optional(),
+  status: z.array(z.nativeEnum(RequestStatus)).optional(),
+  category: z.array(z.nativeEnum(RequestCategory)).optional(),
+  priority: z.array(z.nativeEnum(RequestPriority)).optional(),
+  search: z.string().trim().max(100).optional(),
+  limit: z.number().int().min(1).max(100).default(50).optional(),
+  cursor: z.string().trim().optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const ListRequestActivitySchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  requestId: z.string().trim().min(2),
+  limit: z.number().int().min(1).max(100).default(50).optional(),
+  cursor: z.string().trim().optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const RequestScopedQuerySchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const GetRequestCountsSchema = RequestScopedQuerySchema;
+
+export const InboxListRequestsSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  status: z.array(z.nativeEnum(RequestStatus)).optional(),
+  category: z.array(z.nativeEnum(RequestCategory)).optional(),
+  priority: z.array(z.nativeEnum(RequestPriority)).optional(),
+  targetOrganizationId: z.string().trim().min(2).optional(),
+  assignee: z.string().trim().optional(), // "me" | "unassigned" | uid
+  slaState: z.nativeEnum(SlaState).optional(),
+  search: z.string().trim().max(100).optional(),
+  sortBy: z.enum(["createdAt", "lastActivityAt", "priority", "resolutionDueAt"]).default("lastActivityAt").optional(),
+  sortOrder: z.enum(["asc", "desc"]).default("desc").optional(),
+  limit: z.number().int().min(1).max(100).default(50).optional(),
+  cursor: z.string().trim().optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const InboxCountsRequestsSchema = RequestScopedQuerySchema;
+
+export const AssignRequestSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  requestId: z.string().trim().min(2),
+  assigneeUid: z.string().trim().min(2).nullable(),
+  assigneeName: z.string().trim().max(100).optional(),
+  startReview: z.boolean().default(false).optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const SetRequestPrioritySchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  requestId: z.string().trim().min(2),
+  priority: z.nativeEnum(RequestPriority),
+  severity: z.nativeEnum(RequestSeverity).optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const AddInternalNoteSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  requestId: z.string().trim().min(2),
+  content: z.string().trim().min(1).max(5000),
+  attachments: z.array(RequestAttachmentSchema).max(5).optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const ApplyRequestSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  requestId: z.string().trim().min(2),
+  expectedStatus: z.literal(RequestStatus.APPROVED).default(RequestStatus.APPROVED).optional(),
+  overrideReason: z.string().trim().max(2000).optional(),
+  idempotencyKey: z.string().trim().min(8).max(128).optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const ListPlansCatalogSchema = z.strictObject({
+  organizationId: ContextFields.organizationId,
+  branchId: ContextFields.branchId,
+  includeInactive: z.boolean().default(false).optional(),
+  clientRequestId: z.string().min(8).max(128).optional(),
+});
+
+export const GetRequestsMetaSchema = RequestScopedQuerySchema;
+

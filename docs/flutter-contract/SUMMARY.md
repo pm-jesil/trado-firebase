@@ -63,6 +63,7 @@
 - **delivery:** `pending` → `assigned` → `in_transit` → `delivered` / `failed` / `cancelled`
 - **return:** `pending` → `completed` / `rejected`
 - **task:** `todo` → `in_progress` → `completed` / `cancelled`
+- **request:** `submitted` → `in_review` → `approved` → `applied` (approval) / `submitted` → `in_progress` → `resolved` → `closed` (work)
 
 ## 4. Activity Logs (`auditLogsList`)
 - **Filters:** `actorUserId`, `entityType`, `entityId`, `operation`, `status`, `branchId`, `from`, `to`, `limit`, `cursor`.
@@ -98,3 +99,4 @@
 | `approval_request` | `approvalsDecide` | 0 | 0 | 0 |
 | `recurring_expense` | `recurringExpensesCreate` | 6 | 22 | 18 |
 | `plan` | `plansCreate` | 8 | 5 | 7 |
+| `request` | `requestsCreate` | 9 | 11 | 11 |

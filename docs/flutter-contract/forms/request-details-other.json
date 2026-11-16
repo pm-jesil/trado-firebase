@@ -1,0 +1,19 @@
+{
+  "category": "other",
+  "schemaName": "OtherDetailsSchema",
+  "fields": [
+    {
+      "path": "detailsText",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 5000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample detailsText"
+    }
+  ]
+}

@@ -10,10 +10,10 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `auth` | 2 |
 | `export` | 3 |
 | `file` | 3 |
-| `mutation` | 57 |
-| `none` | 49 |
+| `mutation` | 68 |
+| `none` | 54 |
 | `read_sensitive` | 1 |
-| `system` | 6 |
+| `system` | 8 |
 
 | Code | Action | Entity Type | Verb | Display Key | Status Tracked | Audit Before | Category | Primary Collection | Reason Fields |
 |---|---|---|---|---|---|---|---|---|---|
@@ -72,6 +72,7 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `onDeliveryWritten` | `delivery.derived_update` | `delivery` | `derived_update` | `audit.action.delivery.derived_update` | Yes | No | system | — | — |
 | `onOutflowWritten` | `outflow.derived_update` | `outflow` | `derived_update` | `audit.action.outflow.derived_update` | Yes | No | system | — | — |
 | `onPaymentWritten` | `payment.derived_update` | `payment` | `derived_update` | `audit.action.payment.derived_update` | No | No | system | — | — |
+| `onRequestActivityWritten` | `on.request_activity_written` | `on` | `request_activity_written` | `audit.action.on.request_activity_written` | No | No | system | — | — |
 | `onStorageObjectFinalized` | `storage_object.finalize` | `storage_object` | `finalize` | `audit.action.storage_object.finalize` | Yes | No | system | — | — |
 | `organizationsCreate` | `organization.create` | `organization` | `create` | `audit.action.organization.create` | No | No | admin | `organizations` | `planId` |
 | `organizationsDeactivate` | `organization.deactivate` | `organization` | `deactivate` | `audit.action.organization.deactivate` | No | No | admin | `organizations` | `reason` |
@@ -93,6 +94,7 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `paymentsVoid` | `payment.void` | `payment` | `void` | `audit.action.payment.void` | Yes | Yes | mutation | `payments` | `reason` |
 | `permissionCatalogList` | `permission_catalog.list` | `permission_catalog` | `list` | `audit.action.permission_catalog.list` | No | No | none | `permissionCatalog` | — |
 | `plansArchive` | `plan.archive` | `plan` | `archive` | `audit.action.plan.archive` | No | No | admin | `subscriptionPlans` | `reason` |
+| `plansCatalogList` | `plan.catalog_list` | `plan` | `catalog_list` | `audit.action.plan.catalog_list` | No | No | none | `subscriptionPlans` | — |
 | `plansCreate` | `plan.create` | `plan` | `create` | `audit.action.plan.create` | No | No | admin | `subscriptionPlans` | — |
 | `plansDelete` | `plan.delete` | `plan` | `delete` | `audit.action.plan.delete` | No | No | admin | `subscriptionPlans` | — |
 | `plansGet` | `plan.get` | `plan` | `get` | `audit.action.plan.get` | No | No | none | `subscriptionPlans` | — |
@@ -121,6 +123,22 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `reportsGetStaffActivity` | `report.get_staff_activity` | `report` | `get_staff_activity` | `audit.action.report.get_staff_activity` | No | No | none | — | — |
 | `reportsGetStockValuation` | `report.get_stock_valuation` | `report` | `get_stock_valuation` | `audit.action.report.get_stock_valuation` | No | No | none | — | — |
 | `reportsGetTopEntities` | `report.get_top_entities` | `report` | `get_top_entities` | `audit.action.report.get_top_entities` | No | No | none | — | — |
+| `requestsActivityList` | `request.activity_list` | `request` | `activity_list` | `audit.action.request.activity_list` | No | No | none | `requests` | — |
+| `requestsAddComment` | `request.add_comment` | `request` | `add_comment` | `audit.action.request.add_comment` | No | Yes | mutation | `requests` | — |
+| `requestsAddInternalNote` | `request.add_internal_note` | `request` | `add_internal_note` | `audit.action.request.add_internal_note` | No | Yes | mutation | `requests` | — |
+| `requestsApply` | `request.apply` | `request` | `apply` | `audit.action.request.apply` | No | Yes | mutation | `requests` | `overrideReason` |
+| `requestsAssign` | `request.assign` | `request` | `assign` | `audit.action.request.assign` | No | Yes | mutation | `requests` | — |
+| `requestsCounts` | `request.counts` | `request` | `counts` | `audit.action.request.counts` | No | Yes | mutation | `requests` | — |
+| `requestsCreate` | `request.create` | `request` | `create` | `audit.action.request.create` | No | Yes | mutation | `requests` | — |
+| `requestsGet` | `request.get` | `request` | `get` | `audit.action.request.get` | No | No | none | `requests` | — |
+| `requestsInboxCounts` | `request.inbox_counts` | `request` | `inbox_counts` | `audit.action.request.inbox_counts` | No | Yes | mutation | `requests` | — |
+| `requestsInboxList` | `request.inbox_list` | `request` | `inbox_list` | `audit.action.request.inbox_list` | No | No | none | `requests` | — |
+| `requestsList` | `request.list` | `request` | `list` | `audit.action.request.list` | No | No | none | `requests` | — |
+| `requestsMeta` | `request.meta` | `request` | `meta` | `audit.action.request.meta` | No | Yes | mutation | `requests` | — |
+| `requestsSetPriority` | `request.set_priority` | `request` | `set_priority` | `audit.action.request.set_priority` | No | Yes | mutation | `requests` | — |
+| `requestsSlaAndLifecycleSweep` | `request.sla_and_lifecycle_sweep` | `request` | `sla_and_lifecycle_sweep` | `audit.action.request.sla_and_lifecycle_sweep` | No | No | system | `requests` | — |
+| `requestsTransition` | `request.transition` | `request` | `transition` | `audit.action.request.transition` | No | Yes | mutation | `requests` | `note`, `overrideReason`, `reason` |
+| `requestsUpdate` | `request.update` | `request` | `update` | `audit.action.request.update` | No | Yes | mutation | `requests` | — |
 | `returnsCreate` | `return.create` | `return` | `create` | `audit.action.return.create` | No | Yes | mutation | `returns` | `notes` |
 | `returnsList` | `return.list` | `return` | `list` | `audit.action.return.list` | No | No | none | `returns` | — |
 | `rolesCreate` | `role.create` | `role` | `create` | `audit.action.role.create` | No | Yes | mutation | `roles` | — |

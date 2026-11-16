@@ -1,0 +1,48 @@
+{
+  "category": "org_profile_change",
+  "schemaName": "OrgProfileChangeDetailsSchema",
+  "fields": [
+    {
+      "path": "field",
+      "type": "enum",
+      "required": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "name",
+        "businessType",
+        "businessCategory",
+        "financialYearStartMonth",
+        "moduleToggles",
+        "salesChannels",
+        "timezone",
+        "showCostToTenant"
+      ],
+      "uiHint": "dropdown",
+      "example": "name"
+    },
+    {
+      "path": "proposedValue",
+      "type": "unknown",
+      "required": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample proposedValue"
+    },
+    {
+      "path": "reason",
+      "type": "string",
+      "required": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 2000
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample reason"
+    }
+  ]
+}
