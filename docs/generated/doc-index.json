@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
-  "totalDocuments": 133,
+  "totalDocuments": 160,
   "countsByClassification": {
-    "KEEP+UPDATE": 91,
+    "KEEP+UPDATE": 115,
     "REWRITE": 2,
-    "ARCHIVE": 14,
+    "ARCHIVE": 17,
     "GENERATED": 26
   },
   "documents": [
@@ -31,6 +31,12 @@
       "title": "Trado Architecture Overview",
       "classification": "KEEP+UPDATE",
       "lineCount": 171
+    },
+    {
+      "path": "docs/audit/2026-11-16-master-financial-branch-inventory-audit.md",
+      "title": "Master Forensic Audit & Architecture Blueprint: Financial Accounting, Multi-Branch Operations, Warehouses, Stock Transfers & Approvals",
+      "classification": "ARCHIVE",
+      "lineCount": 237
     },
     {
       "path": "docs/audit/api-logic-ledger.md",
@@ -67,6 +73,18 @@
       "title": "Prompt-62 Reference Catalog (§4) Diff Ledger (Y-8)",
       "classification": "ARCHIVE",
       "lineCount": 157
+    },
+    {
+      "path": "docs/audit/changes/run-74.md",
+      "title": "Run 74 Change Record — Requests and Support Desk Module (Prompt 74)",
+      "classification": "ARCHIVE",
+      "lineCount": 121
+    },
+    {
+      "path": "docs/audit/changes/run-75.md",
+      "title": "Run 75 Change Record — Master Financial Accounting, Branch Operations, Inventory, Stock Transfers & Permissions (Prompt 75)",
+      "classification": "ARCHIVE",
+      "lineCount": 90
     },
     {
       "path": "docs/audit/coverage.md",
@@ -126,7 +144,7 @@
       "path": "docs/audit/handoff.md",
       "title": "Trado Engineering Handoff (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 16
+      "lineCount": 42
     },
     {
       "path": "docs/audit/implementation-status.md",
@@ -168,7 +186,7 @@
       "path": "docs/audit/open-questions.md",
       "title": "Open Questions & Business Decision Register (Appendix B)",
       "classification": "ARCHIVE",
-      "lineCount": 111
+      "lineCount": 123
     },
     {
       "path": "docs/audit/phase-reports-archive.md",
@@ -192,7 +210,7 @@
       "path": "docs/audit/run-ledger.md",
       "title": "Trado Engineering Run Ledger (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 13
+      "lineCount": 16
     },
     {
       "path": "docs/audit/test-coverage-matrix.md",
@@ -246,19 +264,25 @@
       "path": "docs/data-model.md",
       "title": "Trado Data Model & Schema Specification",
       "classification": "KEEP+UPDATE",
-      "lineCount": 925
+      "lineCount": 938
     },
     {
       "path": "docs/decisions/decision-register.md",
-      "title": "Trado Architectural Decision Register (D-1 .. D-35)",
+      "title": "Trado Architectural Decision Register (D-1 .. D-52)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 51
+      "lineCount": 82
     },
     {
       "path": "docs/decisions-log.md",
       "title": "Trado Architectural Decisions Log",
       "classification": "KEEP+UPDATE",
       "lineCount": 235
+    },
+    {
+      "path": "docs/design/requests-as-found.md",
+      "title": "Requests & Support Desk Module — As-Found Inventory (RB0)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 49
     },
     {
       "path": "docs/feature-audit-matrix.md",
@@ -378,7 +402,7 @@
       "path": "docs/flutter-contract/CHANGES.md",
       "title": "Backend Contract Changes (Prompts 60–69)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 14
+      "lineCount": 22
     },
     {
       "path": "docs/flutter-contract/client-meta-and-idempotency.md",
@@ -390,7 +414,13 @@
       "path": "docs/flutter-contract/errors.md",
       "title": "Error Index & Handling",
       "classification": "KEEP+UPDATE",
-      "lineCount": 26
+      "lineCount": 42
+    },
+    {
+      "path": "docs/flutter-contract/forms/account_transfer.md",
+      "title": "Form Contract: Account Transfer (`account_transfer`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 16
     },
     {
       "path": "docs/flutter-contract/forms/approval_request.md",
@@ -402,13 +432,19 @@
       "path": "docs/flutter-contract/forms/bill.md",
       "title": "Form Contract: Bill / POS Sale (`bill`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 29
+      "lineCount": 35
     },
     {
       "path": "docs/flutter-contract/forms/branch.md",
       "title": "Form Contract: Branch (`branch`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 35
+      "lineCount": 36
+    },
+    {
+      "path": "docs/flutter-contract/forms/capital_transaction.md",
+      "title": "Form Contract: Capital Transaction (`capital_transaction`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 18
     },
     {
       "path": "docs/flutter-contract/forms/category.md",
@@ -444,7 +480,13 @@
       "path": "docs/flutter-contract/forms/expense.md",
       "title": "Form Contract: Expense (Outflow) (`expense`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 41
+      "lineCount": 47
+    },
+    {
+      "path": "docs/flutter-contract/forms/financial_account.md",
+      "title": "Form Contract: Financial Account (`financial_account`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 23
     },
     {
       "path": "docs/flutter-contract/forms/job_role.md",
@@ -462,7 +504,13 @@
       "path": "docs/flutter-contract/forms/payment.md",
       "title": "Form Contract: Payment (`payment`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 25
+      "lineCount": 29
+    },
+    {
+      "path": "docs/flutter-contract/forms/payment_processing_fee.md",
+      "title": "Form Contract: Payment Processing Fee (`payment_processing_fee`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 22
     },
     {
       "path": "docs/flutter-contract/forms/plan.md",
@@ -474,19 +522,115 @@
       "path": "docs/flutter-contract/forms/product.md",
       "title": "Form Contract: Product (`product`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 70
+      "lineCount": 71
     },
     {
       "path": "docs/flutter-contract/forms/purchase.md",
       "title": "Form Contract: Purchase (Outflow) (`purchase`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 41
+      "lineCount": 47
     },
     {
       "path": "docs/flutter-contract/forms/recurring_expense.md",
       "title": "Form Contract: Recurring Expense (`recurring_expense`)",
       "classification": "KEEP+UPDATE",
       "lineCount": 36
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-access_request.md",
+      "title": "Request Details Schema: `access_request`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 13
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-billing_query.md",
+      "title": "Request Details Schema: `billing_query`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 12
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-bug_report.md",
+      "title": "Request Details Schema: `bug_report`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 16
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-data_issue.md",
+      "title": "Request Details Schema: `data_issue`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 12
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-data_request.md",
+      "title": "Request Details Schema: `data_request`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 12
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-feature_request.md",
+      "title": "Request Details Schema: `feature_request`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 14
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-improvement.md",
+      "title": "Request Details Schema: `improvement`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 11
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-limit_increase.md",
+      "title": "Request Details Schema: `limit_increase`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 12
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-module_request.md",
+      "title": "Request Details Schema: `module_request`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 11
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-org_profile_change.md",
+      "title": "Request Details Schema: `org_profile_change`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 11
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-other.md",
+      "title": "Request Details Schema: `other`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 9
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-ownership_transfer.md",
+      "title": "Request Details Schema: `ownership_transfer`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 12
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-plan_change.md",
+      "title": "Request Details Schema: `plan_change`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 12
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-security_concern.md",
+      "title": "Request Details Schema: `security_concern`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 11
+    },
+    {
+      "path": "docs/flutter-contract/forms/request-details-support_question.md",
+      "title": "Request Details Schema: `support_question`",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 10
+    },
+    {
+      "path": "docs/flutter-contract/forms/request.md",
+      "title": "Form Contract: Request / Support Ticket (`request`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 28
     },
     {
       "path": "docs/flutter-contract/forms/return.md",
@@ -504,7 +648,19 @@
       "path": "docs/flutter-contract/forms/stock_adjustment.md",
       "title": "Form Contract: Stock Adjustment / Wastage (`stock_adjustment`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 16
+      "lineCount": 17
+    },
+    {
+      "path": "docs/flutter-contract/forms/stock_transfer.md",
+      "title": "Form Contract: Stock Transfer (`stock_transfer`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 20
+    },
+    {
+      "path": "docs/flutter-contract/forms/storage_location.md",
+      "title": "Form Contract: Storage Location (`storage_location`)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 31
     },
     {
       "path": "docs/flutter-contract/forms/task.md",
@@ -534,7 +690,7 @@
       "path": "docs/flutter-contract/permissions.md",
       "title": "Permission Catalog & UI Gating",
       "classification": "KEEP+UPDATE",
-      "lineCount": 138
+      "lineCount": 167
     },
     {
       "path": "docs/flutter-contract/README.md",
@@ -558,13 +714,13 @@
       "path": "docs/flutter-contract/state-machines.md",
       "title": "Document State Machines & Status Transitions",
       "classification": "KEEP+UPDATE",
-      "lineCount": 14
+      "lineCount": 16
     },
     {
       "path": "docs/flutter-contract/SUMMARY.md",
       "title": "Trado Flutter Backend Contract — Summary Cheatsheet",
       "classification": "KEEP+UPDATE",
-      "lineCount": 100
+      "lineCount": 108
     },
     {
       "path": "docs/flutter-contract/usage-limits.md",
@@ -619,6 +775,12 @@
       "title": "Trado Permissions, Roles & Privilege Matrix",
       "classification": "KEEP+UPDATE",
       "lineCount": 262
+    },
+    {
+      "path": "docs/plans/2026-11-15-requests-module.md",
+      "title": "Requests & Support Desk Module — Implementation Plan (RB1)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 231
     },
     {
       "path": "docs/process/ask-protocol.md",

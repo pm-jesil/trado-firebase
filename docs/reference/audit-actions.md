@@ -10,13 +10,18 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `auth` | 2 |
 | `export` | 3 |
 | `file` | 3 |
-| `mutation` | 68 |
-| `none` | 54 |
+| `mutation` | 80 |
+| `none` | 70 |
 | `read_sensitive` | 1 |
 | `system` | 8 |
 
 | Code | Action | Entity Type | Verb | Display Key | Status Tracked | Audit Before | Category | Primary Collection | Reason Fields |
 |---|---|---|---|---|---|---|---|---|---|
+| `accountTransfersCreate` | `account_transfer.create` | `account_transfer` | `create` | `audit.action.account_transfer.create` | No | Yes | mutation | `accountTransfers` | `notes` |
+| `accountTransfersGet` | `account_transfer.get` | `account_transfer` | `get` | `audit.action.account_transfer.get` | No | No | none | `accountTransfers` | — |
+| `accountTransfersList` | `account_transfer.list` | `account_transfer` | `list` | `audit.action.account_transfer.list` | No | No | none | `accountTransfers` | — |
+| `approvalsCounts` | `approval.counts` | `approval` | `counts` | `audit.action.approval.counts` | No | Yes | mutation | — | — |
+| `approvalsList` | `approval.list` | `approval` | `list` | `audit.action.approval.list` | No | No | none | — | — |
 | `auditGetEntityHistory` | `audit.get_entity_history` | `audit` | `get_entity_history` | `audit.action.audit.get_entity_history` | No | No | none | — | — |
 | `auditLogsList` | `audit_log.list` | `audit_log` | `list` | `audit.action.audit_log.list` | No | No | none | `auditLogs` | — |
 | `authLogin` | `auth.login` | `auth` | `login` | `audit.action.auth.login` | No | No | auth | — | — |
@@ -34,6 +39,8 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `branchesGetDefault` | `branch.get_default` | `branch` | `get_default` | `audit.action.branch.get_default` | No | No | none | `branches` | — |
 | `branchesList` | `branch.list` | `branch` | `list` | `audit.action.branch.list` | No | No | none | `branches` | — |
 | `branchesUpdate` | `branch.update` | `branch` | `update` | `audit.action.branch.update` | No | Yes | mutation | `branches` | — |
+| `capitalTransactionsCreate` | `capital_transaction.create` | `capital_transaction` | `create` | `audit.action.capital_transaction.create` | No | Yes | mutation | `capitalTransactions` | — |
+| `capitalTransactionsList` | `capital_transaction.list` | `capital_transaction` | `list` | `audit.action.capital_transaction.list` | No | No | none | `capitalTransactions` | — |
 | `categoriesCreate` | `category.create` | `category` | `create` | `audit.action.category.create` | No | Yes | mutation | `categories` | — |
 | `categoriesList` | `category.list` | `category` | `list` | `audit.action.category.list` | No | No | none | `categories` | — |
 | `categoriesUpdate` | `category.update` | `category` | `update` | `audit.action.category.update` | No | Yes | mutation | `categories` | — |
@@ -54,6 +61,11 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `employeesGet` | `employee.get` | `employee` | `get` | `audit.action.employee.get` | No | No | none | `memberships` | — |
 | `employeesList` | `employee.list` | `employee` | `list` | `audit.action.employee.list` | No | No | none | `memberships` | — |
 | `employeesUpdate` | `employee.update` | `employee` | `update` | `audit.action.employee.update` | No | Yes | mutation | `memberships` | — |
+| `financialAccountsCreate` | `financial_account.create` | `financial_account` | `create` | `audit.action.financial_account.create` | No | Yes | mutation | `financialAccounts` | `notes` |
+| `financialAccountsGet` | `financial_account.get` | `financial_account` | `get` | `audit.action.financial_account.get` | No | No | none | `financialAccounts` | — |
+| `financialAccountsGetLedger` | `financial_account.get_ledger` | `financial_account` | `get_ledger` | `audit.action.financial_account.get_ledger` | No | No | none | `financialAccounts` | — |
+| `financialAccountsList` | `financial_account.list` | `financial_account` | `list` | `audit.action.financial_account.list` | No | No | none | `financialAccounts` | — |
+| `financialAccountsUpdate` | `financial_account.update` | `financial_account` | `update` | `audit.action.financial_account.update` | No | Yes | mutation | `financialAccounts` | `notes` |
 | `healthCheck` | `health.check` | `health` | `check` | `audit.action.health.check` | No | No | none | — | — |
 | `imagesAttach` | `image.attach` | `image` | `attach` | `audit.action.image.attach` | No | No | file | — | — |
 | `imagesCreateUploadSession` | `image.create_upload_session` | `image` | `create_upload_session` | `audit.action.image.create_upload_session` | No | No | file | — | — |
@@ -90,7 +102,10 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `outflowsList` | `outflow.list` | `outflow` | `list` | `audit.action.outflow.list` | Yes | No | none | `outflows` | — |
 | `outflowsVoid` | `outflow.void` | `outflow` | `void` | `audit.action.outflow.void` | Yes | Yes | mutation | `outflows` | `reason` |
 | `paymentsCreate` | `payment.create` | `payment` | `create` | `audit.action.payment.create` | No | Yes | mutation | `payments` | `notes` |
+| `paymentsGetFee` | `payment.get_fee` | `payment` | `get_fee` | `audit.action.payment.get_fee` | No | No | none | — | — |
 | `paymentsList` | `payment.list` | `payment` | `list` | `audit.action.payment.list` | No | No | none | `payments` | — |
+| `paymentsListFees` | `payment.list_fees` | `payment` | `list_fees` | `audit.action.payment.list_fees` | No | No | none | — | — |
+| `paymentsRecordFee` | `payment.record_fee` | `payment` | `record_fee` | `audit.action.payment.record_fee` | No | Yes | mutation | `payments` | `notes` |
 | `paymentsVoid` | `payment.void` | `payment` | `void` | `audit.action.payment.void` | Yes | Yes | mutation | `payments` | `reason` |
 | `permissionCatalogList` | `permission_catalog.list` | `permission_catalog` | `list` | `audit.action.permission_catalog.list` | No | No | none | `permissionCatalog` | — |
 | `plansArchive` | `plan.archive` | `plan` | `archive` | `audit.action.plan.archive` | No | No | admin | `subscriptionPlans` | `reason` |
@@ -115,10 +130,13 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `recurringExpensesList` | `recurring_expense.list` | `recurring_expense` | `list` | `audit.action.recurring_expense.list` | No | No | none | `recurringExpenses` | — |
 | `recurringExpensesUpdate` | `recurring_expense.update` | `recurring_expense` | `update` | `audit.action.recurring_expense.update` | No | Yes | mutation | `recurringExpenses` | — |
 | `reportsExportCsv` | `report.export_csv` | `report` | `export_csv` | `audit.action.report.export_csv` | No | No | export | — | — |
+| `reportsGetCashBankSummary` | `report.get_cash_bank_summary` | `report` | `get_cash_bank_summary` | `audit.action.report.get_cash_bank_summary` | No | No | none | — | — |
 | `reportsGetOutflowSummary` | `report.get_outflow_summary` | `report` | `get_outflow_summary` | `audit.action.report.get_outflow_summary` | No | No | read_sensitive | — | — |
 | `reportsGetPartyStatement` | `report.get_party_statement` | `report` | `get_party_statement` | `audit.action.report.get_party_statement` | No | No | export | — | — |
+| `reportsGetPayablesAgeing` | `report.get_payables_ageing` | `report` | `get_payables_ageing` | `audit.action.report.get_payables_ageing` | No | No | none | — | — |
 | `reportsGetPlatformOverview` | `report.get_platform_overview` | `report` | `get_platform_overview` | `audit.action.report.get_platform_overview` | No | No | admin | — | — |
 | `reportsGetProfitLoss` | `report.get_profit_loss` | `report` | `get_profit_loss` | `audit.action.report.get_profit_loss` | No | No | none | — | — |
+| `reportsGetReceivablesAgeing` | `report.get_receivables_ageing` | `report` | `get_receivables_ageing` | `audit.action.report.get_receivables_ageing` | No | No | none | — | — |
 | `reportsGetRevenue` | `report.get_revenue` | `report` | `get_revenue` | `audit.action.report.get_revenue` | No | No | none | — | — |
 | `reportsGetStaffActivity` | `report.get_staff_activity` | `report` | `get_staff_activity` | `audit.action.report.get_staff_activity` | No | No | none | — | — |
 | `reportsGetStockValuation` | `report.get_stock_valuation` | `report` | `get_stock_valuation` | `audit.action.report.get_stock_valuation` | No | No | none | — | — |
@@ -147,6 +165,16 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `sharingPoliciesUpdate` | `sharing.policies_update` | `sharing` | `policies_update` | `audit.action.sharing.policies_update` | No | Yes | mutation | — | — |
 | `stockAdjust` | `stock.adjust` | `stock` | `adjust` | `audit.action.stock.adjust` | No | Yes | mutation | — | `reason`, `reasonCode` |
 | `stockMovementsList` | `stock_movement.list` | `stock_movement` | `list` | `audit.action.stock_movement.list` | No | No | none | `stockMovements` | — |
+| `stockTransfersCreate` | `stock_transfer.create` | `stock_transfer` | `create` | `audit.action.stock_transfer.create` | No | Yes | mutation | `stockTransfers` | `notes` |
+| `stockTransfersDispatch` | `stock_transfer.dispatch` | `stock_transfer` | `dispatch` | `audit.action.stock_transfer.dispatch` | No | Yes | mutation | `stockTransfers` | `notes` |
+| `stockTransfersGet` | `stock_transfer.get` | `stock_transfer` | `get` | `audit.action.stock_transfer.get` | No | No | none | `stockTransfers` | — |
+| `stockTransfersList` | `stock_transfer.list` | `stock_transfer` | `list` | `audit.action.stock_transfer.list` | No | No | none | `stockTransfers` | — |
+| `stockTransfersReceive` | `stock_transfer.receive` | `stock_transfer` | `receive` | `audit.action.stock_transfer.receive` | No | Yes | mutation | `stockTransfers` | `notes` |
+| `stockTransfersSubmit` | `stock_transfer.submit` | `stock_transfer` | `submit` | `audit.action.stock_transfer.submit` | No | Yes | mutation | `stockTransfers` | — |
+| `storageLocationsCreate` | `storage_location.create` | `storage_location` | `create` | `audit.action.storage_location.create` | No | Yes | mutation | `storageLocations` | `notes` |
+| `storageLocationsGet` | `storage_location.get` | `storage_location` | `get` | `audit.action.storage_location.get` | No | No | none | `storageLocations` | — |
+| `storageLocationsList` | `storage_location.list` | `storage_location` | `list` | `audit.action.storage_location.list` | No | No | none | `storageLocations` | — |
+| `storageLocationsUpdate` | `storage_location.update` | `storage_location` | `update` | `audit.action.storage_location.update` | No | Yes | mutation | `storageLocations` | `notes` |
 | `subscriptionAndUsageSweep` | `subscription.sweep` | `subscription` | `sweep` | `audit.action.subscription.sweep` | No | No | system | — | — |
 | `tasksAssign` | `task.assign` | `task` | `assign` | `audit.action.task.assign` | Yes | Yes | mutation | `tasks` | — |
 | `tasksCreate` | `task.create` | `task` | `create` | `audit.action.task.create` | Yes | Yes | mutation | `tasks` | — |

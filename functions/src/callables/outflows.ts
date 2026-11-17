@@ -33,7 +33,12 @@ import {
   VendorDoc,
   ProductDoc,
   MembershipDoc,
+  SplitPaymentEntry,
 } from "../types/models.js";
+import {
+  prepareAccountTransactionInTxn,
+  applyAccountTransactionInTxn,
+} from "../services/ledgerService.js";
 import {
   OutflowKind,
   OutflowStatus,
@@ -106,9 +111,12 @@ interface OutflowEffectsParams {
   balanceAmount: number;
   paidAmount: number;
   paymentMethod: PaymentMethod;
+  financialAccountId?: string | null;
+  splitPayments?: SplitPaymentEntry[];
+  storageLocationId?: string;
 }
 
-function stockItemsForPurchase(outflowId: string, lines: OutflowLine[]): StockChangeItem[] {
+function stockItemsForPurchase(outflowId: string, lines: OutflowLine[], storageLocationId?: string): StockChangeItem[] {
   const items: StockChangeItem[] = [];
   for (const line of lines) {
     if (!line.productId || !line.addToStock) continue;
@@ -123,6 +131,7 @@ function stockItemsForPurchase(outflowId: string, lines: OutflowLine[]): StockCh
       referenceId: outflowId,
       referenceModel: "outflow",
       referenceLineId: line.lineId,
+      storageLocationId,
       reason: `Purchase receipt ${outflowId}`,
     });
     const damagedBase = Money.qty((line.damagedQuantity || 0) * factor);
@@ -134,6 +143,7 @@ function stockItemsForPurchase(outflowId: string, lines: OutflowLine[]): StockCh
         referenceId: outflowId,
         referenceModel: "outflow",
         referenceLineId: line.lineId,
+        storageLocationId,
         reason: line.damageReason || "Damaged on receipt",
         reasonCode: StockAdjustmentReason.DAMAGED_ON_RECEIPT,
       });
@@ -147,7 +157,7 @@ async function prepareOutflowEffects(txn: Transaction, p: OutflowEffectsParams) 
   const paymentReservation = p.paidAmount > 0
     ? await readNextDocumentNumberInTxn(txn, { organizationId: orgId, type: "PAY" })
     : null;
-  const stockItems = p.doc.kind === OutflowKind.PURCHASE ? stockItemsForPurchase(p.outflowId, p.doc.lines) : [];
+  const stockItems = p.doc.kind === OutflowKind.PURCHASE ? stockItemsForPurchase(p.outflowId, p.doc.lines, p.storageLocationId) : [];
   const preparedStock = stockItems.length
     ? await prepareStockChangesInTxn(txn, { organizationId: orgId, branchId: p.branchId, actorUid: p.ctx.callerUid, items: stockItems })
     : null;
@@ -155,6 +165,53 @@ async function prepareOutflowEffects(txn: Transaction, p: OutflowEffectsParams) 
   const vendorSnap = vendorRef ? await txn.get(vendorRef) : null;
   if (vendorSnap?.exists && (vendorSnap.data() as VendorDoc).organizationId !== orgId) {
     throw new HttpsError("permission-denied", "Cross-tenant vendor reference rejected.");
+  }
+
+  // Operational financial account ledger preps
+  const splitPreps: Array<{
+    prep: Awaited<ReturnType<typeof prepareAccountTransactionInTxn>>;
+    accountId: string;
+    method: PaymentMethod;
+    amount: number;
+  }> = [];
+
+  const txnType = p.doc.kind === OutflowKind.PURCHASE ? "vendor_payment" : "expense";
+  if (p.splitPayments && p.splitPayments.length > 0) {
+    for (const split of p.splitPayments) {
+      if (split.amount > 0) {
+        const prep = await prepareAccountTransactionInTxn(txn, {
+          organizationId: orgId,
+          financialAccountId: split.financialAccountId,
+          branchId: p.branchId,
+          type: txnType,
+          direction: "out",
+          amount: split.amount,
+          sourceDocumentType: "outflow",
+          sourceDocumentId: p.outflowId,
+          partyType: p.doc.vendorId ? "vendor" : null,
+          partyId: p.doc.vendorId || null,
+          description: `${p.doc.kind === OutflowKind.PURCHASE ? "Purchase" : "Expense"} ${p.outflowId} (${split.method})`,
+          actorUid: p.ctx.callerUid,
+        });
+        splitPreps.push({ prep, accountId: split.financialAccountId, method: split.method, amount: split.amount });
+      }
+    }
+  } else if (p.paidAmount > 0 && p.financialAccountId) {
+    const singlePrep = await prepareAccountTransactionInTxn(txn, {
+      organizationId: orgId,
+      financialAccountId: p.financialAccountId,
+      branchId: p.branchId,
+      type: txnType,
+      direction: "out",
+      amount: p.paidAmount,
+      sourceDocumentType: "outflow",
+      sourceDocumentId: p.outflowId,
+      partyType: p.doc.vendorId ? "vendor" : null,
+      partyId: p.doc.vendorId || null,
+      description: `${p.doc.kind === OutflowKind.PURCHASE ? "Purchase" : "Expense"} ${p.outflowId}`,
+      actorUid: p.ctx.callerUid,
+    });
+    splitPreps.push({ prep: singlePrep, accountId: p.financialAccountId, method: p.paymentMethod, amount: p.paidAmount });
   }
 
   return (): { paymentId: string | null } => {
@@ -168,6 +225,25 @@ async function prepareOutflowEffects(txn: Transaction, p: OutflowEffectsParams) 
         updatedAt: now,
       });
     }
+
+    // Apply financial account ledger updates
+    for (const sp of splitPreps) {
+      applyAccountTransactionInTxn(txn, sp.prep, {
+        organizationId: orgId,
+        financialAccountId: sp.accountId,
+        branchId: p.branchId,
+        type: txnType,
+        direction: "out",
+        amount: sp.amount,
+        sourceDocumentType: "outflow",
+        sourceDocumentId: p.outflowId,
+        partyType: p.doc.vendorId ? "vendor" : null,
+        partyId: p.doc.vendorId || null,
+        description: `${p.doc.kind === OutflowKind.PURCHASE ? "Purchase" : "Expense"} ${p.outflowId} (${sp.method})`,
+        actorUid: p.ctx.callerUid,
+      });
+    }
+
     let paymentId: string | null = null;
     if (paymentReservation) {
       commitDocumentNumberInTxn(txn, paymentReservation);
@@ -177,6 +253,7 @@ async function prepareOutflowEffects(txn: Transaction, p: OutflowEffectsParams) 
       const paymentDoc: PaymentDoc = {
         organizationId: orgId,
         branchId: p.branchId,
+        financialAccountId: p.financialAccountId || (p.splitPayments?.[0]?.financialAccountId ?? null),
         paymentNumber: paymentReservation.formattedNumber,
         direction: PaymentDirection.OUT,
         partyType: isEmployee ? PartyType.EMPLOYEE : (p.doc.vendorId ? PartyType.VENDOR : PartyType.OTHER),
@@ -342,9 +419,14 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
       ? invoiceLockRef(orgId, input.vendorId, input.invoiceNumber)
       : null;
 
+    const effectiveAccountId = input.financialAccountId || ctx.branch?.settings?.defaultFinancialAccountId || undefined;
+
     const outflowDoc: OutflowDoc = {
       organizationId: orgId,
       branchId,
+      financialAccountId: effectiveAccountId || null,
+      storageLocationId: input.storageLocationId || null,
+      splitPayments: input.splitPayments || undefined,
       outflowNumber: "",
       kind: input.kind,
       status: pendingApproval ? "pending_approval" : OutflowStatus.CONFIRMED,
@@ -394,7 +476,12 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
       }
       const commitEffects = pendingApproval
         ? null
-        : await prepareOutflowEffects(txn, { ctx, outflowId, doc: outflowDoc, branchId, balanceAmount, paidAmount, paymentMethod });
+        : await prepareOutflowEffects(txn, {
+          ctx, outflowId, doc: outflowDoc, branchId, balanceAmount, paidAmount, paymentMethod,
+          financialAccountId: effectiveAccountId,
+          splitPayments: input.splitPayments,
+          storageLocationId: input.storageLocationId,
+        });
       // Pending purchases register their serials as pending_receipt (unique now, in stock on approval)
       const commitSerials = serialLines.length
         ? await prepareSerialsInTxn(txn, { organizationId: orgId, branchId, lines: serialLines, action: { kind: "receive", outflowId, pending: pendingApproval } })
@@ -546,6 +633,9 @@ export async function decideOutflow(ctx: RequestContext, input: DocumentDecision
       balanceAmount,
       paidAmount,
       paymentMethod: doc.requestedPaymentMethod || PaymentMethod.CASH,
+      financialAccountId: doc.financialAccountId || null,
+      splitPayments: doc.splitPayments,
+      storageLocationId: doc.storageLocationId || undefined,
     });
     const effects = commitEffects();
     if (commitSerials) commitSerials();
@@ -652,6 +742,30 @@ export const outflowsVoid = onCall({ region: "asia-south1" }, async (request) =>
         ? await prepareSerialsInTxn(txn, { organizationId: orgId, branchId: doc.branchId || "main-branch", lines: received, action: { kind: "void_receipt", outflowId: snap.id } })
         : null;
 
+      // Prepare reversals for payments tied to financial accounts
+      const paymentReversalPreps: Array<{
+        prep: Awaited<ReturnType<typeof prepareAccountTransactionInTxn>>;
+        pDoc: PaymentDoc;
+      }> = [];
+      for (const p of paymentsSnap.docs) {
+        const pDoc = p.data() as PaymentDoc;
+        if (pDoc.status === "completed" && pDoc.financialAccountId) {
+          const prep = await prepareAccountTransactionInTxn(txn, {
+            organizationId: orgId,
+            financialAccountId: pDoc.financialAccountId,
+            branchId: pDoc.branchId || doc.branchId,
+            type: "reversal",
+            direction: pDoc.direction === "in" ? "out" : "in",
+            amount: pDoc.amount,
+            sourceDocumentType: "outflow",
+            sourceDocumentId: snap.id,
+            description: `Void outflow ${doc.outflowNumber}`,
+            actorUid: ctx.callerUid,
+          });
+          paymentReversalPreps.push({ prep, pDoc });
+        }
+      }
+
       if (preparedStock) commitStockChangesInTxn(txn, preparedStock);
       if (unreceive) unreceive();
       if (vendRef && vendSnap?.exists) {
@@ -662,6 +776,22 @@ export const outflowsVoid = onCall({ region: "asia-south1" }, async (request) =>
           updatedAt: now,
         });
       }
+
+      for (const pr of paymentReversalPreps) {
+        applyAccountTransactionInTxn(txn, pr.prep, {
+          organizationId: orgId,
+          financialAccountId: pr.pDoc.financialAccountId!,
+          branchId: pr.pDoc.branchId || doc.branchId,
+          type: "reversal",
+          direction: pr.pDoc.direction === "in" ? "out" : "in",
+          amount: pr.pDoc.amount,
+          sourceDocumentType: "outflow",
+          sourceDocumentId: snap.id,
+          description: `Void outflow ${doc.outflowNumber}`,
+          actorUid: ctx.callerUid,
+        });
+      }
+
       let voidedPayments = 0;
       for (const p of paymentsSnap.docs) {
         if ((p.data() as PaymentDoc).status !== "completed") continue;

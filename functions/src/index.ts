@@ -181,8 +181,51 @@ export { recurringExpensesCreate, recurringExpensesUpdate, recurringExpensesList
 // Storage byte metering (organization-prefixed uploads)
 export { onStorageObjectFinalized } from "./triggers/storageTriggers.js";
 
-// Maker–checker decisions (bills, purchases/expenses, returns, stock adjustments)
-export { documentsDecide } from "./callables/approvals.js";
+// Maker–checker decisions & inbox (FB-7)
+export {
+  documentsDecide,
+  approvalsList,
+  approvalsCounts,
+} from "./callables/approvals.js";
+
+// Financial Accounts & Transfers (FB-5)
+export {
+  financialAccountsCreate,
+  financialAccountsUpdate,
+  financialAccountsList,
+  financialAccountsGet,
+  financialAccountsGetLedger,
+  accountTransfersCreate,
+  accountTransfersList,
+  accountTransfersGet,
+  capitalTransactionsCreate,
+  capitalTransactionsList,
+} from "./callables/financialAccounts.js";
+
+// Payment Processing Charges & Fees (Section 9)
+export {
+  paymentsRecordFee,
+  paymentsListFees,
+  paymentsGetFee,
+} from "./callables/paymentFees.js";
+
+// Warehouse & Storage Locations
+export {
+  storageLocationsCreate,
+  storageLocationsUpdate,
+  storageLocationsList,
+  storageLocationsGet,
+} from "./callables/storageLocations.js";
+
+// Inter-Branch Stock Transfers
+export {
+  stockTransfersCreate,
+  stockTransfersSubmit,
+  stockTransfersDispatch,
+  stockTransfersReceive,
+  stockTransfersList,
+  stockTransfersGet,
+} from "./callables/stockTransfers.js";
 
 // Deliveries & Dispatch
 export {
@@ -233,6 +276,9 @@ export {
   reportsExportCsv,
   reportsGetPartyStatement,
   reportsGetOutflowSummary,
+  reportsGetReceivablesAgeing,
+  reportsGetPayablesAgeing,
+  reportsGetCashBankSummary,
 } from "./callables/reports.js";
 
 // Platform Super Admin Users Directory

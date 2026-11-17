@@ -45,6 +45,19 @@
       "example": "Sample branchId"
     },
     {
+      "path": "storageLocationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample storageLocationId"
+    },
+    {
       "path": "productId",
       "type": "string",
       "requiredCreate": true,

@@ -695,6 +695,77 @@
       "field": "activityId",
       "owner": "requests",
       "reason": "Document self ID stored on timeline entry record for client reference and deduplication."
+    },
+    {
+      "id": "DUP-083",
+      "kind": "R4",
+      "collection": "accountTransactions",
+      "field": "balanceAfter",
+      "owner": "financialAccounts",
+      "reason": "Running account balance snapshot at the exact time of the transaction for point-in-time statements and audit."
+    },
+    {
+      "id": "DUP-084",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "stockTransfers",
+      "field": "items",
+      "owner": "stockTransfers",
+      "cap": 200,
+      "reason": "Inter-branch stock transfer line items array capped at 200 in CreateStockTransferSchema."
+    },
+    {
+      "id": "DUP-085",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "accountReconciliations",
+      "field": "reconciledTransactionIds",
+      "owner": "financialAccounts",
+      "serverWritten": true,
+      "cap": 500,
+      "reason": "Array of reconciled ledger transaction IDs bounded per statement period."
+    },
+    {
+      "id": "DUP-088",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "payments",
+      "field": "allocations",
+      "owner": "payments",
+      "cap": 200,
+      "reason": "Payment document allocation breakdown array capped at 200 in CreatePaymentSchema."
+    },
+    {
+      "id": "DUP-089",
+      "kind": "R2",
+      "collection": "paymentProcessingFees",
+      "field": "grossAmount",
+      "owner": "payments",
+      "reason": "Frozen snapshot of the source payment transaction gross amount at fee recording time."
+    },
+    {
+      "id": "DUP-090",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "bills",
+      "field": "splitPayments",
+      "owner": "bills",
+      "cap": 5,
+      "reason": "Split payment tenders array on bills capped at 5 in CreateBillSchema."
+    },
+    {
+      "id": "DUP-091",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "outflows",
+      "field": "splitPayments",
+      "owner": "outflows",
+      "cap": 5,
+      "reason": "Split payment tenders array on outflows capped at 5 in CreateOutflowSchema."
+    },
+    {
+      "id": "DUP-092",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "financialAccounts",
+      "field": "assignedBranchIds",
+      "owner": "financialAccounts",
+      "cap": 100,
+      "reason": "Branch authorization allowlist for branch-scoped operational account transactions, capped at 100 in CreateFinancialAccountSchema."
     }
   ]
 }

@@ -346,6 +346,91 @@
       "example": "cash"
     },
     {
+      "path": "financialAccountId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample financialAccountId"
+    },
+    {
+      "path": "storageLocationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample storageLocationId"
+    },
+    {
+      "path": "splitPayments[].method",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "cash",
+        "card",
+        "upi",
+        "bank_transfer",
+        "cheque",
+        "other"
+      ],
+      "uiHint": "dropdown",
+      "example": "cash"
+    },
+    {
+      "path": "splitPayments[].amount",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "money_paise",
+      "example": 2500
+    },
+    {
+      "path": "splitPayments[].financialAccountId",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample splitPayments[].financialAccountId"
+    },
+    {
+      "path": "splitPayments[].notes",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 300
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample splitPayments[].notes"
+    },
+    {
       "path": "notes",
       "type": "string",
       "requiredCreate": false,

@@ -87,8 +87,24 @@ async function getIdToken(email, password = "TestPassword123!") {
 
 /**
  * Call an exported HTTPS Callable function with optional Auth ID token.
+ * Supports both signatures:
+ *   1) callFunction(name, data, token, timeoutMs)
+ *   2) callFunction(callerPersonaOrToken, name, data, timeoutMs)
  */
-async function callFunction(name, data = {}, token = null, timeoutMs = 90000) {
+async function callFunction(nameOrCaller, dataOrName = {}, tokenOrData = null, timeoutMs = 90000) {
+  let name = nameOrCaller;
+  let data = dataOrName;
+  let token = tokenOrData;
+
+  if (typeof dataOrName === "string") {
+    const caller = nameOrCaller;
+    name = dataOrName;
+    data = tokenOrData || {};
+    token = (caller && typeof caller === "object" && caller.idToken)
+      ? caller.idToken
+      : (typeof caller === "string" ? caller : null);
+  }
+
   const headers = { "Content-Type": "application/json" };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;

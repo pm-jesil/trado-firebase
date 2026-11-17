@@ -64,15 +64,18 @@ import { fetchPage } from "../services/pagination.js";
  */
 export const ORGANIZATION_FIELD_POLICY: Record<"superAdmin" | "owner" | "admin", ReadonlySet<string>> = {
   superAdmin: new Set([
-    "name", "legalName", "businessType", "businessCategory", "financialYearStartMonth", "moduleToggles", "salesChannels", "timezone",
+    "name", "legalName", "displayName", "businessType", "businessCategory", "financialYearStartMonth", "moduleToggles", "salesChannels", "timezone",
     "image", "uploadId", "taxId", "website", "contactEmail", "contactPhone", "contact", "contacts",
     "addresses", "bankAccounts", "settings", "showCostToTenant",
   ]),
   owner: new Set([
-    "legalName", "image", "uploadId", "taxId", "website", "contactEmail", "contactPhone", "contact", "contacts",
+    "legalName", "displayName", "image", "uploadId", "taxId", "website", "contactEmail", "contactPhone", "contact", "contacts",
     "addresses", "bankAccounts", "settings",
   ]),
-  admin: new Set(),
+  admin: new Set([
+    "legalName", "displayName", "image", "uploadId", "taxId", "website", "contactEmail", "contactPhone", "contact", "contacts",
+    "addresses", "settings",
+  ]),
 };
 
 /** Default sales channels by business type when none are supplied at creation. */
@@ -342,10 +345,12 @@ export const organizationsUpdate = onCall({ region: "asia-south1" }, async (requ
     }
     if (memData.roleId === "role_org_owner") {
       tier = "owner";
-    } else if (memData.roleId === "role_admin") {
-      tier = "admin";
     } else {
-      throw new HttpsError("permission-denied", "Insufficient permissions to update organization.");
+      await resolveRequestContext(request, {
+        organizationId: input.organizationId,
+        requiredPermission: AppPermissions.ORG_UPDATE,
+      });
+      tier = "admin";
     }
   }
 

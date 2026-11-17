@@ -52,6 +52,12 @@ const ENTITY_CONFIG = [
   { name: "recurring_expense", label: "Recurring Expense", createCallable: "recurringExpensesCreate", updateCallable: "recurringExpensesUpdate", schemas: ["CreateRecurringExpenseSchema", "UpdateRecurringExpenseSchema"] },
   { name: "plan", label: "Subscription Plan", createCallable: "plansCreate", updateCallable: "plansUpdate", schemas: ["CreatePlanSchema", "UpdatePlanSchema"] },
   { name: "request", label: "Request / Support Ticket", createCallable: "requestsCreate", updateCallable: "requestsUpdate", schemas: ["CreateRequestSchema", "UpdateRequestSchema"] },
+  { name: "financial_account", label: "Financial Account", createCallable: "financialAccountsCreate", updateCallable: "financialAccountsUpdate", schemas: ["CreateFinancialAccountSchema", "UpdateFinancialAccountSchema"] },
+  { name: "storage_location", label: "Storage Location", createCallable: "storageLocationsCreate", updateCallable: "storageLocationsUpdate", schemas: ["CreateStorageLocationSchema", "UpdateStorageLocationSchema"] },
+  { name: "stock_transfer", label: "Stock Transfer", createCallable: "stockTransfersCreate", updateCallable: "stockTransfersDispatch", schemas: ["CreateStockTransferSchema"] },
+  { name: "account_transfer", label: "Account Transfer", createCallable: "accountTransfersCreate", updateCallable: "accountTransfersList", schemas: ["CreateAccountTransferSchema"] },
+  { name: "payment_processing_fee", label: "Payment Processing Fee", createCallable: "paymentsRecordFee", updateCallable: "paymentsGetFee", schemas: ["RecordPaymentFeeSchema"] },
+  { name: "capital_transaction", label: "Capital Transaction", createCallable: "capitalTransactionsCreate", updateCallable: "capitalTransactionsList", schemas: ["CreateCapitalTransactionSchema"] },
 ];
 
 console.log("Generating Flutter Contract Pack...");

@@ -1,7 +1,7 @@
-# Trado Architectural Decision Register (D-1 .. D-45)
+# Trado Architectural Decision Register (D-1 .. D-52)
 
-Generated at: 2026-11-15T12:20:00.000Z  
-Total decisions: **45** (All Active)  
+Generated at: 2026-11-16T13:30:00.000Z  
+Total decisions: **52** (All Active)  
 
 | ID | Title | Prompt | Status | Enforced By | Description |
 |---|---|---|---|---|---|
@@ -50,6 +50,13 @@ Total decisions: **45** (All Active)
 | **D-43** | **One Open Plan Change per Tenant** | 74 | `active` | `functions/src/services/requestsService.ts` | An organization may have at most one open plan_change request; duplicates fail with REQUEST_DUPLICATE_OPEN. |
 | **D-44** | **Server-Computed Blocker Guards** | 74 | `active` | `functions/src/services/requestsService.ts` | Plan-change apply is guarded by server-computed blockers (usage, branches, staff, modules); override requires explicit permission and reason. |
 | **D-45** | **Idempotent Notification Dispatch** | 74 | `active` | `functions/src/triggers/eventTriggers.ts` | Trigger dispatch writes delivery marker keyed by event ID in same transaction, guaranteeing at-most-once delivery under retry. |
+| **D-46** | **Operational Financial Accounts Separation** | 75 | `active` | `functions/src/services/ledgerService.ts` | FB-5: Legal/invoice display bank accounts (OrganizationDoc.bankAccounts) remain distinct from live operational cash/bank ledger entities (financialAccounts) and append-only accountTransactions. |
+| **D-47** | **Atomic Account Ledger Balance Formula** | 75 | `active` | `functions/src/services/ledgerService.ts` | Double-entry running balance balanceAfter = currentBalance ± amount enforced transactionally via two-phase helper; direct manual balance overwrite is impossible. |
+| **D-48** | **Storage Location & Warehouse Hierarchy** | 75 | `active` | `functions/src/callables/storageLocations.ts` | Warehouses, sales counters, transit locations, and stockyards modeled as distinct storage locations per branch or central facility. |
+| **D-49** | **Inter-Branch Stock Transfer Isolation** | 75 | `active` | `functions/src/callables/stockTransfers.ts` | In-transit stock held in dedicated state; source stock deducted atomically upon dispatch and added upon receipt without duplicating master product records or triggering sales tax/AR/AP. |
+| **D-50** | **Unified Approvals Inbox & Decision Router** | 75 | `active` | `functions/src/callables/approvals.ts` | Single maker-checker decision router documentsDecide handles all domains; unified approvalsList and approvalsCounts query pending items across all operational collections. |
+| **D-51** | **Payment Processing Charges Linked Accounting** | 75 | `active` | `functions/src/callables/paymentFees.ts` | Merchant processing charges recorded as operating expenses linked to source payment/bill without reducing gross sales or customer receivable settlement; deducts from clearing/financial account to match net bank deposit. |
+| **D-52** | **Capital & Owner Investment Accounting** | 75 | `active` | `functions/src/callables/financialAccounts.ts` | Capital contributions and drawings adjust cash/bank ledger balances via double-entry without polluting sales revenue, purchases, or customer receivable accounts. |
 
 ## Answered Business Decisions (A-n)
 

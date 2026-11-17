@@ -851,6 +851,8 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 
 | ID | Kind | Collection | Field | Reason | Single writer | Reconcile / cap |
 |---|---|---|---|---|---|---|
+| DUP-085 | BOUNDED_ARRAY | `accountReconciliations` | `reconciledTransactionIds` | Array of reconciled ledger transaction IDs bounded per statement period. | — | cap 500 |
+| DUP-083 | R4 | `accountTransactions` | `balanceAfter` | Running account balance snapshot at the exact time of the transaction for point-in-time statements and audit. | — | — |
 | DUP-081 | R4 | `activity` | `activityId` | Document self ID stored on timeline entry record for client reference and deduplication. | — | — |
 | DUP-080 | BOUNDED_ARRAY | `activity` | `attachments` | Activity comment attachments array capped at 5 in RequestAttachmentSchema. | — | cap 5 |
 | DUP-079 | OWNED | `activity` | `author.roleLabel` | Snapshot of author role label at activity creation time for timeline rendering without role hydration. | — | — |
@@ -865,6 +867,7 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-009 | R2 | `bills` | `items.subtotal` | Line amount at the frozen price snapshot (price × quantity at sale time). | — | — |
 | DUP-027 | R3 | `bills` | `paidAmount` | Settled amount = SUM(non-void payments referencing the document); kept for open-balance queries and overpayment checks. | `paymentsCreate` | reconcile:documentPayments |
 | DUP-029 | R3 | `bills` | `paymentStatus` | Derived from paidAmount vs totalAmount; stored for list filters (paid / partial / pending). | `paymentStatusFor` | reconcile:documentPayments |
+| DUP-090 | BOUNDED_ARRAY | `bills` | `splitPayments` | Split payment tenders array on bills capped at 5 in CreateBillSchema. | — | cap 5 |
 | DUP-001 | R2 | `bills` | `subTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
 | DUP-003 | R2 | `bills` | `taxTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
 | DUP-004 | R2 | `bills` | `totalAmount` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
@@ -877,6 +880,7 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-024 | R3 | `customers` | `totalSpend` | Party ledger balance used for credit-limit checks and statements; equals the open documents minus payments/returns. | `reconcilePartyBalances` | reconcile:partyBalances |
 | DUP-060 | BOUNDED_ARRAY | `deliveries` | `lines` | Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 200 |
 | DUP-046 | BOUNDED_ARRAY | `departments` | `headMembershipIds` | Owned list capped at 20 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
+| DUP-092 | BOUNDED_ARRAY | `financialAccounts` | `assignedBranchIds` | Branch authorization allowlist for branch-scoped operational account transactions, capped at 100 in CreateFinancialAccountSchema. | — | cap 100 |
 | DUP-041 | BOUNDED_ARRAY | `memberships` | `jobRoleIds` | Owned list capped at 20 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
 | DUP-042 | BOUNDED_ARRAY | `memberships` | `reportingToIds` | Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
 | DUP-019 | R3 | `organizations` | `activeEmployeeCount` | Transactional seat counter so concurrent employee creation cannot exceed the plan (a count query cannot be locked). | `assertSeatAvailable` | reconcile:activeEmployeeCount |
@@ -898,9 +902,12 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-030 | R3 | `outflows` | `paidAmount` | Settled amount = SUM(non-void payments referencing the document); kept for open-balance queries and overpayment checks. | `paymentsCreate` | reconcile:documentPayments |
 | DUP-032 | R3 | `outflows` | `paymentStatus` | Derived from paidAmount vs totalAmount; stored for list filters (paid / partial / pending). | `paymentStatusFor` | reconcile:documentPayments |
 | DUP-033 | R3 | `outflows` | `productIds` | Line productIds for array-contains queries (price history by product); capped by the line limit. | `outflowsCreate` | reconcile:outflowProductIds |
+| DUP-091 | BOUNDED_ARRAY | `outflows` | `splitPayments` | Split payment tenders array on outflows capped at 5 in CreateOutflowSchema. | — | cap 5 |
 | DUP-005 | R2 | `outflows` | `subTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
 | DUP-007 | R2 | `outflows` | `taxTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
 | DUP-008 | R2 | `outflows` | `totalAmount` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
+| DUP-089 | R2 | `paymentProcessingFees` | `grossAmount` | Frozen snapshot of the source payment transaction gross amount at fee recording time. | — | — |
+| DUP-088 | BOUNDED_ARRAY | `payments` | `allocations` | Payment document allocation breakdown array capped at 200 in CreatePaymentSchema. | — | cap 200 |
 | DUP-040 | OWNED | `payments` | `partyName` | Only on a standalone payment with neither partyId nor referenceId (e.g. a one-off payee). paymentsCreate rejects it otherwise (REFERENCE_ATTRIBUTE_COPY). | — | — |
 | DUP-047 | BOUNDED_ARRAY | `products` | `alternateUnits` | Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
 | DUP-021 | R3 | `products` | `currentStock` | Organization-wide stock shown on product lists = SUM(stockBalances.currentStock) for the product. | `commitStockChangesInTxn` | reconcile:productStock |
@@ -921,6 +928,7 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-037 | R3 | `stockBalances` | `allocatedStock` | SUM(base quantity of open sales orders) per (organization, branch, product); available = current − allocated is computed. | `commitReservationInTxn` | reconcile:allocatedStock |
 | DUP-036 | R3 | `stockBalances` | `currentStock` | SUM(stockMovements.quantity) per (organization, branch, product); read on every sale for the negative-stock rule. For serial-tracked products it also equals the units in hand in serials/ (reconcile:serialStock). | `commitStockChangesInTxn` | reconcile:stockBalances |
 | DUP-038 | R4 | `stockMovements` | `balanceAfter` | Running branch balance at the moment of the movement: an immutable audit fact of the stock ledger (the movement is the source of truth for itself). | — | — |
+| DUP-084 | BOUNDED_ARRAY | `stockTransfers` | `items` | Inter-branch stock transfer line items array capped at 200 in CreateStockTransferSchema. | — | cap 200 |
 | DUP-065 | BOUNDED_ARRAY | `vendors` | `additionalPhones` | Structured additional phone numbers list capped at 5 by Zod input, keeping the document far below the 1 MiB limit. | — | cap 5 |
 | DUP-069 | BOUNDED_ARRAY | `vendors` | `addresses` | Vendor pickup/office addresses array capped at 20 by AddressArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
 | DUP-071 | BOUNDED_ARRAY | `vendors` | `bankAccounts` | Vendor settlement bank accounts array capped at 10 by BankAccountArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |

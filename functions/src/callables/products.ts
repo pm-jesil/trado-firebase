@@ -168,6 +168,21 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
         }
       }
 
+      if (input.trackStock && initialStock > 0 && input.storageLocationId) {
+        const locRef = db.collection("storageLocations").doc(input.storageLocationId);
+        const locSnap = await txn.get(locRef);
+        if (!locSnap.exists) {
+          throw new HttpsError("not-found", `Storage location "${input.storageLocationId}" not found.`);
+        }
+        const locData = locSnap.data();
+        if (locData?.organizationId !== orgId) {
+          throw new HttpsError("permission-denied", "Cross-tenant storage location reference rejected.");
+        }
+        if (locData?.branchId && locData.branchId !== branchId) {
+          throw new HttpsError("permission-denied", `Storage location is restricted to branch "${locData.branchId}".`);
+        }
+      }
+
       // 2. Transaction Write phase: Save product, barcode lock, opening stock, and idempotency
       txn.set(productRef, productDoc);
 
@@ -180,6 +195,7 @@ export const productsCreate = onCall({ region: "asia-south1" }, async (request) 
         const movementDoc: StockMovementDoc = {
           organizationId: orgId,
           branchId,
+          storageLocationId: input.storageLocationId || undefined,
           productId,
           type: StockMovementType.ADJUSTMENT_IN,
           quantity: initialStock,

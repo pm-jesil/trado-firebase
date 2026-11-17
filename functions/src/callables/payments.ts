@@ -27,6 +27,10 @@ import { hydrate } from "../services/hydration.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext, resolveDataScope, applyDataScope } from "../services/contextResolver.js";
 import { AppPermissions } from "../constants/permissions.js";
+import {
+  prepareAccountTransactionInTxn,
+  applyAccountTransactionInTxn,
+} from "../services/ledgerService.js";
 
 /** Rejects references to documents of another organization. */
 function assertSameOrg(snap: FirebaseFirestore.DocumentSnapshot | null, orgId: string, label: string): void {
@@ -82,6 +86,50 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
         organizationId: orgId,
         type: "PAY",
       });
+
+      let accountPrep = null;
+      if (input.financialAccountId) {
+        accountPrep = await prepareAccountTransactionInTxn(txn, {
+          organizationId: orgId,
+          financialAccountId: input.financialAccountId,
+          branchId,
+          type: input.direction === "in" ? "customer_payment" : "vendor_payment",
+          direction: input.direction,
+          amount: input.amount,
+          sourceDocumentType: "payment",
+          sourceDocumentId: paymentId,
+          actorUid: callerUid,
+          now,
+        });
+      }
+
+      const allocatedDocSnaps: Array<{
+        ref: FirebaseFirestore.DocumentReference;
+        snap: FirebaseFirestore.DocumentSnapshot;
+        type: "bill" | "outflow";
+        amount: number;
+      }> = [];
+      if (input.allocations && input.allocations.length > 0) {
+        let totalAllocated = 0;
+        for (const alloc of input.allocations) {
+          totalAllocated = Money.amount(totalAllocated + alloc.amount);
+          const docRef = db.collection(alloc.documentType === "bill" ? "bills" : "outflows").doc(alloc.documentId);
+          const docSnap = await txn.get(docRef);
+          assertSameOrg(docSnap, orgId, alloc.documentType);
+          const docData = docSnap.data() as BillDoc | OutflowDoc;
+          const openStatus = alloc.documentType === "bill" ? (docData as BillDoc).status === "active" : (docData as OutflowDoc).status === "confirmed";
+          if (!openStatus) {
+            throw new HttpsError("failed-precondition", `Cannot allocate payment against ${alloc.documentType} in status "${docData.status}".`);
+          }
+          if (alloc.amount > Money.amount(docData.balanceAmount || 0) + 0.005) {
+            throw new HttpsError("invalid-argument", `Allocation ${alloc.amount} exceeds open balance ${docData.balanceAmount} on ${alloc.documentType} ${alloc.documentId}.`);
+          }
+          allocatedDocSnaps.push({ ref: docRef, snap: docSnap, type: alloc.documentType, amount: alloc.amount });
+        }
+        if (totalAllocated > input.amount + 0.005) {
+          throw new HttpsError("invalid-argument", `Sum of allocations (${totalAllocated}) exceeds payment amount (${input.amount}).`);
+        }
+      }
 
       let billRef = null;
       let billSnap = null;
@@ -144,6 +192,24 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
       commitDocumentNumberInTxn(txn, paymentReservation);
       const paymentNumber = paymentReservation.formattedNumber;
 
+      if (accountPrep) {
+        applyAccountTransactionInTxn(txn, accountPrep, {
+          organizationId: orgId,
+          financialAccountId: input.financialAccountId!,
+          branchId,
+          type: input.direction === "in" ? "customer_payment" : "vendor_payment",
+          direction: input.direction,
+          amount: input.amount,
+          sourceDocumentType: "payment",
+          sourceDocumentId: paymentId,
+          partyType: (input.partyType === "customer" || input.partyType === "vendor") ? input.partyType : null,
+          partyId,
+          description: `Payment ${paymentNumber}`,
+          actorUid: callerUid,
+          now,
+        });
+      }
+
       const paymentDoc: PaymentDoc = {
         organizationId: orgId,
         branchId,
@@ -156,6 +222,8 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
         method: input.method,
         referenceId: input.referenceId || null,
         referenceModel: input.referenceModel || null,
+        ...(input.financialAccountId ? { financialAccountId: input.financialAccountId } : {}),
+        ...(input.allocations ? { allocations: input.allocations } : {}),
         notes: input.notes,
         status: "completed",
         createdAt: now,
@@ -164,6 +232,33 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
       if (input.gateway) paymentDoc.gateway = input.gateway;
 
       txn.set(paymentRef, paymentDoc);
+
+      // Settle multi-document allocations (GAP-FIN-04)
+      for (const item of allocatedDocSnaps) {
+        if (item.type === "bill") {
+          const bData = item.snap.data() as BillDoc;
+          const newPaid = Money.amount((bData.paidAmount || 0) + item.amount);
+          const newBal = Money.amount(Math.max(0, bData.totalAmount - newPaid));
+          const newStatus = newBal <= 0 ? "paid" : "partial";
+          txn.update(item.ref, {
+            paidAmount: newPaid,
+            balanceAmount: newBal,
+            paymentStatus: newStatus,
+            updatedAt: now,
+          });
+        } else {
+          const oData = item.snap.data() as OutflowDoc;
+          const newPaid = Money.amount((oData.paidAmount || 0) + item.amount);
+          const newBal = Money.amount(Math.max(0, oData.totalAmount - newPaid));
+          const newStatus = newBal <= 0 ? "paid" : "partial";
+          txn.update(item.ref, {
+            paidAmount: newPaid,
+            balanceAmount: newBal,
+            paymentStatus: newStatus,
+            updatedAt: now,
+          });
+        }
+      }
 
       // Settle linked Bill if applicable
       if (billRef && billSnap && billSnap.exists) {
@@ -309,6 +404,23 @@ export const paymentsVoid = onCall({ region: "asia-south1" }, async (request) =>
         partySnap = await txn.get(partyRef);
       }
 
+      // Reverse financial account balance and record ledger transaction
+      let accountPrep = null;
+      if (payment.financialAccountId) {
+        accountPrep = await prepareAccountTransactionInTxn(txn, {
+          organizationId: orgId,
+          financialAccountId: payment.financialAccountId,
+          branchId: payment.branchId,
+          type: "reversal",
+          direction: payment.direction === "in" ? "out" : "in",
+          amount: payment.amount,
+          sourceDocumentType: "payment",
+          sourceDocumentId: paymentRef.id,
+          description: `Void payment ${payment.paymentNumber}: ${input.reason}`,
+          actorUid: ctx.callerUid,
+        });
+      }
+
       // === WRITES ===
 
       // 1. Mark payment as voided
@@ -320,6 +432,22 @@ export const paymentsVoid = onCall({ region: "asia-south1" }, async (request) =>
         updatedAt: now,
         updatedBy: ctx.callerUid,
       });
+
+      // Apply financial account reversal
+      if (accountPrep) {
+        applyAccountTransactionInTxn(txn, accountPrep, {
+          organizationId: orgId,
+          financialAccountId: payment.financialAccountId!,
+          branchId: payment.branchId,
+          type: "reversal",
+          direction: payment.direction === "in" ? "out" : "in",
+          amount: payment.amount,
+          sourceDocumentType: "payment",
+          sourceDocumentId: paymentRef.id,
+          description: `Void payment ${payment.paymentNumber}: ${input.reason}`,
+          actorUid: ctx.callerUid,
+        });
+      }
 
       // 2. Reverse referenced document settlement
       let reversedDocumentId: string | null = null;

@@ -38,6 +38,7 @@ export interface StockChangeItem {
   referenceId: string;
   referenceModel: "bill" | "outflow" | "return" | "manual_adjustment";
   referenceLineId?: string; // lineId on the source document (bills.items / outflows.lines / returns via sourceLineId)
+  storageLocationId?: string;
   reason?: string;
   reasonCode?: StockAdjustmentReason;
 }
@@ -179,6 +180,7 @@ export async function prepareStockChangesInTxn(
       referenceId: item.referenceId,
       referenceModel: item.referenceModel,
       ...(item.referenceLineId ? { referenceLineId: item.referenceLineId } : {}),
+      ...(item.storageLocationId ? { storageLocationId: item.storageLocationId } : {}),
       reason: item.reason || null,
       reasonCode: item.reasonCode || null,
       // Per-base-unit cost at movement time: purchase cost for receipts, WAC otherwise.

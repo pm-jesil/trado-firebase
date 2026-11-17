@@ -19,8 +19,17 @@ describe("Membership & User Provisioning Service Unit Tests", () => {
   let otherOrgId: string;
   let otherBranchId: string;
   const createdUids: string[] = [];
+  let emulatorAvailable = false;
 
   before(async () => {
+    try {
+      await fetch("http://127.0.0.1:8080", { signal: AbortSignal.timeout(500) });
+      emulatorAvailable = true;
+    } catch {
+      console.warn("Firestore emulator not reachable on 127.0.0.1:8080; skipping live provisioning integration tests.");
+      return;
+    }
+
     testOrgId = `prov_test_org_${testRunId}`;
     testBranchId = `${testOrgId}_main-branch`;
     await db.collection("branches").doc(testBranchId).set({
@@ -48,6 +57,7 @@ describe("Membership & User Provisioning Service Unit Tests", () => {
   });
 
   it("provisions an owner with credentialMode: temporaryPassword", async () => {
+    if (!emulatorAvailable) return;
     const ownerEmail = `prov_owner_${testRunId}@test.local`;
     const result = await provisionMembershipInternal({
       organizationId: testOrgId,
@@ -79,6 +89,7 @@ describe("Membership & User Provisioning Service Unit Tests", () => {
   });
 
   it("provisions an employee with credentialMode: invite", async () => {
+    if (!emulatorAvailable) return;
     const empEmail = `prov_emp_${testRunId}@test.local`;
     const result = await provisionMembershipInternal({
       organizationId: testOrgId,
@@ -99,6 +110,7 @@ describe("Membership & User Provisioning Service Unit Tests", () => {
   });
 
   it("rejects duplicate owner provisioning on an organization that already has an owner", async () => {
+    if (!emulatorAvailable) return;
     const secondOwnerEmail = `second_owner_${testRunId}@test.local`;
     await assert.rejects(
       async () =>
@@ -114,6 +126,7 @@ describe("Membership & User Provisioning Service Unit Tests", () => {
   });
 
   it("requires confirmLinkExistingUser: true when provisioning an existing Auth user as Owner", async () => {
+    if (!emulatorAvailable) return;
     // Create a pre-existing user in another test org
     otherOrgId = `prov_other_org_${testRunId}`;
     otherBranchId = `${otherOrgId}_main-branch`;
@@ -172,6 +185,7 @@ describe("Membership & User Provisioning Service Unit Tests", () => {
   });
 
   after(async () => {
+    if (!emulatorAvailable) return;
     // Clean up test documents to keep emulator reference integrity intact
     const orgIds = [testOrgId, otherOrgId].filter(Boolean);
     for (const orgId of orgIds) {

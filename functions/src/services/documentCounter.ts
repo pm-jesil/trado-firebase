@@ -23,7 +23,12 @@ export type DocumentTypePrefix =
   | "ADJ" // Stock Adjustments
   | "QTN" // Quotations
   | "PRO" // Proforma Invoices
-  | "SO"; // Sales Orders
+  | "SO"  // Sales Orders
+  | "TXN" // Account Ledger Transactions
+  | "TRF" // Stock Transfers
+  | "ACT" // Account Transfers
+  | "FEE" // Payment Processing Fees
+  | "CAP"; // Capital Transactions
 
 export interface NextNumberParams {
   organizationId: string;

@@ -30,5 +30,6 @@
 | `contact.contactPerson` | `string` | No | Yes | `text` | {"maxLength":100} | `Sample contact.contactPerson` |
 | `settings.taxId` | `string` | No | Yes | `text` | {} | `Sample settings.taxId` |
 | `settings.allowNegativeStock` | `boolean` | No | Yes | `date_picker` | {} | `true` |
+| `settings.isOwnStockyard` | `boolean` | No | Yes | `switch` | {} | `true` |
 | `settings.defaultSalesMode` | `enum` | No | Yes | `dropdown` | Enum: `pos`, `b2b`, `both` | `pos` |
 | `settings.moduleOverrides.*` | `boolean` | **Yes** | Yes | `switch` | {} | `true` |

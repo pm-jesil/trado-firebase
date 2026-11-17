@@ -157,6 +157,60 @@
       "example": "bill"
     },
     {
+      "path": "financialAccountId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample financialAccountId"
+    },
+    {
+      "path": "allocations[].documentId",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample allocations[].documentId"
+    },
+    {
+      "path": "allocations[].documentType",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "bill",
+        "outflow"
+      ],
+      "uiHint": "date_picker",
+      "example": "bill"
+    },
+    {
+      "path": "allocations[].amount",
+      "type": "number",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": 1
+    },
+    {
       "path": "notes",
       "type": "string",
       "requiredCreate": false,

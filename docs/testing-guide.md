@@ -117,16 +117,16 @@ npm run test:unit --prefix functions
 # 2. Security Rules Tests (Firestore & Storage emulator, 18 tests)
 npm run test:rules --prefix functions
 
-# 3. All 134 HTTPS Callables Integration Suite
+# 3. All 178 HTTPS Callables Integration Suite
 npm run test:callables --prefix functions
 
-# 4. Background Firestore Event Triggers (6 triggers)
+# 4. Background Firestore Event Triggers (8 triggers)
 npm run test:triggers --prefix functions
 
 # 5. Connected End-to-End Scenarios (Retail Lifecycle & Multi-Branch Isolation)
 npm run test:e2e --prefix functions
 
-# 6. Static Test Completeness Audit (140 exports + 47 collections)
+# 6. Static Test Completeness Audit (186 exports + 60 collections)
 npm run test:completeness --prefix functions
 
 # 7. Complete Verification Suite (Executes unit + callables + triggers + e2e + completeness)

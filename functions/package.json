@@ -53,7 +53,7 @@
     "test:schema-sweep": "node scripts/test-schema-contract-sweep.cjs",
     "test:coverage-defects": "node ../scripts/test-coverage-engine-defects.cjs",
     "test:metering": "node scripts/test-metering-layer.cjs && node scripts/test-metering-rollups.cjs && node scripts/test-audit-completeness.cjs",
-    "test:scenarios": "node scripts/test-real-world-scenarios.cjs && node scripts/test-subscription-limits-and-audit-visibility.cjs && node scripts/test-requests-scenarios.cjs",
+    "test:scenarios": "node scripts/test-real-world-scenarios.cjs && node scripts/test-subscription-limits-and-audit-visibility.cjs && node scripts/test-requests-scenarios.cjs && node scripts/test-financial-branch-inventory-scenarios.cjs",
     "contract:generate": "node ../scripts/generate-flutter-contract.js",
     "check:flutter-contract": "node ../scripts/check-flutter-contract.js",
     "test:guard-defects": "node scripts/test-same-doc-duplicates-defects.cjs"

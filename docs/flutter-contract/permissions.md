@@ -1,6 +1,6 @@
 # Permission Catalog & UI Gating
 
-Total permissions: **129**
+Total permissions: **146**
 
 ## Permission Key Directory
 | Permission Constant | Wire Key | Category |
@@ -108,6 +108,7 @@ Total permissions: **129**
 | `PAYMENT_CREATE` | `payment:create` | `payment` |
 | `PAYMENT_VIEW` | `payment:view` | `payment` |
 | `PAYMENT_VOID` | `payment:void` | `payment` |
+| `PAYMENT_FEE_MANAGE` | `payment:fee_manage` | `payment` |
 | `DELIVERY_CREATE` | `delivery:create` | `delivery` |
 | `DELIVERY_VIEW` | `delivery:view` | `delivery` |
 | `DELIVERY_UPDATE` | `delivery:update` | `delivery` |
@@ -134,6 +135,22 @@ Total permissions: **129**
 | `REQUEST_READ_ORG` | `requests:read_org` | `requests` |
 | `REQUEST_COMMENT` | `requests:comment` | `requests` |
 | `REQUEST_MANAGE_ORG` | `requests:manage_org` | `requests` |
+| `ACCOUNT_VIEW` | `accounts:view` | `accounts` |
+| `ACCOUNT_MANAGE` | `accounts:manage` | `accounts` |
+| `ACCOUNT_TRANSFER` | `accounts:transfer` | `accounts` |
+| `ACCOUNT_RECONCILE` | `accounts:reconcile` | `accounts` |
+| `LEDGER_VIEW` | `ledger:view` | `ledger` |
+| `RECEIVABLES_VIEW` | `receivables:view` | `receivables` |
+| `PAYABLES_VIEW` | `payables:view` | `payables` |
+| `CAPITAL_MANAGE` | `capital:manage` | `capital` |
+| `CAPITAL_VIEW` | `capital:view` | `capital` |
+| `APPROVALS_VIEW` | `approvals:view` | `approvals` |
+| `WAREHOUSE_VIEW` | `warehouse:view` | `warehouse` |
+| `WAREHOUSE_MANAGE` | `warehouse:manage` | `warehouse` |
+| `STOCK_TRANSFER_CREATE` | `stock:transfer_create` | `stock` |
+| `STOCK_TRANSFER_APPROVE` | `stock:transfer_approve` | `stock` |
+| `STOCK_TRANSFER_DISPATCH` | `stock:transfer_dispatch` | `stock` |
+| `STOCK_TRANSFER_RECEIVE` | `stock:transfer_receive` | `stock` |
 
 ## UI Gating in Flutter
 Every client session receives effective permissions inside the `authMe` bootstrap payload.

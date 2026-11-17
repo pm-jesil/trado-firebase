@@ -331,6 +331,17 @@
       "example": true
     },
     {
+      "path": "settings.isOwnStockyard",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
       "path": "settings.defaultSalesMode",
       "type": "enum",
       "requiredCreate": false,

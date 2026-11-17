@@ -69,6 +69,9 @@ async function createTenantOwnerPersona(superAdminToken, orgPrefix = "TestOrg", 
     resolvedToken = null;
   } else if (superAdminToken && superAdminToken.idToken) {
     resolvedToken = superAdminToken.idToken;
+  } else if (typeof superAdminToken === "string" && !superAdminToken.includes(".")) {
+    orgPrefix = superAdminToken;
+    resolvedToken = null;
   }
 
   if (!resolvedToken) {
@@ -116,12 +119,13 @@ async function createTenantOwnerPersona(superAdminToken, orgPrefix = "TestOrg", 
  * Provision a staff employee under an existing organization.
  */
 async function createEmployeePersona(ownerToken, organizationId, options = {}, maybeName = null) {
+  const resolvedToken = (ownerToken && typeof ownerToken === "object" && ownerToken.idToken) ? ownerToken.idToken : ownerToken;
   const unique = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   const roleCode = typeof options === "string" ? options : (options.roleCode || "employee");
   
   let defaultRoleId = "role_employee";
-  if (roleCode === "admin" || roleCode === "org_admin") defaultRoleId = "role_admin";
-  if (roleCode === "org_owner") defaultRoleId = "role_org_owner";
+  if (roleCode === "admin" || roleCode === "org_admin" || roleCode === "role_admin") defaultRoleId = "role_admin";
+  if (roleCode === "org_owner" || roleCode === "role_org_owner") defaultRoleId = "role_org_owner";
 
   const roleId = (typeof options === "object" && options.roleId) ? options.roleId : defaultRoleId;
   const email = (typeof options === "object" && options.email) || `${roleCode}_${unique}@testorg.local`;
@@ -140,7 +144,7 @@ async function createEmployeePersona(ownerToken, organizationId, options = {}, m
     defaultBranchId: branchId,
     branchIds: assignedBranchIds,
     permissionOverrides: permissions,
-  }, ownerToken);
+  }, resolvedToken);
 
   const idToken = await getIdToken(email, password);
 

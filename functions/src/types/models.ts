@@ -70,6 +70,7 @@ export interface UserDoc {
   updatedBy?: string;
 }
 
+
 /**
  * 2. memberships/{membershipId}
  * Document ID = `${userId}_${organizationId}`
@@ -95,6 +96,7 @@ export interface MembershipDoc {
   updatedAt?: string;
   updatedBy?: string;
 }
+
 
 /**
  * D-15: ImageRef — the ONLY stored image structure in the system.
@@ -181,6 +183,7 @@ export interface OrganizationDoc {
   updatedBy?: string;
 }
 
+
 /** Flat primary contact stored as a convenience field (R3 cache, single writer: organizationsUpdate). */
 export interface OrganizationPrimaryContact {
   name: string;
@@ -224,7 +227,7 @@ export interface OrganizationSettings {
  */
 export interface ApprovalPolicy {
   enabled: boolean;
-  modules?: Partial<Record<"sale" | "purchase" | "expense" | "return" | "stock_adjustment", boolean>>;
+  modules?: Partial<Record<"sale" | "purchase" | "expense" | "return" | "stock_adjustment" | "account_transfer" | "stock_transfer", boolean>>;
   amountThreshold?: number; // Only documents at/above this total need approval (0 = all)
 }
 
@@ -244,6 +247,7 @@ export interface RoleDoc {
   updatedBy?: string;
 }
 
+
 /**
  * 5. departments/{departmentId}
  */
@@ -257,6 +261,7 @@ export interface DepartmentDoc {
   updatedAt?: string;
   updatedBy?: string;
 }
+
 
 /**
  * 6. jobRoles/{jobRoleId}
@@ -273,6 +278,7 @@ export interface JobRoleDoc {
   updatedBy?: string;
 }
 
+
 /**
  * 7. teams/{teamId}
  * Note: Teams NEVER embed members. Membership is queried via memberships.teamId == teamId.
@@ -288,6 +294,7 @@ export interface TeamDoc {
   updatedAt?: string;
   updatedBy?: string;
 }
+
 
 /**
  * 8. subscriptionPlans/{planId}
@@ -314,6 +321,7 @@ export interface SubscriptionPlanDoc {
   updatedAt?: string;
   updatedBy?: string;
 }
+
 
 /**
  * 9. permissionCatalog/{permissionCode}
@@ -529,6 +537,7 @@ export interface ProductDoc {
   updatedBy?: string;
 }
 
+
 export interface ProductAlternateUnit {
   unit: string;
   factor: number; // base units per one of this unit
@@ -555,6 +564,7 @@ export interface CategoryDoc {
   updatedBy?: string;
 }
 
+
 /**
  * 18. units/{unitId}
  */
@@ -572,6 +582,7 @@ export interface UnitDoc {
   updatedAt?: string;
   updatedBy?: string;
 }
+
 
 /**
  * Stored address / bank account / contact person records. Derived from the shared Zod schemas that
@@ -616,6 +627,7 @@ export interface CustomerDoc {
   updatedBy?: string;
 }
 
+
 /**
  * 20. vendors/{vendorId}
  */
@@ -648,6 +660,7 @@ export interface VendorDoc {
   updatedAt?: string;
   updatedBy?: string;
 }
+
 
 /**
  * Line item in Outflow (Purchase/Expense)
@@ -685,19 +698,43 @@ export interface OutflowLine {
  * note; `approvalReason` is the decider's reason.
  */
 export interface DecisionStamps {
+  submittedAt?: string;
+  submittedBy?: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  verifiedAt?: string;
+  verifiedBy?: string;
   approvedAt?: string;
   approvedBy?: string;
   rejectedAt?: string;
   rejectedBy?: string;
   approvalReason?: string | null;
+  postedAt?: string;
+  postedBy?: string;
+  reversedAt?: string;
+  reversedBy?: string;
+  reversalReason?: string;
+  cancelledAt?: string;
+  cancelledBy?: string;
+  cancelReason?: string;
   voidedAt?: string;
   voidedBy?: string;
   voidReason?: string;
 }
 
+export interface SplitPaymentEntry {
+  method: PaymentMethod;
+  amount: number;
+  financialAccountId: string;
+  notes?: string;
+}
+
 export interface OutflowDoc extends DecisionStamps {
   organizationId: string;
   branchId?: string;
+  financialAccountId?: string | null;
+  storageLocationId?: string | null;
+  splitPayments?: SplitPaymentEntry[];
   outflowNumber: string; // e.g. "PUR-2026-000001" or "EXP-2026-000001"
   kind: OutflowKind; // purchase or expense
   status: OutflowStatus | "pending_approval" | "rejected"; // draft, confirmed, voided (approval state lives here)
@@ -732,6 +769,7 @@ export interface OutflowDoc extends DecisionStamps {
   updatedAt?: string;
   updatedBy?: string;
 }
+
 
 /**
  * Line item in Bill (POS / B2B)
@@ -775,6 +813,9 @@ export interface BillToSnapshot {
 export interface BillDoc extends DecisionStamps {
   organizationId: string;
   branchId?: string;
+  financialAccountId?: string | null;
+  storageLocationId?: string | null;
+  splitPayments?: SplitPaymentEntry[];
   billNumber: string; // e.g. "INV-2026-000001", "POS-2026-000001", "QTN-2026-000001"
   salesMode: SalesMode; // pos or b2b
   documentType?: DocumentType; // invoice, quotation, sales_order, proforma
@@ -807,18 +848,20 @@ export interface BillDoc extends DecisionStamps {
   updatedBy?: string;
 }
 
+
 /**
  * 23. stockMovements/{movementId}
  */
 export interface StockMovementDoc {
   organizationId: string;
   branchId?: string;
+  storageLocationId?: string; // Reference to storageLocations/{id}
   productId: string; // Reference to products/{productId}
   type: StockMovementType;
   quantity: number; // Signed change in the product's BASE unit (+ addition, - reduction)
   balanceAfter: number; // Branch stock after this movement (R4 ledger running balance)
-  referenceId: string; // ID reference to bill, outflow, return, or adjustment
-  referenceModel: "bill" | "outflow" | "return" | "manual_adjustment";
+  referenceId: string; // ID reference to bill, outflow, return, adjustment, or transfer
+  referenceModel: "bill" | "outflow" | "return" | "manual_adjustment" | "stock_transfer";
   referenceLineId?: string; // Source line (bills.items[].lineId / outflows.lines[].lineId / return sourceLineId)
   reason?: string | null;
   reasonCode?: StockAdjustmentReason | null; // Write-off classification for adjustments
@@ -873,6 +916,7 @@ export interface DeliveryDoc {
   updatedBy?: string;
 }
 
+
 /**
  * Return Line Item
  */
@@ -911,6 +955,16 @@ export interface ReturnDoc extends DecisionStamps {
   updatedBy?: string;
 }
 
+
+/**
+ * Payment allocation against an individual bill or outflow
+ */
+export interface PaymentAllocation {
+  documentId: string;
+  documentType: "bill" | "outflow";
+  amount: number;
+}
+
 /**
  * 26. payments/{paymentId}
  * Payment ledger record
@@ -918,6 +972,8 @@ export interface ReturnDoc extends DecisionStamps {
 export interface PaymentDoc extends DecisionStamps {
   organizationId: string;
   branchId?: string;
+  financialAccountId?: string | null; // Operational cash/bank account ledger reference
+  allocations?: PaymentAllocation[]; // Multi-document settlement breakdown
   paymentNumber: string; // e.g. "PAY-2026-000001"
   direction: PaymentDirection; // in (collection from customer) or out (payment to vendor)
   partyType: PartyType; // customer or vendor
@@ -942,6 +998,7 @@ export interface PaymentDoc extends DecisionStamps {
   updatedAt?: string;
   updatedBy?: string;
 }
+
 
 /**
  * 27. documentCounters/{counterId}
@@ -986,6 +1043,7 @@ export interface TaskDoc {
   updatedAt?: string;
   updatedBy?: string;
 }
+
 
 /**
  * 29. dailySummaries/{organizationId}_{date}
@@ -1127,6 +1185,7 @@ export interface BranchDoc {
   updatedBy?: string;
 }
 
+
 /**
  * uniqueKeys/{organizationId}_{kind}_{normalized key} — natural-key uniqueness locks (one collection
  * for barcodes, branch codes, vendor invoice numbers, party phones / tax ids, catalog names, serials).
@@ -1153,6 +1212,7 @@ export interface MembershipBranchDoc {
   updatedAt?: string;
   updatedBy?: string;
 }
+
 
 export interface StockBalanceDoc {
   organizationId: string;
@@ -1371,6 +1431,7 @@ export interface StockAdjustmentRequestDoc extends DecisionStamps {
   updatedBy?: string;
 }
 
+
 /**
  * recurringExpenses/{templateId}: one template per recurring cost; the daily sweep turns each due
  * period into an outflow through outflowsCreate. Client fields are the create schema's output.
@@ -1550,4 +1611,251 @@ export interface PlatformSettingsRequestsDoc {
   updatedAt?: string;
   updatedBy?: string;
 }
+
+
+export type FinancialAccountType = "cash" | "bank" | "digital" | "clearing" | "control";
+
+/**
+ * 28. financialAccounts/{id}
+ * Operational financial accounts (cash desks, bank current accounts, digital wallets).
+ */
+export interface FinancialAccountDoc {
+  organizationId: string;
+  branchId?: string | null; // null for organization-shared accounts
+  assignedBranchIds?: string[]; // Multiple branch assignment (Section 8.1)
+  name: string;
+  code: string;
+  accountType: FinancialAccountType;
+  currency: string;
+  bankDetails?: {
+    bankName?: string;
+    accountNumberMasked?: string;
+    ifscOrSwift?: string;
+    bankBranchName?: string;
+    upiId?: string;
+  };
+  openingBalance: number;
+  currentBalance: number;
+  isDefault: boolean;
+  isActive: boolean;
+  notes?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+
+export type AccountTransactionType =
+  | "sale_collection"
+  | "customer_payment"
+  | "vendor_payment"
+  | "expense"
+  | "transfer_in"
+  | "transfer_out"
+  | "opening_balance"
+  | "capital_contribution"
+  | "capital_drawings"
+  | "processing_fee"
+  | "adjustment"
+  | "reversal";
+
+/**
+ * 29. accountTransactions/{id}
+ * Append-only immutable financial ledger entry (R4).
+ */
+export interface AccountTransactionDoc {
+  organizationId: string;
+  branchId?: string | null;
+  financialAccountId: string;
+  transactionNumber: string;
+  type: AccountTransactionType;
+  direction: "in" | "out";
+  amount: number;
+  balanceAfter: number;
+  sourceDocumentType: "bill" | "outflow" | "payment" | "account_transfer" | "reconciliation" | "manual" | "fee" | "capital";
+  sourceDocumentId: string;
+  partyType?: "customer" | "vendor" | null;
+  partyId?: string | null;
+  description?: string;
+  reconciled?: boolean;
+  reconciledAt?: string | null;
+  reconciliationId?: string | null;
+  actorUid: string;
+  createdAt: string;
+}
+
+/**
+ * 30. accountTransfers/{id}
+ * Inter-account fund transfers with maker-checker support.
+ */
+export interface AccountTransferDoc {
+  organizationId: string;
+  transferNumber: string;
+  transferType?: "transfer" | "cash_deposit" | "cash_withdrawal" | "inter_bank" | "petty_cash" | "cashier_handover";
+  sourceAccountId: string;
+  destinationAccountId: string;
+  sourceBranchId?: string | null;
+  destinationBranchId?: string | null;
+  amount: number;
+  status: "pending_approval" | "completed" | "rejected" | "cancelled";
+  notes?: string;
+  sourceTransactionId?: string;
+  destinationTransactionId?: string;
+  requiresApproval: boolean;
+  approvedBy?: string;
+  approvedAt?: string;
+  rejectedBy?: string;
+  rejectedAt?: string;
+  rejectionReason?: string;
+  createdAt: string;
+  createdBy: string;
+  createdByMembershipId?: string | null;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+
+/**
+ * 31. accountReconciliations/{id}
+ * Bank statement reconciliation audit record.
+ */
+export interface AccountReconciliationDoc {
+  organizationId: string;
+  financialAccountId: string;
+  periodStart: string;
+  periodEnd: string;
+  statementOpeningBalance: number;
+  statementClosingBalance: number;
+  ledgerClosingBalance: number;
+  discrepancyAmount: number;
+  reconciledTransactionIds: string[];
+  status: "draft" | "reconciled" | "discrepancy";
+  notes?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+
+export type StorageLocationType = "warehouse" | "stockyard" | "counter" | "backroom" | "quarantine" | "transit";
+
+/**
+ * 32. storageLocations/{id}
+ * Storage locations and warehouses per branch or central org.
+ */
+export interface StorageLocationDoc {
+  organizationId: string;
+  branchId?: string | null;
+  name: string;
+  code: string;
+  type: StorageLocationType;
+  isDefault: boolean;
+  isActive: boolean;
+  address?: AddressRecord;
+  notes?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+
+export type StockTransferStatus = "draft" | "submitted" | "approved" | "dispatched" | "received" | "partially_received" | "rejected" | "cancelled";
+
+export interface StockTransferLine {
+  productId: string;
+  requestedQty: number;
+  unit?: string;
+  dispatchedQty?: number;
+  receivedQty?: number;
+  rejectedQty?: number;
+  discrepancyReason?: string;
+  notes?: string;
+}
+
+/**
+ * 33. stockTransfers/{id}
+ * Inter-branch stock transfer workflow document.
+ */
+export interface StockTransferDoc {
+  organizationId: string;
+  transferNumber: string;
+  sourceBranchId: string;
+  destinationBranchId: string;
+  sourceLocationId?: string;
+  destinationLocationId?: string;
+  status: StockTransferStatus;
+  items: StockTransferLine[];
+  transportMode?: string;
+  trackingReference?: string;
+  notes?: string;
+  rejectionReason?: string;
+  submittedAt?: string;
+  submittedBy?: string;
+  approvedAt?: string;
+  approvedBy?: string;
+  dispatchedAt?: string;
+  dispatchedBy?: string;
+  receivedAt?: string;
+  receivedBy?: string;
+  createdAt: string;
+  createdBy: string;
+  createdByMembershipId?: string | null;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+export type PaymentFeeSettlementTiming = "immediate_deduction" | "billed_later";
+
+/**
+ * 34. paymentProcessingFees/{id}
+ * Linked merchant payment processing fee record.
+ */
+export interface PaymentProcessingFeeDoc {
+  organizationId: string;
+  branchId?: string | null;
+  feeNumber: string;
+  sourceDocumentType: "bill" | "payment";
+  sourceDocumentId: string;
+  paymentId?: string | null;
+  financialAccountId: string;
+  feeExpenseCategoryId?: string | null;
+  paymentMethod: PaymentMethod;
+  grossAmount: number;
+  feeAmount: number;
+  feeTaxAmount?: number;
+  netSettlementAmount: number;
+  settlementTiming: PaymentFeeSettlementTiming;
+  settlementReference?: string;
+  accountTransactionId?: string;
+  notes?: string;
+  createdAt: string;
+  createdBy: string;
+}
+
+export type CapitalTransactionType = "owner_contribution" | "partner_contribution" | "additional_capital" | "drawings";
+
+/**
+ * 35. capitalTransactions/{id}
+ * Owner/partner capital introduction and drawings.
+ */
+export interface CapitalTransactionDoc {
+  organizationId: string;
+  branchId?: string | null;
+  transactionNumber: string;
+  type: CapitalTransactionType;
+  financialAccountId: string;
+  amount: number;
+  currency: string;
+  sourceReference?: string;
+  description?: string;
+  supportingDocumentPath?: string;
+  accountTransactionId: string;
+  createdAt: string;
+  createdBy: string;
+}
+
+
 

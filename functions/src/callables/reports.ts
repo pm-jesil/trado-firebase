@@ -27,6 +27,9 @@ import {
   ExportReportSchema,
   PartyStatementSchema,
   OutflowSummarySchema,
+  GetReceivablesAgeingReportSchema,
+  GetPayablesAgeingReportSchema,
+  GetCashBankSummarySchema,
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
 import { calculateStockValuation } from "../services/costingEngine.js";
@@ -45,6 +48,8 @@ import {
   OrganizationDoc,
   StockBalanceDoc,
   AuditLogDoc,
+  FinancialAccountDoc,
+  PaymentProcessingFeeDoc,
 } from "../types/models.js";
 import { ReturnType, ReturnDisposition, StockMovementType } from "../constants/enums.js";
 
@@ -168,7 +173,21 @@ export async function computeProfitLoss(orgId: string, validated: {
     outflowsQuery = outflowsQuery.where("createdAt", "<=", `${effectiveTo}T23:59:59.999Z`);
   }
 
-  const [billsSnap, outflowsSnap, returnsSnap, writeOffSnap] = await Promise.all([
+  let feesQuery = db
+    .collection("paymentProcessingFees")
+    .where("organizationId", "==", orgId);
+
+  if (targetBranchId) {
+    feesQuery = feesQuery.where("branchId", "==", targetBranchId);
+  }
+  if (effectiveFrom) {
+    feesQuery = feesQuery.where("createdAt", ">=", effectiveFrom);
+  }
+  if (effectiveTo) {
+    feesQuery = feesQuery.where("createdAt", "<=", `${effectiveTo}T23:59:59.999Z`);
+  }
+
+  const [billsSnap, outflowsSnap, returnsSnap, writeOffSnap, feesSnap] = await Promise.all([
     billsQuery.get(),
     outflowsQuery.get(),
     db.collection("returns").where("organizationId", "==", orgId).where("returnType", "==", ReturnType.SALES_RETURN).get(),
@@ -176,6 +195,7 @@ export async function computeProfitLoss(orgId: string, validated: {
       .where("organizationId", "==", orgId)
       .where("type", "in", WRITE_OFF_MOVEMENT_TYPES)
       .get(),
+    feesQuery.get(),
   ]);
 
   let grossRevenue = 0;
@@ -244,6 +264,20 @@ export async function computeProfitLoss(orgId: string, validated: {
     }
   });
 
+  let paymentFeesTotal = 0;
+  feesSnap.docs.forEach((doc) => {
+    const fee = doc.data() as PaymentProcessingFeeDoc;
+    paymentFeesTotal += (fee.feeAmount || 0) + (fee.feeTaxAmount || 0);
+  });
+  paymentFeesTotal = roundTo(paymentFeesTotal, decimals);
+  if (paymentFeesTotal > 0) {
+    totalExpenses += paymentFeesTotal;
+    expensesByCategory["payment_processing_fees"] = roundTo(
+      (expensesByCategory["payment_processing_fees"] || 0) + paymentFeesTotal,
+      decimals
+    );
+  }
+
   totalExpenses = roundTo(totalExpenses, decimals);
 
   let inventoryWriteOff = 0;
@@ -286,6 +320,7 @@ export async function computeProfitLoss(orgId: string, validated: {
     grossMarginPercent,
     operatingExpenses: totalExpenses,
     totalExpenses,
+    paymentFeesTotal,
     expensesByCategory,
     inventoryWriteOff,
     writeOffCount,
@@ -1154,3 +1189,301 @@ export const reportsGetOutflowSummary = onCall({ region: "asia-south1" }, async 
     note: "Total outflow is a spend/commitment view. The P&L uses COGS for purchases (when sold) and expenses directly; never add totalOutflow to the P&L.",
   };
 });
+
+export const reportsGetReceivablesAgeing = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const input = parseInput(GetReceivablesAgeingReportSchema, request.data);
+  const ctx = await resolveRequestContext(request, {
+    organizationId: input.organizationId,
+    branchId: input.branchId,
+    requiredPermission: AppPermissions.RECEIVABLES_VIEW,
+  });
+
+  const orgId = ctx.organizationId;
+  const asOf = input.asOfDate || new Date().toISOString().slice(0, 10);
+  const asOfMs = Date.parse(`${asOf}T23:59:59.999Z`);
+
+  let query: FirebaseFirestore.Query = db
+    .collection("bills")
+    .where("organizationId", "==", orgId)
+    .where("status", "in", ["active", "partial"]);
+
+  if (input.branchId) {
+    query = query.where("branchId", "==", input.branchId);
+  }
+  if (input.customerId) {
+    query = query.where("customerId", "==", input.customerId);
+  }
+
+  const snap = await query.get();
+
+  const totals = {
+    current: 0,
+    days1to30: 0,
+    days31to60: 0,
+    days61to90: 0,
+    days90Plus: 0,
+    totalOutstanding: 0,
+  };
+
+  const customerMap = new Map<string, {
+    customerId: string;
+    customerName: string;
+    current: number;
+    days1to30: number;
+    days31to60: number;
+    days61to90: number;
+    days90Plus: number;
+    totalOutstanding: number;
+    billCount: number;
+  }>();
+
+  for (const doc of snap.docs) {
+    const bill = doc.data() as BillDoc;
+    const balance = bill.balanceAmount || 0;
+    if (balance <= 0) continue;
+
+    const dueStr = bill.createdAt.slice(0, 10);
+    const dueMs = Date.parse(`${dueStr}T00:00:00.000Z`);
+    const daysOverdue = Math.floor((asOfMs - dueMs) / 86400000);
+
+    const cId = bill.customerId || "walk_in";
+    const cName = bill.billToSnapshot?.name || "Walk-in Customer";
+
+    let cEntry = customerMap.get(cId);
+    if (!cEntry) {
+      cEntry = {
+        customerId: cId,
+        customerName: cName,
+        current: 0,
+        days1to30: 0,
+        days31to60: 0,
+        days61to90: 0,
+        days90Plus: 0,
+        totalOutstanding: 0,
+        billCount: 0,
+      };
+      customerMap.set(cId, cEntry);
+    }
+
+    cEntry.billCount++;
+    cEntry.totalOutstanding = round2(cEntry.totalOutstanding + balance);
+    totals.totalOutstanding = round2(totals.totalOutstanding + balance);
+
+    if (daysOverdue <= 0) {
+      cEntry.current = round2(cEntry.current + balance);
+      totals.current = round2(totals.current + balance);
+    } else if (daysOverdue <= 30) {
+      cEntry.days1to30 = round2(cEntry.days1to30 + balance);
+      totals.days1to30 = round2(totals.days1to30 + balance);
+    } else if (daysOverdue <= 60) {
+      cEntry.days31to60 = round2(cEntry.days31to60 + balance);
+      totals.days31to60 = round2(totals.days31to60 + balance);
+    } else if (daysOverdue <= 90) {
+      cEntry.days61to90 = round2(cEntry.days61to90 + balance);
+      totals.days61to90 = round2(totals.days61to90 + balance);
+    } else {
+      cEntry.days90Plus = round2(cEntry.days90Plus + balance);
+      totals.days90Plus = round2(totals.days90Plus + balance);
+    }
+  }
+
+  return {
+    asOfDate: asOf,
+    organizationId: orgId,
+    branchId: input.branchId || null,
+    totals,
+    customers: Array.from(customerMap.values()).sort((a, b) => b.totalOutstanding - a.totalOutstanding),
+  };
+});
+
+export const reportsGetPayablesAgeing = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const input = parseInput(GetPayablesAgeingReportSchema, request.data);
+  const ctx = await resolveRequestContext(request, {
+    organizationId: input.organizationId,
+    branchId: input.branchId,
+    requiredPermission: AppPermissions.PAYABLES_VIEW,
+  });
+
+  const orgId = ctx.organizationId;
+  const asOf = input.asOfDate || new Date().toISOString().slice(0, 10);
+  const asOfMs = Date.parse(`${asOf}T23:59:59.999Z`);
+
+  let query: FirebaseFirestore.Query = db
+    .collection("outflows")
+    .where("organizationId", "==", orgId)
+    .where("status", "in", ["confirmed", "partial"]);
+
+  if (input.branchId) {
+    query = query.where("branchId", "==", input.branchId);
+  }
+  if (input.vendorId) {
+    query = query.where("vendorId", "==", input.vendorId);
+  }
+
+  const snap = await query.get();
+
+  const totals = {
+    current: 0,
+    days1to30: 0,
+    days31to60: 0,
+    days61to90: 0,
+    days90Plus: 0,
+    totalOutstanding: 0,
+  };
+
+  const vendorMap = new Map<string, {
+    vendorId: string;
+    vendorName: string;
+    current: number;
+    days1to30: number;
+    days31to60: number;
+    days61to90: number;
+    days90Plus: number;
+    totalOutstanding: number;
+    outflowCount: number;
+  }>();
+
+  for (const doc of snap.docs) {
+    const outflow = doc.data() as OutflowDoc;
+    const balance = outflow.balanceAmount || 0;
+    if (balance <= 0) continue;
+
+    const dueStr = outflow.dueDate || outflow.docDate || outflow.createdAt.slice(0, 10);
+    const dueMs = Date.parse(`${dueStr}T00:00:00.000Z`);
+    const daysOverdue = Math.floor((asOfMs - dueMs) / 86400000);
+
+    const vId = outflow.vendorId || "other";
+    const vName = outflow.payee || "Vendor";
+
+    let vEntry = vendorMap.get(vId);
+    if (!vEntry) {
+      vEntry = {
+        vendorId: vId,
+        vendorName: vName,
+        current: 0,
+        days1to30: 0,
+        days31to60: 0,
+        days61to90: 0,
+        days90Plus: 0,
+        totalOutstanding: 0,
+        outflowCount: 0,
+      };
+      vendorMap.set(vId, vEntry);
+    }
+
+    vEntry.outflowCount++;
+    vEntry.totalOutstanding = round2(vEntry.totalOutstanding + balance);
+    totals.totalOutstanding = round2(totals.totalOutstanding + balance);
+
+    if (daysOverdue <= 0) {
+      vEntry.current = round2(vEntry.current + balance);
+      totals.current = round2(totals.current + balance);
+    } else if (daysOverdue <= 30) {
+      vEntry.days1to30 = round2(vEntry.days1to30 + balance);
+      totals.days1to30 = round2(totals.days1to30 + balance);
+    } else if (daysOverdue <= 60) {
+      vEntry.days31to60 = round2(vEntry.days31to60 + balance);
+      totals.days31to60 = round2(totals.days31to60 + balance);
+    } else if (daysOverdue <= 90) {
+      vEntry.days61to90 = round2(vEntry.days61to90 + balance);
+      totals.days61to90 = round2(totals.days61to90 + balance);
+    } else {
+      vEntry.days90Plus = round2(vEntry.days90Plus + balance);
+      totals.days90Plus = round2(totals.days90Plus + balance);
+    }
+  }
+
+  return {
+    asOfDate: asOf,
+    organizationId: orgId,
+    branchId: input.branchId || null,
+    totals,
+    vendors: Array.from(vendorMap.values()).sort((a, b) => b.totalOutstanding - a.totalOutstanding),
+  };
+});
+
+export const reportsGetCashBankSummary = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const input = parseInput(GetCashBankSummarySchema, request.data);
+  const ctx = await resolveRequestContext(request, {
+    organizationId: input.organizationId,
+    branchId: input.branchId,
+    requiredPermission: AppPermissions.ACCOUNT_VIEW,
+  });
+
+  const orgId = ctx.organizationId;
+  let q: FirebaseFirestore.Query = db
+    .collection("financialAccounts")
+    .where("organizationId", "==", orgId);
+
+  if (input.branchId) {
+    q = q.where("branchId", "in", [input.branchId, null]);
+  }
+  if (!input.includeInactive) {
+    q = q.where("isActive", "==", true);
+  }
+
+  const snap = await q.get();
+
+  const totals = {
+    cashInHand: 0,
+    bankBalance: 0,
+    digitalWallets: 0,
+    clearingAndControl: 0,
+    totalOperationalLiquidity: 0,
+  };
+
+  const accounts = snap.docs.map((doc) => {
+    const d = doc.data() as FinancialAccountDoc;
+    const balance = d.currentBalance || 0;
+
+    switch (d.accountType) {
+      case "cash":
+        totals.cashInHand = round2(totals.cashInHand + balance);
+        break;
+      case "bank":
+        totals.bankBalance = round2(totals.bankBalance + balance);
+        break;
+      case "digital":
+        totals.digitalWallets = round2(totals.digitalWallets + balance);
+        break;
+      case "clearing":
+      case "control":
+        totals.clearingAndControl = round2(totals.clearingAndControl + balance);
+        break;
+    }
+    totals.totalOperationalLiquidity = round2(totals.totalOperationalLiquidity + balance);
+
+    return {
+      financialAccountId: doc.id,
+      name: d.name,
+      code: d.code,
+      accountType: d.accountType,
+      currency: d.currency,
+      currentBalance: balance,
+      branchId: d.branchId || null,
+      isDefault: d.isDefault,
+      isActive: d.isActive,
+    };
+  });
+
+  return {
+    organizationId: orgId,
+    branchId: input.branchId || null,
+    totals,
+    accounts: accounts.sort((a, b) => b.currentBalance - a.currentBalance),
+    count: accounts.length,
+  };
+});
+

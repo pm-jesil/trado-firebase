@@ -1,0 +1,319 @@
+{
+  "entity": "storage_location",
+  "label": "Storage Location",
+  "callables": {
+    "create": "storageLocationsCreate",
+    "update": "storageLocationsUpdate"
+  },
+  "fields": [
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample organizationId"
+    },
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample branchId"
+    },
+    {
+      "path": "name",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample name"
+    },
+    {
+      "path": "code",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 30,
+        "format": "regex"
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample code"
+    },
+    {
+      "path": "type",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "warehouse",
+        "stockyard",
+        "counter",
+        "backroom",
+        "quarantine",
+        "transit"
+      ],
+      "uiHint": "dropdown",
+      "example": "warehouse"
+    },
+    {
+      "path": "isDefault",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
+      "path": "address.id",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.id"
+    },
+    {
+      "path": "address.label",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.label"
+    },
+    {
+      "path": "address.line1",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.line1"
+    },
+    {
+      "path": "address.line2",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 200
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.line2"
+    },
+    {
+      "path": "address.area",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.area"
+    },
+    {
+      "path": "address.city",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.city"
+    },
+    {
+      "path": "address.state",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample address.state"
+    },
+    {
+      "path": "address.postalCode",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 20
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.postalCode"
+    },
+    {
+      "path": "address.country",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 2,
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.country"
+    },
+    {
+      "path": "address.geoPoint.latitude",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": -90,
+        "minInclusive": true,
+        "max": 90,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": 1
+    },
+    {
+      "path": "address.geoPoint.longitude",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": -180,
+        "minInclusive": true,
+        "max": 180,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": 1
+    },
+    {
+      "path": "address.contactName",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample address.contactName"
+    },
+    {
+      "path": "address.phone",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "phone",
+      "example": "Sample address.phone"
+    },
+    {
+      "path": "address.isDefaultBilling",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": true
+    },
+    {
+      "path": "address.isDefaultShipping",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": true
+    },
+    {
+      "path": "notes",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "Sample notes"
+    },
+    {
+      "path": "idempotencyKey",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample idempotencyKey"
+    }
+  ]
+}

@@ -5,7 +5,7 @@
 - **Agent:** Antigravity (Google DeepMind)
 - **Model:** Gemini 3.8 Flash
 - **Project:** Trado Firebase (`trado-x`, Cloud Functions Gen 2, Node 22, `asia-south1`)
-- **Phases Completed:** RB0, RB1, RB2, RB3, RB4, RB5, RB6, RB7, RB8 (100% Complete [cov:RB0-RB8])
+- **Phases Completed:** RB0, RB1, RB2, RB3, RB4, RB5, RB6, RB7, RB8 ([cov:RB0-RB8 9/9 phases])
 
 ---
 
@@ -13,7 +13,7 @@
 
 Prompt 74 builds the complete backend engine for Trado's unified Requests & Support Desk Module. It supports tenant plan changes, limit increases, module toggles, bug reports, feature requests, ownership transfers, access requests, and security concerns with full category validation, dual state machines (`approval` and `work`), compare-and-set concurrency control, deterministic SLA tracking with pause states, automated blocker evaluation, internal note redaction, and idempotent timeline activity notifications.
 
-All 16 HTTPS callables and 2 event triggers have been implemented, tested across 30 unit tests and 12 emulator scenario flows, and synchronized with the Flutter Contract Pack (`docs/flutter-contract/`).
+The 16 HTTPS callables and 2 event triggers have been implemented, tested across 30 unit tests and 12 emulator scenario flows, and synchronized with the Flutter Contract Pack (`docs/flutter-contract/`).
 
 ---
 
@@ -78,7 +78,7 @@ All 16 HTTPS callables and 2 event triggers have been implemented, tested across
 
 ### 3.3 Event Triggers & Scheduled Functions
 - `onRequestActivityWritten`: Firestore onWrite trigger delivering notifications with `reserveIdempotency` deduplication.
-- `requestsSlaAndLifecycleSweep`: Scheduled PubSub trigger (every 15 min) evaluating SLA breaches, 7-day auto-closing of resolved requests, and 14-day auto-canceling of abandoned requests in needs_info.
+- `requestsSlaAndLifecycleSweep`: Scheduled PubSub trigger (interval: 15 min) evaluating SLA breaches, 7-day auto-closing of resolved requests, and 14-day auto-canceling of abandoned requests in needs_info.
 
 ### 3.4 Flutter Contract Pack Updates
 - `docs/flutter-contract/forms/request-details-*.json/md`: 15 category detail forms generated.
@@ -116,5 +116,5 @@ Executed against local Firebase Emulators (Auth, Firestore, Functions):
 - `check-flutter-contract.js`: 177 contract items examined across 11 docs and 23 forms, 0 violations, 2/2 seeded defects caught. **PASS**.
 - `check-rules-sync.js`: `AGENTS.md` and `CLAUDE.md` synchronized. **PASS**.
 - `check-doc-truth.js`: 150 callables verified across 151 documents. **PASS**.
-- `verify-coupling.js`: 134 callables, 6 triggers, 48 collections fully coupled. **PASS**.
+- `verify-coupling.js`: 134 callables, 6 triggers, 48 collections verified coupled. **PASS**.
 - `verify:plan`: 92 units total, 0 unmapped changed files. **PASS**.

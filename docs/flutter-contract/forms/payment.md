@@ -16,6 +16,10 @@
 | `method` | `enum` | No | Yes | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
 | `referenceId` | `string` | No | Yes | `text` | {} | `Sample referenceId` |
 | `referenceModel` | `enum` | No | Yes | `dropdown` | Enum: `bill`, `outflow` | `bill` |
+| `financialAccountId` | `string` | No | Yes | `text` | {"minLength":2} | `Sample financialAccountId` |
+| `allocations[].documentId` | `string` | **Yes** | Yes | `date_picker` | {"minLength":2} | `Sample allocations[].documentId` |
+| `allocations[].documentType` | `enum` | **Yes** | Yes | `date_picker` | Enum: `bill`, `outflow` | `bill` |
+| `allocations[].amount` | `number` | **Yes** | Yes | `date_picker` | {"min":0,"minInclusive":false} | `1` |
 | `notes` | `string` | No | Yes | `textarea` | {"maxLength":500} | `Sample notes` |
 | `gateway.externalReference` | `string` | No | Yes | `date_picker` | {"maxLength":128} | `Sample gateway.externalReference` |
 | `gateway.gatewayProvider` | `string` | No | Yes | `date_picker` | {"maxLength":50} | `Sample gateway.gatewayProvider` |

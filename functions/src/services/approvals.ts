@@ -16,7 +16,7 @@ import { AppPermissions } from "../constants/permissions.js";
 import { EntityStatus } from "../constants/enums.js";
 import type { RequestContext } from "./contextResolver.js";
 
-export type ApprovalModule = "sale" | "purchase" | "expense" | "return" | "stock_adjustment";
+export type ApprovalModule = "sale" | "purchase" | "expense" | "return" | "stock_adjustment" | "account_transfer" | "stock_transfer";
 
 export const APPROVE_PERMISSION: Record<ApprovalModule, string> = {
   sale: AppPermissions.BILL_APPROVE,
@@ -24,6 +24,8 @@ export const APPROVE_PERMISSION: Record<ApprovalModule, string> = {
   expense: AppPermissions.EXPENSE_APPROVE,
   return: AppPermissions.RETURN_APPROVE,
   stock_adjustment: AppPermissions.STOCK_APPROVE,
+  account_transfer: AppPermissions.ACCOUNT_TRANSFER,
+  stock_transfer: AppPermissions.STOCK_TRANSFER_APPROVE,
 };
 
 export interface ApprovalDecision {
@@ -39,7 +41,7 @@ export async function evaluateApproval(
   forceReason?: string
 ): Promise<ApprovalDecision> {
   const policy = ctx.organization.settings?.approvals;
-  const policyOn = !!policy?.enabled && policy.modules?.[module] !== false;
+  const policyOn = !!policy?.enabled && (policy.modules as Record<string, boolean | undefined> | undefined)?.[module] !== false;
   const aboveThreshold = !policy?.amountThreshold || amount >= policy.amountThreshold;
   const needsByPolicy = policyOn && aboveThreshold;
 
@@ -69,7 +71,8 @@ export function assertCanDecide(
   module: ApprovalModule,
   doc: { createdBy?: string; status?: string }
 ): void {
-  if (doc.status !== "pending_approval") {
+  const isPending = doc.status === "pending_approval" || doc.status === "submitted";
+  if (!isPending) {
     throw new HttpsError("failed-precondition", `Document is not pending approval (status: ${doc.status || "none"}).`);
   }
   if (!ctx.can(APPROVE_PERMISSION[module])) {

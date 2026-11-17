@@ -166,6 +166,13 @@ async function run() {
   assert.strictEqual(planReq.request.requestedPlanName, "Pro Plan");
   ok(`requestsCreate filed plan_change: ${planReq.request.requestNumber} (${planReqId})`);
 
+  // 1.2b Tenant reads request via requestsGet
+  const getReq = await callFunction("requestsGet", {
+    requestId: planReqId,
+  }, orgOwner.idToken);
+  assert.strictEqual(getReq.request.requestId, planReqId);
+  ok(`requestsGet retrieved request by ID`);
+
   // 1.3 Super Admin sees request in platform inbox
   const inbox = await callFunction("requestsInboxList", {
     category: ["plan_change"],
@@ -259,6 +266,14 @@ async function run() {
     "REQUEST_DUPLICATE_OPEN"
   );
   ok("Rejected duplicate open plan_change request with REQUEST_DUPLICATE_OPEN (D-43)");
+
+  // 2.2 Verify requestsUpdate
+  const updReq = await callFunction("requestsUpdate", {
+    requestId: planReq2.request.requestId,
+    title: "Upgrade to Enterprise - Revised",
+  }, orgOwner.idToken);
+  assert.strictEqual(updReq.request.title, "Upgrade to Enterprise - Revised");
+  ok(`requestsUpdate updated open request title`);
 
   // Clean up planReq2 by cancelling it
   await callFunction("requestsTransition", {
@@ -380,6 +395,23 @@ async function run() {
     assigneeName: "Lead Platform Engineer",
   }, superAdmin.idToken);
   ok(`requestsAssign assigned request to Super Admin`);
+
+  // Super Admin sets priority
+  const prioRes = await callFunction("requestsSetPriority", {
+    requestId: bugReqId,
+    priority: "urgent",
+    reason: "Saturday rush hour checkout impact",
+  }, superAdmin.idToken);
+  assert.strictEqual(prioRes.request.priority, "urgent");
+  ok(`requestsSetPriority elevated priority to urgent`);
+
+  // Requester adds comment
+  const commentRes = await callFunction("requestsAddComment", {
+    requestId: bugReqId,
+    content: "Customer confirmed card payments are working fine, issue is isolated to UPI QR.",
+  }, staff2.idToken);
+  assert.ok(commentRes.activityId);
+  ok(`requestsAddComment added public comment`);
 
   await callFunction("requestsTransition", {
     requestId: bugReqId,
@@ -559,6 +591,15 @@ async function run() {
   const inboxCounts = await callFunction("requestsInboxCounts", {}, superAdmin.idToken);
   assert.ok(typeof inboxCounts.unassigned === "number");
   ok(`requestsInboxCounts returned: unassigned=${inboxCounts.unassigned}, mine=${inboxCounts.mine}`);
+
+  // ---------------------------------------------------------------------------
+  // Flow 11: requestsSlaAndLifecycleSweep Scheduled Job Core
+  // ---------------------------------------------------------------------------
+  console.log("\n--- Flow 11: requestsSlaAndLifecycleSweep Scheduled Job Execution ---");
+  const { runRequestsSlaAndLifecycleSweep } = require("../lib/triggers/scheduled.js");
+  const sweepRes = await runRequestsSlaAndLifecycleSweep();
+  assert.ok(typeof sweepRes.scanned === "number");
+  ok(`runRequestsSlaAndLifecycleSweep executed successfully: scanned=${sweepRes.scanned}, slaTransitions=${sweepRes.slaTransitions}`);
 
   console.log("\n================================================================================");
   console.log(`   ALL 12 EXECUTABLE FLOWS & SCENARIOS PASSED: ${passed} VERIFIED CHECKS       `);

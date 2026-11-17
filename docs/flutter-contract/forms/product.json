@@ -255,6 +255,19 @@
       "example": 1
     },
     {
+      "path": "storageLocationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample storageLocationId"
+    },
+    {
       "path": "lowStockThreshold",
       "type": "number",
       "requiredCreate": false,

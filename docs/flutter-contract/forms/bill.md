@@ -25,4 +25,10 @@
 | `discountTotal` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true} | `1` |
 | `paidAmount` | `number` | No | No | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
 | `paymentMethod` | `enum` | No | No | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
+| `financialAccountId` | `string` | No | No | `text` | {"minLength":2} | `Sample financialAccountId` |
+| `storageLocationId` | `string` | No | No | `date_picker` | {"minLength":2} | `Sample storageLocationId` |
+| `splitPayments[].method` | `enum` | **Yes** | No | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
+| `splitPayments[].amount` | `number` | **Yes** | No | `money_paise` | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `splitPayments[].financialAccountId` | `string` | **Yes** | No | `text` | {"minLength":2} | `Sample splitPayments[].financialAccountId` |
+| `splitPayments[].notes` | `string` | No | No | `textarea` | {"maxLength":300} | `Sample splitPayments[].notes` |
 | `notes` | `string` | No | Yes | `textarea` | {"maxLength":1000} | `Sample notes` |

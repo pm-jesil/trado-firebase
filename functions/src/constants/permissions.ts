@@ -136,6 +136,7 @@ export const AppPermissions = {
   PAYMENT_CREATE: "payment:create",
   PAYMENT_VIEW: "payment:view",
   PAYMENT_VOID: "payment:void",
+  PAYMENT_FEE_MANAGE: "payment:fee_manage",
 
   // Deliveries & Dispatch
   DELIVERY_CREATE: "delivery:create",
@@ -176,6 +177,30 @@ export const AppPermissions = {
   REQUEST_READ_ORG: "requests:read_org",
   REQUEST_COMMENT: "requests:comment",
   REQUEST_MANAGE_ORG: "requests:manage_org",
+
+  // Financial Accounts & Ledger
+  ACCOUNT_VIEW: "accounts:view",
+  ACCOUNT_MANAGE: "accounts:manage",
+  ACCOUNT_TRANSFER: "accounts:transfer",
+  ACCOUNT_RECONCILE: "accounts:reconcile",
+  LEDGER_VIEW: "ledger:view",
+  RECEIVABLES_VIEW: "receivables:view",
+  PAYABLES_VIEW: "payables:view",
+  CAPITAL_MANAGE: "capital:manage",
+  CAPITAL_VIEW: "capital:view",
+
+  // Approvals Inbox
+  APPROVALS_VIEW: "approvals:view",
+
+  // Warehouse & Storage Locations
+  WAREHOUSE_VIEW: "warehouse:view",
+  WAREHOUSE_MANAGE: "warehouse:manage",
+
+  // Granular Stock Transfers
+  STOCK_TRANSFER_CREATE: "stock:transfer_create",
+  STOCK_TRANSFER_APPROVE: "stock:transfer_approve",
+  STOCK_TRANSFER_DISPATCH: "stock:transfer_dispatch",
+  STOCK_TRANSFER_RECEIVE: "stock:transfer_receive",
 } as const;
 
 export type PermissionCode = typeof AppPermissions[keyof typeof AppPermissions] | string;

@@ -44,7 +44,12 @@ import {
   CustomerDoc,
   ReturnDoc,
   StockBalanceDoc,
+  SplitPaymentEntry,
 } from "../types/models.js";
+import {
+  prepareAccountTransactionInTxn,
+  applyAccountTransactionInTxn,
+} from "../services/ledgerService.js";
 import {
   SalesMode,
   PaymentStatus,
@@ -251,7 +256,7 @@ export const billsUpdateDraft = onCall({ region: "asia-south1" }, async (request
   return { billId: snap.id, status: "draft", totalAmount: updates.totalAmount ?? bill.totalAmount, updated: Object.keys(updates) };
 });
 
-function stockOutItems(billId: string, items: BillItem[], reason: string): StockChangeItem[] {
+function stockOutItems(billId: string, items: BillItem[], reason: string, storageLocationId?: string): StockChangeItem[] {
   return items
     .filter((i) => i.trackStock !== false)
     .map((i) => ({
@@ -262,6 +267,7 @@ function stockOutItems(billId: string, items: BillItem[], reason: string): Stock
       referenceId: billId,
       referenceModel: "bill" as const,
       referenceLineId: i.lineId,
+      storageLocationId,
       reason,
     }));
 }
@@ -284,6 +290,9 @@ interface SaleEffectsParams {
   balanceAmount: number;
   paidAmount: number;
   paymentMethod: PaymentMethod;
+  financialAccountId?: string | null;
+  splitPayments?: SplitPaymentEntry[];
+  storageLocationId?: string;
   stockReason: string;
   releaseReservation?: boolean;
 }
@@ -297,7 +306,7 @@ async function prepareSaleEffects(txn: Transaction, p: SaleEffectsParams) {
   const reservation = p.releaseReservation
     ? await prepareReservationInTxn(txn, { organizationId: orgId, branchId: p.branchId, lines: reservationLines(p.items), direction: -1 })
     : null;
-  const stockItems = stockOutItems(p.billId, p.items, p.stockReason);
+  const stockItems = stockOutItems(p.billId, p.items, p.stockReason, p.storageLocationId);
   const preparedStock = stockItems.length
     ? await prepareStockChangesInTxn(txn, {
       organizationId: orgId,
@@ -309,6 +318,52 @@ async function prepareSaleEffects(txn: Transaction, p: SaleEffectsParams) {
     : null;
   const customerRef = p.customerId ? db.collection("customers").doc(p.customerId) : null;
   const customerSnap = customerRef ? await txn.get(customerRef) : null;
+
+  // Operational financial account ledger preps
+  const splitPreps: Array<{
+    prep: Awaited<ReturnType<typeof prepareAccountTransactionInTxn>>;
+    accountId: string;
+    method: PaymentMethod;
+    amount: number;
+  }> = [];
+
+  if (p.splitPayments && p.splitPayments.length > 0) {
+    for (const split of p.splitPayments) {
+      if (split.amount > 0) {
+        const prep = await prepareAccountTransactionInTxn(txn, {
+          organizationId: orgId,
+          financialAccountId: split.financialAccountId,
+          branchId: p.branchId,
+          type: "sale_collection",
+          direction: "in",
+          amount: split.amount,
+          sourceDocumentType: "bill",
+          sourceDocumentId: p.billId,
+          partyType: p.customerId ? "customer" : null,
+          partyId: p.customerId || null,
+          description: `Sale ${p.billId} (${split.method})`,
+          actorUid: p.ctx.callerUid,
+        });
+        splitPreps.push({ prep, accountId: split.financialAccountId, method: split.method, amount: split.amount });
+      }
+    }
+  } else if (p.paidAmount > 0 && p.financialAccountId) {
+    const singlePrep = await prepareAccountTransactionInTxn(txn, {
+      organizationId: orgId,
+      financialAccountId: p.financialAccountId,
+      branchId: p.branchId,
+      type: "sale_collection",
+      direction: "in",
+      amount: p.paidAmount,
+      sourceDocumentType: "bill",
+      sourceDocumentId: p.billId,
+      partyType: p.customerId ? "customer" : null,
+      partyId: p.customerId || null,
+      description: `Sale ${p.billId}`,
+      actorUid: p.ctx.callerUid,
+    });
+    splitPreps.push({ prep: singlePrep, accountId: p.financialAccountId, method: p.paymentMethod, amount: p.paidAmount });
+  }
 
   /**
    * Writes the effects. MUST run in the transaction write phase. Returns the payment id and the
@@ -326,6 +381,25 @@ async function prepareSaleEffects(txn: Transaction, p: SaleEffectsParams) {
         updatedAt: now,
       });
     }
+
+    // Apply financial account ledger updates
+    for (const sp of splitPreps) {
+      applyAccountTransactionInTxn(txn, sp.prep, {
+        organizationId: orgId,
+        financialAccountId: sp.accountId,
+        branchId: p.branchId,
+        type: "sale_collection",
+        direction: "in",
+        amount: sp.amount,
+        sourceDocumentType: "bill",
+        sourceDocumentId: p.billId,
+        partyType: p.customerId ? "customer" : null,
+        partyId: p.customerId || null,
+        description: `Sale ${p.billId} (${sp.method})`,
+        actorUid: p.ctx.callerUid,
+      });
+    }
+
     let paymentId: string | null = null;
     if (paymentReservation) {
       commitDocumentNumberInTxn(txn, paymentReservation);
@@ -334,6 +408,7 @@ async function prepareSaleEffects(txn: Transaction, p: SaleEffectsParams) {
       const paymentDoc: PaymentDoc = {
         organizationId: orgId,
         branchId: p.branchId,
+        financialAccountId: p.financialAccountId || (p.splitPayments?.[0]?.financialAccountId ?? null),
         paymentNumber: paymentReservation.formattedNumber,
         direction: PaymentDirection.IN,
         partyType: PartyType.CUSTOMER,
@@ -494,13 +569,19 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
     const paymentMethod = (input.paymentMethod as PaymentMethod) || PaymentMethod.CASH;
 
 
+    const effectiveAccountId = input.financialAccountId || ctx.branch.settings?.defaultFinancialAccountId || undefined;
+
     const finalResult = await db.runTransaction(async (txn) => {
       // === READS ===
       const billReservation = await readNextDocumentNumberInTxn(txn, { organizationId: orgId, type: prefix });
       const commitEffects = applyEffectsNow
         ? await prepareSaleEffects(txn, {
           ctx, billId, branchId, items: processedItems, customerId: input.customerId,
-          totalAmount, balanceAmount, paidAmount, paymentMethod, stockReason: `Sale ${billId}`,
+          totalAmount, balanceAmount, paidAmount, paymentMethod,
+          financialAccountId: effectiveAccountId,
+          splitPayments: input.splitPayments,
+          storageLocationId: input.storageLocationId,
+          stockReason: `Sale ${billId}`,
         })
         : null;
       const reservation = isSalesOrder && !pendingApproval
@@ -520,6 +601,9 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
       const billDoc: BillDoc = {
         organizationId: orgId,
         branchId,
+        financialAccountId: effectiveAccountId || null,
+        storageLocationId: input.storageLocationId || null,
+        splitPayments: input.splitPayments || undefined,
         billNumber,
         salesMode: input.salesMode || SalesMode.POS,
         documentType: docType,
@@ -852,6 +936,9 @@ export async function decideBill(ctx: RequestContext, input: DocumentDecisionInp
       balanceAmount,
       paidAmount,
       paymentMethod: (bill.requestedPaymentMethod as PaymentMethod) || PaymentMethod.CASH,
+      financialAccountId: bill.financialAccountId || null,
+      splitPayments: bill.splitPayments,
+      storageLocationId: bill.storageLocationId || undefined,
       stockReason: `Approved sale ${bill.billNumber}`,
     });
     const effects = commitEffects();
@@ -961,6 +1048,30 @@ export const billsVoid = onCall({ region: "asia-south1" }, async (request) => {
       const custRef = bill.customerId ? db.collection("customers").doc(bill.customerId) : null;
       const custSnap = custRef ? await txn.get(custRef) : null;
 
+      // Prepare reversals for payments tied to financial accounts
+      const paymentReversalPreps: Array<{
+        prep: Awaited<ReturnType<typeof prepareAccountTransactionInTxn>>;
+        pDoc: PaymentDoc;
+      }> = [];
+      for (const p of paymentsSnap.docs) {
+        const pDoc = p.data() as PaymentDoc;
+        if (pDoc.status === "completed" && pDoc.financialAccountId) {
+          const prep = await prepareAccountTransactionInTxn(txn, {
+            organizationId: orgId,
+            financialAccountId: pDoc.financialAccountId,
+            branchId: pDoc.branchId || bill.branchId,
+            type: "reversal",
+            direction: pDoc.direction === "in" ? "out" : "in",
+            amount: pDoc.amount,
+            sourceDocumentType: "bill",
+            sourceDocumentId: snap.id,
+            description: `Void bill ${bill.billNumber}`,
+            actorUid: ctx.callerUid,
+          });
+          paymentReversalPreps.push({ prep, pDoc });
+        }
+      }
+
       if (preparedStock) commitStockChangesInTxn(txn, preparedStock);
       if (releaseSerials) releaseSerials();
       if (custRef && custSnap?.exists) {
@@ -971,6 +1082,22 @@ export const billsVoid = onCall({ region: "asia-south1" }, async (request) => {
           updatedAt: now,
         });
       }
+
+      for (const pr of paymentReversalPreps) {
+        applyAccountTransactionInTxn(txn, pr.prep, {
+          organizationId: orgId,
+          financialAccountId: pr.pDoc.financialAccountId!,
+          branchId: pr.pDoc.branchId || bill.branchId,
+          type: "reversal",
+          direction: pr.pDoc.direction === "in" ? "out" : "in",
+          amount: pr.pDoc.amount,
+          sourceDocumentType: "bill",
+          sourceDocumentId: snap.id,
+          description: `Void bill ${bill.billNumber}`,
+          actorUid: ctx.callerUid,
+        });
+      }
+
       let voidedPayments = 0;
       for (const p of paymentsSnap.docs) {
         if ((p.data() as PaymentDoc).status !== "completed") continue;

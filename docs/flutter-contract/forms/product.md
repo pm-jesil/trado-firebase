@@ -24,6 +24,7 @@
 | `hasExpiry` | `boolean` | No | Yes | `switch` | {} | `true` |
 | `trackStock` | `boolean` | No | Yes | `switch` | {} | `true` |
 | `initialStock` | `number` | No | No | `numeric` | {"min":0,"minInclusive":true} | `1` |
+| `storageLocationId` | `string` | No | No | `date_picker` | {"minLength":2} | `Sample storageLocationId` |
 | `lowStockThreshold` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true} | `1` |
 | `trackBatch` | `boolean` | No | Yes | `date_picker` | {} | `true` |
 | `trackSerial` | `boolean` | No | Yes | `switch` | {} | `true` |

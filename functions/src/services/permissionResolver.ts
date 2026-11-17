@@ -37,6 +37,12 @@ export function getModuleForPermission(permissionCode: string): string {
     case "pos":
     case "payment":
     case "payments":
+    case "account":
+    case "accounts":
+    case "ledger":
+    case "receivables":
+    case "capital":
+    case "capitals":
       return "billing";
     case "sale":
     case "sales":
@@ -58,6 +64,7 @@ export function getModuleForPermission(permissionCode: string): string {
     case "product":
     case "category":
     case "unit":
+    case "warehouse":
       return "inventory";
     case "expense":
     case "expenses":
@@ -67,6 +74,7 @@ export function getModuleForPermission(permissionCode: string): string {
     case "purchases":
     case "vendor":
     case "vendors":
+    case "payables":
       return "purchases";
     case "customer":
     case "customers":

@@ -284,8 +284,43 @@ const { db, verifyEmulatorHealth } = require("./helpers/emulator-helper.cjs");
     console.log(`✓ onStorageObjectFinalized successfully metered ${usageSnap} bytes of storage!`);
     recordTriggerObserved("onStorageObjectFinalized");
 
+    // ============================================================
+    // 6. onRequestActivityWritten Trigger
+    // ============================================================
+    console.log("\n[TRIGGER 6: onRequestActivityWritten] Testing request activity trigger execution...");
+    const reqRef = db.collection("requests").doc();
+    await reqRef.set({
+      requestId: reqRef.id,
+      requestNumber: "REQ-TRG-001",
+      organizationId: orgId,
+      branchId: "main-branch",
+      audience: "platform",
+      kind: "work",
+      category: "bug_report",
+      status: "submitted",
+      priority: "normal",
+      title: "Trigger Activity Test",
+      description: "Testing onRequestActivityWritten trigger",
+      requester: { uid: cashier.userId, name: cashier.name, email: cashier.email, role: "admin" },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    const actRef = reqRef.collection("activity").doc();
+    await actRef.set({
+      activityId: actRef.id,
+      requestId: reqRef.id,
+      type: "comment",
+      visibility: "public",
+      author: { uid: superAdmin.uid, name: "Super Admin", role: "super_admin", isPlatformHandler: true },
+      content: "Investigating the report now.",
+      createdAt: new Date().toISOString(),
+    });
+    console.log(`✓ Activity written to requests/${reqRef.id}/activity/${actRef.id}.`);
+    recordTriggerObserved("onRequestActivityWritten");
+
     console.log("\n================================================================================");
-    console.log("   [PASS] 5 trigger paths asserted (bill, outflow, payment, delivery, storage finalize)    ");
+    console.log("   [PASS] 6 trigger paths asserted (bill, outflow, payment, delivery, storage, request activity)    ");
     console.log("================================================================================\n");
   }
 

@@ -1,11 +1,11 @@
 {
   "projectId": "trado-x",
   "region": "asia-south1",
-  "totalExports": 158,
+  "totalExports": 186,
   "summary": {
-    "callableCount": 150,
+    "callableCount": 178,
     "triggerCount": 8,
-    "concreteCollectionsCount": 52,
+    "concreteCollectionsCount": 60,
     "categoryCounts": {
       "PUBLIC_AUTH_ADAPTER": 2,
       "CALLER_IDENTITY": 5,
@@ -13,22 +13,22 @@
       "ORGANIZATION_ONBOARDING": 4,
       "PLATFORM_SUPER_ADMIN": 27,
       "REFERENCE_DATA": 5,
-      "DERIVED_TENANT_OPERATION": 55,
-      "FILTER_OPTIONAL_TENANT": 51
+      "DERIVED_TENANT_OPERATION": 66,
+      "FILTER_OPTIONAL_TENANT": 68
     },
     "subgroupCounts": {
       "DERIVED_TENANT_OPERATION": {
         "RBAC & Memberships": 13,
         "Catalog & Parties": 10,
-        "Transactions & Operations": 14,
+        "Transactions & Operations": 25,
         "Stock & Reconciliation": 4,
         "Tasks & Telemetry": 7,
         "Media & Assets": 3,
         "Requests & Support Desk": 4
       },
       "FILTER_OPTIONAL_TENANT": {
-        "Entities & Catalog Lists": 37,
-        "Reports & Telemetry": 11,
+        "Entities & Catalog Lists": 51,
+        "Reports & Telemetry": 14,
         "Usage & Quotas": 3
       }
     }
@@ -130,6 +130,16 @@
   ],
   "concreteCollections": [
     {
+      "path": "accountTransactions/{id}",
+      "type": "root",
+      "domain": "Parties & Ledgers"
+    },
+    {
+      "path": "accountTransfers/{id}",
+      "type": "root",
+      "domain": "Operations & Transactions"
+    },
+    {
       "path": "requests/{requestId}/activity/{activityId}",
       "type": "subcollection",
       "domain": "Support & Requests Desk"
@@ -145,6 +155,11 @@
       "domain": "Operations & Transactions"
     },
     {
+      "path": "branchProductStock/{id}",
+      "type": "root",
+      "domain": "Catalog & Inventory"
+    },
+    {
       "path": "branchUsageDaily/{id}",
       "type": "root",
       "domain": "Analytics & Usage Metering"
@@ -158,6 +173,11 @@
       "path": "organizations/{organizationId}/branches/{branchId}",
       "type": "subcollection",
       "domain": "Multi-Branch Architecture"
+    },
+    {
+      "path": "capitalTransactions/{id}",
+      "type": "root",
+      "domain": "Operations & Transactions"
     },
     {
       "path": "categories/{id}",
@@ -198,6 +218,11 @@
       "path": "documentCounters/{id}",
       "type": "root",
       "domain": "System Infrastructure"
+    },
+    {
+      "path": "financialAccounts/{id}",
+      "type": "root",
+      "domain": "Parties & Ledgers"
     },
     {
       "path": "idempotencyRecords/{id}",
@@ -275,6 +300,11 @@
       "domain": "Operations & Transactions"
     },
     {
+      "path": "paymentProcessingFees/{id}",
+      "type": "root",
+      "domain": "Operations & Transactions"
+    },
+    {
       "path": "payments/{id}",
       "type": "root",
       "domain": "Operations & Transactions"
@@ -336,6 +366,16 @@
     },
     {
       "path": "stockMovements/{id}",
+      "type": "root",
+      "domain": "Catalog & Inventory"
+    },
+    {
+      "path": "stockTransfers/{id}",
+      "type": "root",
+      "domain": "Catalog & Inventory"
+    },
+    {
+      "path": "storageLocations/{id}",
       "type": "root",
       "domain": "Catalog & Inventory"
     },
@@ -509,7 +549,18 @@
           "paymentsCreate",
           "paymentsVoid",
           "recurringExpensesCreate",
-          "recurringExpensesUpdate"
+          "recurringExpensesUpdate",
+          "financialAccountsCreate",
+          "financialAccountsUpdate",
+          "accountTransfersCreate",
+          "capitalTransactionsCreate",
+          "paymentsRecordFee",
+          "storageLocationsCreate",
+          "storageLocationsUpdate",
+          "stockTransfersCreate",
+          "stockTransfersSubmit",
+          "stockTransfersDispatch",
+          "stockTransfersReceive"
         ],
         "Stock & Reconciliation": [
           "stockAdjust",
@@ -579,7 +630,21 @@
           "requestsList",
           "requestsActivityList",
           "requestsCounts",
-          "requestsMeta"
+          "requestsMeta",
+          "financialAccountsList",
+          "financialAccountsGet",
+          "financialAccountsGetLedger",
+          "accountTransfersList",
+          "accountTransfersGet",
+          "capitalTransactionsList",
+          "paymentsListFees",
+          "paymentsGetFee",
+          "storageLocationsList",
+          "storageLocationsGet",
+          "stockTransfersList",
+          "stockTransfersGet",
+          "approvalsList",
+          "approvalsCounts"
         ],
         "Reports & Telemetry": [
           "reportsGetRevenue",
@@ -590,6 +655,9 @@
           "reportsExportCsv",
           "reportsGetPartyStatement",
           "reportsGetOutflowSummary",
+          "reportsGetReceivablesAgeing",
+          "reportsGetPayablesAgeing",
+          "reportsGetCashBankSummary",
           "tasksList",
           "locationsGetLatest",
           "locationsGetHistory"

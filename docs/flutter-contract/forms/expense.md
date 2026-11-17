@@ -31,6 +31,12 @@
 | `lines[].serialNumbers[]` | `string` | **Yes** | Yes | `text` | {"minLength":1,"maxLength":64} | `Sample lines[].serialNumbers[]` |
 | `paidAmount` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
 | `paymentMethod` | `enum` | No | Yes | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
+| `financialAccountId` | `string` | No | Yes | `text` | {"minLength":2} | `Sample financialAccountId` |
+| `storageLocationId` | `string` | No | Yes | `date_picker` | {"minLength":2} | `Sample storageLocationId` |
+| `splitPayments[].method` | `enum` | **Yes** | Yes | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
+| `splitPayments[].amount` | `number` | **Yes** | Yes | `money_paise` | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `splitPayments[].financialAccountId` | `string` | **Yes** | Yes | `text` | {"minLength":2} | `Sample splitPayments[].financialAccountId` |
+| `splitPayments[].notes` | `string` | No | Yes | `textarea` | {"maxLength":300} | `Sample splitPayments[].notes` |
 | `notes` | `string` | No | Yes | `textarea` | {"maxLength":1000} | `Sample notes` |
 | `payeeType` | `enum` | No | Yes | `dropdown` | Enum: `vendor`, `employee`, `other` | `vendor` |
 | `payeeMembershipId` | `string` | No | Yes | `text` | {"minLength":2} | `Sample payeeMembershipId` |
