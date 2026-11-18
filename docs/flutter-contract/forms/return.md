@@ -18,4 +18,5 @@
 | `items[].reason` | `string` | **Yes** | Yes | `text` | {"minLength":1,"maxLength":200} | `Sample items[].reason` |
 | `items[].disposition` | `enum` | No | Yes | `dropdown` | Enum: `restocked_to_inventory`, `wasted_discarded` | `restocked_to_inventory` |
 | `refundMethod` | `enum` | No | Yes | `dropdown` | Enum: `cash`, `credit_note`, `original_payment` | `cash` |
+| `refundFinancialAccountId` | `string` | No | Yes | `text` | {"minLength":2} | `Sample refundFinancialAccountId` |
 | `notes` | `string` | No | Yes | `textarea` | {"maxLength":500} | `Sample notes` |

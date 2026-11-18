@@ -29,8 +29,8 @@ import { HttpsError } from "firebase-functions/v2/https";
 import { db } from "./firebase.js";
 import { lockSegment } from "./naturalKeys.js";
 
-export type SerialStatus = "pending_receipt" | "in_stock" | "reserved" | "sold" | "returned" | "damaged" | "vendor_returned";
-export const IN_HAND: ReadonlySet<SerialStatus> = new Set(["in_stock", "returned", "reserved"]);
+export type SerialStatus = "pending_receipt" | "in_stock" | "reserved" | "sold" | "returned" | "damaged" | "vendor_returned" | "in_transit";
+export const IN_HAND: ReadonlySet<SerialStatus> = new Set(["in_stock", "returned", "reserved", "in_transit"]);
 const AVAILABLE: ReadonlySet<SerialStatus> = new Set(["in_stock", "returned"]);
 
 export interface SerialLine {
@@ -50,7 +50,10 @@ export type SerialAction =
   | { kind: "customer_return"; billId: string; returnId: string; restock: boolean }
   | { kind: "vendor_return"; outflowId: string; returnId: string }
   | { kind: "adjust_in"; adjustmentId: string }
-  | { kind: "adjust_out"; adjustmentId: string };
+  | { kind: "adjust_out"; adjustmentId: string }
+  | { kind: "transfer_dispatch"; transferId: string }
+  | { kind: "transfer_receive"; transferId: string; destinationBranchId: string }
+  | { kind: "transfer_cancel"; transferId: string };
 
 export function normalizeSerial(serial: string): string {
   return serial.trim().replace(/\s+/g, "").toUpperCase();
@@ -140,6 +143,37 @@ export async function prepareSerialsInTxn(
       case "adjust_out":
         if (!doc || !AVAILABLE.has(status as SerialStatus) || doc.branchId !== branchId) throw fail(`${label} is not in stock at this branch.`, "SERIAL_NOT_IN_STOCK");
         writes.push(() => txn.update(e.ref, { status: "damaged", adjustmentId: action.adjustmentId, updatedAt: now }));
+        return;
+      case "transfer_dispatch":
+        if (!doc || !AVAILABLE.has(status as SerialStatus) || doc.branchId !== branchId) {
+          throw fail(`${label} is not in stock at source branch.`, "SERIAL_NOT_IN_STOCK");
+        }
+        writes.push(() => txn.update(e.ref, {
+          status: "in_transit",
+          transferId: action.transferId,
+          updatedAt: now,
+        }));
+        return;
+      case "transfer_receive":
+        if (!doc || status !== "in_transit" || doc.transferId !== action.transferId) {
+          throw fail(`${label} is not in transit on transfer ${action.transferId}.`, "SERIAL_NOT_IN_TRANSIT");
+        }
+        writes.push(() => txn.update(e.ref, {
+          status: "in_stock",
+          branchId: action.destinationBranchId,
+          transferId: null,
+          updatedAt: now,
+        }));
+        return;
+      case "transfer_cancel":
+        if (!doc || status !== "in_transit" || doc.transferId !== action.transferId) {
+          throw fail(`${label} is not in transit on transfer ${action.transferId}.`);
+        }
+        writes.push(() => txn.update(e.ref, {
+          status: "in_stock",
+          transferId: null,
+          updatedAt: now,
+        }));
         return;
     }
   });

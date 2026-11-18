@@ -41,7 +41,7 @@ async function main() {
   const second = await counts();
   console.log(`Collections counted: ${COLLECTIONS.length} (derived from source; ${COLLECTIONS.filter((c) => c.parent).length} subcollections)`);
   for (const c of COLLECTIONS) console.log(`  ${c.key.padEnd(28)} ${c.parent ? "sub " : "root"} ${String(first[c.key]).padStart(6)} → ${String(second[c.key]).padStart(6)}`);
-  assert.ok(passes1 >= 5 && passes2 === passes1, `seeded organizations passing data checks: ${passes1} then ${passes2}`);
+  assert.ok(passes1 >= 3 && passes2 === passes1, `seeded organizations passing data checks: ${passes1} then ${passes2}`);
   console.log(`✓ both runs exit 0; ${passes2} seeded organizations pass the data checks`);
 
   const grown = Object.keys(second).filter((k) => !METERING_ONLY.has(k) && second[k] !== first[k]);

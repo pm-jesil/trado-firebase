@@ -32,16 +32,129 @@ export interface TaxRegimeDefinition {
   name: string;
   description: string;
   isDefault: boolean;
+  taxType: "gst" | "vat" | "sales_tax" | "none";
+  defaultRate: number;
+  rates: number[];
+  labels: {
+    taxName: string;
+    registrationLabel: string;
+    invoiceTitle: string;
+  };
+  supportsInterState?: boolean;
 }
 
 export const DEFAULT_TAX_REGIMES: TaxRegimeDefinition[] = [
-  { code: "IN_GST", country: "IN", name: "India Goods & Services Tax (GST)", description: "Standard Indian GST regime", isDefault: true },
-  { code: "AE_VAT", country: "AE", name: "UAE Value Added Tax (VAT)", description: "Standard UAE 5% VAT regime", isDefault: false },
-  { code: "OM_VAT", country: "OM", name: "Oman Value Added Tax (VAT)", description: "Standard Oman 5% VAT regime", isDefault: false },
-  { code: "BH_VAT", country: "BH", name: "Bahrain Value Added Tax (VAT)", description: "Standard Bahrain 10% VAT regime", isDefault: false },
-  { code: "SG_GST", country: "SG", name: "Singapore Goods & Services Tax (GST)", description: "Standard Singapore 9% GST regime", isDefault: false },
-  { code: "US_SALES_TAX", country: "US", name: "US State Sales Tax", description: "US Destination-based sales tax", isDefault: false },
-  { code: "NONE", country: "GLOBAL", name: "No Tax / Tax Exempt", description: "Exempt or zero-tax business operations", isDefault: false },
+  {
+    code: "IN_GST",
+    country: "IN",
+    name: "India Goods & Services Tax (GST)",
+    description: "Standard Indian GST regime with multi-slab rates and intra/inter-state split",
+    isDefault: true,
+    taxType: "gst",
+    defaultRate: 18,
+    rates: [0, 5, 12, 18, 28],
+    labels: { taxName: "GST", registrationLabel: "GSTIN", invoiceTitle: "Tax Invoice" },
+    supportsInterState: true,
+  },
+  {
+    code: "AE_VAT",
+    country: "AE",
+    name: "UAE Value Added Tax (VAT)",
+    description: "Standard UAE 5% VAT regime with zero-rated categories",
+    isDefault: false,
+    taxType: "vat",
+    defaultRate: 5,
+    rates: [0, 5],
+    labels: { taxName: "VAT", registrationLabel: "TRN", invoiceTitle: "Tax Invoice" },
+  },
+  {
+    code: "OM_VAT",
+    country: "OM",
+    name: "Oman Value Added Tax (VAT)",
+    description: "Standard Oman 5% VAT regime",
+    isDefault: false,
+    taxType: "vat",
+    defaultRate: 5,
+    rates: [0, 5],
+    labels: { taxName: "VAT", registrationLabel: "VATIN", invoiceTitle: "Tax Invoice" },
+  },
+  {
+    code: "BH_VAT",
+    country: "BH",
+    name: "Bahrain Value Added Tax (VAT)",
+    description: "Standard Bahrain 10% VAT regime with 0% essential items",
+    isDefault: false,
+    taxType: "vat",
+    defaultRate: 10,
+    rates: [0, 5, 10],
+    labels: { taxName: "VAT", registrationLabel: "TRN", invoiceTitle: "Tax Invoice" },
+  },
+  {
+    code: "SG_GST",
+    country: "SG",
+    name: "Singapore Goods & Services Tax (GST)",
+    description: "Standard Singapore 9% GST regime",
+    isDefault: false,
+    taxType: "gst",
+    defaultRate: 9,
+    rates: [0, 9],
+    labels: { taxName: "GST", registrationLabel: "GST Reg No", invoiceTitle: "Tax Invoice" },
+  },
+  {
+    code: "US_SALES_TAX",
+    country: "US",
+    name: "US State Sales Tax",
+    description: "US Destination-based state and local sales tax",
+    isDefault: false,
+    taxType: "sales_tax",
+    defaultRate: 7,
+    rates: [0, 4, 5, 6, 7, 8, 9, 10],
+    labels: { taxName: "Sales Tax", registrationLabel: "Tax Permit", invoiceTitle: "Sales Invoice" },
+  },
+  {
+    code: "SA_VAT",
+    country: "SA",
+    name: "Saudi Arabia Value Added Tax (VAT)",
+    description: "Standard Saudi 15% VAT regime",
+    isDefault: false,
+    taxType: "vat",
+    defaultRate: 15,
+    rates: [0, 15],
+    labels: { taxName: "VAT", registrationLabel: "VAT Number", invoiceTitle: "Tax Invoice" },
+  },
+  {
+    code: "GB_VAT",
+    country: "GB",
+    name: "United Kingdom Value Added Tax (VAT)",
+    description: "Standard UK 20% VAT regime with 5% reduced and 0% zero-rated",
+    isDefault: false,
+    taxType: "vat",
+    defaultRate: 20,
+    rates: [0, 5, 20],
+    labels: { taxName: "VAT", registrationLabel: "VAT Reg No", invoiceTitle: "VAT Invoice" },
+  },
+  {
+    code: "EU_VAT",
+    country: "EU",
+    name: "European Union Value Added Tax (VAT)",
+    description: "Standard EU VAT regime (19% standard, 7% reduced)",
+    isDefault: false,
+    taxType: "vat",
+    defaultRate: 19,
+    rates: [0, 7, 19],
+    labels: { taxName: "VAT", registrationLabel: "VAT ID", invoiceTitle: "Tax Invoice" },
+  },
+  {
+    code: "NONE",
+    country: "GLOBAL",
+    name: "No Tax / Tax Exempt",
+    description: "Exempt or zero-tax business operations",
+    isDefault: false,
+    taxType: "none",
+    defaultRate: 0,
+    rates: [0],
+    labels: { taxName: "None", registrationLabel: "N/A", invoiceTitle: "Bill of Supply" },
+  },
 ];
 
 export interface SubscriptionPlanDefinition {
@@ -227,6 +340,7 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
       AppPermissions.PAYMENT_VIEW,
       AppPermissions.PAYMENT_VOID,
       AppPermissions.PAYMENT_FEE_MANAGE,
+      AppPermissions.PAYMENT_FEE_VERIFY,
       AppPermissions.DELIVERY_CREATE,
       AppPermissions.DELIVERY_VIEW,
       AppPermissions.DELIVERY_UPDATE,
@@ -391,6 +505,7 @@ export const DEFAULT_SYSTEM_ROLES: SystemRoleDefinition[] = [
       AppPermissions.PAYMENT_VIEW,
       AppPermissions.PAYMENT_VOID,
       AppPermissions.PAYMENT_FEE_MANAGE,
+      AppPermissions.PAYMENT_FEE_VERIFY,
       AppPermissions.DELIVERY_CREATE,
       AppPermissions.DELIVERY_VIEW,
       AppPermissions.DELIVERY_UPDATE,

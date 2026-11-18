@@ -137,6 +137,7 @@ export const AppPermissions = {
   PAYMENT_VIEW: "payment:view",
   PAYMENT_VOID: "payment:void",
   PAYMENT_FEE_MANAGE: "payment:fee_manage",
+  PAYMENT_FEE_VERIFY: "payment:fee_verify",
 
   // Deliveries & Dispatch
   DELIVERY_CREATE: "delivery:create",

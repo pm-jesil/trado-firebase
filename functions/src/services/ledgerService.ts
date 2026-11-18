@@ -26,7 +26,7 @@ export interface RecordTransactionParams {
   type: AccountTransactionType;
   direction: "in" | "out";
   amount: number;
-  sourceDocumentType: "bill" | "outflow" | "payment" | "account_transfer" | "reconciliation" | "manual" | "fee" | "capital";
+  sourceDocumentType: "bill" | "outflow" | "payment" | "account_transfer" | "reconciliation" | "manual" | "fee" | "capital" | "return";
   sourceDocumentId: string;
   partyType?: "customer" | "vendor" | null;
   partyId?: string | null;

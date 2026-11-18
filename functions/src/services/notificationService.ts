@@ -14,7 +14,7 @@ import { NotificationDoc, NotificationType } from "../types/models.js";
 export interface CreateNotificationParams {
   organizationId: string;
   userId: string;
-  membershipId: string;
+  membershipId?: string | null;
   type: NotificationType;
   title: string;
   body: string;
@@ -32,7 +32,7 @@ export async function createAndDispatchNotification(
   const notificationDoc: NotificationDoc = {
     organizationId: params.organizationId,
     userId: params.userId,
-    membershipId: params.membershipId,
+    membershipId: params.membershipId || null,
     type: params.type,
     title: params.title,
     body: params.body,

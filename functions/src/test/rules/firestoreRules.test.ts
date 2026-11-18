@@ -57,11 +57,14 @@ const RULES_MATRIX: Record<string, { path: string; data?: Record<string, unknown
   "tasks": { path: "tasks/task1", readers: NOBODY },
   "latestLocations": { path: "latestLocations/l1", readers: NOBODY },
   "locationPings": { path: "locationPings/p1", readers: NOBODY },
+  "requests/activity": { path: "requests/r1/activity/a1", readers: NOBODY },
   ...Object.fromEntries([
     "products", "customers", "vendors", "outflows", "bills", "stockMovements", "deliveries", "returns",
     "payments", "dailySummaries", "monthlySummaries", "organizationUsageDaily", "organizationUsageMonthly", "userUsageDaily", "branchUsageDaily",
     "branchUsageMonthly", "usageRateCards", "usageCounterShards", "platformCostReconciliation", "serials", "stockAdjustmentRequests", "recurringExpenses",
     "documentCounters", "idempotencyRecords", "auditLogs", "notificationOutbox", "uniqueKeys", "imageUploadSessions",
+    "accountTransactions", "accountTransfers", "branchProductStock", "capitalTransactions", "counters", "financialAccounts",
+    "journalEntries", "paymentProcessingFees", "platformSettings", "requests", "stockTransfers", "storageLocations",
   ].map((c) => [c, { path: `${c}/x1`, readers: NOBODY }])),
 };
 

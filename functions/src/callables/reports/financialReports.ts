@@ -1,0 +1,432 @@
+/**
+ * Reports & Analytics - Financial Reports
+ * 
+ * - computeProfitLoss: Master profit & loss calculation
+ * - reportsGetRevenue: Revenue and sales trends
+ * - reportsGetProfitLoss: Full P&L statement
+ * - reportsGetCashBankSummary: Operational cash and bank liquidity summary
+ */
+
+import { HttpsError } from "firebase-functions/v2/https";
+import { onCall } from "../../services/callable.js";
+import { db } from "../../services/firebase.js";
+import { resolveRequestContext } from "../../services/contextResolver.js";
+import { DEFAULT_ORG_TIMEZONE, localDateInTimezone } from "../../services/subscription.js";
+import { AppPermissions } from "../../constants/permissions.js";
+import {
+  GetRevenueReportSchema,
+  GetProfitLossReportSchema,
+  GetCashBankSummarySchema,
+} from "../../validation/schemas.js";
+import { parseInput } from "../../validation/parseInput.js";
+import { round2, roundTo } from "../../services/money.js";
+import {
+  BillDoc,
+  OutflowDoc,
+  DailySummaryDoc,
+  ReturnDoc,
+  StockMovementDoc,
+  OrganizationDoc,
+  FinancialAccountDoc,
+  PaymentProcessingFeeDoc,
+} from "../../types/models.js";
+import { ReturnType, ReturnDisposition } from "../../constants/enums.js";
+import { WRITE_OFF_MOVEMENT_TYPES, billsInPeriod, sourceLinesById } from "./helpers.js";
+
+/** Profit & loss for a period: the single implementation behind reportsGetProfitLoss and the P&L CSV. */
+export async function computeProfitLoss(orgId: string, validated: {
+  branchId?: string;
+  from?: string;
+  to?: string;
+  periodType?: "day" | "week" | "month" | "year" | "custom";
+  periodValue?: string;
+  comparePreviousPeriod?: boolean;
+}) {
+  const targetBranchId = validated.branchId;
+
+  // Load organization configuration (timezone, financial year start, currency decimals)
+  const orgDoc = await db.collection("organizations").doc(orgId).get();
+  const orgData = (orgDoc.exists ? orgDoc.data() : {}) as OrganizationDoc;
+  const tz = orgData.timezone || DEFAULT_ORG_TIMEZONE;
+  const fyStartMonth = (orgData as unknown as { financialYearStartMonth?: number }).financialYearStartMonth || 4;
+  const decimals = orgData.currencyDecimals ?? 2;
+
+  let effectiveFrom = validated.from;
+  let effectiveTo = validated.to;
+
+  // Resolve period boundaries if periodType is specified
+  if (validated.periodType && validated.periodType !== "custom") {
+    const now = new Date();
+    const todayStr = localDateInTimezone(now.getTime(), tz);
+    if (validated.periodType === "day") {
+      effectiveFrom = validated.periodValue || todayStr;
+      effectiveTo = effectiveFrom;
+    } else if (validated.periodType === "month") {
+      const monthPrefix = validated.periodValue || todayStr.slice(0, 7);
+      effectiveFrom = `${monthPrefix}-01`;
+      const [y, m] = monthPrefix.split("-").map(Number);
+      const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+      effectiveTo = `${monthPrefix}-${String(lastDay).padStart(2, "0")}`;
+    } else if (validated.periodType === "year") {
+      const targetYear = validated.periodValue ? parseInt(validated.periodValue, 10) : parseInt(todayStr.slice(0, 4), 10);
+      effectiveFrom = `${targetYear}-${String(fyStartMonth).padStart(2, "0")}-01`;
+      const endYear = fyStartMonth === 1 ? targetYear : targetYear + 1;
+      const endMonth = fyStartMonth === 1 ? 12 : fyStartMonth - 1;
+      const lastDay = new Date(Date.UTC(endYear, endMonth, 0)).getUTCDate();
+      effectiveTo = `${endYear}-${String(endMonth).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+    }
+  }
+
+  const periodParams = { branchId: targetBranchId, from: effectiveFrom, to: effectiveTo };
+  const billsQuery = billsInPeriod(orgId, periodParams);
+
+  // Read outflows for operational expenses
+  let outflowsQuery = db
+    .collection("outflows")
+    .where("organizationId", "==", orgId)
+    .where("status", "==", "confirmed");
+
+  if (targetBranchId) {
+    outflowsQuery = outflowsQuery.where("branchId", "==", targetBranchId);
+  }
+  if (effectiveFrom) {
+    outflowsQuery = outflowsQuery.where("createdAt", ">=", effectiveFrom);
+  }
+  if (effectiveTo) {
+    outflowsQuery = outflowsQuery.where("createdAt", "<=", `${effectiveTo}T23:59:59.999Z`);
+  }
+
+  let feesQuery = db
+    .collection("paymentProcessingFees")
+    .where("organizationId", "==", orgId);
+
+  if (targetBranchId) {
+    feesQuery = feesQuery.where("branchId", "==", targetBranchId);
+  }
+  if (effectiveFrom) {
+    feesQuery = feesQuery.where("createdAt", ">=", effectiveFrom);
+  }
+  if (effectiveTo) {
+    feesQuery = feesQuery.where("createdAt", "<=", `${effectiveTo}T23:59:59.999Z`);
+  }
+
+  const [billsSnap, outflowsSnap, returnsSnap, writeOffSnap, feesSnap] = await Promise.all([
+    billsQuery.get(),
+    outflowsQuery.get(),
+    db.collection("returns").where("organizationId", "==", orgId).where("returnType", "==", ReturnType.SALES_RETURN).get(),
+    db.collection("stockMovements")
+      .where("organizationId", "==", orgId)
+      .where("type", "in", WRITE_OFF_MOVEMENT_TYPES)
+      .get(),
+    feesQuery.get(),
+  ]);
+
+  let grossRevenue = 0;
+  let grossCogs = 0;
+  let billCount = 0;
+  let totalTax = 0;
+  let totalDiscounts = 0;
+
+  billsSnap.docs.forEach((doc) => {
+    const bill = doc.data() as BillDoc;
+    grossRevenue += bill.totalAmount || 0;
+    totalTax += bill.taxTotal || 0;
+    totalDiscounts += bill.discountTotal || 0;
+    billCount++;
+
+    if (Array.isArray(bill.items)) {
+      bill.items.forEach((item) => {
+        grossCogs += (item.quantity || 0) * (item.costSnapshot || 0);
+      });
+    }
+  });
+
+  let salesReturns = 0;
+  let cogsReversals = 0;
+  let returnCount = 0;
+
+  const inPeriodReturns = returnsSnap.docs.map((d) => d.data() as ReturnDoc).filter((ret) =>
+    ret.status !== "voided" &&
+    !(targetBranchId && ret.branchId && ret.branchId !== targetBranchId) &&
+    !(effectiveFrom && ret.createdAt < effectiveFrom) &&
+    !(effectiveTo && ret.createdAt > `${effectiveTo}T23:59:59.999Z`));
+  const sourceBills = await sourceLinesById(inPeriodReturns.map((r) => r.referenceId));
+  inPeriodReturns.forEach((ret) => {
+    salesReturns += ret.totalRefundAmount || 0;
+    returnCount++;
+    for (const item of ret.items || []) {
+      if (item.disposition !== ReturnDisposition.RESTOCKED_TO_INVENTORY) continue;
+      const line = sourceBills.get(`${ret.referenceId}#${item.sourceLineId}`);
+      const costPerBase = line ? (line.costSnapshot || 0) / (line.conversionFactor || 1) : 0;
+      cogsReversals += (item.baseQuantity || 0) * costPerBase;
+    }
+  });
+
+  grossRevenue = roundTo(grossRevenue, decimals);
+  salesReturns = roundTo(salesReturns, decimals);
+  const netRevenue = roundTo(Math.max(0, grossRevenue - salesReturns), decimals);
+
+  grossCogs = roundTo(grossCogs, decimals);
+  cogsReversals = roundTo(cogsReversals, decimals);
+  const netCogs = roundTo(Math.max(0, grossCogs - cogsReversals), decimals);
+
+  let totalExpenses = 0;
+  let outflowCount = 0;
+  const expensesByCategory: Record<string, number> = {};
+
+  outflowsSnap.docs.forEach((doc) => {
+    const outflow = doc.data() as OutflowDoc;
+    if (outflow.kind === "expense") {
+      const amt = outflow.totalAmount || 0;
+      totalExpenses += amt;
+      const cat = outflow.expenseCategoryId || "general";
+      expensesByCategory[cat] = roundTo((expensesByCategory[cat] || 0) + amt, decimals);
+      outflowCount++;
+    } else if (outflow.kind === "purchase") {
+      outflowCount++;
+    }
+  });
+
+  let paymentFeesTotal = 0;
+  feesSnap.docs.forEach((doc) => {
+    const fee = doc.data() as PaymentProcessingFeeDoc;
+    paymentFeesTotal += (fee.feeAmount || 0) + (fee.feeTaxAmount || 0);
+  });
+  paymentFeesTotal = roundTo(paymentFeesTotal, decimals);
+  if (paymentFeesTotal > 0) {
+    totalExpenses += paymentFeesTotal;
+    expensesByCategory["payment_processing_fees"] = roundTo(
+      (expensesByCategory["payment_processing_fees"] || 0) + paymentFeesTotal,
+      decimals
+    );
+  }
+
+  totalExpenses = roundTo(totalExpenses, decimals);
+
+  let inventoryWriteOff = 0;
+  let writeOffCount = 0;
+  writeOffSnap.docs.forEach((doc) => {
+    const mv = doc.data() as StockMovementDoc;
+    if (targetBranchId && mv.branchId && mv.branchId !== targetBranchId) return;
+    if (effectiveFrom && mv.createdAt < effectiveFrom) return;
+    if (effectiveTo && mv.createdAt > `${effectiveTo}T23:59:59.999Z`) return;
+    const unitCost = mv.unitCostSnapshot || 0;
+    inventoryWriteOff += Math.abs(mv.quantity || 0) * unitCost;
+    writeOffCount++;
+  });
+  inventoryWriteOff = roundTo(inventoryWriteOff, decimals);
+
+  const grossProfit = roundTo(netRevenue - netCogs, decimals);
+  const grossMarginPercent = netRevenue > 0 ? round2((grossProfit / netRevenue) * 100) : 0;
+  const netProfit = roundTo(grossProfit - totalExpenses - inventoryWriteOff, decimals);
+  const netMarginPercent = netRevenue > 0 ? round2((netProfit / netRevenue) * 100) : 0;
+
+  return {
+    branchId: targetBranchId || null,
+    from: effectiveFrom || null,
+    to: effectiveTo || null,
+    periodType: validated.periodType || "custom",
+    timezone: tz,
+    currencyDecimals: decimals,
+    financialYearStartMonth: fyStartMonth,
+    grossRevenue,
+    discounts: roundTo(totalDiscounts, decimals),
+    tax: roundTo(totalTax, decimals),
+    salesReturns,
+    netRevenue,
+    totalRevenue: netRevenue,
+    grossCogs,
+    cogsReversals,
+    netCogs,
+    cogs: netCogs,
+    grossProfit,
+    grossMarginPercent,
+    operatingExpenses: totalExpenses,
+    totalExpenses,
+    paymentFeesTotal,
+    expensesByCategory,
+    inventoryWriteOff,
+    writeOffCount,
+    netProfit,
+    netMarginPercent,
+    billCount,
+    returnCount,
+    outflowCount,
+    costingMethod: "weighted_average",
+  };
+}
+
+/**
+ * 1. reportsGetRevenue
+ */
+export const reportsGetRevenue = onCall({ region: "asia-south1" }, async (request) => {
+  const context = await resolveRequestContext(request, {
+    requiredPermission: AppPermissions.REPORT_VIEW,
+    allowPlatformSuperAdmin: true,
+  });
+
+  const validated = parseInput(GetRevenueReportSchema, request.data);
+  const orgId = validated.organizationId || context.organizationId;
+  const targetBranchId = validated.branchId;
+
+  if (orgId !== context.organizationId && !context.isSuperAdmin) {
+    throw new HttpsError("permission-denied", "Cross-organization access denied");
+  }
+
+  let totalRevenue = 0;
+  let billCount = 0;
+  const breakdown: Array<{ period: string; revenue: number; count: number }> = [];
+
+  // Attempt reading maintained daily summaries first ONLY if no branch filter is active (summaries are org-wide)
+  if (!targetBranchId) {
+    let summariesQuery = db
+      .collection("dailySummaries")
+      .where("organizationId", "==", orgId);
+
+    if (validated.from) {
+      summariesQuery = summariesQuery.where("date", ">=", validated.from);
+    }
+    if (validated.to) {
+      summariesQuery = summariesQuery.where("date", "<=", validated.to);
+    }
+
+    const summariesSnap = await summariesQuery.get();
+
+    if (!summariesSnap.empty) {
+      summariesSnap.docs.forEach((doc) => {
+        const data = doc.data() as DailySummaryDoc;
+        totalRevenue += data.totalRevenue || 0;
+        billCount += data.billCount || 0;
+        breakdown.push({
+          period: data.date,
+          revenue: data.totalRevenue || 0,
+          count: data.billCount || 0,
+        });
+      });
+    }
+  }
+
+  if (breakdown.length === 0) {
+    // Direct scan on source bills (branch-aware)
+    const billsSnap = await billsInPeriod(orgId, { branchId: targetBranchId, from: validated.from, to: validated.to }).get();
+    billsSnap.docs.forEach((doc) => {
+      const data = doc.data() as BillDoc;
+      totalRevenue += data.totalAmount || 0;
+      billCount++;
+    });
+
+    breakdown.push({
+      period: validated.from || "all-time",
+      revenue: round2(totalRevenue),
+      count: billCount,
+    });
+  }
+
+  breakdown.sort((a, b) => a.period.localeCompare(b.period));
+
+  return {
+    totalRevenue: round2(totalRevenue),
+    billCount,
+    averageBillValue: billCount > 0 ? round2(totalRevenue / billCount) : 0,
+    breakdown,
+  };
+});
+
+/**
+ * 2. reportsGetProfitLoss
+ */
+export const reportsGetProfitLoss = onCall({ region: "asia-south1" }, async (request) => {
+  const context = await resolveRequestContext(request, {
+    requiredPermission: AppPermissions.REPORT_VIEW,
+    allowPlatformSuperAdmin: true,
+  });
+
+  const validated = parseInput(GetProfitLossReportSchema, request.data);
+  const orgId = validated.organizationId || context.organizationId;
+
+  if (orgId !== context.organizationId && !context.isSuperAdmin) {
+    throw new HttpsError("permission-denied", "Cross-organization access denied");
+  }
+
+  return { organizationId: orgId, ...(await computeProfitLoss(orgId, validated)) };
+});
+
+/**
+ * 12. reportsGetCashBankSummary
+ */
+export const reportsGetCashBankSummary = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const input = parseInput(GetCashBankSummarySchema, request.data);
+  const ctx = await resolveRequestContext(request, {
+    organizationId: input.organizationId,
+    branchId: input.branchId,
+    requiredPermission: AppPermissions.ACCOUNT_VIEW,
+  });
+
+  const orgId = ctx.organizationId;
+  let q: FirebaseFirestore.Query = db
+    .collection("financialAccounts")
+    .where("organizationId", "==", orgId);
+
+  if (input.branchId) {
+    q = q.where("branchId", "in", [input.branchId, null]);
+  }
+  if (!input.includeInactive) {
+    q = q.where("isActive", "==", true);
+  }
+
+  const snap = await q.get();
+
+  const totals = {
+    cashInHand: 0,
+    bankBalance: 0,
+    digitalWallets: 0,
+    clearingAndControl: 0,
+    totalOperationalLiquidity: 0,
+  };
+
+  const accounts = snap.docs.map((doc) => {
+    const d = doc.data() as FinancialAccountDoc;
+    const balance = d.currentBalance || 0;
+
+    switch (d.accountType) {
+      case "cash":
+        totals.cashInHand = round2(totals.cashInHand + balance);
+        break;
+      case "bank":
+        totals.bankBalance = round2(totals.bankBalance + balance);
+        break;
+      case "digital":
+        totals.digitalWallets = round2(totals.digitalWallets + balance);
+        break;
+      case "clearing":
+      case "control":
+        totals.clearingAndControl = round2(totals.clearingAndControl + balance);
+        break;
+    }
+    totals.totalOperationalLiquidity = round2(totals.totalOperationalLiquidity + balance);
+
+    return {
+      financialAccountId: doc.id,
+      name: d.name,
+      code: d.code,
+      accountType: d.accountType,
+      currency: d.currency,
+      currentBalance: balance,
+      branchId: d.branchId || null,
+      isDefault: d.isDefault,
+      isActive: d.isActive,
+    };
+  });
+
+  return {
+    organizationId: orgId,
+    branchId: input.branchId || null,
+    totals,
+    accounts: accounts.sort((a, b) => b.currentBalance - a.currentBalance),
+    count: accounts.length,
+  };
+});

@@ -14,6 +14,10 @@
 | `businessCategory` | `enum` | **Yes** | Yes | `date_picker` | Enum: `bicycle`, `motorcycle`, `car_automobile`, `auto_spare_parts`, `mobile_electronics`, `grocery_fmcg`, `pharmacy_medical`, `textile_garments`, `hardware_building`, `furniture_home`, `stationery_books`, `food_beverage`, `agri_products`, `jewellery`, `kitchenware_household`, `gifts_toys`, `restaurant_food_service`, `services_repair`, `general` | `bicycle` |
 | `country` | `string` | **Yes** | No | `text` | {"maxLength":2,"minLength":2} | `Sample country` |
 | `currency` | `string` | **Yes** | No | `text` | {"maxLength":3,"minLength":3} | `Sample currency` |
+| `currencyDecimals` | `number` | No | No | `numeric` | {"format":"safeint","min":0,"minInclusive":true,"max":4,"maxInclusive":true} | `1` |
+| `minorUnitName` | `string` | No | No | `text` | {"maxLength":30} | `Sample minorUnitName` |
+| `minorUnitNamePlural` | `string` | No | No | `text` | {"maxLength":30} | `Sample minorUnitNamePlural` |
+| `currencySymbol` | `string` | No | No | `text` | {"maxLength":10} | `Sample currencySymbol` |
 | `taxRegimeCode` | `string` | **Yes** | No | `text` | {"minLength":2,"maxLength":32} | `Sample taxRegimeCode` |
 | `planId` | `string` | **Yes** | No | `text` | {"minLength":2,"maxLength":64} | `Sample planId` |
 | `createOwner` | `boolean` | No | No | `date_picker` | {} | `true` |

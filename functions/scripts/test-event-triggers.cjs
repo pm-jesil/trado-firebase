@@ -301,7 +301,7 @@ const { db, verifyEmulatorHealth } = require("./helpers/emulator-helper.cjs");
       priority: "normal",
       title: "Trigger Activity Test",
       description: "Testing onRequestActivityWritten trigger",
-      requester: { uid: cashier.userId, name: cashier.name, email: cashier.email, role: "admin" },
+      requester: { uid: cashier.userId, name: cashier.name || "Trigger Cashier", email: cashier.email, role: "admin" },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });

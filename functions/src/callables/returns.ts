@@ -47,6 +47,10 @@ import type { DocumentDecisionInput, CreateReturnInput } from "../validation/sch
 import { SerialLine, assertSerialCount, prepareSerialsInTxn } from "../services/serials.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext, resolveDataScope, applyDataScope } from "../services/contextResolver.js";
+import {
+  prepareAccountTransactionInTxn,
+  applyAccountTransactionInTxn,
+} from "../services/ledgerService.js";
 import { AppPermissions } from "../constants/permissions.js";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -268,9 +272,83 @@ export async function executeReturn(
         }));
       }
 
+      // Prepare financial account ledger transaction if refund involves monetary payout / receipt
+      let ledgerPrep: {
+        accountRef: FirebaseFirestore.DocumentReference;
+        accountData: import("../types/models.js").FinancialAccountDoc;
+        reservation: import("../services/documentCounter.js").DocumentNumberReservation;
+      } | null = null;
+      let chosenAccountId: string | null = null;
+      const isMonetaryRefund = input.refundMethod !== "credit_note" && totalRefundAmount > 0;
+
+      if (isMonetaryRefund) {
+        chosenAccountId =
+          input.refundFinancialAccountId ||
+          (input.returnType === ReturnType.SALES_RETURN ? billData?.financialAccountId : outflowData?.financialAccountId) ||
+          null;
+
+        if (!chosenAccountId) {
+          const accSnap = await txn.get(
+            db.collection("financialAccounts")
+              .where("organizationId", "==", orgId)
+              .where("isDefault", "==", true)
+              .limit(1)
+          );
+          if (!accSnap.empty) {
+            chosenAccountId = accSnap.docs[0].id;
+          } else {
+            const anyCashSnap = await txn.get(
+              db.collection("financialAccounts")
+                .where("organizationId", "==", orgId)
+                .where("accountType", "==", "cash")
+                .limit(1)
+            );
+            if (!anyCashSnap.empty) {
+              chosenAccountId = anyCashSnap.docs[0].id;
+            }
+          }
+        }
+
+        if (chosenAccountId) {
+          const isSales = input.returnType === ReturnType.SALES_RETURN;
+          ledgerPrep = await prepareAccountTransactionInTxn(txn, {
+            organizationId: orgId,
+            financialAccountId: chosenAccountId,
+            branchId: branchId || null,
+            type: "refund",
+            direction: isSales ? "out" : "in",
+            amount: totalRefundAmount,
+            sourceDocumentType: "return",
+            sourceDocumentId: returnId,
+            description: `${isSales ? "Customer refund for " + (billData?.billNumber || input.referenceId) : "Vendor refund for " + (outflowData?.outflowNumber || input.referenceId)} (${returnReservation.formattedNumber})`,
+            actorUid: callerUid,
+            now,
+          });
+        }
+      }
+
       // === STEP 2: ALL TRANSACTIONAL WRITES ===
       commitDocumentNumberInTxn(txn, returnReservation);
       const returnNumber = returnReservation.formattedNumber;
+
+      let accountTransactionId: string | null = null;
+      if (ledgerPrep && chosenAccountId) {
+        const isSales = input.returnType === ReturnType.SALES_RETURN;
+        const ledgerRes = applyAccountTransactionInTxn(txn, ledgerPrep, {
+          organizationId: orgId,
+          financialAccountId: chosenAccountId,
+          branchId: branchId || null,
+          type: "refund",
+          direction: isSales ? "out" : "in",
+          amount: totalRefundAmount,
+          sourceDocumentType: "return",
+          sourceDocumentId: returnId,
+          description: `${isSales ? "Customer refund for " + (billData?.billNumber || input.referenceId) : "Vendor refund for " + (outflowData?.outflowNumber || input.referenceId)} (${returnNumber})`,
+          actorUid: callerUid,
+          now,
+        });
+        accountTransactionId = ledgerRes.transactionId;
+      }
 
       const returnDoc: ReturnDoc = {
         organizationId: orgId,
@@ -282,6 +360,8 @@ export async function executeReturn(
         items: processedItems,
         totalRefundAmount,
         refundMethod: input.refundMethod || "cash",
+        financialAccountId: chosenAccountId,
+        accountTransactionId,
         status: "completed",
         notes: input.notes,
         createdAt: approval?.maker.createdAt || now,
@@ -334,6 +414,8 @@ export async function executeReturn(
         organizationId: orgId,
         returnNumber,
         totalRefundAmount,
+        financialAccountId: chosenAccountId,
+        accountTransactionId,
         status: "completed",
         message: "Return processed successfully.",
       };

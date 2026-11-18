@@ -554,10 +554,24 @@ export const outflowsList = onCall({ region: "asia-south1" }, async (request) =>
   const scoped = applyDataScope(query, scope);
 
   const { snapshot, nextCursor } = await fetchPage(scoped.query, "outflows", input.startAfterId, input.limit || 50);
-  const items = snapshot.docs
+  let items = snapshot.docs
     .map((doc) => ({ outflowId: doc.id, ...(doc.data() as OutflowDoc) }))
     .filter((o) => scoped.keep(o as unknown as Record<string, unknown>))
     .filter((o) => canViewKind(ctx, o.kind) && canViewOutflow(o as unknown as Record<string, unknown>, ctx));
+
+  if (input.startDate) items = items.filter((o) => (o.createdAt || o.docDate || "") >= input.startDate!);
+  if (input.endDate) items = items.filter((o) => (o.createdAt || o.docDate || "") <= input.endDate!);
+  if (input.minAmount !== undefined) items = items.filter((o) => (o.totalAmount || 0) >= input.minAmount!);
+  if (input.maxAmount !== undefined) items = items.filter((o) => (o.totalAmount || 0) <= input.maxAmount!);
+  if (input.search) {
+    const s = input.search.toLowerCase();
+    items = items.filter((o) =>
+      (o.outflowNumber || "").toLowerCase().includes(s) ||
+      (o.notes || "").toLowerCase().includes(s) ||
+      (o.invoiceNumber || "").toLowerCase().includes(s) ||
+      (o.payee || "").toLowerCase().includes(s)
+    );
+  }
 
   return { items, count: items.length, scope: scope.level, nextCursor, included: await hydrate(ctx, items) };
 });

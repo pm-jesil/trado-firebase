@@ -168,14 +168,25 @@ export const onPaymentWritten = onDocumentWritten(
         const billSnap = await db.collection("bills").doc(payment.referenceId).get();
         if (billSnap.exists) {
           const bill = billSnap.data() as BillDoc;
-          const targetMembershipId = bill.salespersonMembershipId;
+          let targetMembershipId = bill.salespersonMembershipId || null;
           const targetUserId = bill.createdBy;
 
           if (targetUserId) {
+            if (!targetMembershipId) {
+              const memSnap = await db
+                .collection("memberships")
+                .where("organizationId", "==", payment.organizationId)
+                .where("userId", "==", targetUserId)
+                .limit(1)
+                .get();
+              if (!memSnap.empty) {
+                targetMembershipId = memSnap.docs[0].id;
+              }
+            }
             await createAndDispatchNotification({
               organizationId: payment.organizationId,
               userId: targetUserId,
-              membershipId: targetMembershipId || targetUserId,
+              membershipId: targetMembershipId,
               type: "payment_received",
               title: "Payment Received",
               body: `Payment of Rs ${payment.amount} received for invoice ${bill.billNumber}.`,
@@ -266,10 +277,23 @@ export const onRequestActivityWritten = onDocumentWritten(
 
     if (recipientUid) {
       try {
+        let recipientMembershipId: string | null = null;
+        if (requestDoc.organizationId && requestDoc.organizationId !== "platform") {
+          const memSnap = await db
+            .collection("memberships")
+            .where("organizationId", "==", requestDoc.organizationId)
+            .where("userId", "==", recipientUid)
+            .limit(1)
+            .get();
+          if (!memSnap.empty) {
+            recipientMembershipId = memSnap.docs[0].id;
+          }
+        }
+
         await createAndDispatchNotification({
           organizationId: requestDoc.organizationId,
           userId: recipientUid,
-          membershipId: recipientUid,
+          membershipId: recipientMembershipId,
           type: "request_updated",
           title: `Update on ${requestDoc.requestNumber}`,
           body: activity.content || `Request ${requestDoc.requestNumber} status changed to ${requestDoc.status}.`,

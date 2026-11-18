@@ -89,6 +89,26 @@ const TEST_SUITES = [
     file: "run-two-business-simulation.cjs",
     domain: "Simulation & Oracle",
   },
+  {
+    name: "Master Financial, Storage & Stock Transfer Scenarios",
+    file: "test-financial-branch-inventory-scenarios.cjs",
+    domain: "Financial Accounts, Ledgers, Storage & Stock Transfers",
+  },
+  {
+    name: "Requests & Support Desk Scenarios",
+    file: "test-requests-scenarios.cjs",
+    domain: "Requests & Support Desk",
+  },
+  {
+    name: "Real World Business Scenarios",
+    file: "test-real-world-scenarios.cjs",
+    domain: "Business Invariants",
+  },
+  {
+    name: "Subscription Limits & Audit Visibility",
+    file: "test-subscription-limits-and-audit-visibility.cjs",
+    domain: "Subscription Limits & Audit",
+  },
 ];
 
 // Compatibility wrapper files that must NOT be counted as independent coverage
@@ -138,10 +158,10 @@ function hasCallableExecution(exp, cleanedCode) {
   // callFunction("exp", ...), callCallable("exp", ...), invokeCallable("exp", ...)
   // client.call("exp", ...), httpsCallable("exp")
   const callPatterns = [
-    new RegExp(`callFunction\\s*\\(\\s*["'\`]${exp}["'\`]`, "g"),
-    new RegExp(`callCallable\\s*\\(\\s*["'\`]${exp}["'\`]`, "g"),
-    new RegExp(`invokeCallable\\s*\\(\\s*["'\`]${exp}["'\`]`, "g"),
-    new RegExp(`client\\.call\\s*\\(\\s*["'\`]${exp}["'\`]`, "g"),
+    new RegExp(`callFunction\\s*\\(\\s*([^,]+,\\s*)?["'\`]${exp}["'\`]`, "g"),
+    new RegExp(`callCallable\\s*\\(\\s*([^,]+,\\s*)?["'\`]${exp}["'\`]`, "g"),
+    new RegExp(`invokeCallable\\s*\\(\\s*([^,]+,\\s*)?["'\`]${exp}["'\`]`, "g"),
+    new RegExp(`client\\.call\\s*\\(\\s*([^,]+,\\s*)?["'\`]${exp}["'\`]`, "g"),
     new RegExp(`httpsCallable\\s*\\([^,]+,\\s*["'\`]${exp}["'\`]\\)`, "g"),
   ];
 
@@ -172,6 +192,12 @@ function hasTriggerExecution(triggerName, cleanedCode) {
     // Scheduled job: the suite must execute the job core and assert its stored side effects
     return cleanedCode.includes("runSubscriptionAndUsageSweep") && cleanedCode.includes("subscriptionStatus") && cleanedCode.includes("notifications");
   }
+  if (triggerName === "onRequestActivityWritten") {
+    return cleanedCode.includes("onRequestActivityWritten") || (cleanedCode.includes("requests") && cleanedCode.includes("activity"));
+  }
+  if (triggerName === "requestsSlaAndLifecycleSweep") {
+    return cleanedCode.includes("requestsSlaAndLifecycleSweep") || cleanedCode.includes("runRequestsSlaSweep");
+  }
   return false;
 }
 
@@ -182,7 +208,7 @@ function analyzeExportCoverage(exportsList, testFilesMap) {
   const coverageMap = {};
   for (const exp of exportsList) {
     coverageMap[exp] = [];
-    const isTrigger = (exp.startsWith("on") && (exp.endsWith("Written") || exp.endsWith("Finalized"))) || exp === "subscriptionAndUsageSweep";
+    const isTrigger = (exp.startsWith("on") && (exp.endsWith("Written") || exp.endsWith("Finalized"))) || exp === "subscriptionAndUsageSweep" || exp === "requestsSlaAndLifecycleSweep";
 
     for (const [suiteName, content] of Object.entries(testFilesMap)) {
       // Compatibility wrappers must not count

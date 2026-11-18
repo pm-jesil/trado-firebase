@@ -82,7 +82,8 @@
         "cash_deposit",
         "cash_withdrawal",
         "inter_bank",
-        "petty_cash"
+        "petty_cash",
+        "cashier_handover"
       ],
       "uiHint": "dropdown",
       "example": "transfer"

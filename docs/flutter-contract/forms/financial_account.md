@@ -11,11 +11,16 @@
 | `code` | `string` | **Yes** | No | `text` | {"minLength":2,"maxLength":30,"format":"regex"} | `Sample code` |
 | `accountType` | `enum` | **Yes** | No | `dropdown` | Enum: `cash`, `bank`, `digital`, `clearing`, `control` | `cash` |
 | `currency` | `string` | No | No | `text` | {"maxLength":3,"minLength":3} | `Sample currency` |
+| `assignedBranchIds[]` | `string` | **Yes** | Yes | `text` | {"minLength":2} | `Sample assignedBranchIds[]` |
 | `bankDetails.bankName` | `string` | No | Yes | `text` | {"minLength":2,"maxLength":100} | `Sample bankDetails.bankName` |
 | `bankDetails.accountNumberMasked` | `string` | No | Yes | `text` | {"minLength":4,"maxLength":30} | `Sample bankDetails.accountNumberMasked` |
 | `bankDetails.ifscOrSwift` | `string` | No | Yes | `text` | {"minLength":4,"maxLength":20} | `Sample bankDetails.ifscOrSwift` |
 | `bankDetails.bankBranchName` | `string` | No | Yes | `text` | {"maxLength":100} | `Sample bankDetails.bankBranchName` |
 | `bankDetails.upiId` | `string` | No | Yes | `text` | {"maxLength":100} | `Sample bankDetails.upiId` |
+| `feeRule.feePercent` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
+| `feeRule.feeFixed` | `number` | No | Yes | `numeric` | {"format":"safeint","min":0,"minInclusive":true} | `1` |
+| `feeRule.feeTaxPercent` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
+| `feeRule.settlementDays` | `number` | No | Yes | `numeric` | {"format":"safeint","min":0,"minInclusive":true} | `1` |
 | `openingBalance` | `number` | No | No | `numeric` | {} | `1` |
 | `isDefault` | `boolean` | No | Yes | `switch` | {} | `true` |
 | `notes` | `string` | No | Yes | `textarea` | {"maxLength":500} | `Sample notes` |

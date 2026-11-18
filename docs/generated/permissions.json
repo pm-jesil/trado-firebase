@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-15T13:00:18.452Z",
-  "totalPermissions": 129,
+  "generatedAt": "2026-11-17T23:08:46.138Z",
+  "totalPermissions": 147,
   "permissions": [
     {
       "name": "ALL",
@@ -957,7 +957,9 @@
       "module": "stock",
       "isPlatform": false,
       "allowedRoles": [
-        "role_org_owner"
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
       ]
     },
     {
@@ -1037,6 +1039,28 @@
     {
       "name": "PAYMENT_VOID",
       "code": "payment:void",
+      "module": "payment",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PAYMENT_FEE_MANAGE",
+      "code": "payment:fee_manage",
+      "module": "payment",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PAYMENT_FEE_VERIFY",
+      "code": "payment:fee_verify",
       "module": "payment",
       "isPlatform": false,
       "allowedRoles": [
@@ -1339,6 +1363,186 @@
       "allowedRoles": [
         "role_org_owner",
         "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "ACCOUNT_VIEW",
+      "code": "accounts:view",
+      "module": "accounts",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_cashier",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "ACCOUNT_MANAGE",
+      "code": "accounts:manage",
+      "module": "accounts",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "ACCOUNT_TRANSFER",
+      "code": "accounts:transfer",
+      "module": "accounts",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "ACCOUNT_RECONCILE",
+      "code": "accounts:reconcile",
+      "module": "accounts",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "LEDGER_VIEW",
+      "code": "ledger:view",
+      "module": "ledger",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "RECEIVABLES_VIEW",
+      "code": "receivables:view",
+      "module": "receivables",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "PAYABLES_VIEW",
+      "code": "payables:view",
+      "module": "payables",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "CAPITAL_MANAGE",
+      "code": "capital:manage",
+      "module": "capital",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "CAPITAL_VIEW",
+      "code": "capital:view",
+      "module": "capital",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "APPROVALS_VIEW",
+      "code": "approvals:view",
+      "module": "approvals",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "WAREHOUSE_VIEW",
+      "code": "warehouse:view",
+      "module": "warehouse",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "WAREHOUSE_MANAGE",
+      "code": "warehouse:manage",
+      "module": "warehouse",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "STOCK_TRANSFER_CREATE",
+      "code": "stock:transfer_create",
+      "module": "stock",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_purchase_staff",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "STOCK_TRANSFER_APPROVE",
+      "code": "stock:transfer_approve",
+      "module": "stock",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "STOCK_TRANSFER_DISPATCH",
+      "code": "stock:transfer_dispatch",
+      "module": "stock",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_store_manager"
+      ]
+    },
+    {
+      "name": "STOCK_TRANSFER_RECEIVE",
+      "code": "stock:transfer_receive",
+      "module": "stock",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner",
+        "role_admin",
+        "role_purchase_staff",
         "role_store_manager"
       ]
     }

@@ -1,6 +1,6 @@
 # Permission Catalog & UI Gating
 
-Total permissions: **146**
+Total permissions: **147**
 
 ## Permission Key Directory
 | Permission Constant | Wire Key | Category |
@@ -109,6 +109,7 @@ Total permissions: **146**
 | `PAYMENT_VIEW` | `payment:view` | `payment` |
 | `PAYMENT_VOID` | `payment:void` | `payment` |
 | `PAYMENT_FEE_MANAGE` | `payment:fee_manage` | `payment` |
+| `PAYMENT_FEE_VERIFY` | `payment:fee_verify` | `payment` |
 | `DELIVERY_CREATE` | `delivery:create` | `delivery` |
 | `DELIVERY_VIEW` | `delivery:view` | `delivery` |
 | `DELIVERY_UPDATE` | `delivery:update` | `delivery` |

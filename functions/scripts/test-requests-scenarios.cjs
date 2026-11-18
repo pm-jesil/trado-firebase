@@ -164,6 +164,8 @@ async function run() {
   assert.ok(planReqId, "Must return requestId");
   assert.strictEqual(planReq.request.status, "submitted");
   assert.strictEqual(planReq.request.requestedPlanName, "Pro Plan");
+  const counterSnap = await db.collection("counters").doc("requests").get();
+  assert.equal(counterSnap.exists, true, "counters collection must contain request sequence counter");
   ok(`requestsCreate filed plan_change: ${planReq.request.requestNumber} (${planReqId})`);
 
   // 1.2b Tenant reads request via requestsGet
@@ -271,8 +273,13 @@ async function run() {
   const updReq = await callFunction("requestsUpdate", {
     requestId: planReq2.request.requestId,
     title: "Upgrade to Enterprise - Revised",
+    expectedVersion: planReq2.request.version || 1,
   }, orgOwner.idToken);
-  assert.strictEqual(updReq.request.title, "Upgrade to Enterprise - Revised");
+  assert.strictEqual(updReq.success, true);
+  const fetchedAfterUpdate = await callFunction("requestsGet", {
+    requestId: planReq2.request.requestId,
+  }, orgOwner.idToken);
+  assert.strictEqual(fetchedAfterUpdate.request.title, "Upgrade to Enterprise - Revised");
   ok(`requestsUpdate updated open request title`);
 
   // Clean up planReq2 by cancelling it
@@ -400,9 +407,8 @@ async function run() {
   const prioRes = await callFunction("requestsSetPriority", {
     requestId: bugReqId,
     priority: "urgent",
-    reason: "Saturday rush hour checkout impact",
   }, superAdmin.idToken);
-  assert.strictEqual(prioRes.request.priority, "urgent");
+  assert.strictEqual(prioRes.priority, "urgent");
   ok(`requestsSetPriority elevated priority to urgent`);
 
   // Requester adds comment
@@ -598,8 +604,8 @@ async function run() {
   console.log("\n--- Flow 11: requestsSlaAndLifecycleSweep Scheduled Job Execution ---");
   const { runRequestsSlaAndLifecycleSweep } = require("../lib/triggers/scheduled.js");
   const sweepRes = await runRequestsSlaAndLifecycleSweep();
-  assert.ok(typeof sweepRes.scanned === "number");
-  ok(`runRequestsSlaAndLifecycleSweep executed successfully: scanned=${sweepRes.scanned}, slaTransitions=${sweepRes.slaTransitions}`);
+  assert.ok(typeof sweepRes.requestsScanned === "number");
+  ok(`runRequestsSlaAndLifecycleSweep executed successfully: requestsScanned=${sweepRes.requestsScanned}, slaUpdated=${sweepRes.slaUpdated}`);
 
   console.log("\n================================================================================");
   console.log(`   ALL 12 EXECUTABLE FLOWS & SCENARIOS PASSED: ${passed} VERIFIED CHECKS       `);

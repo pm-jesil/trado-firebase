@@ -191,6 +191,48 @@ const REGISTERED_PAIRS = new Set([
   "approvedBy|createdBy",
   "approvedBy|updatedBy",
   "approvedAt|updatedAt",
+  // State transition stamps & actor identities in test/single-user workflows
+  "appliedBy|lastActivityBy.uid",
+  "assignee.uid|lastActivityBy.uid",
+  "cancelledAt|updatedAt",
+  "cancelledBy|createdBy",
+  "cancelledBy|updatedBy",
+  "createdAt|lastActivityAt",
+  "createdAt|statusChangedAt",
+  "createdBy|dispatchedBy",
+  "createdBy|enteredBy",
+  "createdBy|receivedBy",
+  "createdBy|submittedBy",
+  "dispatchedBy|receivedBy",
+  "dispatchedBy|submittedBy",
+  "dispatchedBy|updatedBy",
+  "enteredBy|updatedBy",
+  "firstResponseAt|lastActivityAt",
+  "firstResponseAt|statusChangedAt",
+  "firstResponseAt|updatedAt",
+  "lastActivityBy.name|requester.name",
+  "lastActivityBy.name|requesterName",
+  "lastActivityBy.uid|requester.uid",
+  "receivedAt|updatedAt",
+  "receivedBy|submittedBy",
+  "receivedBy|updatedBy",
+  "submittedBy|updatedBy",
+  // Workflow timestamps
+  "appliedAt|lastActivityAt",
+  "appliedAt|statusChangedAt",
+  "appliedAt|updatedAt",
+  "closedAt|statusChangedAt",
+  "lastActivityAt|statusChangedAt",
+  "lastActivityAt|updatedAt",
+  "statusChangedAt|updatedAt",
+  // Identifiers & entity attributes
+  "address.city|address.state",
+  "applyResult.metric|details.metric",
+  "currentPlanName|requestedPlanName",
+  "financialAccountId|sourceDocumentId",
+  "legalNameKey|name",
+  "membershipId|userId",
+  "requester.name|requesterName",
   // Bill tax — taxTotal equals taxSnapshot.taxAmount for single-line bills or when only one tax applies
   "taxSnapshot.taxAmount|taxTotal",
   // Bill amounts — coincidental equality between tax total and balance when partially paid
@@ -290,7 +332,7 @@ const COLLECTION_POLICY = {
  * R3 = cache with a single writer and a reconcile test.
  */
 const DERIVED_REGISTER = [
-  { collections: ["bills", "outflows", "returns"], field: /^(subTotal|totalAmount|totalRefundAmount|taxTotal|discountTotal)$/, class: "R2", reason: "document totals are frozen when the document is issued (tax invoice / purchase / credit note); lines are never edited afterwards" },
+  { collections: ["bills", "outflows", "returns", "stockTransfers"], field: /^(subTotal|totalAmount|totalRefundAmount|taxTotal|discountTotal|totalValuation)$/, class: "R2", reason: "document totals are frozen when the document is issued (tax invoice / purchase / credit note / stock transfer); lines are never edited afterwards" },
   { collections: ["dailySummaries", "monthlySummaries", "organizationUsageDaily", "organizationUsageMonthly", "branchUsageDaily", "branchUsageMonthly", "usageCounterShards"], field: /.*/, class: "R3", reason: "rollup counters; single writer (triggers / usageMetering); reconciled by reconcile* callables" },
 ];
 
@@ -328,6 +370,7 @@ function analyzeDocument(collection, ref, data) {
     const keys = new Set(Object.keys(node));
     // (ii) the same concept under different names, at any depth
     for (const [family, members] of Object.entries(NAME_FAMILIES)) {
+      if (collection === "organizations" && family === "name") continue; // organizations schema defines both legal/primary name and optional short displayName (entity-fields.md)
       const present = members.filter((m) => keys.has(m));
       if (present.length > 1) findings.push({ doc: ref, type: "alias-family", detail: `${at || "(root)"}: family "${family}" stored as ${present.join(" + ")}` });
     }

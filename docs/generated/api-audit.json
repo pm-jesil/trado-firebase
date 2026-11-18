@@ -1495,7 +1495,7 @@
     },
     {
       "callable": "billsUpdateDraft",
-      "file": "bills.ts",
+      "file": "bills\\billsMutations.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -1517,7 +1517,7 @@
     },
     {
       "callable": "billsCreate",
-      "file": "bills.ts",
+      "file": "bills\\billsMutations.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -1539,7 +1539,7 @@
     },
     {
       "callable": "billsList",
-      "file": "bills.ts",
+      "file": "bills\\billsQueries.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -1559,7 +1559,7 @@
     },
     {
       "callable": "billsGet",
-      "file": "bills.ts",
+      "file": "bills\\billsQueries.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -1579,7 +1579,7 @@
     },
     {
       "callable": "billsFinalize",
-      "file": "bills.ts",
+      "file": "bills\\billsMutations.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -1601,7 +1601,7 @@
     },
     {
       "callable": "billsVoid",
-      "file": "bills.ts",
+      "file": "bills\\billsMutations.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -1623,7 +1623,7 @@
     },
     {
       "callable": "billsPreview",
-      "file": "bills.ts",
+      "file": "bills\\billsQueries.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -2399,7 +2399,7 @@
     },
     {
       "callable": "reportsGetRevenue",
-      "file": "reports.ts",
+      "file": "reports\\financialReports.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -2419,7 +2419,7 @@
     },
     {
       "callable": "reportsGetProfitLoss",
-      "file": "reports.ts",
+      "file": "reports\\financialReports.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -2439,7 +2439,7 @@
     },
     {
       "callable": "reportsGetStockValuation",
-      "file": "reports.ts",
+      "file": "reports\\analyticsReports.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -2459,7 +2459,7 @@
     },
     {
       "callable": "reportsGetTopEntities",
-      "file": "reports.ts",
+      "file": "reports\\analyticsReports.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -2479,7 +2479,7 @@
     },
     {
       "callable": "reportsGetStaffActivity",
-      "file": "reports.ts",
+      "file": "reports\\analyticsReports.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -2499,7 +2499,7 @@
     },
     {
       "callable": "reportsGetPlatformOverview",
-      "file": "reports.ts",
+      "file": "reports\\analyticsReports.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -2519,7 +2519,7 @@
     },
     {
       "callable": "reportsExportCsv",
-      "file": "reports.ts",
+      "file": "reports\\analyticsReports.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -2539,7 +2539,7 @@
     },
     {
       "callable": "reportsGetPartyStatement",
-      "file": "reports.ts",
+      "file": "reports\\operationalReports.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,
@@ -2559,7 +2559,7 @@
     },
     {
       "callable": "reportsGetOutflowSummary",
-      "file": "reports.ts",
+      "file": "reports\\operationalReports.ts",
       "checks": {
         "A_exported": true,
         "B_gate": true,

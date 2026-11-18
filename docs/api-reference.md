@@ -1166,6 +1166,80 @@ node tools/api-explorer/server.js
 - **Output Schema**: `{ success: boolean, organizationId: string, newOwnerUserId: string, previousOwnerUserId: string | null, previousOwnerAction: string }`
 - **Summary**: Transfers organization ownership to an active member while demoting or deactivating the previous owner in a single atomic transaction.
 
+### Module: `./callables/approvals.js` (Maker-Checker Decisions)
+- `approvalsList`
+- `approvalsCounts`
+
+### Module: `./callables/financialAccounts.js` (Financial Accounts & Transfers)
+- `financialAccountsCreate`
+- `financialAccountsUpdate`
+- `financialAccountsList`
+- `financialAccountsGet`
+- `financialAccountsGetLedger`
+- `accountTransfersCreate`
+- `accountTransfersList`
+- `accountTransfersGet`
+- `capitalTransactionsCreate`
+- `capitalTransactionsList`
+
+### Module: `./callables/paymentFees.js` (Payment Gateway & Fee Tracking)
+- `paymentsRecordFee`
+- `paymentsVerifyFee`
+- `paymentsDisputeFee`
+- `paymentsReverseFee`
+- `paymentsListFees`
+- `paymentsGetFee`
+
+### Module: `./callables/ledgerVerify.js` (Ledger Invariant Verification)
+- `ledgerVerify`
+- `reportsGetTrialBalance`
+
+### Module: `./callables/storageLocations.js` (Warehouse & Storage Locations)
+- `storageLocationsCreate`
+- `storageLocationsUpdate`
+- `storageLocationsList`
+- `storageLocationsGet`
+
+### Module: `./callables/stockTransfers.js` (Inter-Branch Stock Transfers)
+- `stockTransfersCreate`
+- `stockTransfersSubmit`
+- `stockTransfersCancel`
+- `stockTransfersDispatch`
+- `stockTransfersReceive`
+- `stockTransfersResolveDiscrepancy`
+- `stockTransfersList`
+- `stockTransfersGet`
+
+### Module: `./callables/stockVerify.js` (Stock Invariant Verification)
+- `stockVerify`
+
+### Module: `./callables/reports.js` (Operational Reports Additions)
+- `reportsGetReceivablesAgeing`
+- `reportsGetPayablesAgeing`
+- `reportsGetCashBankSummary`
+
+### Module: `./callables/requests.js` (Tenant Requests & Support Desk)
+- `requestsMeta`
+- `plansCatalogList`
+- `requestsCreate`
+- `requestsUpdate`
+- `requestsAddComment`
+- `requestsTransition`
+- `requestsGet`
+- `requestsList`
+- `requestsActivityList`
+- `requestsCounts`
+- `requestsInboxList`
+- `requestsInboxCounts`
+- `requestsAssign`
+- `requestsSetPriority`
+- `requestsAddInternalNote`
+- `requestsApply`
+
+### Triggers & Scheduled Jobs
+- `onRequestActivityWritten`
+- `requestsSlaAndLifecycleSweep`
+
 ### Related Resources
 
 | Resource | Path | Purpose |

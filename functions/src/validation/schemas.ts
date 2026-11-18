@@ -152,6 +152,10 @@ export const CreateOrganizationSchema = z.strictObject({
   businessCategory: z.nativeEnum(BusinessCategory),
   country: z.string().trim().length(2).toUpperCase(),
   currency: z.string().trim().length(3).toUpperCase(),
+  currencyDecimals: z.number().int().min(0).max(4).optional(),
+  minorUnitName: z.string().trim().max(30).optional(),
+  minorUnitNamePlural: z.string().trim().max(30).optional(),
+  currencySymbol: z.string().trim().max(10).optional(),
   taxRegimeCode: z.string().trim().min(2).max(32),
   planId: z.string().trim().min(2).max(64),
   createOwner: z.boolean().default(true).optional(),
@@ -906,6 +910,11 @@ export const ListOutflowsSchema = z.strictObject({
   vendorId: z.string().trim().optional(),
   status: z.string().trim().optional(),
   payeeMembershipId: z.string().trim().optional(),
+  startDate: z.string().trim().optional(),
+  endDate: z.string().trim().optional(),
+  minAmount: z.number().min(0).optional(),
+  maxAmount: z.number().min(0).optional(),
+  search: z.string().trim().optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
 });
@@ -997,6 +1006,11 @@ export const ListBillsSchema = z.strictObject({
   customerId: z.string().trim().optional(),
   status: z.string().trim().optional(),
   createdBy: z.string().trim().optional(),
+  startDate: z.string().trim().optional(),
+  endDate: z.string().trim().optional(),
+  minAmount: z.number().min(0).optional(),
+  maxAmount: z.number().min(0).optional(),
+  search: z.string().trim().optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
 });
@@ -1071,6 +1085,7 @@ export const CreateReturnSchema = z.strictObject({
   referenceId: z.string().trim().min(2), // billId or outflowId; the party is derived from it
   items: z.array(ReturnItemSchema).min(1).max(MAX_DOCUMENT_LINES),
   refundMethod: z.enum(["cash", "credit_note", "original_payment"]).default("cash"),
+  refundFinancialAccountId: z.string().trim().min(2).optional(),
   notes: z.string().trim().max(500).optional(),
 });
 export type CreateReturnInput = z.infer<typeof CreateReturnSchema>;
@@ -2009,6 +2024,13 @@ export const BankDetailsInputSchema = z.strictObject({
   upiId: z.string().trim().max(100).optional(),
 });
 
+export const FeeRuleInputSchema = z.strictObject({
+  feePercent: z.number().min(0).max(100).optional(),
+  feeFixed: z.number().int().min(0).optional(),
+  feeTaxPercent: z.number().min(0).max(100).optional(),
+  settlementDays: z.number().int().min(0).optional(),
+});
+
 export const CreateFinancialAccountSchema = z.strictObject({
   ...ContextFields,
   name: z.string().trim().min(2).max(100),
@@ -2017,6 +2039,7 @@ export const CreateFinancialAccountSchema = z.strictObject({
   currency: z.string().trim().length(3).toUpperCase().default("INR").optional(),
   assignedBranchIds: z.array(z.string().trim().min(2)).max(100).optional(),
   bankDetails: BankDetailsInputSchema.optional(),
+  feeRule: FeeRuleInputSchema.optional(),
   openingBalance: z.number().default(0).optional(),
   isDefault: z.boolean().default(false).optional(),
   notes: z.string().trim().max(500).optional(),
@@ -2029,6 +2052,7 @@ export const UpdateFinancialAccountSchema = z.strictObject({
   name: z.string().trim().min(2).max(100).optional(),
   assignedBranchIds: z.array(z.string().trim().min(2)).max(100).optional(),
   bankDetails: BankDetailsInputSchema.optional(),
+  feeRule: FeeRuleInputSchema.optional(),
   isDefault: z.boolean().optional(),
   isActive: z.boolean().optional(),
   notes: z.string().trim().max(500).optional(),
@@ -2121,9 +2145,16 @@ export const GetStorageLocationSchema = getByIdSchema("locationId");
 
 export const StockTransferLineInputSchema = z.strictObject({
   productId: z.string().trim().min(2),
-  requestedQty: z.number().positive(),
+  requestedQty: z.number().positive().optional(),
+  quantity: z.number().positive().optional(),
   unit: z.string().trim().min(1).max(30).default("piece").optional(),
+  conversionFactor: z.number().positive().optional(),
+  batchNumber: z.string().trim().max(100).optional(),
+  expiryDate: z.string().trim().max(50).optional(),
   notes: z.string().trim().max(200).optional(),
+  serialNumbers: z.array(z.string().trim().min(1).max(64)).max(500).optional(),
+}).refine((data) => data.requestedQty !== undefined || data.quantity !== undefined, {
+  message: "Either requestedQty or quantity must be provided",
 });
 
 export const CreateStockTransferSchema = z.strictObject({
@@ -2133,6 +2164,8 @@ export const CreateStockTransferSchema = z.strictObject({
   sourceLocationId: z.string().trim().min(2).optional(),
   destinationLocationId: z.string().trim().min(2).optional(),
   items: z.array(StockTransferLineInputSchema).min(1).max(MAX_DOCUMENT_LINES),
+  handlingFee: z.number().min(0).optional(),
+  handlingFeeFinancialAccountId: z.string().trim().min(2).optional(),
   notes: z.string().trim().max(500).optional(),
   idempotencyKey: z.string().min(8).max(128).optional(),
 });
@@ -2140,6 +2173,16 @@ export const CreateStockTransferSchema = z.strictObject({
 export const SubmitStockTransferSchema = z.strictObject({
   ...ContextFields,
   transferId: z.string().trim().min(2),
+  version: z.number().int().min(0).optional(),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const CancelStockTransferSchema = z.strictObject({
+  ...ContextFields,
+  transferId: z.string().trim().min(2),
+  reason: z.string().trim().max(500).optional(),
+  version: z.number().int().min(0).optional(),
+  idempotencyKey: z.string().min(8).max(128).optional(),
 });
 
 export const DispatchStockTransferSchema = z.strictObject({
@@ -2148,9 +2191,13 @@ export const DispatchStockTransferSchema = z.strictObject({
   items: z.array(z.strictObject({
     productId: z.string().trim().min(2),
     dispatchedQty: z.number().positive(),
+    serialNumbers: z.array(z.string().trim().min(1).max(64)).max(500).optional(),
+    batchNumber: z.string().trim().max(100).optional(),
+    expiryDate: z.string().trim().max(50).optional(),
   })).min(1).max(MAX_DOCUMENT_LINES).optional(),
   transportMode: z.string().trim().max(100).optional(),
   trackingReference: z.string().trim().max(100).optional(),
+  version: z.number().int().min(0).optional(),
   notes: z.string().trim().max(500).optional(),
   idempotencyKey: z.string().min(8).max(128).optional(),
 });
@@ -2163,10 +2210,28 @@ export const ReceiveStockTransferSchema = z.strictObject({
     productId: z.string().trim().min(2),
     receivedQty: z.number().min(0),
     rejectedQty: z.number().min(0).default(0).optional(),
+    shortQty: z.number().min(0).default(0).optional(),
     discrepancyReason: z.string().trim().max(300).optional(),
+    serialNumbers: z.array(z.string().trim().min(1).max(64)).max(500).optional(),
   })).min(1).max(MAX_DOCUMENT_LINES),
+  version: z.number().int().min(0).optional(),
   notes: z.string().trim().max(500).optional(),
   idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const ResolveTransferDiscrepancySchema = z.strictObject({
+  ...ContextFields,
+  transferId: z.string().trim().min(2),
+  productId: z.string().trim().min(2),
+  resolution: z.enum(["return_to_source", "write_off", "claim_carrier"]),
+  version: z.number().int().min(0).optional(),
+  notes: z.string().trim().max(500).optional(),
+});
+
+export const StockVerifySchema = z.strictObject({
+  ...ContextFields,
+  productId: z.string().trim().optional(),
+  storageLocationId: z.string().trim().optional(),
 });
 
 export const ListStockTransfersSchema = z.strictObject({
@@ -2235,11 +2300,45 @@ export const ListPaymentFeesSchema = z.strictObject({
   ...ContextFields,
   sourceDocumentId: z.string().trim().optional(),
   paymentId: z.string().trim().optional(),
+  financialAccountId: z.string().trim().optional(),
+  status: z.enum(["expected", "pending_verification", "verified", "disputed", "reversed"]).optional(),
+  highlight: z.enum(["needs_review"]).optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
 });
 
 export const GetPaymentFeeSchema = getByIdSchema("feeId");
+
+export const VerifyPaymentFeeSchema = z.strictObject({
+  ...ContextFields,
+  feeId: z.string().trim().min(2),
+  settlementDate: z.string().trim().optional(),
+  settlementReference: z.string().trim().max(100).optional(),
+  notes: z.string().trim().max(500).optional(),
+});
+
+export const DisputePaymentFeeSchema = z.strictObject({
+  ...ContextFields,
+  feeId: z.string().trim().min(2),
+  reason: z.string().trim().min(3).max(500).describe("Dispute justification"),
+});
+
+export const ReversePaymentFeeSchema = z.strictObject({
+  ...ContextFields,
+  feeId: z.string().trim().min(2),
+  reason: z.string().trim().min(3).max(500).describe("Reversal justification"),
+});
+
+export const LedgerVerifySchema = z.strictObject({
+  ...ContextFields,
+  financialAccountId: z.string().trim().optional(),
+  asOfDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "asOfDate must be YYYY-MM-DD").optional(),
+});
+
+export const GetTrialBalanceSchema = z.strictObject({
+  ...ContextFields,
+  asOfDate: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "asOfDate must be YYYY-MM-DD").optional(),
+});
 
 // ============================================================
 // Capital Transactions Validation Schemas

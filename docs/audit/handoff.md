@@ -1,42 +1,49 @@
 # Trado Engineering Handoff (Appendix E)
 
-- **Date:** 2026-11-16
+- **Date:** 2026-11-18
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** 75 (Trado Firebase BACKEND: Master Financial Accounting, Branch Operations, Inventory, Stock Transfers, Permissions & Flutter Contract Alignment)
-- **Current State:** ALL 13 MASTER SCENARIOS PASSING (35/35) [cov:FB-1..FB-7 7/7]. TypeScript builds clean. 24/24 unit tests pass. 3/3 static guards pass. All scenario assertions verified against callable source code. Operational financial accounts, double-entry ledger, payment fees, capital transactions, cash/bank liquidity, multi-invoice allocations, split payments, storage locations, inter-branch stock transfers, unified approvals inbox, admin field policy, and 17 new RBAC permissions — all emulator-verified end-to-end.
-- **Half-Done Items:** None. Specified features, schemas, callables, indexes, contract artifacts, and tests implemented and integrated.
-- **Components Delivered in Prompt 75:**
-  - **Forensic Truth Audit (Phase 0):** Attested in `docs/audit/2026-11-16-master-financial-branch-inventory-audit.md`. Reconciled 23 base vs 39 total contract entities; 134 coupled vs 156 exported callables vs 106 Flutter-referenced; 129 vs 124 permissions; 294 executed vs 3,552 theoretical test cases.
-  - **Financial Accounts & Ledger (FB-5, R4, D-46, D-47):** Decoupled static invoice metadata (`OrganizationDoc.bankAccounts`) from live operational cash/bank accounts (`financialAccounts`) and immutable ledger (`accountTransactions`). Built two-phase atomic transaction writer in `services/ledgerService.ts`. Implemented 8 callables (`financialAccountsCreate`, `financialAccountsUpdate`, `financialAccountsList`, `financialAccountsGet`, `financialAccountsGetLedger`, `accountTransfersCreate`, `accountTransfersList`, `accountTransfersGet`).
-  - **Payment Processing Fees (D-51, GAP-FEE-01):** Linked merchant processing charges to original sales/payments without reducing gross customer bill amounts or customer receivable settlement; deducts from clearing/financial accounts to match bank deposits. Implemented 3 callables (`paymentsRecordFee`, `paymentsListFees`, `paymentsGetFee`).
-  - **Capital Contributions & Drawings (D-52, GAP-CAP-01):** Double-entry owner/partner equity injections and personal drawings adjusting cash/bank ledger balances without polluting sales revenue or purchases. Implemented 2 callables (`capitalTransactionsCreate`, `capitalTransactionsList`).
-  - **Cash & Bank Liquidity Summary (GAP-REP-01):** Implemented `reportsGetCashBankSummary` aggregating liquidity across cash, bank, digital, and clearing accounts.
-  - **Payments & Multi-Bill Allocations & Split Payments (GAP-SPL-01):** Updated `paymentsCreate` with `PaymentAllocation[]` support and transactional customer/vendor balance settlement. Extended `billsCreate`, `billsPreview`, and `outflowsCreate` with bounded `splitPayments` (max 5 tenders).
-  - **Ageing Reports:** Added `reportsGetReceivablesAgeing` and `reportsGetPayablesAgeing` (Current, 1-30, 31-60, 61-90, 90+ days).
-  - **Storage Locations & Warehouses (D-48):** Added `storageLocations/{id}` collection, branch settings `isOwnStockyard`, opening stock location enforcement (`storageLocationId` required when `initialStock > 0`), and 4 callables (`storageLocationsCreate`, `storageLocationsUpdate`, `storageLocationsList`, `storageLocationsGet`).
-  - **Inter-Branch Stock Transfers (D-49):** Implemented complete transfer workflow (`stockTransfers/{id}`) with source stock deduction on dispatch, in-transit isolation, and destination intake with discrepancy logging. Implemented 6 callables (`stockTransfersCreate`, `stockTransfersSubmit`, `stockTransfersDispatch`, `stockTransfersReceive`, `stockTransfersList`, `stockTransfersGet`).
-  - **Unified Approvals Inbox & Decisions (FB-7, D-50):** Added `approvalsList` and `approvalsCounts`, integrating `account_transfer` and `stock_transfer` into `documentsDecide` with self-approval prevention (`assertCanDecide`).
-  - **Organization Governance (FB-2, FB-4):** Updated `ORGANIZATION_FIELD_POLICY.admin` to permit non-sensitive fields (`legalName`, `taxId`, `contact`, etc.) while protecting sensitive Super-Admin fields (`financialYearStartMonth`, `moduleToggles`, `showCostToTenant`).
-  - **RBAC & Permissions (FB-3):** Registered 17 new permissions in `AppPermissions` (146 total, including `payment:fee_manage`, `capital:manage`, `capital:view`), mapped across billing, purchases, capital, and inventory modules.
-  - **Flutter Contract Pack (D-35):** Generated form contracts (`financial_account`, `storage_location`, `stock_transfer`, `account_transfer`, `payment_processing_fee`, `capital_transaction`), updated `SUMMARY.md` (108 lines <= 250 max), and updated state machines.
-  - **Decisions & Registries:** Installed decisions D-46..D-52 in `docs/decisions/decision-register.md`. Added composite indexes in `firestore.indexes.json` for `paymentProcessingFees` and `capitalTransactions`. Registered allowlist entries DUP-082..DUP-092 in `duplication-allowlist.json` and `docs/data-model.md`.
-  - **Test Suites:** Created pure-logic unit test suite `financialAndBranchInventory.test.ts` (24 assertions across 7 suites) and executable scenario test suite `test-financial-branch-inventory-scenarios.cjs` (13 end-to-end scenarios S1–S13).
-  - **Test Runner Fixes:** Enhanced `callFunction` dual signature support (`(name, data, token)` and `(caller, name, data)`), resolved Super Admin auth token pass-through in tenant provisioning, and wired multi-branch assignment for admin persona.
-- **Manual Verification Commands for User Execution (Section 24 Compliance):**
+- **Prompt:** 76 (Trado Firebase: Phase 6 Final Verification Gate; Backend Hardening Emulator-Verified)
+- **Current State:** PHASE 6 DELIVERED & EMULATOR-VERIFIED [cov:C-4]. Clean TypeScript build (0 errors). Suite verification:
+  - **Unit tests:** 307/307 pass across 87 suites (`npm --prefix functions run test:unit`).
+  - **Master Scenarios:** 152/152 checks pass across 4 suites (`test:scenarios`):
+    - `test-real-world-scenarios.cjs`: 22/22 checks pass.
+    - `test-subscription-limits-and-audit-visibility.cjs`: 37/37 checks pass.
+    - `test-requests-scenarios.cjs`: 43/43 checks pass.
+    - `test-financial-branch-inventory-scenarios.cjs`: 50/50 checks pass [cov:C-4].
+  - **Security Rules:** 79/79 tests pass across Firestore (61 collections) and Storage matrices (`test:rules`).
+  - **Event Triggers:** 6 trigger execution paths verified (`test:triggers`).
+  - **Schema Contract Sweep:** Part A: 4,143/4,143 cases pass; Part B: 334/334 unknown field probes rejected with `UNKNOWN_FIELD`.
+  - **Maximal Roundtrip Proof:** 50/72 callables exercised, 567 leaf paths proven (`test:roundtrip`).
+  - **Seed Repeatability:** Verified 0 document growth on repeat seed across 61 collections (562 documents) (`test:seed`).
+  - **Data Integrity & Consistency (`check:data`):**
+    - 61 collections, 1,684 documents scanned.
+    - 0 dangling / cross-tenant references.
+    - 0 unregistered value copies (duplication).
+    - 0 cache reconciliation findings across 459 reconciliations.
+    - 0 date discipline findings across 3,362 date values.
+    - 0 same-document duplicates, alias families, or unregistered derived values.
+    - 0 removed fields in stored data.
+  - **Firestore Composite Indexes:** 1,435 query shapes across 47 collections; 50 composite indexes declared in `firestore.indexes.json`; 0 missing.
+  - **API Drift:** 194/194 Cloud Function exports documented in `docs/api-reference.md`.
+  - **Gate Conformance:** 151 callables analysed, 0 client-supplied organizationId bypasses.
+  - **Flutter Contract:** 207 items across 11 docs & 23 entity forms, 0 violations (`SUMMARY.md` 108 lines).
+  - **Cost Profiles & Budgets:** 185 callables measured, 185 budgets, 0 over budget.
+  - **Write-Path Typing:** 112 production files scanned, 0 `any` casts or annotations (`check:no-any-writes`).
+  - **Impact Verification (`verify:changed`):** 97 units total, 0 stale, 0 untraced, 0 unmapped files, 0 failures.
+- **Delivered in Prompt 76 (Phases 0–6):**
+  1. **Phase 0 Baseline:** Established read-only baseline; confirmed 10 architectural gaps G1–G10.
+  2. **Phase 1 Accounting Integrity:** Integer money minor units (`money.ts`), posting rules engine (`postingRules.ts`), returns cash refund ledger wiring (G1), fee lifecycle maker-checker & reversals (G2), double-entry trial balance (G3), system-wide invariant verification (`ledgerVerify`, G4).
+  3. **Phase 2 Stock Transfers:** Unit conversions (`conversionFactor`, `baseQuantity`), WAC carry, in-transit isolation (D-49), serial transitions, cancellation, discrepancy write-off & return-to-source, `stockVerify` (G6).
+  4. **Phase 3 Worldwide Tax & Currency:** Country defaults & minor unit naming across 11 countries (G8), 3-decimal currencies (BHD, OMR, KWD) with integer fils arithmetic, dynamic DB-backed multi-slab tax regimes (G7).
+  5. **Phase 4 Flagship Seed:** Bahrain Bicycle Shop (BHD, 3 decimals) and UAE Kitchenware (AED) specs with 0-growth repeat guarantee (G9).
+  6. **Phase 5 Cleanup & Splits:** Domain module splits for `reports/`, `requests/`, `bills/`; list endpoint filter parameters; zero `any`; zero dead fields; zero removed fields (G10).
+  7. **Phase 6 Verification Gate:** Verification gate passed cleanly across 97 verification units [cov:C-4].
+- **Pending List-then-confirm Item:**
+  - **Duplicate Skills Directories (`.agents/skills` vs `.claude/skills`):** Both directories are identical (88 files across 13 skills). Per AGENTS.md rule *"Never edit the git state of .claude/"*, user confirmation is requested on whether to:
+    1. Remove `.agents/skills` and retain `.claude/skills`.
+    2. Symlink `.agents/skills -> .claude/skills`.
+    3. Keep both as-is.
+- **Next Command:**
   ```powershell
-  # 1. Typecheck the Functions codebase
-  npm --prefix functions run build
-
-  # 2. Run unit tests
-  npm --prefix functions run test:unit
-
-  # 3. Check Flutter contract pack integrity
-  node scripts/check-flutter-contract.js
-
-  # 4. Check schema duplication allowlist & rules sync
-  node scripts/check-schema-duplicates.js
-  node scripts/check-rules-sync.js
-
-  # 5. Run scenario test suite against local Firebase emulators
-  node functions/scripts/test-financial-branch-inventory-scenarios.cjs
+  npm --prefix functions run verify:status
   ```

@@ -184,6 +184,19 @@
       "example": "cash"
     },
     {
+      "path": "refundFinancialAccountId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample refundFinancialAccountId"
+    },
+    {
       "path": "notes",
       "type": "string",
       "requiredCreate": false,

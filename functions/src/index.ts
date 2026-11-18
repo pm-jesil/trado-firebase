@@ -205,9 +205,18 @@ export {
 // Payment Processing Charges & Fees (Section 9)
 export {
   paymentsRecordFee,
+  paymentsVerifyFee,
+  paymentsDisputeFee,
+  paymentsReverseFee,
   paymentsListFees,
   paymentsGetFee,
 } from "./callables/paymentFees.js";
+
+// Ledger Invariant Verification & Trial Balance (Phase 1)
+export {
+  ledgerVerify,
+  reportsGetTrialBalance,
+} from "./callables/ledgerVerify.js";
 
 // Warehouse & Storage Locations
 export {
@@ -221,11 +230,18 @@ export {
 export {
   stockTransfersCreate,
   stockTransfersSubmit,
+  stockTransfersCancel,
   stockTransfersDispatch,
   stockTransfersReceive,
+  stockTransfersResolveDiscrepancy,
   stockTransfersList,
   stockTransfersGet,
 } from "./callables/stockTransfers.js";
+
+// Stock Invariant Verification (Phase 2)
+export {
+  stockVerify,
+} from "./callables/stockVerify.js";
 
 // Deliveries & Dispatch
 export {

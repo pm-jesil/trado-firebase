@@ -29,10 +29,12 @@ export const storageLocationsCreate = onCall({ region: "asia-south1" }, async (r
 
   const input = parseInput(CreateStorageLocationSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.WAREHOUSE_MANAGE,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
@@ -91,10 +93,12 @@ export const storageLocationsUpdate = onCall({ region: "asia-south1" }, async (r
 
   const input = parseInput(UpdateStorageLocationSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.WAREHOUSE_MANAGE,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
@@ -136,10 +140,12 @@ export const storageLocationsList = onCall({ region: "asia-south1" }, async (req
 
   const input = parseInput(ListStorageLocationsSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.WAREHOUSE_VIEW,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   let query: FirebaseFirestore.Query = db
@@ -188,10 +194,12 @@ export const storageLocationsGet = onCall({ region: "asia-south1" }, async (requ
 
   const input = parseInput(GetStorageLocationSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.WAREHOUSE_VIEW,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const locationRef = db.collection("storageLocations").doc(input.locationId);
   const snap = await locationRef.get();

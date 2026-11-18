@@ -10,10 +10,10 @@
 ## 2. Core Entities & Form Callables
 ### `organization` (Organization)
 - **Callables:** `organizationsCreate`, `organizationsUpdate`
-- **Fields:** 17 required on create, 65 optional, 63 patchable on update.
+- **Fields:** 17 required on create, 69 optional, 63 patchable on update.
 ### `branch` (Branch)
 - **Callables:** `branchesCreate`, `branchesUpdate`
-- **Fields:** 3 required on create, 25 optional, 26 patchable on update.
+- **Fields:** 3 required on create, 26 optional, 27 patchable on update.
 ### `employee` (Employee / User)
 - **Callables:** `employeesCreate`, `employeesUpdate`
 - **Fields:** 6 required on create, 17 optional, 18 patchable on update.
@@ -49,7 +49,7 @@
 - **Fields:** 6 required on create, 13 optional, 4 patchable on update.
 ### `return` (Return)
 - **Callables:** `returnsCreate`, `returnsList`
-- **Fields:** 7 required on create, 7 optional, 14 patchable on update.
+- **Fields:** 7 required on create, 8 optional, 15 patchable on update.
 ### `stock_adjustment` (Stock Adjustment / Wastage)
 - **Callables:** `stockAdjust`, `stockGetLevels`
 - **Fields:** 4 required on create, 5 optional, 9 patchable on update.
@@ -76,8 +76,8 @@
 ## 6. Entity Counts Matrix
 | Entity | Callables | Req Fields | Opt Fields | Updatable |
 |---|---|---|---|---|
-| `organization` | `organizationsCreate` | 17 | 65 | 63 |
-| `branch` | `branchesCreate` | 3 | 25 | 26 |
+| `organization` | `organizationsCreate` | 17 | 69 | 63 |
+| `branch` | `branchesCreate` | 3 | 26 | 27 |
 | `employee` | `employeesCreate` | 6 | 17 | 18 |
 | `customer` | `customersCreate` | 11 | 47 | 56 |
 | `vendor` | `vendorsCreate` | 11 | 46 | 55 |
@@ -89,7 +89,7 @@
 | `expense` | `outflowsCreate` | 8 | 31 | 39 |
 | `payment` | `paymentsCreate` | 6 | 15 | 21 |
 | `delivery` | `deliveriesCreate` | 6 | 13 | 4 |
-| `return` | `returnsCreate` | 7 | 7 | 14 |
+| `return` | `returnsCreate` | 7 | 8 | 15 |
 | `stock_adjustment` | `stockAdjust` | 4 | 5 | 9 |
 | `task` | `tasksCreate` | 2 | 8 | 2 |
 | `role` | `rolesCreate` | 4 | 3 | 5 |
@@ -100,9 +100,9 @@
 | `recurring_expense` | `recurringExpensesCreate` | 6 | 22 | 18 |
 | `plan` | `plansCreate` | 8 | 5 | 7 |
 | `request` | `requestsCreate` | 9 | 11 | 11 |
-| `financial_account` | `financialAccountsCreate` | 3 | 12 | 10 |
+| `financial_account` | `financialAccountsCreate` | 4 | 16 | 15 |
 | `storage_location` | `storageLocationsCreate` | 3 | 20 | 20 |
-| `stock_transfer` | `stockTransfersCreate` | 4 | 8 | 12 |
+| `stock_transfer` | `stockTransfersCreate` | 4 | 15 | 19 |
 | `account_transfer` | `accountTransfersCreate` | 3 | 5 | 8 |
 | `payment_processing_fee` | `paymentsRecordFee` | 5 | 9 | 14 |
 | `capital_transaction` | `capitalTransactionsCreate` | 3 | 7 | 10 |

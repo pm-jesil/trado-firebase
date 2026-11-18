@@ -793,9 +793,18 @@ async function run() {
     const payload = withRealIds(base.value);
     const shape = schema.def.shape || {};
     if ("organizationId" in shape) payload.organizationId = orgId;
-    // Names are unique per callable and run: no two generated records share a name, and a second run on
-    // the same emulator data is not a duplicate organization.
-    for (const k of Object.keys(payload)) if (/name$/i.test(k) && typeof payload[k] === "string") payload[k] = `${payload[k]} ${exp.name} ${orgUnique}`;
+    // Names and codes are unique per callable and run: no two generated records share a name or code,
+    // and a second run on the same emulator data does not trigger false cross-entity duplicate checks.
+    for (const k of Object.keys(payload)) {
+      if (/name$/i.test(k) && typeof payload[k] === "string") {
+        payload[k] = `${payload[k]} ${exp.name} ${orgUnique}`;
+      }
+      if (k === "code" && typeof payload[k] === "string") {
+        const hash = [...exp.name].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 1000, 7);
+        const prefix = exp.name.slice(0, 3).toLowerCase().replace(/[^a-z0-9]/g, "c");
+        payload[k] = `${prefix}_${hash}`;
+      }
+    }
     const token = exp.superAdminOnly || !("organizationId" in shape) ? superAdminToken : ownerToken;
     const optional = (k) => shape[k] && shape[k].def && ["optional", "default", "prefault"].includes(shape[k].def.type);
     // When a business rule names an optional field of the payload ("partyName is only for…", a field the

@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "generatedAt": "2026-11-07T00:00:00Z",
   "projectId": "trado-x",
-  "totalExports": 140,
+  "totalExports": 194,
   "phases": {
     "phase1Count": 29,
     "phase2Count": 37,
@@ -4268,6 +4268,1525 @@
       ],
       "sideEffects": [
         "OWNERSHIP_TRANSFERRED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "financialAccountsCreate",
+      "logicalName": "financialAccounts.create",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "CreateFinancialAccountSchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "organizations",
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [
+        "financialAccounts",
+        "accountTransactions",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "ACCOUNT_CREATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "financialAccountsUpdate",
+      "logicalName": "financialAccounts.update",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "UpdateFinancialAccountSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [
+        "financialAccounts",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "ACCOUNT_UPDATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "financialAccountsList",
+      "logicalName": "financialAccounts.list",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ListFinancialAccountsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "financialAccountsGet",
+      "logicalName": "financialAccounts.get",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetFinancialAccountSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "financialAccountsGetLedger",
+      "logicalName": "financialAccounts.getLedger",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "ledger:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetAccountLedgerSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "financialAccounts",
+        "accountTransactions"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountTransfersCreate",
+      "logicalName": "financialAccounts.transfersCreate",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:transfer"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "CreateAccountTransferSchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "organizations",
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [
+        "accountTransfers",
+        "accountTransactions",
+        "financialAccounts",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "TRANSFER_CREATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountTransfersList",
+      "logicalName": "financialAccounts.transfersList",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ListAccountTransfersSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "accountTransfers"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountTransfersGet",
+      "logicalName": "financialAccounts.transfersGet",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetAccountTransferSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "accountTransfers"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "capitalTransactionsCreate",
+      "logicalName": "financialAccounts.capitalCreate",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "capital:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "CreateCapitalTransactionSchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "organizations",
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [
+        "capitalTransactions",
+        "accountTransactions",
+        "financialAccounts",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "CAPITAL_TRANSACTION_RECORDED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "capitalTransactionsList",
+      "logicalName": "financialAccounts.capitalList",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "capital:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ListCapitalTransactionsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "capitalTransactions"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "approvalsCounts",
+      "logicalName": "approvals.counts",
+      "phase": 3,
+      "domain": "approvals",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "approvals:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetApprovalCountsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "bills",
+        "outflows",
+        "payments",
+        "accountTransfers",
+        "stockTransfers"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "approvalsList",
+      "logicalName": "approvals.list",
+      "phase": 3,
+      "domain": "approvals",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "approvals:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ListApprovalsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "bills",
+        "outflows",
+        "payments",
+        "accountTransfers",
+        "stockTransfers"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "paymentsRecordFee",
+      "logicalName": "payments.recordFee",
+      "phase": 3,
+      "domain": "payments",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "payment:fee_manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "RecordPaymentFeeSchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "payments",
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [
+        "paymentProcessingFees",
+        "accountTransactions",
+        "financialAccounts",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "PAYMENT_FEE_RECORDED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "paymentsVerifyFee",
+      "logicalName": "payments.verifyFee",
+      "phase": 3,
+      "domain": "payments",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "payment:fee_verify"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "VerifyPaymentFeeSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "paymentProcessingFees"
+      ],
+      "firestoreCollectionsWritten": [
+        "paymentProcessingFees",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "PAYMENT_FEE_VERIFIED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "paymentsDisputeFee",
+      "logicalName": "payments.disputeFee",
+      "phase": 3,
+      "domain": "payments",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "payment:fee_manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "DisputePaymentFeeSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "paymentProcessingFees"
+      ],
+      "firestoreCollectionsWritten": [
+        "paymentProcessingFees",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "PAYMENT_FEE_DISPUTED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "paymentsReverseFee",
+      "logicalName": "payments.reverseFee",
+      "phase": 3,
+      "domain": "payments",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "payment:fee_manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ReversePaymentFeeSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "paymentProcessingFees",
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [
+        "paymentProcessingFees",
+        "accountTransactions",
+        "financialAccounts",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "PAYMENT_FEE_REVERSED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "paymentsListFees",
+      "logicalName": "payments.listFees",
+      "phase": 3,
+      "domain": "payments",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "payment:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ListPaymentFeesSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "paymentProcessingFees"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "paymentsGetFee",
+      "logicalName": "payments.getFee",
+      "phase": 3,
+      "domain": "payments",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "payment:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetPaymentFeeSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "paymentProcessingFees"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "plansCatalogList",
+      "logicalName": "plans.catalogList",
+      "phase": 3,
+      "domain": "plans",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": false,
+      "requiredClaims": {},
+      "activeContextDerivation": "none",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "ListPlansCatalogSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "subscriptionPlans"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "reportsGetCashBankSummary",
+      "logicalName": "reports.getCashBankSummary",
+      "phase": 3,
+      "domain": "reports",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:view"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "GetCashBankSummarySchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "reportsGetReceivablesAgeing",
+      "logicalName": "reports.getReceivablesAgeing",
+      "phase": 3,
+      "domain": "reports",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "receivables:view"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "GetReceivablesAgeingReportSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "customers",
+        "bills"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "reportsGetPayablesAgeing",
+      "logicalName": "reports.getPayablesAgeing",
+      "phase": 3,
+      "domain": "reports",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "payables:view"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "GetPayablesAgeingReportSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "vendors",
+        "outflows"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "reportsGetTrialBalance",
+      "logicalName": "reports.getTrialBalance",
+      "phase": 3,
+      "domain": "reports",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "report:view"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "GetTrialBalanceSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "financialAccounts",
+        "accountTransactions",
+        "bills",
+        "outflows"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "ledgerVerify",
+      "logicalName": "ledger.verify",
+      "phase": 3,
+      "domain": "reconciliation",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "LedgerVerifySchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "financialAccounts",
+        "accountTransactions",
+        "customers",
+        "vendors"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "stockVerify",
+      "logicalName": "stock.verify",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "stock:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "StockVerifySchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "products",
+        "stockMovements",
+        "stockTransfers",
+        "serials"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsMeta",
+      "logicalName": "requests.meta",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": false,
+      "requiredClaims": {},
+      "activeContextDerivation": "none",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "GetRequestsMetaSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsCreate",
+      "logicalName": "requests.create",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_or_membership_lookup",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "CreateRequestSchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "organizations",
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [
+        "requests",
+        "requests/{requestId}/activity",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "REQUEST_CREATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsUpdate",
+      "logicalName": "requests.update",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_or_membership_lookup",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "UpdateRequestSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [
+        "requests",
+        "requests/{requestId}/activity",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "REQUEST_UPDATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsAddComment",
+      "logicalName": "requests.addComment",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_or_membership_lookup",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "AddRequestCommentSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [
+        "requests",
+        "requests/{requestId}/activity",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "COMMENT_ADDED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsGet",
+      "logicalName": "requests.get",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_or_membership_lookup",
+      "requiredPermissions": [],
+      "superAdminBypass": true,
+      "inputSchema": "GetRequestSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsList",
+      "logicalName": "requests.list",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_or_membership_lookup",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "ListRequestsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsActivityList",
+      "logicalName": "requests.activityList",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_or_membership_lookup",
+      "requiredPermissions": [],
+      "superAdminBypass": true,
+      "inputSchema": "ListRequestActivitySchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests",
+        "requests/{requestId}/activity"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsCounts",
+      "logicalName": "requests.counts",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_or_membership_lookup",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "GetRequestCountsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsTransition",
+      "logicalName": "requests.transition",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_or_membership_lookup",
+      "requiredPermissions": [],
+      "superAdminBypass": true,
+      "inputSchema": "TransitionRequestSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [
+        "requests",
+        "requests/{requestId}/activity",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "REQUEST_TRANSITIONED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsInboxList",
+      "logicalName": "requests.inboxList",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "platform_super_admin_context",
+      "requiredPermissions": [
+        "platform:requests_read"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "InboxListRequestsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsInboxCounts",
+      "logicalName": "requests.inboxCounts",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "platform_super_admin_context",
+      "requiredPermissions": [
+        "platform:requests_read"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "InboxCountsRequestsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsAssign",
+      "logicalName": "requests.assign",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "platform_super_admin_context",
+      "requiredPermissions": [
+        "platform:requests_manage"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "AssignRequestSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [
+        "requests",
+        "requests/{requestId}/activity",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "REQUEST_ASSIGNED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsSetPriority",
+      "logicalName": "requests.setPriority",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "platform_super_admin_context",
+      "requiredPermissions": [
+        "platform:requests_manage"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "SetRequestPrioritySchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [
+        "requests",
+        "requests/{requestId}/activity",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "PRIORITY_UPDATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsAddInternalNote",
+      "logicalName": "requests.addInternalNote",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "platform_super_admin_context",
+      "requiredPermissions": [
+        "platform:requests_internal_notes"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "AddInternalNoteSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [
+        "requests",
+        "requests/{requestId}/activity",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "INTERNAL_NOTE_ADDED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsApply",
+      "logicalName": "requests.apply",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "platform_super_admin_context",
+      "requiredPermissions": [
+        "platform:requests_apply"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "ApplyRequestSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "requests",
+        "organizations",
+        "subscriptionPlans"
+      ],
+      "firestoreCollectionsWritten": [
+        "requests",
+        "organizations",
+        "requests/{requestId}/activity",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "REQUEST_APPLIED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "stockTransfersCreate",
+      "logicalName": "stockTransfers.create",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "stock:transfer_create"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "CreateStockTransferSchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "storageLocations",
+        "products"
+      ],
+      "firestoreCollectionsWritten": [
+        "stockTransfers",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "TRANSFER_CREATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "stockTransfersSubmit",
+      "logicalName": "stockTransfers.submit",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "stock:transfer_create"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "SubmitStockTransferSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "stockTransfers"
+      ],
+      "firestoreCollectionsWritten": [
+        "stockTransfers",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "TRANSFER_SUBMITTED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "stockTransfersCancel",
+      "logicalName": "stockTransfers.cancel",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "stock:transfer_create"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "CancelStockTransferSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "stockTransfers"
+      ],
+      "firestoreCollectionsWritten": [
+        "stockTransfers",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "TRANSFER_CANCELLED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "stockTransfersDispatch",
+      "logicalName": "stockTransfers.dispatch",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "stock:transfer_dispatch"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "DispatchStockTransferSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "stockTransfers",
+        "storageLocations",
+        "products",
+        "serials"
+      ],
+      "firestoreCollectionsWritten": [
+        "stockTransfers",
+        "stockMovements",
+        "products",
+        "serials",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "TRANSFER_DISPATCHED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "stockTransfersReceive",
+      "logicalName": "stockTransfers.receive",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "stock:transfer_receive"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ReceiveStockTransferSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "stockTransfers",
+        "storageLocations",
+        "products",
+        "serials"
+      ],
+      "firestoreCollectionsWritten": [
+        "stockTransfers",
+        "stockMovements",
+        "products",
+        "serials",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "TRANSFER_RECEIVED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "stockTransfersResolveDiscrepancy",
+      "logicalName": "stockTransfers.resolveDiscrepancy",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "stock:transfer_receive"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ResolveTransferDiscrepancySchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "stockTransfers",
+        "products",
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [
+        "stockTransfers",
+        "stockMovements",
+        "products",
+        "accountTransactions",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "DISCREPANCY_RESOLVED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "stockTransfersList",
+      "logicalName": "stockTransfers.list",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "stock:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ListStockTransfersSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "stockTransfers"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "stockTransfersGet",
+      "logicalName": "stockTransfers.get",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "stock:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetStockTransferSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "stockTransfers"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "storageLocationsCreate",
+      "logicalName": "storageLocations.create",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "warehouse:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "CreateStorageLocationSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "storageLocations"
+      ],
+      "firestoreCollectionsWritten": [
+        "storageLocations",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "STORAGE_LOCATION_CREATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "storageLocationsUpdate",
+      "logicalName": "storageLocations.update",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "warehouse:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "UpdateStorageLocationSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "storageLocations"
+      ],
+      "firestoreCollectionsWritten": [
+        "storageLocations",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "STORAGE_LOCATION_UPDATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "storageLocationsList",
+      "logicalName": "storageLocations.list",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "warehouse:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ListStorageLocationsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "storageLocations"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "storageLocationsGet",
+      "logicalName": "storageLocations.get",
+      "phase": 3,
+      "domain": "stock",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "warehouse:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetStorageLocationSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "storageLocations"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "onRequestActivityWritten",
+      "logicalName": "triggers.onRequestActivityWritten",
+      "phase": 3,
+      "domain": "triggers",
+      "triggerType": "firestore_trigger",
+      "region": "asia-south1",
+      "authRequired": false,
+      "requiredClaims": {},
+      "activeContextDerivation": "document_trigger_context",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "FirestoreDocumentSnapshot",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [
+        "auditLogs",
+        "notifications"
+      ],
+      "sideEffects": [
+        "requestActivityNotification"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsSlaAndLifecycleSweep",
+      "logicalName": "scheduled.requestsSlaAndLifecycleSweep",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "schedule",
+      "region": "asia-south1",
+      "authRequired": false,
+      "requiredClaims": {},
+      "activeContextDerivation": "none",
+      "requiredPermissions": [],
+      "superAdminBypass": false,
+      "inputSchema": "None",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "requests"
+      ],
+      "firestoreCollectionsWritten": [
+        "requests",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "SLA breaches marked, overdue auto-escalations"
       ],
       "indexesRequired": [],
       "coveredInIntegrationTests": true,

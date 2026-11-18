@@ -32,4 +32,5 @@
 | `settings.allowNegativeStock` | `boolean` | No | Yes | `date_picker` | {} | `true` |
 | `settings.isOwnStockyard` | `boolean` | No | Yes | `switch` | {} | `true` |
 | `settings.defaultSalesMode` | `enum` | No | Yes | `dropdown` | Enum: `pos`, `b2b`, `both` | `pos` |
+| `settings.defaultFinancialAccountId` | `string` | No | Yes | `text` | {"minLength":2} | `Sample settings.defaultFinancialAccountId` |
 | `settings.moduleOverrides.*` | `boolean` | **Yes** | Yes | `switch` | {} | `true` |

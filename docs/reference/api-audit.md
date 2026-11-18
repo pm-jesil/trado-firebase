@@ -149,13 +149,13 @@
 
 | Callable | File | Status | Issues |
 |----------|------|--------|--------|
-| `billsUpdateDraft` | `bills.ts` | ⚠️ WARN | E: No createAuditLog() call for mutation |
-| `billsCreate` | `bills.ts` | ⚠️ WARN | E: No createAuditLog() call for mutation |
-| `billsList` | `bills.ts` | ✅ PASS | — |
-| `billsGet` | `bills.ts` | ✅ PASS | — |
-| `billsFinalize` | `bills.ts` | ⚠️ WARN | E: No createAuditLog() call for mutation |
-| `billsVoid` | `bills.ts` | ⚠️ WARN | E: No createAuditLog() call for mutation |
-| `billsPreview` | `bills.ts` | ✅ PASS | — |
+| `billsUpdateDraft` | `bills\billsMutations.ts` | ⚠️ WARN | E: No createAuditLog() call for mutation |
+| `billsCreate` | `bills\billsMutations.ts` | ⚠️ WARN | E: No createAuditLog() call for mutation |
+| `billsList` | `bills\billsQueries.ts` | ✅ PASS | — |
+| `billsGet` | `bills\billsQueries.ts` | ✅ PASS | — |
+| `billsFinalize` | `bills\billsMutations.ts` | ⚠️ WARN | E: No createAuditLog() call for mutation |
+| `billsVoid` | `bills\billsMutations.ts` | ⚠️ WARN | E: No createAuditLog() call for mutation |
+| `billsPreview` | `bills\billsQueries.ts` | ✅ PASS | — |
 
 ### Outflows
 
@@ -257,15 +257,15 @@
 
 | Callable | File | Status | Issues |
 |----------|------|--------|--------|
-| `reportsGetRevenue` | `reports.ts` | ✅ PASS | — |
-| `reportsGetProfitLoss` | `reports.ts` | ✅ PASS | — |
-| `reportsGetStockValuation` | `reports.ts` | ✅ PASS | — |
-| `reportsGetTopEntities` | `reports.ts` | ✅ PASS | — |
-| `reportsGetStaffActivity` | `reports.ts` | ✅ PASS | — |
-| `reportsGetPlatformOverview` | `reports.ts` | ✅ PASS | — |
-| `reportsExportCsv` | `reports.ts` | ✅ PASS | — |
-| `reportsGetPartyStatement` | `reports.ts` | ✅ PASS | — |
-| `reportsGetOutflowSummary` | `reports.ts` | ✅ PASS | — |
+| `reportsGetRevenue` | `reports\financialReports.ts` | ✅ PASS | — |
+| `reportsGetProfitLoss` | `reports\financialReports.ts` | ✅ PASS | — |
+| `reportsGetStockValuation` | `reports\analyticsReports.ts` | ✅ PASS | — |
+| `reportsGetTopEntities` | `reports\analyticsReports.ts` | ✅ PASS | — |
+| `reportsGetStaffActivity` | `reports\analyticsReports.ts` | ✅ PASS | — |
+| `reportsGetPlatformOverview` | `reports\analyticsReports.ts` | ✅ PASS | — |
+| `reportsExportCsv` | `reports\analyticsReports.ts` | ✅ PASS | — |
+| `reportsGetPartyStatement` | `reports\operationalReports.ts` | ✅ PASS | — |
+| `reportsGetOutflowSummary` | `reports\operationalReports.ts` | ✅ PASS | — |
 
 ### Usage
 

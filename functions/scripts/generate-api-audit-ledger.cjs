@@ -126,7 +126,7 @@ function auditCallable(callableName) {
   // Find source file
   let src = "";
   let srcFile = "";
-  for (const f of fs.readdirSync(SRC_DIR)) {
+  for (const f of fs.readdirSync(SRC_DIR, { recursive: true })) {
     if (!f.endsWith(".ts")) continue;
     const content = fs.readFileSync(path.join(SRC_DIR, f), "utf8");
     if (content.includes(`export const ${callableName} `)) {

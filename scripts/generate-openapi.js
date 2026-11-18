@@ -1834,6 +1834,9 @@ const DOMAIN_TAGS = {
   tasks: "Tasks & Operations",
   locations: "Employee Location Tracking",
   usage: "Platform Usage & Metering",
+  financialAccounts: "Financial Accounts & Banking",
+  approvals: "Approvals & Decisions",
+  requests: "Requests & Support Desk",
 };
 
 // ── Build tags list ──────────────────────────────────────────────

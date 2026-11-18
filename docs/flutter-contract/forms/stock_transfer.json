@@ -98,7 +98,21 @@
     {
       "path": "items[].requestedQty",
       "type": "number",
-      "requiredCreate": true,
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "items[].quantity",
+      "type": "number",
+      "requiredCreate": false,
       "updatable": true,
       "nullable": false,
       "bounds": {
@@ -124,6 +138,46 @@
       "example": "Sample items[].unit"
     },
     {
+      "path": "items[].conversionFactor",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": false
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "items[].batchNumber",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample items[].batchNumber"
+    },
+    {
+      "path": "items[].expiryDate",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 50
+      },
+      "enumValues": [],
+      "uiHint": "date_picker",
+      "example": "Sample items[].expiryDate"
+    },
+    {
       "path": "items[].notes",
       "type": "string",
       "requiredCreate": false,
@@ -135,6 +189,47 @@
       "enumValues": [],
       "uiHint": "textarea",
       "example": "Sample items[].notes"
+    },
+    {
+      "path": "items[].serialNumbers[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 1,
+        "maxLength": 64
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample items[].serialNumbers[]"
+    },
+    {
+      "path": "handlingFee",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "handlingFeeFinancialAccountId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample handlingFeeFinancialAccountId"
     },
     {
       "path": "notes",

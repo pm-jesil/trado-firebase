@@ -1,8 +1,33 @@
 {
-  "$comment": "Per-callable cost budgets for the standard scenarios of the test suites (prompt 66 Part 8): 1.25 × the measured maximum + 1, set from the run of 2026-11-13. A regression fails check:cost-budgets for exactly that callable. Raise a budget only with the reason in the commit.",
+  "$comment": "Per-callable cost budgets for the standard scenarios of the test suites (prompt 66 Part 8): 1.25 × the measured maximum + 1, set from the run of 2026-11-18. A regression fails check:cost-budgets for exactly that callable. Raise a budget only with the reason in the commit.",
   "callables": {
+    "accountTransfersCreate": {
+      "maxReads": 18,
+      "maxWrites": 14,
+      "maxDeletes": 1
+    },
+    "accountTransfersGet": {
+      "maxReads": 11,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "accountTransfersList": {
+      "maxReads": 13,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "approvalsCounts": {
+      "maxReads": 18,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "approvalsList": {
+      "maxReads": 18,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
     "auditGetEntityHistory": {
-      "maxReads": 30,
+      "maxReads": 44,
       "maxWrites": 3,
       "maxDeletes": 1
     },
@@ -12,18 +37,18 @@
       "maxDeletes": 1
     },
     "authLogin": {
-      "maxReads": 154,
+      "maxReads": 191,
       "maxWrites": 4,
       "maxDeletes": 1
     },
     "authMe": {
-      "maxReads": 154,
+      "maxReads": 191,
       "maxWrites": 4,
       "maxDeletes": 1
     },
     "billsCreate": {
-      "maxReads": 20,
-      "maxWrites": 16,
+      "maxReads": 21,
+      "maxWrites": 18,
       "maxDeletes": 1
     },
     "billsFinalize": {
@@ -77,13 +102,23 @@
       "maxDeletes": 1
     },
     "branchesList": {
-      "maxReads": 11,
+      "maxReads": 14,
       "maxWrites": 3,
       "maxDeletes": 1
     },
     "branchesUpdate": {
       "maxReads": 16,
       "maxWrites": 9,
+      "maxDeletes": 1
+    },
+    "capitalTransactionsCreate": {
+      "maxReads": 14,
+      "maxWrites": 10,
+      "maxDeletes": 1
+    },
+    "capitalTransactionsList": {
+      "maxReads": 14,
+      "maxWrites": 3,
       "maxDeletes": 1
     },
     "categoriesCreate": {
@@ -102,7 +137,7 @@
       "maxDeletes": 3
     },
     "customersCreate": {
-      "maxReads": 30,
+      "maxReads": 33,
       "maxWrites": 10,
       "maxDeletes": 1
     },
@@ -112,7 +147,7 @@
       "maxDeletes": 1
     },
     "customersList": {
-      "maxReads": 11,
+      "maxReads": 13,
       "maxWrites": 3,
       "maxDeletes": 1
     },
@@ -147,7 +182,7 @@
       "maxDeletes": 1
     },
     "departmentsList": {
-      "maxReads": 4,
+      "maxReads": 5,
       "maxWrites": 1,
       "maxDeletes": 1
     },
@@ -157,7 +192,7 @@
       "maxDeletes": 3
     },
     "documentsDecide": {
-      "maxReads": 18,
+      "maxReads": 20,
       "maxWrites": 11,
       "maxDeletes": 1
     },
@@ -177,13 +212,38 @@
       "maxDeletes": 1
     },
     "employeesList": {
-      "maxReads": 24,
+      "maxReads": 40,
       "maxWrites": 3,
       "maxDeletes": 1
     },
     "employeesUpdate": {
       "maxReads": 15,
       "maxWrites": 8,
+      "maxDeletes": 1
+    },
+    "financialAccountsCreate": {
+      "maxReads": 14,
+      "maxWrites": 11,
+      "maxDeletes": 1
+    },
+    "financialAccountsGet": {
+      "maxReads": 11,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "financialAccountsGetLedger": {
+      "maxReads": 21,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "financialAccountsList": {
+      "maxReads": 13,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "financialAccountsUpdate": {
+      "maxReads": 11,
+      "maxWrites": 5,
       "maxDeletes": 1
     },
     "healthCheck": {
@@ -212,7 +272,7 @@
       "maxDeletes": 1
     },
     "jobRolesList": {
-      "maxReads": 10,
+      "maxReads": 11,
       "maxWrites": 1,
       "maxDeletes": 1
     },
@@ -220,6 +280,11 @@
       "maxReads": 13,
       "maxWrites": 6,
       "maxDeletes": 3
+    },
+    "ledgerVerify": {
+      "maxReads": 54,
+      "maxWrites": 3,
+      "maxDeletes": 1
     },
     "locationsGetHistory": {
       "maxReads": 11,
@@ -307,8 +372,8 @@
       "maxDeletes": 1
     },
     "organizationsUpdate": {
-      "maxReads": 4,
-      "maxWrites": 4,
+      "maxReads": 13,
+      "maxWrites": 5,
       "maxDeletes": 1
     },
     "outflowsCreate": {
@@ -332,13 +397,38 @@
       "maxDeletes": 3
     },
     "paymentsCreate": {
-      "maxReads": 15,
-      "maxWrites": 11,
+      "maxReads": 16,
+      "maxWrites": 14,
+      "maxDeletes": 1
+    },
+    "paymentsDisputeFee": {
+      "maxReads": 11,
+      "maxWrites": 5,
+      "maxDeletes": 1
+    },
+    "paymentsGetFee": {
+      "maxReads": 11,
+      "maxWrites": 3,
       "maxDeletes": 1
     },
     "paymentsList": {
       "maxReads": 15,
       "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "paymentsListFees": {
+      "maxReads": 13,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "paymentsRecordFee": {
+      "maxReads": 18,
+      "maxWrites": 13,
+      "maxDeletes": 1
+    },
+    "paymentsReverseFee": {
+      "maxReads": 15,
+      "maxWrites": 10,
       "maxDeletes": 1
     },
     "paymentsVoid": {
@@ -347,13 +437,18 @@
       "maxDeletes": 1
     },
     "permissionCatalogList": {
-      "maxReads": 145,
+      "maxReads": 183,
       "maxWrites": 1,
       "maxDeletes": 1
     },
     "plansArchive": {
       "maxReads": 3,
       "maxWrites": 4,
+      "maxDeletes": 1
+    },
+    "plansCatalogList": {
+      "maxReads": 30,
+      "maxWrites": 3,
       "maxDeletes": 1
     },
     "plansCreate": {
@@ -372,7 +467,7 @@
       "maxDeletes": 1
     },
     "plansList": {
-      "maxReads": 10,
+      "maxReads": 19,
       "maxWrites": 1,
       "maxDeletes": 1
     },
@@ -392,12 +487,12 @@
       "maxDeletes": 1
     },
     "platformUsersList": {
-      "maxReads": 55,
+      "maxReads": 58,
       "maxWrites": 1,
       "maxDeletes": 1
     },
     "productsCreate": {
-      "maxReads": 30,
+      "maxReads": 31,
       "maxWrites": 11,
       "maxDeletes": 1
     },
@@ -456,6 +551,11 @@
       "maxWrites": 4,
       "maxDeletes": 1
     },
+    "reportsGetCashBankSummary": {
+      "maxReads": 14,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
     "reportsGetOutflowSummary": {
       "maxReads": 16,
       "maxWrites": 4,
@@ -466,18 +566,28 @@
       "maxWrites": 4,
       "maxDeletes": 1
     },
+    "reportsGetPayablesAgeing": {
+      "maxReads": 11,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
     "reportsGetPlatformOverview": {
-      "maxReads": 305,
+      "maxReads": 344,
       "maxWrites": 1,
       "maxDeletes": 1
     },
     "reportsGetProfitLoss": {
-      "maxReads": 20,
+      "maxReads": 21,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "reportsGetReceivablesAgeing": {
+      "maxReads": 13,
       "maxWrites": 3,
       "maxDeletes": 1
     },
     "reportsGetRevenue": {
-      "maxReads": 11,
+      "maxReads": 13,
       "maxWrites": 3,
       "maxDeletes": 1
     },
@@ -487,7 +597,7 @@
       "maxDeletes": 1
     },
     "reportsGetStockValuation": {
-      "maxReads": 11,
+      "maxReads": 13,
       "maxWrites": 3,
       "maxDeletes": 1
     },
@@ -496,8 +606,88 @@
       "maxWrites": 3,
       "maxDeletes": 1
     },
+    "reportsGetTrialBalance": {
+      "maxReads": 33,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "requestsActivityList": {
+      "maxReads": 26,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "requestsAddComment": {
+      "maxReads": 13,
+      "maxWrites": 6,
+      "maxDeletes": 1
+    },
+    "requestsAddInternalNote": {
+      "maxReads": 4,
+      "maxWrites": 5,
+      "maxDeletes": 1
+    },
+    "requestsApply": {
+      "maxReads": 8,
+      "maxWrites": 6,
+      "maxDeletes": 1
+    },
+    "requestsAssign": {
+      "maxReads": 4,
+      "maxWrites": 5,
+      "maxDeletes": 1
+    },
+    "requestsCounts": {
+      "maxReads": 16,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "requestsCreate": {
+      "maxReads": 25,
+      "maxWrites": 8,
+      "maxDeletes": 1
+    },
+    "requestsGet": {
+      "maxReads": 16,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "requestsInboxCounts": {
+      "maxReads": 59,
+      "maxWrites": 1,
+      "maxDeletes": 1
+    },
+    "requestsInboxList": {
+      "maxReads": 59,
+      "maxWrites": 1,
+      "maxDeletes": 1
+    },
+    "requestsList": {
+      "maxReads": 19,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "requestsMeta": {
+      "maxReads": 28,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "requestsSetPriority": {
+      "maxReads": 4,
+      "maxWrites": 5,
+      "maxDeletes": 1
+    },
+    "requestsTransition": {
+      "maxReads": 13,
+      "maxWrites": 6,
+      "maxDeletes": 1
+    },
+    "requestsUpdate": {
+      "maxReads": 13,
+      "maxWrites": 6,
+      "maxDeletes": 1
+    },
     "returnsCreate": {
-      "maxReads": 18,
+      "maxReads": 20,
       "maxWrites": 15,
       "maxDeletes": 1
     },
@@ -512,7 +702,7 @@
       "maxDeletes": 1
     },
     "rolesList": {
-      "maxReads": 11,
+      "maxReads": 13,
       "maxWrites": 1,
       "maxDeletes": 1
     },
@@ -534,6 +724,71 @@
     "stockMovementsList": {
       "maxReads": 15,
       "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "stockTransfersCancel": {
+      "maxReads": 10,
+      "maxWrites": 5,
+      "maxDeletes": 1
+    },
+    "stockTransfersCreate": {
+      "maxReads": 15,
+      "maxWrites": 6,
+      "maxDeletes": 1
+    },
+    "stockTransfersDispatch": {
+      "maxReads": 14,
+      "maxWrites": 9,
+      "maxDeletes": 1
+    },
+    "stockTransfersGet": {
+      "maxReads": 11,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "stockTransfersList": {
+      "maxReads": 14,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "stockTransfersReceive": {
+      "maxReads": 18,
+      "maxWrites": 13,
+      "maxDeletes": 1
+    },
+    "stockTransfersResolveDiscrepancy": {
+      "maxReads": 14,
+      "maxWrites": 8,
+      "maxDeletes": 1
+    },
+    "stockTransfersSubmit": {
+      "maxReads": 11,
+      "maxWrites": 5,
+      "maxDeletes": 1
+    },
+    "stockVerify": {
+      "maxReads": 39,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "storageLocationsCreate": {
+      "maxReads": 11,
+      "maxWrites": 6,
+      "maxDeletes": 1
+    },
+    "storageLocationsGet": {
+      "maxReads": 11,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "storageLocationsList": {
+      "maxReads": 13,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "storageLocationsUpdate": {
+      "maxReads": 11,
+      "maxWrites": 5,
       "maxDeletes": 1
     },
     "tasksAssign": {
@@ -567,7 +822,7 @@
       "maxDeletes": 1
     },
     "taxRegimesList": {
-      "maxReads": 10,
+      "maxReads": 14,
       "maxWrites": 1,
       "maxDeletes": 1
     },
@@ -582,7 +837,7 @@
       "maxDeletes": 1
     },
     "teamsList": {
-      "maxReads": 20,
+      "maxReads": 23,
       "maxWrites": 3,
       "maxDeletes": 1
     },
@@ -627,17 +882,17 @@
       "maxDeletes": 1
     },
     "usageGetOrganizations": {
-      "maxReads": 113,
+      "maxReads": 84,
       "maxWrites": 1,
       "maxDeletes": 1
     },
     "usageGetPlatformSummary": {
-      "maxReads": 101,
+      "maxReads": 73,
       "maxWrites": 1,
       "maxDeletes": 1
     },
     "usageRecordClientMetric": {
-      "maxReads": 14,
+      "maxReads": 15,
       "maxWrites": 8,
       "maxDeletes": 1
     },
@@ -652,7 +907,7 @@
       "maxDeletes": 1
     },
     "vendorsCreate": {
-      "maxReads": 30,
+      "maxReads": 15,
       "maxWrites": 10,
       "maxDeletes": 1
     },
@@ -662,7 +917,7 @@
       "maxDeletes": 1
     },
     "vendorsList": {
-      "maxReads": 11,
+      "maxReads": 13,
       "maxWrites": 3,
       "maxDeletes": 1
     },

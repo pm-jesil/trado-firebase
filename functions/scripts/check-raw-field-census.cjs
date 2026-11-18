@@ -43,12 +43,25 @@ function collect(value, at, out) {
 async function main() {
   await verifyEmulatorHealth();
   const { collections } = truth.getCollections();
-  // A removed name matches the stored top-level field of that name, or the register's own path (bankAccounts[].branchName);
-  // the same name nested elsewhere (billToSnapshot.billingAddress, contact.contactPerson) is a different, typed field.
-  const removedPaths = new Set((config.removedFieldNames || []).map((r) => r.path || r.name));
+  // A removed name matches the stored top-level field of that name in the collections of its callables,
+  // or the register's own path (bankAccounts[].branchName);
+  // the same name nested elsewhere (billToSnapshot.billingAddress, contact.contactPerson, financialAccounts.bankDetails) is a different, typed field.
+  const removedEntries = (config.removedFieldNames || []).map((r) => {
+    const p = r.path || r.name;
+    const targetCols = (r.callables || []).map((c) => {
+      const match = c.match(/^(organizations|products|customers|vendors|users)/);
+      return match ? match[1] : null;
+    }).filter(Boolean);
+    return { path: p, collections: new Set(targetCols) };
+  });
   const census = {};
   const stillStored = [];
   for (const col of collections) {
+    const removedForCol = new Set(
+      removedEntries
+        .filter((r) => r.collections.size === 0 || r.collections.has(col.name) || r.collections.has(col.key))
+        .map((r) => r.path)
+    );
     const snap = await (col.parent ? db.collectionGroup(col.name) : db.collection(col.name)).get();
     const paths = {};
     for (const doc of snap.docs) {
@@ -57,7 +70,7 @@ async function main() {
         const entry = (paths[p] = paths[p] || { documents: 0, types: [] });
         if (!entry.types.includes(type)) entry.types.push(type);
         if (!seen.has(p)) { seen.add(p); entry.documents++; }
-        const removedHere = [...removedPaths].some((r) => p === r || p.startsWith(`${r}.`) || p.startsWith(`${r}[]`));
+        const removedHere = [...removedForCol].some((r) => p === r || p.startsWith(`${r}.`) || p.startsWith(`${r}[]`));
         if (removedHere && stillStored.length < 50) stillStored.push(`${doc.ref.path} → ${p}`);
       }
     }

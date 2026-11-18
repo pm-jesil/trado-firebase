@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
-  "totalDocuments": 160,
+  "totalDocuments": 162,
   "countsByClassification": {
     "KEEP+UPDATE": 115,
     "REWRITE": 2,
-    "ARCHIVE": 17,
+    "ARCHIVE": 19,
     "GENERATED": 26
   },
   "documents": [
@@ -24,7 +24,7 @@
       "path": "docs/api-reference.md",
       "title": "Trado API Reference",
       "classification": "KEEP+UPDATE",
-      "lineCount": 1183
+      "lineCount": 1257
     },
     {
       "path": "docs/architecture.md",
@@ -37,6 +37,12 @@
       "title": "Master Forensic Audit & Architecture Blueprint: Financial Accounting, Multi-Branch Operations, Warehouses, Stock Transfers & Approvals",
       "classification": "ARCHIVE",
       "lineCount": 237
+    },
+    {
+      "path": "docs/audit/2026-11-17-backend-baseline.md",
+      "title": "Trado Firebase Backend — Baseline Audit & Gap Verification (Phase 0)",
+      "classification": "ARCHIVE",
+      "lineCount": 129
     },
     {
       "path": "docs/audit/api-logic-ledger.md",
@@ -85,6 +91,12 @@
       "title": "Run 75 Change Record — Master Financial Accounting, Branch Operations, Inventory, Stock Transfers & Permissions (Prompt 75)",
       "classification": "ARCHIVE",
       "lineCount": 90
+    },
+    {
+      "path": "docs/audit/changes/run-76.md",
+      "title": "Run 76 Change Record — Comprehensive Backend Hardening, Accounting Integrity & Verification Gate (Prompt 76)",
+      "classification": "ARCHIVE",
+      "lineCount": 85
     },
     {
       "path": "docs/audit/coverage.md",
@@ -144,7 +156,7 @@
       "path": "docs/audit/handoff.md",
       "title": "Trado Engineering Handoff (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 42
+      "lineCount": 50
     },
     {
       "path": "docs/audit/implementation-status.md",
@@ -210,7 +222,7 @@
       "path": "docs/audit/run-ledger.md",
       "title": "Trado Engineering Run Ledger (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 16
+      "lineCount": 32
     },
     {
       "path": "docs/audit/test-coverage-matrix.md",
@@ -264,7 +276,7 @@
       "path": "docs/data-model.md",
       "title": "Trado Data Model & Schema Specification",
       "classification": "KEEP+UPDATE",
-      "lineCount": 938
+      "lineCount": 949
     },
     {
       "path": "docs/decisions/decision-register.md",
@@ -438,7 +450,7 @@
       "path": "docs/flutter-contract/forms/branch.md",
       "title": "Form Contract: Branch (`branch`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 36
+      "lineCount": 37
     },
     {
       "path": "docs/flutter-contract/forms/capital_transaction.md",
@@ -486,7 +498,7 @@
       "path": "docs/flutter-contract/forms/financial_account.md",
       "title": "Form Contract: Financial Account (`financial_account`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 23
+      "lineCount": 28
     },
     {
       "path": "docs/flutter-contract/forms/job_role.md",
@@ -498,7 +510,7 @@
       "path": "docs/flutter-contract/forms/organization.md",
       "title": "Form Contract: Organization (`organization`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 90
+      "lineCount": 94
     },
     {
       "path": "docs/flutter-contract/forms/payment.md",
@@ -636,7 +648,7 @@
       "path": "docs/flutter-contract/forms/return.md",
       "title": "Form Contract: Return (`return`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 22
+      "lineCount": 23
     },
     {
       "path": "docs/flutter-contract/forms/role.md",
@@ -654,7 +666,7 @@
       "path": "docs/flutter-contract/forms/stock_transfer.md",
       "title": "Form Contract: Stock Transfer (`stock_transfer`)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 20
+      "lineCount": 27
     },
     {
       "path": "docs/flutter-contract/forms/storage_location.md",
@@ -690,7 +702,7 @@
       "path": "docs/flutter-contract/permissions.md",
       "title": "Permission Catalog & UI Gating",
       "classification": "KEEP+UPDATE",
-      "lineCount": 167
+      "lineCount": 168
     },
     {
       "path": "docs/flutter-contract/README.md",

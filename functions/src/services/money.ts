@@ -194,9 +194,68 @@ export const Money = {
   },
 
   /**
+   * Alias: Convert major decimal into exact integer minor units.
+   */
+  toMinor(amount: number, currency: string = "INR"): number {
+    return this.fromDecimal(amount, currency);
+  },
+
+  /**
+   * Alias: Convert exact integer minor units to major decimal.
+   */
+  fromMinor(minorUnits: number, currency: string = "INR"): number {
+    return this.toDecimal(minorUnits, currency);
+  },
+
+  /**
+   * Add integer minor units with exact integer arithmetic.
+   */
+  addMinor(a: number, b: number): number {
+    return Math.round(a) + Math.round(b);
+  },
+
+  /**
+   * Subtract integer minor units with exact integer arithmetic.
+   */
+  subtractMinor(a: number, b: number): number {
+    return Math.round(a) - Math.round(b);
+  },
+
+  /**
+   * Allocate integer minor units across proportions without fractional remainder loss.
+   */
+  allocateMinor(totalMinor: number, ratios: number[]): number[] {
+    const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
+    if (totalRatio <= 0) return ratios.map(() => 0);
+
+    const intTotal = Math.round(totalMinor);
+    let remainder = intTotal;
+    const results: number[] = [];
+
+    for (let i = 0; i < ratios.length; i++) {
+      const share = Math.floor((intTotal * ratios[i]) / totalRatio);
+      results.push(share);
+      remainder -= share;
+    }
+
+    // Distribute remaining cents/paise one by one to parts with highest remainder
+    for (let i = 0; i < remainder; i++) {
+      results[i % results.length]++;
+    }
+
+    return results;
+  },
+
+  /**
    * Round amount to the currency's standard decimal places.
    */
   roundCurrency(amount: number, currency: string = "INR"): number {
     return roundTo(amount, getCurrencyDecimals(currency));
   },
 } as const;
+
+export const toMinor = Money.toMinor.bind(Money);
+export const fromMinor = Money.toDecimal.bind(Money);
+export const addMinor = Money.addMinor;
+export const subtractMinor = Money.subtractMinor;
+export const allocateMinor = Money.allocateMinor;

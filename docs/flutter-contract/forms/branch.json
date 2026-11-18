@@ -357,6 +357,19 @@
       "example": "pos"
     },
     {
+      "path": "settings.defaultFinancialAccountId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": true,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample settings.defaultFinancialAccountId"
+    },
+    {
       "path": "settings.moduleOverrides.*",
       "type": "boolean",
       "requiredCreate": true,

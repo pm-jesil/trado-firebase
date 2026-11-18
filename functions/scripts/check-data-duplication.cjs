@@ -257,8 +257,17 @@ function reconcile() {
   // reconcile:documentPayments — paid = SUM(completed payments), balance = total − paid, status derived
   const paidByDoc = new Map();
   for (const [, p] of byOrg("payments")) {
-    if (p.status !== "completed" || !p.referenceId) continue;
-    paidByDoc.set(p.referenceId, (paidByDoc.get(p.referenceId) || 0) + (p.amount || 0));
+    if (p.status !== "completed") continue;
+    if (p.referenceId) {
+      paidByDoc.set(p.referenceId, (paidByDoc.get(p.referenceId) || 0) + (p.amount || 0));
+    }
+    if (Array.isArray(p.allocations)) {
+      for (const a of p.allocations) {
+        if (a.documentId) {
+          paidByDoc.set(a.documentId, (paidByDoc.get(a.documentId) || 0) + (a.amount || 0));
+        }
+      }
+    }
   }
   const statusFor = (total, paid) => (paid >= total && total > 0 ? "paid" : paid > 0 ? "partial" : total === 0 ? "paid" : "pending");
   for (const [name, open] of [["bills", "active"], ["outflows", "confirmed"]]) {
@@ -359,15 +368,17 @@ const INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/;
 const CAL_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const YEAR_MONTH = /^\d{4}-\d{2}$/;
 const TTL_FIELDS = new Set(["locationPings.expiresAt", "auditLogs.expireAt", "auditLogs.occurredAt", "organizationUsageDaily.expireAt", "organizationUsageDaily.lastSeenAt", "userUsageDaily.expireAt", "userUsageDaily.lastSeenAt"]);
-const CALENDAR_FIELDS = new Set(["date", "dueDate", "expiryDate", "expiresOn", "day", "startDate", "endDate", "startOn", "nextRunOn", "endOn", "occurredLocalDate"]);
+const CALENDAR_FIELDS = new Set(["date", "dueDate", "expiryDate", "expiresOn", "day", "startDate", "endDate", "startOn", "nextRunOn", "endOn", "occurredLocalDate", "settlementDate"]);
 const dateTable = new Map(); // "collection.field" -> { class, values, bad }
 
 function classify(collection, field) {
   const leaf = field.split(".").pop().replace(/\[\d+\]/g, "");
+  if (collection === "requests" && (leaf === "billingPeriod" || leaf === "period")) return null;
   if (TTL_FIELDS.has(`${collection}.${leaf}`)) return "ttl";
-  if (CALENDAR_FIELDS.has(leaf)) return "calendar";
+  if (["timestamp", "docDate", "recordedAt"].includes(leaf)) return "instant";
+  if (CALENDAR_FIELDS.has(leaf) || /Date$/.test(leaf)) return "calendar";
+  if (/(At|On)$/.test(leaf)) return "instant";
   if (["yearMonth", "billingPeriod", "month", "period", "lastGeneratedPeriod"].includes(leaf)) return "yearMonth";
-  if (/(At|On)$/.test(leaf) || ["timestamp", "docDate", "recordedAt"].includes(leaf)) return "instant";
   return null;
 }
 

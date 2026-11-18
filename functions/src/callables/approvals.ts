@@ -198,10 +198,12 @@ export const approvalsList = onCall({ region: "asia-south1" }, async (request) =
 
   const input = parseInput(ListApprovalsSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.APPROVALS_VIEW,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   const items: Array<{
@@ -350,10 +352,12 @@ export const approvalsCounts = onCall({ region: "asia-south1" }, async (request)
 
   const input = parseInput(GetApprovalCountsSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.APPROVALS_VIEW,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   const branchId = input.branchId;

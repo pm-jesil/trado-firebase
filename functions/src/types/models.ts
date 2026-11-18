@@ -140,6 +140,9 @@ export interface OrganizationDoc {
   country: string; // ISO 3166-1 alpha-2
   currency: string; // ISO 4217 code
   currencyDecimals?: number;
+  minorUnitName?: string; // e.g. "paisa", "fils", "cent" (G8)
+  minorUnitNamePlural?: string; // e.g. "paise", "fils", "cents" (G8)
+  currencySymbol?: string; // e.g. "₹", "AED", "BD", "$" (G8)
   taxRegimeCode: string; // Reference to taxRegimes/{taxRegimeCode}
   status: EntityStatus;
   planId: string; // Reference to subscriptionPlans/{planId}
@@ -342,6 +345,13 @@ export interface ModuleDoc {
   description: string;
 }
 
+export interface TaxSlab {
+  name: string; // e.g. "Standard", "Zero", "Reduced", "Exempt"
+  rate: number; // e.g. 0, 5, 10, 18
+  hsnPrefixes?: string[]; // Optional HSN prefix matching
+  isDefault?: boolean;
+}
+
 /**
  * 11. taxRegimes/{taxRegimeCode}
  */
@@ -351,6 +361,17 @@ export interface TaxRegimeDoc {
   name: string;
   description: string;
   isDefault: boolean;
+  taxType?: "gst" | "vat" | "sales_tax" | "none";
+  defaultRate?: number;
+  rates?: number[];
+  slabs?: TaxSlab[];
+  labels?: {
+    taxName: string;
+    registrationLabel: string;
+    invoiceTitle: string;
+  };
+  supportsInterState?: boolean;
+  roundingMethod?: "commercial" | "floor" | "ceil";
 }
 
 /**
@@ -451,6 +472,13 @@ export interface NotificationOutboxDoc {
  * -------------------------------------------------------------
  */
 
+export interface TaxBreakdownItem {
+  name: string;
+  rate: number;
+  amount: number;
+  taxableAmount?: number;
+}
+
 /**
  * Shared Tax Snapshot (frozen at document creation)
  */
@@ -462,6 +490,8 @@ export interface TaxSnapshot {
   taxType: string;
   isRegistered: boolean;
   registrationNumber?: string;
+  breakdown?: TaxBreakdownItem[];
+  isInterState?: boolean;
   labels?: {
     taxName: string;
     registrationLabel: string;
@@ -943,6 +973,8 @@ export interface ReturnDoc extends DecisionStamps {
   items: ReturnItem[];
   totalRefundAmount: number;
   refundMethod: string; // cash, credit_note, original_payment
+  financialAccountId?: string | null;
+  accountTransactionId?: string | null;
   status: "completed" | "voided" | "pending_approval" | "rejected";
   /** Pending approval only: the requested lines (owned request data; replaced by `items` when approved). */
   requestedItems?: Array<{ productId: string; sourceLineId?: string; quantity: number; refundAmount: number; reason: string; disposition: ReturnDisposition; serialNumbers?: string[] }>;
@@ -1140,7 +1172,7 @@ export type NotificationType =
 export interface NotificationDoc {
   organizationId: string;
   userId: string; // Recipient user ID
-  membershipId: string; // Recipient membership ID
+  membershipId?: string | null; // Recipient membership ID
   type: NotificationType;
   title: string;
   body: string;
@@ -1220,6 +1252,7 @@ export interface StockBalanceDoc {
   productId: string;
   currentStock: number; // R3 cache of SUM(stockMovements.quantity) for (org, branch, product)
   allocatedStock?: number; // R3 cache of open sales-order reservations (available = current - allocated, computed)
+  inTransitQty?: number; // Physical inventory in transit between branches
   updatedAt: string;
   updatedBy?: string;
 }
@@ -1636,6 +1669,14 @@ export interface FinancialAccountDoc {
   };
   openingBalance: number;
   currentBalance: number;
+  openingBalanceMinor?: number;
+  currentBalanceMinor?: number;
+  feeRule?: {
+    feePercent?: number;
+    feeFixed?: number;
+    feeTaxPercent?: number;
+    settlementDays?: number;
+  };
   isDefault: boolean;
   isActive: boolean;
   notes?: string;
@@ -1658,6 +1699,7 @@ export type AccountTransactionType =
   | "capital_drawings"
   | "processing_fee"
   | "adjustment"
+  | "refund"
   | "reversal";
 
 /**
@@ -1673,7 +1715,9 @@ export interface AccountTransactionDoc {
   direction: "in" | "out";
   amount: number;
   balanceAfter: number;
-  sourceDocumentType: "bill" | "outflow" | "payment" | "account_transfer" | "reconciliation" | "manual" | "fee" | "capital";
+  amountMinor?: number;
+  balanceAfterMinor?: number;
+  sourceDocumentType: "bill" | "outflow" | "payment" | "account_transfer" | "reconciliation" | "manual" | "fee" | "capital" | "return";
   sourceDocumentId: string;
   partyType?: "customer" | "vendor" | null;
   partyId?: string | null;
@@ -1767,11 +1811,25 @@ export type StockTransferStatus = "draft" | "submitted" | "approved" | "dispatch
 export interface StockTransferLine {
   productId: string;
   requestedQty: number;
+  quantity?: number; // alias for requestedQty
   unit?: string;
+  conversionFactor?: number;
+  baseQuantity?: number;
   dispatchedQty?: number;
+  dispatchedBaseQuantity?: number;
   receivedQty?: number;
+  receivedBaseQuantity?: number;
+  shortQty?: number;
   rejectedQty?: number;
   discrepancyReason?: string;
+  discrepancyResolution?: "return_to_source" | "write_off" | "claim_carrier";
+  discrepancyResolvedAt?: string;
+  discrepancyResolvedBy?: string;
+  unitCost?: number; // Frozen source WAC at dispatch
+  totalCost?: number; // unitCost * dispatchedBaseQuantity
+  serialNumbers?: string[];
+  batchNumber?: string;
+  expiryDate?: string;
   notes?: string;
 }
 
@@ -1792,6 +1850,11 @@ export interface StockTransferDoc {
   trackingReference?: string;
   notes?: string;
   rejectionReason?: string;
+  version?: number;
+  handlingFee?: number;
+  handlingFeeFinancialAccountId?: string;
+  totalValuation?: number;
+  discrepancyStatus?: "none" | "pending_resolution" | "resolved";
   submittedAt?: string;
   submittedBy?: string;
   approvedAt?: string;
@@ -1800,6 +1863,8 @@ export interface StockTransferDoc {
   dispatchedBy?: string;
   receivedAt?: string;
   receivedBy?: string;
+  cancelledAt?: string;
+  cancelledBy?: string;
   createdAt: string;
   createdBy: string;
   createdByMembershipId?: string | null;
@@ -1808,6 +1873,7 @@ export interface StockTransferDoc {
 }
 
 export type PaymentFeeSettlementTiming = "immediate_deduction" | "billed_later";
+export type PaymentFeeStatus = "expected" | "pending_verification" | "verified" | "disputed" | "reversed";
 
 /**
  * 34. paymentProcessingFees/{id}
@@ -1831,8 +1897,22 @@ export interface PaymentProcessingFeeDoc {
   settlementReference?: string;
   accountTransactionId?: string;
   notes?: string;
+  status: PaymentFeeStatus;
+  isManualEntry: boolean;
+  enteredBy: string;
+  verifiedBy?: string | null;
+  verifiedAt?: string | null;
+  expectedFeeAmount?: number;
+  varianceAmount?: number;
+  settlementDate?: string | null;
+  highlight?: "green" | "amber" | "red" | "needs_review" | null;
+  expenseOutflowId?: string | null;
+  reversalReason?: string | null;
+  disputeReason?: string | null;
   createdAt: string;
   createdBy: string;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export type CapitalTransactionType = "owner_contribution" | "partner_contribution" | "additional_capital" | "drawings";
@@ -1855,6 +1935,61 @@ export interface CapitalTransactionDoc {
   accountTransactionId: string;
   createdAt: string;
   createdBy: string;
+}
+
+export type AccountClassification = "asset" | "liability" | "equity" | "revenue" | "expense";
+export type NormalBalance = "debit" | "credit";
+
+/**
+ * 36. chartOfAccounts/{id}
+ * Standard Chart of Accounts for double-entry trial-balancing.
+ */
+export interface ChartOfAccountDoc {
+  organizationId: string;
+  accountCode: string;
+  name: string;
+  classification: AccountClassification;
+  normalBalance: NormalBalance;
+  isSystem: boolean;
+  isActive: boolean;
+  description?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+export interface JournalLineItem {
+  accountCode: string;
+  accountName: string;
+  debit: number;
+  credit: number;
+  debitMinor?: number;
+  creditMinor?: number;
+  description?: string;
+}
+
+/**
+ * 37. journalEntries/{id}
+ * Balanced double-entry general journal record (totalDebit === totalCredit).
+ */
+export interface JournalEntryDoc {
+  organizationId: string;
+  branchId?: string | null;
+  entryNumber: string;
+  entryDate: string;
+  sourceDocumentType: string;
+  sourceDocumentId: string;
+  eventKey: string;
+  lines: JournalLineItem[];
+  totalDebit: number;
+  totalCredit: number;
+  totalDebitMinor?: number;
+  totalCreditMinor?: number;
+  currency?: string;
+  notes?: string;
+  actorUid: string;
+  createdAt: string;
 }
 
 

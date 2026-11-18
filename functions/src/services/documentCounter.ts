@@ -28,7 +28,8 @@ export type DocumentTypePrefix =
   | "TRF" // Stock Transfers
   | "ACT" // Account Transfers
   | "FEE" // Payment Processing Fees
-  | "CAP"; // Capital Transactions
+  | "CAP" // Capital Transactions
+  | "JRN"; // General Journal Entries
 
 export interface NextNumberParams {
   organizationId: string;

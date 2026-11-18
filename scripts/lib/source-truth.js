@@ -135,15 +135,50 @@ function getExports() {
     for (const el of st.exportClause.elements) {
       const name = el.name.text;
       let decl = null;
+      let targetSf = sf;
+      let targetLocals = locals;
+      let targetAbs = abs;
+
       for (const s of sf.statements) {
         if (!ts.isVariableStatement(s)) continue;
         for (const d of s.declarationList.declarations) if (ts.isIdentifier(d.name) && d.name.text === name) decl = d;
       }
-      const record = { name, file: rel(abs), line: decl ? lineOf(sf, decl) : null, factory: null, type: "unknown", schemas: [], collections: [], idempotent: false };
+
+      if (!decl) {
+        for (const s of sf.statements) {
+          if (ts.isExportDeclaration(s) && !s.exportClause && s.moduleSpecifier) {
+            const subSpec = s.moduleSpecifier.text;
+            const subAbs = path.resolve(path.dirname(abs), subSpec.replace(/\.js$/, ".ts"));
+            if (fs.existsSync(subAbs)) {
+              if (!parsed.has(subAbs)) {
+                const subSf = parseFile(subAbs);
+                parsed.set(subAbs, { sf: subSf, locals: localFunctions(subSf) });
+              }
+              const subParsed = parsed.get(subAbs);
+              for (const subS of subParsed.sf.statements) {
+                if (!ts.isVariableStatement(subS)) continue;
+                for (const d of subS.declarationList.declarations) {
+                  if (ts.isIdentifier(d.name) && d.name.text === name) {
+                    decl = d;
+                    targetSf = subParsed.sf;
+                    targetLocals = subParsed.locals;
+                    targetAbs = subAbs;
+                    break;
+                  }
+                }
+                if (decl) break;
+              }
+            }
+          }
+          if (decl) break;
+        }
+      }
+
+      const record = { name, file: rel(targetAbs), line: decl ? lineOf(targetSf, decl) : null, factory: null, type: "unknown", schemas: [], collections: [], idempotent: false };
       if (decl && decl.initializer && ts.isCallExpression(decl.initializer)) {
-        record.factory = decl.initializer.expression.getText(sf);
+        record.factory = decl.initializer.expression.getText(targetSf);
         record.type = record.factory === "onCall" ? "callable" : "trigger";
-        const facts = analyseHandler(sf, decl.initializer, locals);
+        const facts = analyseHandler(targetSf, decl.initializer, targetLocals);
         record.schemas = facts.schemas;
         record.collections = facts.collections;
         record.idempotent = facts.calls.has("reserveIdempotency");
@@ -151,7 +186,7 @@ function getExports() {
         record.gated = facts.calls.has("resolveRequestContext");
         record.permissioned = !!facts.permissioned; // the gate is asked for a permission, so a role can be denied
         // Super Admin only: the handler throws unless the caller is a Super Admin (no tenant, no plan).
-        record.superAdminOnly = superAdminGuarded(sf, decl.initializer);
+        record.superAdminOnly = superAdminGuarded(targetSf, decl.initializer);
       }
       Object.assign(record, record.type === "trigger" ? { kind: "trigger", kindRule: `factory ${record.factory}` } : deriveKind(name));
       out.push(record);

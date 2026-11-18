@@ -50,10 +50,12 @@ export const financialAccountsCreate = onCall({ region: "asia-south1" }, async (
 
   const input = parseInput(CreateFinancialAccountSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.ACCOUNT_MANAGE,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
@@ -154,10 +156,12 @@ export const financialAccountsUpdate = onCall({ region: "asia-south1" }, async (
 
   const input = parseInput(UpdateFinancialAccountSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.ACCOUNT_MANAGE,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
@@ -200,10 +204,12 @@ export const financialAccountsList = onCall({ region: "asia-south1" }, async (re
 
   const input = parseInput(ListFinancialAccountsSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.ACCOUNT_VIEW,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   let query: FirebaseFirestore.Query = db
@@ -252,10 +258,12 @@ export const financialAccountsGet = onCall({ region: "asia-south1" }, async (req
 
   const input = parseInput(GetFinancialAccountSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.ACCOUNT_VIEW,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const accountRef = db.collection("financialAccounts").doc(input.financialAccountId);
   const snap = await accountRef.get();
@@ -284,10 +292,12 @@ export const financialAccountsGetLedger = onCall({ region: "asia-south1" }, asyn
 
   const input = parseInput(GetAccountLedgerSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.LEDGER_VIEW,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   const accountRef = db.collection("financialAccounts").doc(input.financialAccountId);
@@ -356,10 +366,12 @@ export const accountTransfersCreate = onCall({ region: "asia-south1" }, async (r
 
   const input = parseInput(CreateAccountTransferSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.ACCOUNT_TRANSFER,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
@@ -528,10 +540,12 @@ export const accountTransfersList = onCall({ region: "asia-south1" }, async (req
 
   const input = parseInput(ListAccountTransfersSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.ACCOUNT_VIEW,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   let query: FirebaseFirestore.Query = db
@@ -580,10 +594,12 @@ export const accountTransfersGet = onCall({ region: "asia-south1" }, async (requ
 
   const input = parseInput(GetAccountTransferSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.ACCOUNT_VIEW,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const transferRef = db.collection("accountTransfers").doc(input.transferId);
   const snap = await transferRef.get();
@@ -612,10 +628,12 @@ export const capitalTransactionsCreate = onCall({ region: "asia-south1" }, async
 
   const input = parseInput(CreateCapitalTransactionSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.CAPITAL_MANAGE,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
@@ -727,10 +745,12 @@ export const capitalTransactionsList = onCall({ region: "asia-south1" }, async (
 
   const input = parseInput(ListCapitalTransactionsSchema, request.data);
   const ctx = await resolveRequestContext(request, {
-    organizationId: input.organizationId,
     branchId: input.branchId,
     requiredPermission: AppPermissions.CAPITAL_VIEW,
   });
+  if (input.organizationId && input.organizationId !== ctx.organizationId) {
+    throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+  }
 
   const orgId = ctx.organizationId;
   let query: FirebaseFirestore.Query = db

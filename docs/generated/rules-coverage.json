@@ -1,6 +1,6 @@
 {
-  "runId": "rules-mwg2geke",
-  "generatedAt": "2026-11-14T07:10:28.286Z",
+  "runId": "rules-mwlwkttk",
+  "generatedAt": "2026-11-18T09:12:34.040Z",
   "firestore": {
     "38:read": {
       "allowed": 4,
@@ -28,39 +28,71 @@
     },
     "66:read": {
       "allowed": 45,
-      "denied": 1023
+      "denied": 1257
     },
     "70:read": {
       "allowed": 20,
-      "denied": 692
+      "denied": 854
     },
     "75:read": {
       "allowed": 0,
-      "denied": 6
+      "denied": 0
     },
     "75:write": {
+      "allowed": 0,
+      "denied": 0
+    },
+    "77:read": {
+      "allowed": 0,
+      "denied": 0
+    },
+    "77:write": {
+      "allowed": 0,
+      "denied": 0
+    },
+    "81:read": {
+      "allowed": 0,
+      "denied": 0
+    },
+    "81:write": {
+      "allowed": 0,
+      "denied": 0
+    },
+    "84:read": {
+      "allowed": 0,
+      "denied": 0
+    },
+    "84:write": {
+      "allowed": 0,
+      "denied": 0
+    },
+    "89:read": {
+      "allowed": 0,
+      "denied": 6
+    },
+    "89:write": {
       "allowed": 0,
       "denied": 6
     }
   },
   "firestoreMeta": {
-    "projectId": "trado-x-rules-mwg2fudx",
+    "projectId": "trado-x-rules-mwlwkdqq",
     "recordedOutcomes": 12
   },
   "storage": {
-    "25:read": {
+    "26:read": {
       "allowed": 1,
       "denied": 1
     },
-    "26:write": {
+    "27:write": {
       "allowed": 1,
       "denied": 7
     },
-    "32:read": {
+    "33:read": {
       "allowed": 1,
       "denied": 2
     },
-    "33:write": {
+    "34:write": {
       "allowed": 0,
       "denied": 9
     }

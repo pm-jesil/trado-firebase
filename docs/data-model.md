@@ -869,6 +869,7 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-029 | R3 | `bills` | `paymentStatus` | Derived from paidAmount vs totalAmount; stored for list filters (paid / partial / pending). | `paymentStatusFor` | reconcile:documentPayments |
 | DUP-090 | BOUNDED_ARRAY | `bills` | `splitPayments` | Split payment tenders array on bills capped at 5 in CreateBillSchema. | — | cap 5 |
 | DUP-001 | R2 | `bills` | `subTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
+| DUP-099 | BOUNDED_ARRAY | `bills` | `taxSnapshot.breakdown` | Tax snapshot breakdown line items array computed deterministically by taxCalculation engine. | — | cap 20 |
 | DUP-003 | R2 | `bills` | `taxTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
 | DUP-004 | R2 | `bills` | `totalAmount` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
 | DUP-064 | BOUNDED_ARRAY | `customers` | `additionalPhones` | Structured additional phone numbers list capped at 5 by Zod input, keeping the document far below the 1 MiB limit. | — | cap 5 |
@@ -881,6 +882,7 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-060 | BOUNDED_ARRAY | `deliveries` | `lines` | Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 200 |
 | DUP-046 | BOUNDED_ARRAY | `departments` | `headMembershipIds` | Owned list capped at 20 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
 | DUP-092 | BOUNDED_ARRAY | `financialAccounts` | `assignedBranchIds` | Branch authorization allowlist for branch-scoped operational account transactions, capped at 100 in CreateFinancialAccountSchema. | — | cap 100 |
+| DUP-093 | BOUNDED_ARRAY | `journalEntries` | `lines` | Double-entry journal line items bounded per balanced journal entry. | — | cap 20 |
 | DUP-041 | BOUNDED_ARRAY | `memberships` | `jobRoleIds` | Owned list capped at 20 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
 | DUP-042 | BOUNDED_ARRAY | `memberships` | `reportingToIds` | Owned list capped at 10 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |
 | DUP-019 | R3 | `organizations` | `activeEmployeeCount` | Transactional seat counter so concurrent employee creation cannot exceed the plan (a count query cannot be locked). | `assertSeatAvailable` | reconcile:activeEmployeeCount |
@@ -904,6 +906,7 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-033 | R3 | `outflows` | `productIds` | Line productIds for array-contains queries (price history by product); capped by the line limit. | `outflowsCreate` | reconcile:outflowProductIds |
 | DUP-091 | BOUNDED_ARRAY | `outflows` | `splitPayments` | Split payment tenders array on outflows capped at 5 in CreateOutflowSchema. | — | cap 5 |
 | DUP-005 | R2 | `outflows` | `subTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
+| DUP-100 | BOUNDED_ARRAY | `outflows` | `taxSnapshot.breakdown` | Tax snapshot breakdown line items array computed deterministically by taxCalculation engine. | — | cap 20 |
 | DUP-007 | R2 | `outflows` | `taxTotal` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
 | DUP-008 | R2 | `outflows` | `totalAmount` | Issued document total with the rounding, round-off and tax rates of the issue date; recomputing from current product data would change a legal document. | — | — |
 | DUP-089 | R2 | `paymentProcessingFees` | `grossAmount` | Frozen snapshot of the source payment transaction gross amount at fee recording time. | — | — |
@@ -929,6 +932,11 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-036 | R3 | `stockBalances` | `currentStock` | SUM(stockMovements.quantity) per (organization, branch, product); read on every sale for the negative-stock rule. For serial-tracked products it also equals the units in hand in serials/ (reconcile:serialStock). | `commitStockChangesInTxn` | reconcile:stockBalances |
 | DUP-038 | R4 | `stockMovements` | `balanceAfter` | Running branch balance at the moment of the movement: an immutable audit fact of the stock ledger (the movement is the source of truth for itself). | — | — |
 | DUP-084 | BOUNDED_ARRAY | `stockTransfers` | `items` | Inter-branch stock transfer line items array capped at 200 in CreateStockTransferSchema. | — | cap 200 |
+| DUP-094 | R2 | `stockTransfers` | `items.baseQuantity` | Quantity multiplied by the frozen conversionFactor at transfer creation time; product unit conversion factors may change later. | — | — |
+| DUP-095 | BOUNDED_ARRAY | `stockTransfers` | `items.serialNumbers` | Serial numbers tracked during inter-branch transfer, capped at 500 in schemas. | — | cap 500 |
+| DUP-096 | BOUNDED_ARRAY | `taxRegimes` | `rates` | Tax rates array in canonical tax regime definition bounded per regime. | — | cap 20 |
+| DUP-097 | BOUNDED_ARRAY | `taxRegimes` | `slabs` | Tax slabs array in canonical tax regime definition bounded per regime. | — | cap 20 |
+| DUP-098 | BOUNDED_ARRAY | `taxRegimes` | `slabs.hsnPrefixes` | HSN code prefixes array bounded per tax slab definition. | — | cap 50 |
 | DUP-065 | BOUNDED_ARRAY | `vendors` | `additionalPhones` | Structured additional phone numbers list capped at 5 by Zod input, keeping the document far below the 1 MiB limit. | — | cap 5 |
 | DUP-069 | BOUNDED_ARRAY | `vendors` | `addresses` | Vendor pickup/office addresses array capped at 20 by AddressArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 20 |
 | DUP-071 | BOUNDED_ARRAY | `vendors` | `bankAccounts` | Vendor settlement bank accounts array capped at 10 by BankAccountArraySchema in Zod input, keeping the document far below the 1 MiB limit. | — | cap 10 |

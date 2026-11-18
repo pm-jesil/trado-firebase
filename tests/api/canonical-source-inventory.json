@@ -1,11 +1,11 @@
 {
   "projectId": "trado-x",
   "region": "asia-south1",
-  "totalExports": 186,
+  "totalExports": 194,
   "summary": {
-    "callableCount": 178,
+    "callableCount": 186,
     "triggerCount": 8,
-    "concreteCollectionsCount": 60,
+    "concreteCollectionsCount": 61,
     "categoryCounts": {
       "PUBLIC_AUTH_ADAPTER": 2,
       "CALLER_IDENTITY": 5,
@@ -13,22 +13,22 @@
       "ORGANIZATION_ONBOARDING": 4,
       "PLATFORM_SUPER_ADMIN": 27,
       "REFERENCE_DATA": 5,
-      "DERIVED_TENANT_OPERATION": 66,
-      "FILTER_OPTIONAL_TENANT": 68
+      "DERIVED_TENANT_OPERATION": 73,
+      "FILTER_OPTIONAL_TENANT": 69
     },
     "subgroupCounts": {
       "DERIVED_TENANT_OPERATION": {
         "RBAC & Memberships": 13,
         "Catalog & Parties": 10,
-        "Transactions & Operations": 25,
-        "Stock & Reconciliation": 4,
+        "Transactions & Operations": 30,
+        "Stock & Reconciliation": 6,
         "Tasks & Telemetry": 7,
         "Media & Assets": 3,
         "Requests & Support Desk": 4
       },
       "FILTER_OPTIONAL_TENANT": {
         "Entities & Catalog Lists": 51,
-        "Reports & Telemetry": 14,
+        "Reports & Telemetry": 15,
         "Usage & Quotas": 3
       }
     }
@@ -238,6 +238,11 @@
       "path": "jobRoles/{id}",
       "type": "root",
       "domain": "Tenant & RBAC"
+    },
+    {
+      "path": "journalEntries/{id}",
+      "type": "root",
+      "domain": "Parties & Ledgers"
     },
     {
       "path": "latestLocations/{id}",
@@ -555,18 +560,25 @@
           "accountTransfersCreate",
           "capitalTransactionsCreate",
           "paymentsRecordFee",
+          "paymentsVerifyFee",
+          "paymentsDisputeFee",
+          "paymentsReverseFee",
           "storageLocationsCreate",
           "storageLocationsUpdate",
           "stockTransfersCreate",
           "stockTransfersSubmit",
           "stockTransfersDispatch",
-          "stockTransfersReceive"
+          "stockTransfersReceive",
+          "stockTransfersCancel",
+          "stockTransfersResolveDiscrepancy"
         ],
         "Stock & Reconciliation": [
           "stockAdjust",
           "reconcileStockBalances",
           "reconcilePartyLedgers",
-          "reconcileBranchCounts"
+          "reconcileBranchCounts",
+          "ledgerVerify",
+          "stockVerify"
         ],
         "Tasks & Telemetry": [
           "tasksCreate",
@@ -658,6 +670,7 @@
           "reportsGetReceivablesAgeing",
           "reportsGetPayablesAgeing",
           "reportsGetCashBankSummary",
+          "reportsGetTrialBalance",
           "tasksList",
           "locationsGetLatest",
           "locationsGetHistory"

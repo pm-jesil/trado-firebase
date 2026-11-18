@@ -91,6 +91,19 @@
       "example": "Sample currency"
     },
     {
+      "path": "assignedBranchIds[]",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample assignedBranchIds[]"
+    },
+    {
       "path": "bankDetails.bankName",
       "type": "string",
       "requiredCreate": false,
@@ -157,6 +170,68 @@
       "enumValues": [],
       "uiHint": "text",
       "example": "Sample bankDetails.upiId"
+    },
+    {
+      "path": "feeRule.feePercent",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true,
+        "max": 100,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "feeRule.feeFixed",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "feeRule.feeTaxPercent",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "min": 0,
+        "minInclusive": true,
+        "max": 100,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
+    },
+    {
+      "path": "feeRule.settlementDays",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 0,
+        "minInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "openingBalance",

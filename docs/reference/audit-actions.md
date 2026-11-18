@@ -10,8 +10,8 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `auth` | 2 |
 | `export` | 3 |
 | `file` | 3 |
-| `mutation` | 80 |
-| `none` | 70 |
+| `mutation` | 87 |
+| `none` | 71 |
 | `read_sensitive` | 1 |
 | `system` | 8 |
 
@@ -73,6 +73,7 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `jobRolesCreate` | `job_role.create` | `job_role` | `create` | `audit.action.job_role.create` | No | Yes | mutation | `jobRoles` | — |
 | `jobRolesList` | `job_role.list` | `job_role` | `list` | `audit.action.job_role.list` | No | No | none | `jobRoles` | — |
 | `jobRolesUpdate` | `job_role.update` | `job_role` | `update` | `audit.action.job_role.update` | No | Yes | mutation | `jobRoles` | — |
+| `ledgerVerify` | `ledger.verify` | `ledger` | `verify` | `audit.action.ledger.verify` | No | Yes | mutation | — | — |
 | `locationsGetHistory` | `location.get_history` | `location` | `get_history` | `audit.action.location.get_history` | No | No | none | — | — |
 | `locationsGetLatest` | `location.get_latest` | `location` | `get_latest` | `audit.action.location.get_latest` | No | No | none | — | — |
 | `locationsRecordPing` | `location.record_ping` | `location` | `record_ping` | `audit.action.location.record_ping` | No | Yes | mutation | — | — |
@@ -102,10 +103,13 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `outflowsList` | `outflow.list` | `outflow` | `list` | `audit.action.outflow.list` | Yes | No | none | `outflows` | — |
 | `outflowsVoid` | `outflow.void` | `outflow` | `void` | `audit.action.outflow.void` | Yes | Yes | mutation | `outflows` | `reason` |
 | `paymentsCreate` | `payment.create` | `payment` | `create` | `audit.action.payment.create` | No | Yes | mutation | `payments` | `notes` |
+| `paymentsDisputeFee` | `payment.dispute_fee` | `payment` | `dispute_fee` | `audit.action.payment.dispute_fee` | No | Yes | mutation | — | `reason` |
 | `paymentsGetFee` | `payment.get_fee` | `payment` | `get_fee` | `audit.action.payment.get_fee` | No | No | none | — | — |
 | `paymentsList` | `payment.list` | `payment` | `list` | `audit.action.payment.list` | No | No | none | `payments` | — |
 | `paymentsListFees` | `payment.list_fees` | `payment` | `list_fees` | `audit.action.payment.list_fees` | No | No | none | — | — |
 | `paymentsRecordFee` | `payment.record_fee` | `payment` | `record_fee` | `audit.action.payment.record_fee` | No | Yes | mutation | `payments` | `notes` |
+| `paymentsReverseFee` | `payment.reverse_fee` | `payment` | `reverse_fee` | `audit.action.payment.reverse_fee` | No | Yes | mutation | — | `reason` |
+| `paymentsVerifyFee` | `payment.verify_fee` | `payment` | `verify_fee` | `audit.action.payment.verify_fee` | No | Yes | mutation | — | `notes` |
 | `paymentsVoid` | `payment.void` | `payment` | `void` | `audit.action.payment.void` | Yes | Yes | mutation | `payments` | `reason` |
 | `permissionCatalogList` | `permission_catalog.list` | `permission_catalog` | `list` | `audit.action.permission_catalog.list` | No | No | none | `permissionCatalog` | — |
 | `plansArchive` | `plan.archive` | `plan` | `archive` | `audit.action.plan.archive` | No | No | admin | `subscriptionPlans` | `reason` |
@@ -141,6 +145,7 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `reportsGetStaffActivity` | `report.get_staff_activity` | `report` | `get_staff_activity` | `audit.action.report.get_staff_activity` | No | No | none | — | — |
 | `reportsGetStockValuation` | `report.get_stock_valuation` | `report` | `get_stock_valuation` | `audit.action.report.get_stock_valuation` | No | No | none | — | — |
 | `reportsGetTopEntities` | `report.get_top_entities` | `report` | `get_top_entities` | `audit.action.report.get_top_entities` | No | No | none | — | — |
+| `reportsGetTrialBalance` | `report.get_trial_balance` | `report` | `get_trial_balance` | `audit.action.report.get_trial_balance` | No | No | none | — | — |
 | `requestsActivityList` | `request.activity_list` | `request` | `activity_list` | `audit.action.request.activity_list` | No | No | none | `requests` | — |
 | `requestsAddComment` | `request.add_comment` | `request` | `add_comment` | `audit.action.request.add_comment` | No | Yes | mutation | `requests` | — |
 | `requestsAddInternalNote` | `request.add_internal_note` | `request` | `add_internal_note` | `audit.action.request.add_internal_note` | No | Yes | mutation | `requests` | — |
@@ -165,12 +170,15 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `sharingPoliciesUpdate` | `sharing.policies_update` | `sharing` | `policies_update` | `audit.action.sharing.policies_update` | No | Yes | mutation | — | — |
 | `stockAdjust` | `stock.adjust` | `stock` | `adjust` | `audit.action.stock.adjust` | No | Yes | mutation | — | `reason`, `reasonCode` |
 | `stockMovementsList` | `stock_movement.list` | `stock_movement` | `list` | `audit.action.stock_movement.list` | No | No | none | `stockMovements` | — |
+| `stockTransfersCancel` | `stock_transfer.cancel` | `stock_transfer` | `cancel` | `audit.action.stock_transfer.cancel` | Yes | Yes | mutation | `stockTransfers` | `reason` |
 | `stockTransfersCreate` | `stock_transfer.create` | `stock_transfer` | `create` | `audit.action.stock_transfer.create` | No | Yes | mutation | `stockTransfers` | `notes` |
 | `stockTransfersDispatch` | `stock_transfer.dispatch` | `stock_transfer` | `dispatch` | `audit.action.stock_transfer.dispatch` | No | Yes | mutation | `stockTransfers` | `notes` |
 | `stockTransfersGet` | `stock_transfer.get` | `stock_transfer` | `get` | `audit.action.stock_transfer.get` | No | No | none | `stockTransfers` | — |
 | `stockTransfersList` | `stock_transfer.list` | `stock_transfer` | `list` | `audit.action.stock_transfer.list` | No | No | none | `stockTransfers` | — |
 | `stockTransfersReceive` | `stock_transfer.receive` | `stock_transfer` | `receive` | `audit.action.stock_transfer.receive` | No | Yes | mutation | `stockTransfers` | `notes` |
+| `stockTransfersResolveDiscrepancy` | `stock_transfer.resolve_discrepancy` | `stock_transfer` | `resolve_discrepancy` | `audit.action.stock_transfer.resolve_discrepancy` | No | Yes | mutation | `stockTransfers` | `notes` |
 | `stockTransfersSubmit` | `stock_transfer.submit` | `stock_transfer` | `submit` | `audit.action.stock_transfer.submit` | No | Yes | mutation | `stockTransfers` | — |
+| `stockVerify` | `stock.verify` | `stock` | `verify` | `audit.action.stock.verify` | No | Yes | mutation | — | — |
 | `storageLocationsCreate` | `storage_location.create` | `storage_location` | `create` | `audit.action.storage_location.create` | No | Yes | mutation | `storageLocations` | `notes` |
 | `storageLocationsGet` | `storage_location.get` | `storage_location` | `get` | `audit.action.storage_location.get` | No | No | none | `storageLocations` | — |
 | `storageLocationsList` | `storage_location.list` | `storage_location` | `list` | `audit.action.storage_location.list` | No | No | none | `storageLocations` | — |

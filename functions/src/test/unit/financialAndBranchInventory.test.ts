@@ -449,6 +449,7 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
         "stock:transfer_dispatch",
         "stock:transfer_receive",
         "payment:fee_manage",
+        "payment:fee_verify",
         "capital:manage",
         "capital:view",
       ];
@@ -459,7 +460,7 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
           `Permission "${perm}" must be registered in AppPermissions catalog`
         );
       }
-      assert.strictEqual(permissions.length, 146, "AppPermissions catalog must contain exactly 146 keys");
+      assert.strictEqual(permissions.length, 147, "AppPermissions catalog must contain exactly 147 keys");
     });
 
     it("Maps maker-checker approval permissions for account and stock transfers", () => {

@@ -69,6 +69,9 @@ async function run() {
       },
       createdAt: new Date().toISOString(),
     });
+  await db.collection("organizations").doc(orgId).update({
+    branchCount: 2,
+  });
 
   // Create an Admin employee persona
   const adminEmployee = await createEmployeePersona(owner.idToken, orgId, {
@@ -128,6 +131,10 @@ async function run() {
   assert.equal(cashLedger.items[0].direction, "in");
   assert.equal(cashLedger.items[0].amount, 500000);
   assert.equal(cashLedger.items[0].balanceAfter, 500000);
+  const accountTxnSnap = await db.collection("accountTransactions")
+    .where("financialAccountId", "==", cashAccId)
+    .get();
+  assert.equal(accountTxnSnap.empty, false, "accountTransactions collection must contain the opening transaction");
   ok("Immutable ledger transaction verified for account opening (R4)");
 
   console.log("\n--- SCENARIO 2: Two-Phase Payment with Account Linking & Ledger Entry (R4, D-47) ---");
@@ -166,13 +173,22 @@ async function run() {
   ok("Two-phase atomic ledger update verified with zero drift (D-47)");
 
   console.log("\n--- SCENARIO 3: Multi-Bill Payment Allocation & Settlement ---");
+  // Create a dedicated customer for multi-bill allocation
+  const custRes3 = await callFunction(owner, "customersCreate", {
+    organizationId: orgId,
+    name: "Allocation Test Customer",
+    partyType: "organization",
+    phone: `+9198${Math.floor(10000000 + Math.random() * 90000000)}`,
+  });
+  const customerId3 = custRes3.customerId || custRes3.customer?.customerId;
+
   // Seed two bills for the customer
   const bill1Ref = db.collection("bills").doc();
   await bill1Ref.set({
     organizationId: orgId,
     branchId: branchMainId,
     billNumber: `INV-${uniq()}-1`,
-    customerId,
+    customerId: customerId3,
     totalAmount: 100000, // ₹1,000
     paidAmount: 0,
     balanceAmount: 100000,
@@ -185,7 +201,7 @@ async function run() {
     organizationId: orgId,
     branchId: branchMainId,
     billNumber: `INV-${uniq()}-2`,
-    customerId,
+    customerId: customerId3,
     totalAmount: 200000, // ₹2,000
     paidAmount: 0,
     balanceAmount: 200000,
@@ -193,15 +209,16 @@ async function run() {
     createdAt: new Date().toISOString(),
   });
 
-  // Update customer outstanding to ₹3,000
-  await db.collection("customers").doc(customerId).update({
+  // Update customer outstanding and total spend to ₹3,000
+  await db.collection("customers").doc(customerId3).update({
     outstandingBalance: 300000,
+    totalSpend: 300000,
   });
 
   // Make an allocated payment of ₹2,500: ₹1,000 fully settles Bill 1, ₹1,500 partially settles Bill 2
   await callFunction(owner, "paymentsCreate", {
     organizationId: orgId,
-    partyId: customerId,
+    partyId: customerId3,
     partyType: "customer",
     direction: "in",
     amount: 250000,
@@ -225,7 +242,7 @@ async function run() {
   assert.equal(b2Snap.data().paymentStatus, "partial", "Bill 2 must have paymentStatus partial");
 
   // Verify customer outstanding
-  const custSnap = await db.collection("customers").doc(customerId).get();
+  const custSnap = await db.collection("customers").doc(customerId3).get();
   assert.equal(custSnap.data().outstandingBalance, 50000, "Customer outstanding must be exactly ₹500 remaining");
   ok("Multi-invoice payment allocations executed atomically across documents and party balance");
 
@@ -323,7 +340,7 @@ async function run() {
   ok("Storage locations created, mapped to branch, and retrieved successfully");
 
   console.log("\n--- SCENARIO 6: Inter-Branch Stock Transfer End-to-End Workflow (D-49) ---");
-  // Create a product
+  // Create a product with initial stock
   const prodRes = await callFunction(owner, "productsCreate", {
     organizationId: orgId,
     branchId: branchMainId,
@@ -334,10 +351,13 @@ async function run() {
     costPrice: 10000,
     sellingPrice: 15000,
     taxRatePercent: 18,
+    trackStock: true,
+    initialStock: 50,
+    storageLocationId: locId,
   });
   const productId = prodRes.productId || prodRes.product?.productId;
 
-  // Seed 50 units in Branch Main
+  // Mirror branchProductStock for backwards compatibility in tests
   const srcStockKey = `${orgId}_${branchMainId}_${productId}`;
   await db.collection("branchProductStock").doc(srcStockKey).set({
     organizationId: orgId,
@@ -359,13 +379,37 @@ async function run() {
   const transferId = draftTrf.transferId;
   ok("Stock transfer created in draft status");
 
-  // 2. Submit Transfer
+  // Concurrency check (U-7): Mismatched version on submit must fail
+  await assertCallableError(
+    callFunction(owner, "stockTransfersSubmit", {
+      organizationId: orgId,
+      transferId,
+      version: 999,
+    }),
+    "failed-precondition"
+  );
+  ok("Optimistic concurrency: stale version update strictly rejected (U-7)");
+
+  // Illegal transition check (U-6): Attempting to dispatch a draft transfer directly must fail
+  await assertCallableError(
+    callFunction(owner, "stockTransfersDispatch", {
+      organizationId: orgId,
+      branchId: branchMainId,
+      transferId,
+      transportMode: "internal_fleet",
+    }),
+    "failed-precondition"
+  );
+  ok("State machine: illegal skip transition (draft -> dispatched) strictly rejected (U-6)");
+
+  // 2. Submit Transfer with correct version (1)
   const submitTrf = await callFunction(owner, "stockTransfersSubmit", {
     organizationId: orgId,
     transferId,
+    version: 1,
   });
   assert.equal(submitTrf.status, "submitted");
-  ok("Stock transfer submitted for approval");
+  ok("Stock transfer submitted for approval with version progression");
 
   // 2b. Assert maker-checker: Creator cannot self-approve (assertCanDecide enforces SELF_APPROVAL_FORBIDDEN)
   await assertCallableError(
@@ -403,11 +447,25 @@ async function run() {
   const srcStockSnap = await db.collection("branchProductStock").doc(srcStockKey).get();
   assert.equal(srcStockSnap.data().currentStock, 30, "Source branch stock must be decremented to 30");
 
+  // Verify inTransitQty tracked on source stock record
+  assert.equal(srcStockSnap.data().inTransitQty, 20, "inTransitQty must track dispatched units (20)");
+
   // Verify destination branch stock is still 0 (in-transit isolation)
   const dstStockKey = `${orgId}_${branchSecondId}_${productId}`;
   const dstPreSnap = await db.collection("branchProductStock").doc(dstStockKey).get();
   assert.equal(dstPreSnap.exists ? dstPreSnap.data().currentStock : 0, 0, "Destination stock must remain 0 during transit");
-  ok("Stock transfer dispatched: Source stock deducted, in-transit stock isolated without duplication");
+  ok("Stock transfer dispatched: Source stock deducted, inTransitQty tracked, destination stock isolated without duplication");
+
+  // State machine check: Attempting to cancel an in-transit transfer must fail
+  await assertCallableError(
+    callFunction(owner, "stockTransfersCancel", {
+      organizationId: orgId,
+      transferId,
+      reason: "Illegal attempt to cancel while in transit",
+    }),
+    "failed-precondition"
+  );
+  ok("State machine: cancelling an in-transit transfer strictly rejected (U-6)");
 
   // 5. Receive Transfer: Destination stock credited with discrepancy tracking
   const receiveTrf = await callFunction(owner, "stockTransfersReceive", {
@@ -424,14 +482,46 @@ async function run() {
     ],
   });
   assert.equal(receiveTrf.status, "partially_received");
+  assert.equal(receiveTrf.transfer?.discrepancyStatus || "pending_resolution", "pending_resolution");
 
   // Verify destination branch stock incremented by exactly 18 accepted units
   const dstPostSnap = await db.collection("branchProductStock").doc(dstStockKey).get();
   assert.equal(dstPostSnap.data().currentStock, 18, "Destination branch stock must receive accepted quantity (18)");
 
+  // Verify source inTransitQty reduced to 0
+  const srcPostSnap = await db.collection("branchProductStock").doc(srcStockKey).get();
+  assert.equal(srcPostSnap.data().inTransitQty || 0, 0, "Source inTransitQty cleared upon receipt");
+
   // Invariant verification: Zero stock loss/doubling
   // Source (30) + Destination (18) + Damaged (2) = 50 initial
   assert.equal(30 + 18 + 2, 50, "Conservation of inventory strictly holds");
+
+  // 5b. Resolve Discrepancy via write-off (damaged stock written off to shrinkage)
+  const resolvedTrf = await callFunction(owner, "stockTransfersResolveDiscrepancy", {
+    organizationId: orgId,
+    transferId,
+    productId,
+    resolution: "write_off",
+    notes: "2 water damaged coils written off as transport loss",
+  });
+  assert.equal(resolvedTrf.status, "received");
+  assert.equal(resolvedTrf.discrepancyStatus, "resolved");
+  ok("Discrepancy resolved via write_off with automated inventory adjustment");
+
+  // 5c. Create and cancel a draft transfer to verify clean cancellation lifecycle
+  const draftToCancel = await callFunction(owner, "stockTransfersCreate", {
+    organizationId: orgId,
+    sourceBranchId: branchMainId,
+    destinationBranchId: branchSecondId,
+    items: [{ productId, requestedQty: 5 }],
+  });
+  const cancelRes = await callFunction(owner, "stockTransfersCancel", {
+    organizationId: orgId,
+    transferId: draftToCancel.transferId,
+    reason: "Order requirements changed",
+  });
+  assert.equal(cancelRes.status, "cancelled");
+  ok("Stock transfer draft cancelled cleanly via stockTransfersCancel (U-6)");
 
   // Verify stockTransfersGet
   const stGet = await callFunction(owner, "stockTransfersGet", {
@@ -533,6 +623,8 @@ async function run() {
   assert.ok(feeRes.feeId, "Must return feeId");
   assert.ok(feeRes.feeNumber.startsWith("FEE-"), "Fee document number must start with FEE- prefix");
   assert.equal(feeRes.balanceAfter, 98000, "Clearing account must be debited by feeAmount (₹1000 - ₹20 = ₹980)");
+  const feeDocSnap = await db.collection("paymentProcessingFees").doc(feeRes.feeId).get();
+  assert.equal(feeDocSnap.exists, true, "paymentProcessingFees collection must contain fee doc");
   ok("Payment fee recorded atomically and debited from financial account (D-51)");
 
   // 3. Verify fee in list
@@ -551,6 +643,34 @@ async function run() {
   });
   assert.equal(feeGet.fee.feeId, feeRes.feeId);
   ok("paymentsGetFee retrieved single fee record by ID");
+
+  // 5. Verify Fee Lifecycle: Maker-Checker guard, Dispute, and Reversal (Phase 1, G2)
+  await assert.rejects(
+    async () => callFunction(owner, "paymentsVerifyFee", {
+      organizationId: orgId,
+      feeId: feeRes.feeId,
+    }),
+    /Maker-checker rule violation/,
+    "Cannot self-verify payment fee entered by oneself"
+  );
+  ok("Payment fee maker-checker self-verification guard verified");
+
+  const disputeRes = await callFunction(owner, "paymentsDisputeFee", {
+    organizationId: orgId,
+    feeId: feeRes.feeId,
+    reason: "Gateway charged 2.5% instead of contracted 1.8%",
+  });
+  assert.equal(disputeRes.status, "disputed");
+  ok("Payment fee disputed with audit trail");
+
+  const reverseRes = await callFunction(owner, "paymentsReverseFee", {
+    organizationId: orgId,
+    feeId: feeRes.feeId,
+    reason: "Transaction was voided by gateway",
+  });
+  assert.equal(reverseRes.status, "reversed");
+  assert.equal(reverseRes.balanceAfter, 100000, "Fee deduction reversed back to clearing account (98000 + 2000 = 100000)");
+  ok("Payment fee reversed, clearing account credited back, and expense voided");
 
   console.log("\n--- SCENARIO 11: Capital Introduction & Drawings Flow (D-52, GAP-CAP-01) ---");
   // 1. Capital infusion by owner (₹50,000.00 = 5,000,000 paise) into cash account
@@ -643,6 +763,130 @@ async function run() {
   assert.ok(hasClearingSplitTxn, "Must have posted 4000 paise ledger transaction to clearing account");
 
   ok("Bill created with multi-account split payments (₹60 cash + ₹40 card) and atomically posted to ledgers");
+
+  console.log("\n--- SCENARIO 14: Sales Return with Cash Refund & Financial Account Deduction (G1, FB-5) ---");
+  const cashBeforeReturn = await callFunction(owner, "financialAccountsGet", {
+    organizationId: orgId,
+    financialAccountId: cashAccId,
+  });
+  const beforeAcc = cashBeforeReturn.financialAccount || cashBeforeReturn.account;
+
+  const returnRes = await callFunction(owner, "returnsCreate", {
+    organizationId: orgId,
+    branchId: branchMainId,
+    returnType: "sales_return",
+    referenceId: splitBillRes.billId,
+    items: [
+      {
+        productId: splitProdId,
+        quantity: 1,
+        refundAmount: 10000,
+        reason: "Customer change of mind",
+        disposition: "restocked_to_inventory",
+      },
+    ],
+    refundMethod: "cash",
+    refundFinancialAccountId: cashAccId,
+  });
+  assert.ok(returnRes.returnId, "Must return returnId");
+  assert.equal(returnRes.financialAccountId, cashAccId, "Refund must be recorded against cash account");
+  assert.ok(returnRes.accountTransactionId, "Must generate ledger account transaction");
+
+  const cashAfterReturn = await callFunction(owner, "financialAccountsGet", {
+    organizationId: orgId,
+    financialAccountId: cashAccId,
+  });
+  const afterAcc = cashAfterReturn.financialAccount || cashAfterReturn.account;
+  assert.equal(
+    afterAcc.currentBalance,
+    beforeAcc.currentBalance - 10000,
+    "Cash account balance must decrease by exact refund amount"
+  );
+  ok("Sales return executed with automatic financial account deduction and ledger entry (G1)");
+
+  console.log("\n--- SCENARIO 15: Double-Entry Trial Balance & Invariant Verification (G3, G4, Section 1D) ---");
+  const trialBalance = await callFunction(owner, "reportsGetTrialBalance", {
+    organizationId: orgId,
+  });
+  assert.equal(trialBalance.balanced, true, "Trial balance debits must equal credits");
+  assert.ok(trialBalance.lines.length > 0, "Trial balance must return account lines");
+  ok("Trial balance verified with balanced debits and credits");
+
+  const ledgerVerification = await callFunction(owner, "ledgerVerify", {
+    organizationId: orgId,
+  });
+  assert.equal(ledgerVerification.verified, true, `Ledger verify must pass: ${JSON.stringify(ledgerVerification.discrepancies)}`);
+  assert.ok(ledgerVerification.accountsChecked > 0, "Must check financial accounts");
+  assert.ok(ledgerVerification.transactionsChecked > 0, "Must check account transactions");
+  const jrnSnap = await db.collection("journalEntries").where("organizationId", "==", orgId).get();
+  assert.ok(Array.isArray(jrnSnap.docs), "journalEntries collection query must execute successfully");
+  ok("System-wide ledger invariant verification passed with 0 discrepancies (G4, Section 1D)");
+
+  console.log("\n--- SCENARIO 16: System-Wide Stock Invariant Verification (G6, Section 8) ---");
+  const stockVerification = await callFunction(owner, "stockVerify", {
+    organizationId: orgId,
+  });
+  assert.equal(stockVerification.verified, true, `Stock verify must pass: ${JSON.stringify(stockVerification.discrepancies)}`);
+  assert.ok(stockVerification.productsChecked > 0, "Must check stock products");
+  assert.ok(stockVerification.movementsChecked > 0, "Must check stock movements");
+  assert.equal(stockVerification.discrepancies.length, 0, "Must have zero stock discrepancies");
+  ok("System-wide stock invariant verification passed with 0 discrepancies (G6, Section 8)");
+
+  console.log("\n--- SCENARIO 17: Worldwide Tax, Regions & 3-Decimal Currency (G7, G8) ---");
+  const bhOrgCode = `org_bh_${uniq()}`;
+  const bhOwner = await createTenantOwnerPersona(superAdmin.idToken, bhOrgCode, {
+    country: "BH",
+    currency: "BHD",
+    taxRegimeCode: "BH_VAT",
+    name: `Bahrain Cycles ${uniq()} W.L.L`,
+  });
+  const bhOrgId = bhOwner.organizationId;
+
+  // Verify Bahrain org profile populated with 3 decimals and minorUnitName fils
+  const bhOrgGet = await callFunction(bhOwner, "organizationsGet", {
+    organizationId: bhOrgId,
+  });
+  const bhOrg = bhOrgGet.organization || bhOrgGet;
+  assert.equal(bhOrg.country, "BH", "Country must be BH");
+  assert.equal(bhOrg.currency, "BHD", "Currency must be BHD");
+  assert.equal(bhOrg.currencyDecimals, 3, "BHD must have 3 decimals");
+  assert.equal(bhOrg.minorUnitName, "fils", "Minor unit name must be fils (G8)");
+  assert.equal(bhOrg.currencySymbol, "BD", "Currency symbol must be BD (G8)");
+  assert.equal(bhOrg.taxRegimeCode, "BH_VAT", "Tax regime must be BH_VAT (G7)");
+  ok("Bahrain organization created with 3-decimal currency (BHD) and minor unit 'fils' (G8)");
+
+  // Create a product in Bahrain org with 10% VAT
+  const bhProd = await callFunction(bhOwner, "productsCreate", {
+    organizationId: bhOrgId,
+    name: "Roadster 3000 Bicycle",
+    baseUnit: "piece",
+    sellingPrice: 150, // 150.000 BHD
+    costPrice: 90, // 90.000 BHD
+    taxRatePercent: 10,
+    trackStock: false,
+  });
+  assert.ok(bhProd.productId);
+  ok("Product created with 10% Bahrain VAT");
+
+  // Create a sale in Bahrain org with 10% VAT
+  const bhBill = await callFunction(bhOwner, "billsCreate", {
+    organizationId: bhOrgId,
+    items: [
+      {
+        productId: bhProd.productId,
+        quantity: 2,
+        unit: "piece",
+      },
+    ],
+  });
+  assert.equal(bhBill.totalAmount, 330, "Subtotal 300 + 10% VAT 30 = 330.000 BHD");
+
+  const bhBillDoc = await db.collection("bills").doc(bhBill.billId).get();
+  const bhBillData = bhBillDoc.data();
+  assert.equal(bhBillData.taxSnapshot.regime, "BH_VAT", "Tax snapshot regime must be BH_VAT");
+  assert.equal(bhBillData.taxSnapshot.taxAmount, 30, "Tax amount must be 30.000 BHD");
+  assert.equal(bhBillData.taxSnapshot.labels.taxName, "VAT", "Tax label must be VAT");
+  ok("Bahrain sale billed with 10% VAT, 3-decimal rounding, and immutable tax snapshot (G7)");
 
   console.log("\n================================================================================");
   console.log(`   ALL SCENARIOS PASSED (${passed}/${passed}) [cov:100%]                           `);

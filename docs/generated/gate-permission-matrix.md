@@ -6,23 +6,23 @@ Gate order for `tenant-gate`: authenticated → user active → membership activ
 
 | Callable | Source | Gate | Permission (any of) | Plan module(s) | Allowlist reason |
 |---|---|---|---|---|---|
+| `accountTransfersCreate` | financialAccounts.ts | tenant-gate | `accounts:transfer` | billing |  |
+| `accountTransfersGet` | financialAccounts.ts | tenant-gate | `accounts:view` | billing |  |
+| `accountTransfersList` | financialAccounts.ts | tenant-gate | `accounts:view` | billing |  |
+| `approvalsCounts` | approvals.ts | tenant-gate | `approvals:view` | system |  |
+| `approvalsList` | approvals.ts | tenant-gate | `approvals:view` | system |  |
 | `auditGetEntityHistory` | history.ts | tenant-gate | `audit:view`, `audit:read_own` | staff |  |
 | `auditLogsList` | history.ts | tenant-gate | `audit:view`, `audit:read_own` | staff |  |
 | `authLogin` | authLogin.ts | NONE | — | — | emulator auth adapter (credentials -> token) |
 | `authMe` | authMe.ts | NONE | — | — | session bootstrap; reports contextStatus incl. subscription_expired |
-| `billsCreate` | bills.ts | tenant-gate | `sale:create`, `bill:create` | sales, billing |  |
-| `billsFinalize` | bills.ts | tenant-gate | `bill:create`, `bill:update`, `delivery:update` | billing, delivery |  |
-| `billsGet` | bills.ts | tenant-gate | `bill:view`, `bill:view_all`, `sale:view` | billing, sales |  |
-| `billsList` | bills.ts | tenant-gate | `bill:view`, `bill:view_all`, `sale:view` | billing, sales |  |
-| `billsPreview` | bills.ts | tenant-gate | `bill:view`, `bill:view_all`, `sale:view`, `bill:create`, `sale:create` | billing, sales |  |
-| `billsUpdateDraft` | bills.ts | tenant-gate | `bill:create`, `sale:create` | billing, sales |  |
-| `billsVoid` | bills.ts | tenant-gate | `bill:void` | billing |  |
 | `branchContextSwitch` | branches.ts | member-gate | — | — | member switches own working branch (assignment checked) |
 | `branchesCreate` | branches.ts | tenant-gate | `branch:create` | staff |  |
 | `branchesDeactivate` | branches.ts | tenant-gate | `branch:deactivate` | staff |  |
 | `branchesGetDefault` | branches.ts | member-gate | — | — | member reads default branch (gate without permission: any active member) |
 | `branchesList` | branches.ts | member-gate | — | — | member lists own branches (gate without permission: any active member) |
 | `branchesUpdate` | branches.ts | tenant-gate | `branch:update` | staff |  |
+| `capitalTransactionsCreate` | financialAccounts.ts | tenant-gate | `capital:manage` | billing |  |
+| `capitalTransactionsList` | financialAccounts.ts | tenant-gate | `capital:view` | billing |  |
 | `categoriesCreate` | categories.ts | catalog-gate | `category:manage`, `inventory:manage` | inventory |  |
 | `categoriesList` | categories.ts | NONE | — | — | reference list visible to members |
 | `categoriesUpdate` | categories.ts | catalog-gate | `category:manage`, `inventory:manage` | inventory |  |
@@ -43,6 +43,11 @@ Gate order for `tenant-gate`: authenticated → user active → membership activ
 | `employeesGet` | employees.ts | tenant-gate | `employee:view` | staff |  |
 | `employeesList` | employees.ts | tenant-gate | `employee:view` | staff |  |
 | `employeesUpdate` | employees.ts | tenant-gate | `employee:update` | staff |  |
+| `financialAccountsCreate` | financialAccounts.ts | tenant-gate | `accounts:manage` | billing |  |
+| `financialAccountsGet` | financialAccounts.ts | tenant-gate | `accounts:view` | billing |  |
+| `financialAccountsGetLedger` | financialAccounts.ts | tenant-gate | `ledger:view` | billing |  |
+| `financialAccountsList` | financialAccounts.ts | tenant-gate | `accounts:view` | billing |  |
+| `financialAccountsUpdate` | financialAccounts.ts | tenant-gate | `accounts:manage` | billing |  |
 | `healthCheck` | healthCheck.ts | NONE | — | — | public liveness probe |
 | `imagesAttach` | images.ts | tenant-gate | `(dynamic: requiredPerm || undefined)` | — |  |
 | `imagesCreateUploadSession` | images.ts | tenant-gate | `(dynamic: requiredPerm || undefined)` | — |  |
@@ -50,6 +55,7 @@ Gate order for `tenant-gate`: authenticated → user active → membership activ
 | `jobRolesCreate` | jobRoles.ts | catalog-gate | `job_role:manage` | staff |  |
 | `jobRolesList` | jobRoles.ts | NONE | — | — | reference list visible to members |
 | `jobRolesUpdate` | jobRoles.ts | catalog-gate | `job_role:manage` | staff |  |
+| `ledgerVerify` | ledgerVerify.ts | tenant-gate | `accounts:view` | billing |  |
 | `locationsGetHistory` | locations.ts | tenant-gate | `location:view_own`, `location:view_all` | employee_tracking |  |
 | `locationsGetLatest` | locations.ts | tenant-gate | `location:view_own`, `location:view_all` | employee_tracking |  |
 | `locationsRecordPing` | locations.ts | tenant-gate | `location:ping` | employee_tracking |  |
@@ -67,13 +73,19 @@ Gate order for `tenant-gate`: authenticated → user active → membership activ
 | `organizationsReactivate` | organizations.ts | platform-only | — | — |  |
 | `organizationsSetSubscription` | organizations.ts | platform-only | — | — |  |
 | `organizationsTransferOwnership` | organizations.ts | NONE | — | — | Super Admin or current Owner transfers ownership (dual tier) |
-| `organizationsUpdate` | organizations.ts | NONE | — | — | field-policy matrix (ORGANIZATION_FIELD_POLICY) + subscription check, hand-rolled tiers |
+| `organizationsUpdate` | organizations.ts | tenant-gate | `org:update` | staff | field-policy matrix (ORGANIZATION_FIELD_POLICY) + subscription check, hand-rolled tiers |
 | `outflowsCreate` | outflows.ts | tenant-gate | `purchase:create`, `outflow:create`, `expense:create`, `(by input)` | purchases, expenses |  |
 | `outflowsGet` | outflows.ts | tenant-gate | `outflow:view`, `purchase:view`, `expense:view` | expenses, purchases |  |
 | `outflowsList` | outflows.ts | tenant-gate | `outflow:view`, `purchase:view`, `expense:view` | expenses, purchases |  |
 | `outflowsVoid` | outflows.ts | tenant-gate | `purchase:void`, `expense:void`, `outflow:void` | purchases, expenses |  |
 | `paymentsCreate` | payments.ts | tenant-gate | `payment:create` | billing |  |
+| `paymentsDisputeFee` | paymentFees.ts | tenant-gate | `payment:fee_manage` | billing |  |
+| `paymentsGetFee` | paymentFees.ts | tenant-gate | `payment:view` | billing |  |
 | `paymentsList` | payments.ts | tenant-gate | `payment:view` | billing |  |
+| `paymentsListFees` | paymentFees.ts | tenant-gate | `payment:view` | billing |  |
+| `paymentsRecordFee` | paymentFees.ts | tenant-gate | `payment:fee_manage` | billing |  |
+| `paymentsReverseFee` | paymentFees.ts | tenant-gate | `payment:fee_manage` | billing |  |
+| `paymentsVerifyFee` | paymentFees.ts | tenant-gate | `payment:fee_verify` | billing |  |
 | `paymentsVoid` | payments.ts | tenant-gate | `payment:void` | billing |  |
 | `permissionCatalogList` | catalogs.ts | NONE | — | — | platform reference catalog |
 | `plansArchive` | plans.ts | platform-only | — | — |  |
@@ -96,15 +108,7 @@ Gate order for `tenant-gate`: authenticated → user active → membership activ
 | `recurringExpensesCreate` | recurringExpenses.ts | tenant-gate | `expense:create` | expenses |  |
 | `recurringExpensesList` | recurringExpenses.ts | tenant-gate | `expense:view` | expenses |  |
 | `recurringExpensesUpdate` | recurringExpenses.ts | tenant-gate | `expense:create` | expenses |  |
-| `reportsExportCsv` | reports.ts | tenant-gate | `report:export` | reports |  |
-| `reportsGetOutflowSummary` | reports.ts | tenant-gate | `report:view`, `outflow:view` | reports, expenses |  |
-| `reportsGetPartyStatement` | reports.ts | tenant-gate | `(dynamic: isVendor)` | — |  |
-| `reportsGetPlatformOverview` | reports.ts | tenant-gate | `platform:dashboard` | platform |  |
-| `reportsGetProfitLoss` | reports.ts | tenant-gate | `report:profit` | reports |  |
-| `reportsGetRevenue` | reports.ts | tenant-gate | `report:view` | reports |  |
-| `reportsGetStaffActivity` | reports.ts | tenant-gate | `report:view`, `employee:view` | reports, staff |  |
-| `reportsGetStockValuation` | reports.ts | tenant-gate | `inventory:view` | inventory |  |
-| `reportsGetTopEntities` | reports.ts | tenant-gate | `report:view` | reports |  |
+| `reportsGetTrialBalance` | ledgerVerify.ts | tenant-gate | `report:view` | reports |  |
 | `returnsCreate` | returns.ts | tenant-gate | `return:create` | returns |  |
 | `returnsList` | returns.ts | tenant-gate | `return:view` | returns |  |
 | `rolesCreate` | roles.ts | platform-only | — | — | Owner-only custom roles (role_org_owner check) / Super Admin system roles |
@@ -113,6 +117,19 @@ Gate order for `tenant-gate`: authenticated → user active → membership activ
 | `sharingPoliciesUpdate` | branches.ts | tenant-gate | `org:settings` | staff |  |
 | `stockAdjust` | stock.ts | tenant-gate | `stock:adjust`, `inventory:adjust` | inventory |  |
 | `stockMovementsList` | stock.ts | tenant-gate | `stock:view`, `inventory:view` | inventory |  |
+| `stockTransfersCancel` | stockTransfers.ts | tenant-gate | `stock:transfer_create` | inventory |  |
+| `stockTransfersCreate` | stockTransfers.ts | tenant-gate | `stock:transfer_create` | inventory |  |
+| `stockTransfersDispatch` | stockTransfers.ts | tenant-gate | `stock:transfer_dispatch` | inventory |  |
+| `stockTransfersGet` | stockTransfers.ts | tenant-gate | `stock:view` | inventory |  |
+| `stockTransfersList` | stockTransfers.ts | tenant-gate | `stock:view` | inventory |  |
+| `stockTransfersReceive` | stockTransfers.ts | tenant-gate | `stock:transfer_receive` | inventory |  |
+| `stockTransfersResolveDiscrepancy` | stockTransfers.ts | tenant-gate | `stock:transfer_receive` | inventory |  |
+| `stockTransfersSubmit` | stockTransfers.ts | tenant-gate | `stock:transfer_create` | inventory |  |
+| `stockVerify` | stockVerify.ts | tenant-gate | `stock:view` | inventory |  |
+| `storageLocationsCreate` | storageLocations.ts | tenant-gate | `warehouse:manage` | inventory |  |
+| `storageLocationsGet` | storageLocations.ts | tenant-gate | `warehouse:view` | inventory |  |
+| `storageLocationsList` | storageLocations.ts | tenant-gate | `warehouse:view` | inventory |  |
+| `storageLocationsUpdate` | storageLocations.ts | tenant-gate | `warehouse:manage` | inventory |  |
 | `tasksAssign` | tasks.ts | tenant-gate | `task:assign` | tasks |  |
 | `tasksCreate` | tasks.ts | tenant-gate | `task:create` | tasks |  |
 | `tasksDelete` | tasks.ts | tenant-gate | `task:delete` | tasks |  |

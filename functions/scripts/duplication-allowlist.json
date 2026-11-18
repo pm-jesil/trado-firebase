@@ -766,6 +766,83 @@
       "owner": "financialAccounts",
       "cap": 100,
       "reason": "Branch authorization allowlist for branch-scoped operational account transactions, capped at 100 in CreateFinancialAccountSchema."
+    },
+    {
+      "id": "DUP-093",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "journalEntries",
+      "field": "lines",
+      "owner": "journalEntries",
+      "serverWritten": true,
+      "cap": 20,
+      "reason": "Double-entry journal line items bounded per balanced journal entry."
+    },
+    {
+      "id": "DUP-094",
+      "kind": "R2",
+      "collection": "stockTransfers",
+      "field": "items.baseQuantity",
+      "owner": "stockTransfers",
+      "reason": "Quantity multiplied by the frozen conversionFactor at transfer creation time; product unit conversion factors may change later."
+    },
+    {
+      "id": "DUP-095",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "stockTransfers",
+      "field": "items.serialNumbers",
+      "owner": "stockTransfers",
+      "cap": 500,
+      "reason": "Serial numbers tracked during inter-branch transfer, capped at 500 in schemas."
+    },
+    {
+      "id": "DUP-096",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "taxRegimes",
+      "field": "rates",
+      "owner": "taxRegimes",
+      "serverWritten": true,
+      "cap": 20,
+      "reason": "Tax rates array in canonical tax regime definition bounded per regime."
+    },
+    {
+      "id": "DUP-097",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "taxRegimes",
+      "field": "slabs",
+      "owner": "taxRegimes",
+      "serverWritten": true,
+      "cap": 20,
+      "reason": "Tax slabs array in canonical tax regime definition bounded per regime."
+    },
+    {
+      "id": "DUP-098",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "taxRegimes",
+      "field": "slabs.hsnPrefixes",
+      "owner": "taxRegimes",
+      "serverWritten": true,
+      "cap": 50,
+      "reason": "HSN code prefixes array bounded per tax slab definition."
+    },
+    {
+      "id": "DUP-099",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "bills",
+      "field": "taxSnapshot.breakdown",
+      "owner": "bills",
+      "serverWritten": true,
+      "cap": 20,
+      "reason": "Tax snapshot breakdown line items array computed deterministically by taxCalculation engine."
+    },
+    {
+      "id": "DUP-100",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "outflows",
+      "field": "taxSnapshot.breakdown",
+      "owner": "outflows",
+      "serverWritten": true,
+      "cap": 20,
+      "reason": "Tax snapshot breakdown line items array computed deterministically by taxCalculation engine."
     }
   ]
 }

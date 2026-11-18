@@ -1,6 +1,6 @@
 {
- "runId": "sweep-mwg3dt8d",
- "generatedAt": "2026-11-14T07:36:26.941Z",
+ "runId": "sweep-mwlwkvnc",
+ "generatedAt": "2026-11-18T09:12:36.408Z",
  "items": [
   {
    "id": "healthCheck:organizationId:min",
@@ -640,6 +640,46 @@
   },
   {
    "id": "organizationsCreate:currency:min-1",
+   "pass": true
+  },
+  {
+   "id": "organizationsCreate:currencyDecimals:max",
+   "pass": true
+  },
+  {
+   "id": "organizationsCreate:currencyDecimals:max+1",
+   "pass": true
+  },
+  {
+   "id": "organizationsCreate:currencyDecimals:min",
+   "pass": true
+  },
+  {
+   "id": "organizationsCreate:currencyDecimals:min-1",
+   "pass": true
+  },
+  {
+   "id": "organizationsCreate:minorUnitName:max",
+   "pass": true
+  },
+  {
+   "id": "organizationsCreate:minorUnitName:max+1",
+   "pass": true
+  },
+  {
+   "id": "organizationsCreate:minorUnitNamePlural:max",
+   "pass": true
+  },
+  {
+   "id": "organizationsCreate:minorUnitNamePlural:max+1",
+   "pass": true
+  },
+  {
+   "id": "organizationsCreate:currencySymbol:max",
+   "pass": true
+  },
+  {
+   "id": "organizationsCreate:currencySymbol:max+1",
    "pass": true
   },
   {
@@ -3103,6 +3143,14 @@
    "pass": true
   },
   {
+   "id": "branchesCreate:settings.defaultFinancialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "branchesCreate:settings.defaultFinancialAccountId:min-1",
+   "pass": true
+  },
+  {
    "id": "branchesUpdate:branchId:min",
    "pass": true
   },
@@ -3300,6 +3348,14 @@
   },
   {
    "id": "branchesUpdate:settings.defaultSalesMode:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "branchesUpdate:settings.defaultFinancialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "branchesUpdate:settings.defaultFinancialAccountId:min-1",
    "pass": true
   },
   {
@@ -4804,6 +4860,14 @@
   },
   {
    "id": "productsCreate:initialStock:min-1",
+   "pass": true
+  },
+  {
+   "id": "productsCreate:storageLocationId:min",
+   "pass": true
+  },
+  {
+   "id": "productsCreate:storageLocationId:min-1",
    "pass": true
   },
   {
@@ -8515,6 +8579,74 @@
    "pass": true
   },
   {
+   "id": "outflowsCreate:financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:storageLocationId:min",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:storageLocationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].method:enum=cash",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].method:enum=card",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].method:enum=upi",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].method:enum=bank_transfer",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].method:enum=cheque",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].method:enum=other",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].method:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].amount:min",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].amount:min-1",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].notes:max",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[].notes:max+1",
+   "pass": true
+  },
+  {
    "id": "outflowsCreate:notes:max",
    "pass": true
   },
@@ -8603,6 +8735,14 @@
    "pass": true
   },
   {
+   "id": "outflowsCreate:splitPayments[length]:max",
+   "pass": true
+  },
+  {
+   "id": "outflowsCreate:splitPayments[length]:max+1",
+   "pass": true
+  },
+  {
    "id": "outflowsCreate:attachmentPaths[length]:max",
    "pass": true
   },
@@ -8628,6 +8768,22 @@
   },
   {
    "id": "outflowsList:kind:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "outflowsList:minAmount:min",
+   "pass": true
+  },
+  {
+   "id": "outflowsList:minAmount:min-1",
+   "pass": true
+  },
+  {
+   "id": "outflowsList:maxAmount:min",
+   "pass": true
+  },
+  {
+   "id": "outflowsList:maxAmount:min-1",
    "pass": true
   },
   {
@@ -8923,6 +9079,74 @@
    "pass": true
   },
   {
+   "id": "billsCreate:financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:storageLocationId:min",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:storageLocationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].method:enum=cash",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].method:enum=card",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].method:enum=upi",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].method:enum=bank_transfer",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].method:enum=cheque",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].method:enum=other",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].method:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].amount:min",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].amount:min-1",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].notes:max",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[].notes:max+1",
+   "pass": true
+  },
+  {
    "id": "billsCreate:notes:max",
    "pass": true
   },
@@ -8952,6 +9176,14 @@
   },
   {
    "id": "billsCreate:items[].serialNumbers[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[length]:max",
+   "pass": true
+  },
+  {
+   "id": "billsCreate:splitPayments[length]:max+1",
    "pass": true
   },
   {
@@ -9008,6 +9240,22 @@
   },
   {
    "id": "billsList:salesMode:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "billsList:minAmount:min",
+   "pass": true
+  },
+  {
+   "id": "billsList:minAmount:min-1",
+   "pass": true
+  },
+  {
+   "id": "billsList:maxAmount:min",
+   "pass": true
+  },
+  {
+   "id": "billsList:maxAmount:min-1",
    "pass": true
   },
   {
@@ -9419,6 +9667,74 @@
    "pass": true
   },
   {
+   "id": "billsPreview:financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:storageLocationId:min",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:storageLocationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].method:enum=cash",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].method:enum=card",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].method:enum=upi",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].method:enum=bank_transfer",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].method:enum=cheque",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].method:enum=other",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].method:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].amount:min",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].amount:min-1",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].notes:max",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[].notes:max+1",
+   "pass": true
+  },
+  {
    "id": "billsPreview:notes:max",
    "pass": true
   },
@@ -9448,6 +9764,14 @@
   },
   {
    "id": "billsPreview:items[].serialNumbers[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[length]:max",
+   "pass": true
+  },
+  {
+   "id": "billsPreview:splitPayments[length]:max+1",
    "pass": true
   },
   {
@@ -9927,6 +10251,14 @@
    "pass": true
   },
   {
+   "id": "documentsDecide:documentType:enum=account_transfer",
+   "pass": true
+  },
+  {
+   "id": "documentsDecide:documentType:enum=stock_transfer",
+   "pass": true
+  },
+  {
    "id": "documentsDecide:documentType:enum-invalid",
    "pass": true
   },
@@ -9972,6 +10304,2354 @@
   },
   {
    "id": "documentsDecide:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:documentType:enum=bill",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:documentType:enum=outflow",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:documentType:enum=return",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:documentType:enum=stock_adjustment",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:documentType:enum=account_transfer",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:documentType:enum=stock_transfer",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:documentType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:limit:max",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:limit:min",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "approvalsCounts:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "approvalsCounts:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:name:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:name:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:name:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:name:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:code:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:code:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:code:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:code:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:accountType:enum=cash",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:accountType:enum=bank",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:accountType:enum=digital",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:accountType:enum=clearing",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:accountType:enum=control",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:accountType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:currency:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:currency:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:currency:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:currency:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:assignedBranchIds[]:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:assignedBranchIds[]:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.bankName:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.bankName:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.bankName:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.bankName:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.accountNumberMasked:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.accountNumberMasked:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.accountNumberMasked:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.accountNumberMasked:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.ifscOrSwift:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.ifscOrSwift:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.ifscOrSwift:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.ifscOrSwift:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.bankBranchName:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.bankBranchName:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.upiId:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:bankDetails.upiId:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.feePercent:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.feePercent:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.feePercent:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.feePercent:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.feeFixed:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.feeFixed:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.feeTaxPercent:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.feeTaxPercent:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.feeTaxPercent:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.feeTaxPercent:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.settlementDays:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:feeRule.settlementDays:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:notes:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:assignedBranchIds[length]:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsCreate:assignedBranchIds[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:name:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:name:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:name:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:name:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:assignedBranchIds[]:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:assignedBranchIds[]:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.bankName:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.bankName:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.bankName:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.bankName:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.accountNumberMasked:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.accountNumberMasked:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.accountNumberMasked:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.accountNumberMasked:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.ifscOrSwift:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.ifscOrSwift:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.ifscOrSwift:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.ifscOrSwift:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.bankBranchName:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.bankBranchName:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.upiId:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:bankDetails.upiId:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.feePercent:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.feePercent:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.feePercent:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.feePercent:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.feeFixed:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.feeFixed:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.feeTaxPercent:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.feeTaxPercent:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.feeTaxPercent:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.feeTaxPercent:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.settlementDays:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:feeRule.settlementDays:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:notes:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:assignedBranchIds[length]:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsUpdate:assignedBranchIds[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:accountType:enum=cash",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:accountType:enum=bank",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:accountType:enum=digital",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:accountType:enum=clearing",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:accountType:enum=control",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:accountType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:limit:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:limit:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGet:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGet:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGet:financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGet:financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGetLedger:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGetLedger:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGetLedger:financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGetLedger:financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGetLedger:limit:max",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGetLedger:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGetLedger:limit:min",
+   "pass": true
+  },
+  {
+   "id": "financialAccountsGetLedger:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:sourceAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:sourceAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:destinationAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:destinationAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:amount:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:amount:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:transferType:enum=transfer",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:transferType:enum=cash_deposit",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:transferType:enum=cash_withdrawal",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:transferType:enum=inter_bank",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:transferType:enum=petty_cash",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:transferType:enum=cashier_handover",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:transferType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:notes:max",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersList:status:enum=pending_approval",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersList:status:enum=completed",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersList:status:enum=rejected",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersList:status:enum=cancelled",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersList:status:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersList:limit:max",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersList:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersList:limit:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersGet:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersGet:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersGet:transferId:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersGet:transferId:min-1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:type:enum=owner_contribution",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:type:enum=partner_contribution",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:type:enum=additional_capital",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:type:enum=drawings",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:type:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:amount:min",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:amount:min-1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:currency:max",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:currency:max+1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:currency:min",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:currency:min-1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:sourceReference:max",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:sourceReference:max+1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:description:max",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:description:max+1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:supportingDocumentPath:max",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:supportingDocumentPath:max+1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsCreate:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsList:type:enum=owner_contribution",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsList:type:enum=partner_contribution",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsList:type:enum=additional_capital",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsList:type:enum=drawings",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsList:type:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsList:limit:max",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsList:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsList:limit:min",
+   "pass": true
+  },
+  {
+   "id": "capitalTransactionsList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:sourceDocumentType:enum=bill",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:sourceDocumentType:enum=payment",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:sourceDocumentType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:sourceDocumentId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:sourceDocumentId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:paymentMethod:enum=cash",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:paymentMethod:enum=card",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:paymentMethod:enum=upi",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:paymentMethod:enum=bank_transfer",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:paymentMethod:enum=cheque",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:paymentMethod:enum=other",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:paymentMethod:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:feeAmount:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:feeAmount:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:feeTaxAmount:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:feeTaxAmount:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:settlementTiming:enum=immediate_deduction",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:settlementTiming:enum=billed_later",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:settlementTiming:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:settlementReference:max",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:settlementReference:max+1",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:notes:max",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsRecordFee:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsVerifyFee:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsVerifyFee:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsVerifyFee:feeId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsVerifyFee:feeId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsVerifyFee:settlementReference:max",
+   "pass": true
+  },
+  {
+   "id": "paymentsVerifyFee:settlementReference:max+1",
+   "pass": true
+  },
+  {
+   "id": "paymentsVerifyFee:notes:max",
+   "pass": true
+  },
+  {
+   "id": "paymentsVerifyFee:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "paymentsDisputeFee:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsDisputeFee:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsDisputeFee:feeId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsDisputeFee:feeId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsDisputeFee:reason:max",
+   "pass": true
+  },
+  {
+   "id": "paymentsDisputeFee:reason:max+1",
+   "pass": true
+  },
+  {
+   "id": "paymentsDisputeFee:reason:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsDisputeFee:reason:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsReverseFee:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsReverseFee:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsReverseFee:feeId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsReverseFee:feeId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsReverseFee:reason:max",
+   "pass": true
+  },
+  {
+   "id": "paymentsReverseFee:reason:max+1",
+   "pass": true
+  },
+  {
+   "id": "paymentsReverseFee:reason:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsReverseFee:reason:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:status:enum=expected",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:status:enum=pending_verification",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:status:enum=verified",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:status:enum=disputed",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:status:enum=reversed",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:status:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:highlight:enum=needs_review",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:highlight:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:limit:max",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:limit:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsListFees:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsGetFee:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsGetFee:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsGetFee:feeId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsGetFee:feeId:min-1",
+   "pass": true
+  },
+  {
+   "id": "ledgerVerify:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "ledgerVerify:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "reportsGetTrialBalance:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "reportsGetTrialBalance:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:name:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:name:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:name:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:name:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:code:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:code:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:code:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:code:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:type:enum=warehouse",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:type:enum=stockyard",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:type:enum=counter",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:type:enum=backroom",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:type:enum=quarantine",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:type:enum=transit",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:type:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.id:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.id:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.label:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.label:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.line1:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.line1:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.line1:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.line1:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.line2:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.line2:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.area:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.area:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.city:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.city:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.city:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.city:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.state:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.state:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.state:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.state:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.postalCode:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.postalCode:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.postalCode:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.postalCode:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.country:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.country:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.country:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.country:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.geoPoint.latitude:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.geoPoint.latitude:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.geoPoint.latitude:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.geoPoint.latitude:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.geoPoint.longitude:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.geoPoint.longitude:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.geoPoint.longitude:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.geoPoint.longitude:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.contactName:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:address.contactName:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:notes:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsCreate:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:locationId:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:locationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:name:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:name:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:name:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:name:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.id:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.id:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.label:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.label:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.line1:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.line1:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.line1:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.line1:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.line2:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.line2:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.area:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.area:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.city:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.city:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.city:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.city:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.state:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.state:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.state:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.state:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.postalCode:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.postalCode:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.postalCode:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.postalCode:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.country:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.country:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.country:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.country:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.geoPoint.latitude:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.geoPoint.latitude:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.geoPoint.latitude:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.geoPoint.latitude:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.geoPoint.longitude:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.geoPoint.longitude:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.geoPoint.longitude:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.geoPoint.longitude:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.contactName:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:address.contactName:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:notes:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsUpdate:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:type:enum=warehouse",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:type:enum=stockyard",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:type:enum=counter",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:type:enum=backroom",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:type:enum=quarantine",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:type:enum=transit",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:type:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:limit:max",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:limit:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsGet:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsGet:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsGet:locationId:min",
+   "pass": true
+  },
+  {
+   "id": "storageLocationsGet:locationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:sourceBranchId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:sourceBranchId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:destinationBranchId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:destinationBranchId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:sourceLocationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:sourceLocationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:destinationLocationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:destinationLocationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].productId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].productId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].requestedQty:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].requestedQty:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].quantity:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].quantity:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].unit:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].unit:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].unit:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].unit:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].conversionFactor:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].conversionFactor:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].batchNumber:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].batchNumber:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].expiryDate:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].expiryDate:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].notes:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].serialNumbers[]:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].serialNumbers[]:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].serialNumbers[]:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].serialNumbers[]:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:handlingFee:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:handlingFee:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:handlingFeeFinancialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:handlingFeeFinancialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:notes:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[length]:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[length]:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[length]:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].serialNumbers[length]:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCreate:items[].serialNumbers[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersSubmit:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersSubmit:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersSubmit:transferId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersSubmit:transferId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersSubmit:version:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersSubmit:version:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersSubmit:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersSubmit:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersSubmit:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersSubmit:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:transferId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:transferId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:reason:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:reason:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:version:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:version:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersCancel:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:transferId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:transferId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].productId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].productId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].dispatchedQty:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].dispatchedQty:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].serialNumbers[]:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].serialNumbers[]:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].serialNumbers[]:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].serialNumbers[]:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].batchNumber:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].batchNumber:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].expiryDate:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].expiryDate:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:transportMode:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:transportMode:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:trackingReference:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:trackingReference:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:version:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:version:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:notes:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[length]:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[length]:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[length]:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].serialNumbers[length]:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersDispatch:items[].serialNumbers[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:transferId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:transferId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:destinationLocationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:destinationLocationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].productId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].productId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].receivedQty:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].receivedQty:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].rejectedQty:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].rejectedQty:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].shortQty:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].shortQty:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].discrepancyReason:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].discrepancyReason:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].serialNumbers[]:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].serialNumbers[]:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].serialNumbers[]:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].serialNumbers[]:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:version:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:version:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:notes:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[length]:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[length]:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[length]:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].serialNumbers[length]:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersReceive:items[].serialNumbers[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:transferId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:transferId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:productId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:productId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:resolution:enum=return_to_source",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:resolution:enum=write_off",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:resolution:enum=claim_carrier",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:resolution:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:version:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:version:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:notes:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersResolveDiscrepancy:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:status:enum=draft",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:status:enum=submitted",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:status:enum=approved",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:status:enum=dispatched",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:status:enum=received",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:status:enum=partially_received",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:status:enum=rejected",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:status:enum=cancelled",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:status:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:limit:max",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:limit:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersGet:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersGet:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersGet:transferId:min",
+   "pass": true
+  },
+  {
+   "id": "stockTransfersGet:transferId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockVerify:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockVerify:organizationId:min-1",
    "pass": true
   },
   {
@@ -10459,6 +13139,14 @@
    "pass": true
   },
   {
+   "id": "returnsCreate:refundFinancialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "returnsCreate:refundFinancialAccountId:min-1",
+   "pass": true
+  },
+  {
    "id": "returnsCreate:notes:max",
    "pass": true
   },
@@ -10647,6 +13335,42 @@
    "pass": true
   },
   {
+   "id": "paymentsCreate:financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsCreate:financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsCreate:allocations[].documentId:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsCreate:allocations[].documentId:min-1",
+   "pass": true
+  },
+  {
+   "id": "paymentsCreate:allocations[].documentType:enum=bill",
+   "pass": true
+  },
+  {
+   "id": "paymentsCreate:allocations[].documentType:enum=outflow",
+   "pass": true
+  },
+  {
+   "id": "paymentsCreate:allocations[].documentType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "paymentsCreate:allocations[].amount:min",
+   "pass": true
+  },
+  {
+   "id": "paymentsCreate:allocations[].amount:min-1",
+   "pass": true
+  },
+  {
    "id": "paymentsCreate:notes:max",
    "pass": true
   },
@@ -10700,6 +13424,14 @@
   },
   {
    "id": "paymentsCreate:gateway.cardBrand:max+1",
+   "pass": true
+  },
+  {
+   "id": "paymentsCreate:allocations[length]:max",
+   "pass": true
+  },
+  {
+   "id": "paymentsCreate:allocations[length]:max+1",
    "pass": true
   },
   {
@@ -10808,6 +13540,14 @@
   },
   {
    "id": "stockAdjust:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "stockAdjust:storageLocationId:min",
+   "pass": true
+  },
+  {
+   "id": "stockAdjust:storageLocationId:min-1",
    "pass": true
   },
   {
@@ -11164,6 +13904,30 @@
   },
   {
    "id": "reportsGetOutflowSummary:groupBy:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "reportsGetReceivablesAgeing:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "reportsGetReceivablesAgeing:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "reportsGetPayablesAgeing:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "reportsGetPayablesAgeing:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "reportsGetCashBankSummary:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "reportsGetCashBankSummary:organizationId:min-1",
    "pass": true
   },
   {
@@ -11856,6 +14620,1770 @@
   },
   {
    "id": "notificationsMarkRead:notificationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsMeta:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsMeta:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsMeta:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsMeta:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsMeta:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsMeta:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "plansCatalogList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "plansCatalogList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "plansCatalogList:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "plansCatalogList:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "plansCatalogList:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "plansCatalogList:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:audience:enum=platform",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:audience:enum=organization",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:audience:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=plan_change",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=limit_increase",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=module_request",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=billing_query",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=org_profile_change",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=ownership_transfer",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=bug_report",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=data_issue",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=feature_request",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=improvement",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=support_question",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=other",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=data_request",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=security_concern",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum=access_request",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:category:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:title:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:title:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:title:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:title:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:description:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:description:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:description:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:description:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:priority:enum=low",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:priority:enum=normal",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:priority:enum=high",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:priority:enum=urgent",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:priority:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:severity:enum=minor",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:severity:enum=major",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:severity:enum=critical",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:severity:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.type:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.type:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.type:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.type:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.id:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.id:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.id:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.id:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.label:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.label:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.label:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:relatedEntity.label:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].storagePath:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].storagePath:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].storagePath:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].storagePath:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].filename:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].filename:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].filename:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].filename:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].mimeType:enum=image/jpeg",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].mimeType:enum=image/png",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].mimeType:enum=image/webp",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].mimeType:enum=application/pdf",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].mimeType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].sizeBytes:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].sizeBytes:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].sizeBytes:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[].sizeBytes:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:labels[]:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:labels[]:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:labels[]:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:labels[]:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[length]:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:attachments[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:labels[length]:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCreate:labels[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:requestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:requestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:title:max",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:title:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:title:min",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:title:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:description:max",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:description:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:description:min",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:description:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].storagePath:max",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].storagePath:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].storagePath:min",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].storagePath:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].filename:max",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].filename:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].filename:min",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].filename:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].mimeType:enum=image/jpeg",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].mimeType:enum=image/png",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].mimeType:enum=image/webp",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].mimeType:enum=application/pdf",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].mimeType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].sizeBytes:max",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].sizeBytes:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].sizeBytes:min",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[].sizeBytes:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:expectedVersion:min",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:expectedVersion:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[length]:max",
+   "pass": true
+  },
+  {
+   "id": "requestsUpdate:attachments[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:requestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:requestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:content:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:content:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:content:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:content:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].storagePath:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].storagePath:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].storagePath:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].storagePath:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].filename:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].filename:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].filename:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].filename:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].mimeType:enum=image/jpeg",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].mimeType:enum=image/png",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].mimeType:enum=image/webp",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].mimeType:enum=application/pdf",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].mimeType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].sizeBytes:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].sizeBytes:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].sizeBytes:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[].sizeBytes:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[length]:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddComment:attachments[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:requestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:requestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=start_review",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=request_info",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=respond",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=hold",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=resume",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=approve",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=reject",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=apply",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=start_work",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=resolve",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=decline",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=close",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=reopen",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum=cancel",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:action:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=submitted",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=in_review",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=needs_info",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=on_hold",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=approved",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=applied",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=rejected",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=in_progress",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=resolved",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=declined",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=closed",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum=cancelled",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:expectedStatus:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:reason:max",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:reason:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:note:max",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:note:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:resolutionType:enum=fixed",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:resolutionType:enum=answered",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:resolutionType:enum=implemented",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:resolutionType:enum=duplicate",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:resolutionType:enum=cannot_reproduce",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:resolutionType:enum=workaround",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:resolutionType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:overrideReason:max",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:overrideReason:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsTransition:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsGet:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsGet:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsGet:requestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsGet:requestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsGet:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsGet:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsGet:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsGet:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsList:scope:enum=mine",
+   "pass": true
+  },
+  {
+   "id": "requestsList:scope:enum=organization",
+   "pass": true
+  },
+  {
+   "id": "requestsList:scope:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsList:audience:enum=platform",
+   "pass": true
+  },
+  {
+   "id": "requestsList:audience:enum=organization",
+   "pass": true
+  },
+  {
+   "id": "requestsList:audience:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=submitted",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=in_review",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=needs_info",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=on_hold",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=approved",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=applied",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=rejected",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=in_progress",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=resolved",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=declined",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=closed",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum=cancelled",
+   "pass": true
+  },
+  {
+   "id": "requestsList:status[]:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=plan_change",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=limit_increase",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=module_request",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=billing_query",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=org_profile_change",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=ownership_transfer",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=bug_report",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=data_issue",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=feature_request",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=improvement",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=support_question",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=other",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=data_request",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=security_concern",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum=access_request",
+   "pass": true
+  },
+  {
+   "id": "requestsList:category[]:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsList:priority[]:enum=low",
+   "pass": true
+  },
+  {
+   "id": "requestsList:priority[]:enum=normal",
+   "pass": true
+  },
+  {
+   "id": "requestsList:priority[]:enum=high",
+   "pass": true
+  },
+  {
+   "id": "requestsList:priority[]:enum=urgent",
+   "pass": true
+  },
+  {
+   "id": "requestsList:priority[]:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsList:search:max",
+   "pass": true
+  },
+  {
+   "id": "requestsList:search:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsList:limit:max",
+   "pass": true
+  },
+  {
+   "id": "requestsList:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsList:limit:min",
+   "pass": true
+  },
+  {
+   "id": "requestsList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsList:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsList:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsList:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsList:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:requestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:requestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:limit:max",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:limit:min",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsActivityList:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCounts:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCounts:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsCounts:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsCounts:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsCounts:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsCounts:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=submitted",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=in_review",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=needs_info",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=on_hold",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=approved",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=applied",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=rejected",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=in_progress",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=resolved",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=declined",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=closed",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum=cancelled",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:status[]:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=plan_change",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=limit_increase",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=module_request",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=billing_query",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=org_profile_change",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=ownership_transfer",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=bug_report",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=data_issue",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=feature_request",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=improvement",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=support_question",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=other",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=data_request",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=security_concern",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum=access_request",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:category[]:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:priority[]:enum=low",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:priority[]:enum=normal",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:priority[]:enum=high",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:priority[]:enum=urgent",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:priority[]:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:targetOrganizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:targetOrganizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:slaState:enum=on_track",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:slaState:enum=at_risk",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:slaState:enum=breached",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:slaState:enum=paused",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:slaState:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:search:max",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:search:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:sortBy:enum=createdAt",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:sortBy:enum=lastActivityAt",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:sortBy:enum=priority",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:sortBy:enum=resolutionDueAt",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:sortBy:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:sortOrder:enum=asc",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:sortOrder:enum=desc",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:sortOrder:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:limit:max",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:limit:min",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxList:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxCounts:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxCounts:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxCounts:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxCounts:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxCounts:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsInboxCounts:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:requestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:requestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:assigneeUid:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:assigneeUid:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:assigneeName:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:assigneeName:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAssign:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:requestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:requestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:priority:enum=low",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:priority:enum=normal",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:priority:enum=high",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:priority:enum=urgent",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:priority:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:severity:enum=minor",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:severity:enum=major",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:severity:enum=critical",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:severity:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSetPriority:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:requestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:requestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:content:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:content:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:content:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:content:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].storagePath:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].storagePath:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].storagePath:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].storagePath:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].filename:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].filename:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].filename:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].filename:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].mimeType:enum=image/jpeg",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].mimeType:enum=image/png",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].mimeType:enum=image/webp",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].mimeType:enum=application/pdf",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].mimeType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].sizeBytes:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].sizeBytes:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].sizeBytes:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[].sizeBytes:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[length]:max",
+   "pass": true
+  },
+  {
+   "id": "requestsAddInternalNote:attachments[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:requestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:requestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:expectedStatus:enum=approved",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:expectedStatus:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:overrideReason:max",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:overrideReason:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:clientRequestId:max",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:clientRequestId:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:clientRequestId:min",
+   "pass": true
+  },
+  {
+   "id": "requestsApply:clientRequestId:min-1",
    "pass": true
   },
   {
