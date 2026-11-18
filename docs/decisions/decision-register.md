@@ -1,7 +1,7 @@
-# Trado Architectural Decision Register (D-1 .. D-52)
+# Trado Architectural Decision Register (D-1 .. D-61)
 
-Generated at: 2026-11-16T13:30:00.000Z  
-Total decisions: **52** (All Active)  
+Generated at: 2026-11-18T17:30:00.000Z  
+Total decisions: **61** (All Active)  
 
 | ID | Title | Prompt | Status | Enforced By | Description |
 |---|---|---|---|---|---|
@@ -57,6 +57,15 @@ Total decisions: **52** (All Active)
 | **D-50** | **Unified Approvals Inbox & Decision Router** | 75 | `active` | `functions/src/callables/approvals.ts` | Single maker-checker decision router documentsDecide handles all domains; unified approvalsList and approvalsCounts query pending items across all operational collections. |
 | **D-51** | **Payment Processing Charges Linked Accounting** | 75 | `active` | `functions/src/callables/paymentFees.ts` | Merchant processing charges recorded as operating expenses linked to source payment/bill without reducing gross sales or customer receivable settlement; deducts from clearing/financial account to match net bank deposit. |
 | **D-52** | **Capital & Owner Investment Accounting** | 75 | `active` | `functions/src/callables/financialAccounts.ts` | Capital contributions and drawings adjust cash/bank ledger balances via double-entry without polluting sales revenue, purchases, or customer receivable accounts. |
+| **D-53** | **Truth Before Work (Source-Derived Numbers)** | Hybrid-76 | `active` | `functions/scripts/report-numbers.js` | Every number in a sign-off, handoff, or report is pasted from a tool run with git sha, dirty flag, and UTC time. Unsourced numbers are UNVERIFIED; zeros require the command that produced them (D-34). |
+| **D-54** | **Permission-Driven Organization Edit Policy** | Hybrid-76 | `active` | `functions/src/callables/organizations.ts` | Each organization field is classified once (S0/S1/S2) in one policy table governed strictly by permission codes (never role names), exported to the contract, and fail-closed on unclassified fields. |
+| **D-55** | **Generated Contract as Single Callable Description** | Hybrid-76 | `active` | `scripts/generate-flutter-contract.js` | The generated contract pack is the sole authoritative description of every callable (input, response, errors, permission, gate, idempotency, metering, audit). |
+| **D-56** | **Explicit Spec Deviation Resolution** | Hybrid-76 | `active` | `docs/decisions/decision-register.md` | Every spec deviation (reopen window, groups, flows, scenario count) is resolved to the spec or recorded as an owner-approved decision — never left unexplained. |
+| **D-57** | **Never Hand-Edit Generated Contract Files** | Hybrid-76 | `active` | `scripts/check-flutter-contract.js` | Contract defects are fixed in schemas or the generator and regenerated; a seeded-defect proof verifies the guard catches hand edits. |
+| **D-58** | **Verification Gate Discipline** | Hybrid-76 | `active` | `scripts/verify-impact.js` | Gate order: `verify:plan` → `verify:changed` → `verify:full` (once) → emulator suites including Storage and pubsub → seeded-defect proofs; baselines updated only via documented procedure with owner approval. |
+| **D-59** | **Honest Test Tiers and Timeouts** | Hybrid-76 | `active` | `functions/package.json` | Emulator-dependent tests live in the emulator tier; the unit tier opens no network connections; skipped tests are explicitly counted and fail `verify:full`; every test run enforces a per-test timeout. |
+| **D-60** | **Outcome-Based Callable Coverage** | Hybrid-76 | `active` | `functions/scripts/report-outcome-coverage.js` | Coverage is mapped per `callable#outcome` via test title tags against declared outcomes, replacing name-mention scratch scripts. |
+| **D-61** | **Duplication Allowlist Authorization (DUP-074..DUP-100)** | Hybrid-76 | `active` | `functions/scripts/duplication-allowlist.json` | Refactored DUP-077 (`requests.organizationName` removed; R1). Authorized remaining entries DUP-074..076, 078..081 (wire-compat R4 self-IDs/snapshots/bounded arrays), and DUP-083..100 (bounded arrays, R2 snapshots, R4 running balance, authoritative `financialAccounts.assignedBranchIds`). No new allowlist entry without a decision row. |
 
 ## Answered Business Decisions (A-n)
 
@@ -79,3 +88,14 @@ Total decisions: **52** (All Active)
 | **A-15** | Bug report diagnostics: Strictly opt-in (`diagnosticsOptIn: true`) without payloads or PII. | 2026-11-15 | `schemas.ts` |
 | **A-16** | Role migration: Idempotent script with `--dry-run` default updating system roles in `roles` collection. | 2026-11-15 | `migrate-requests-permissions.ts` |
 | **A-17** | Dark launch: `platformSettings/requests.requestsEnabled` defaults to `false`; callables return `FEATURE_DISABLED` while off. | 2026-11-15 | `requests.ts`, `requestsService.ts` |
+| **A-18** | Q-B1: Organization field editability decided strictly by permission codes (never role names); S0/S1/S2 field table proposed in `docs/plans/2026-11-18-gap-closure.md` awaiting owner confirmation before BX2 code; S0/S1 mutations audited with before/after. | 2026-11-18 | Pending BX2 |
+| **A-19** | Q-B2: Organization `bankAccounts` are S1 controlled by dedicated permission `org:manage_bank_details` (owner default, never plain `org:update`); account numbers masked to last 4 in audit logs AND API responses. | 2026-11-18 | Pending BX2 |
+| **A-20** | Q-B3: Requests reopen window defaults to `14` days, stored as Super-Admin-configurable platform setting `reopenWindowDays`. | 2026-11-18 | Pending BX3 |
+| **A-21** | Q-B4: Requests taxonomy exposes 7 contract-driven category groups in `requestsMeta` and the contract pack. | 2026-11-18 | Pending BX3 |
+| **A-22** | Q-B5: Request attachment cap remains 5 files × 5 MB; Flutter client must follow contract. | 2026-11-18 | Confirmed (`storage.rules`, `schemas.ts`) |
+| **A-23** | Q-B6: Add optional `ids` filter (1–50 unique IDs) to `productsList` with `missingIds` response field. | 2026-11-18 | Pending BX4 |
+| **A-24** | Q-B7: Live location UI deferred (no map package); document current callables & privacy findings; register work-session location tracking (start/end session, route/distance/work/idle/breaks, configurable month retention, consent, batching) as backend gap MG-41 (not built in Prompt 76). | 2026-11-18 | `docs/plans/2026-11-18-gap-closure.md` |
+| **A-25** | Q-B8: Server-side PDF generation deferred; clients render from structured document snapshots. | 2026-11-18 | Pending BX4 doc |
+| **A-26** | Q-B9: Add Super-Admin `requestsSettingsUpdate` and `requestsSettingsGet` callables (`platform:requests_configure`, audited, bounded SLA/limits); fresh DB defaults OFF (`FEATURE_DISABLED`), emulator seed ON. | 2026-11-18 | Pending BX3 |
+| **A-27** | Q-B10: Prefer refactoring `DUP-074..DUP-081` (and review `DUP-083..DUP-100`); allow entries only with one-line justification and decision row; table presented in `docs/plans/2026-11-18-gap-closure.md` awaiting confirmation before editing allowlist. | 2026-11-18 | Pending BX3 |
+| **A-28** | Q-B12: Honest test tiers — move emulator-dependent tests out of unit tier (or explicit counted skip failing `verify:full`); add per-test timeouts. | 2026-11-18 | Pending BX4 |

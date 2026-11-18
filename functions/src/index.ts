@@ -350,6 +350,8 @@ export {
   requestsSetPriority,
   requestsAddInternalNote,
   requestsApply,
+  requestsSettingsGet,
+  requestsSettingsUpdate,
 } from "./callables/requests.js";
 
 // Super Admin Usage Metering & Platform Consumption

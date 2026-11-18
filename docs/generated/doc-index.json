@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "totalDocuments": 162,
+  "totalDocuments": 213,
   "countsByClassification": {
-    "KEEP+UPDATE": 115,
+    "KEEP+UPDATE": 60,
     "REWRITE": 2,
     "ARCHIVE": 19,
-    "GENERATED": 26
+    "GENERATED": 132
   },
   "documents": [
     {
@@ -24,7 +24,7 @@
       "path": "docs/api-reference.md",
       "title": "Trado API Reference",
       "classification": "KEEP+UPDATE",
-      "lineCount": 1257
+      "lineCount": 1259
     },
     {
       "path": "docs/architecture.md",
@@ -156,7 +156,7 @@
       "path": "docs/audit/handoff.md",
       "title": "Trado Engineering Handoff (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 50
+      "lineCount": 38
     },
     {
       "path": "docs/audit/implementation-status.md",
@@ -198,7 +198,7 @@
       "path": "docs/audit/open-questions.md",
       "title": "Open Questions & Business Decision Register (Appendix B)",
       "classification": "ARCHIVE",
-      "lineCount": 123
+      "lineCount": 135
     },
     {
       "path": "docs/audit/phase-reports-archive.md",
@@ -222,7 +222,7 @@
       "path": "docs/audit/run-ledger.md",
       "title": "Trado Engineering Run Ledger (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 32
+      "lineCount": 34
     },
     {
       "path": "docs/audit/test-coverage-matrix.md",
@@ -276,13 +276,13 @@
       "path": "docs/data-model.md",
       "title": "Trado Data Model & Schema Specification",
       "classification": "KEEP+UPDATE",
-      "lineCount": 949
+      "lineCount": 948
     },
     {
       "path": "docs/decisions/decision-register.md",
-      "title": "Trado Architectural Decision Register (D-1 .. D-52)",
+      "title": "Trado Architectural Decision Register (D-1 .. D-61)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 82
+      "lineCount": 102
     },
     {
       "path": "docs/decisions-log.md",
@@ -342,7 +342,7 @@
       "path": "docs/features/organizations-subscriptions-and-branches.md",
       "title": "Feature Guide: Organizations, Subscriptions & Branches",
       "classification": "KEEP+UPDATE",
-      "lineCount": 355
+      "lineCount": 363
     },
     {
       "path": "docs/features/payments-and-party-ledgers.md",
@@ -384,7 +384,7 @@
       "path": "docs/features/sales-billing-and-quotations.md",
       "title": "Feature Guide: Sales, Billing & Quotations Engine",
       "classification": "KEEP+UPDATE",
-      "lineCount": 271
+      "lineCount": 277
     },
     {
       "path": "docs/features/tasks-and-employee-operations.md",
@@ -407,338 +407,638 @@
     {
       "path": "docs/flutter-contract/activity-log.md",
       "title": "Activity Log & Audit Trail",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 50
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/auth.md",
+      "title": "Authentication & Session Bootstrap Contract (`authMe` / `authLogin`)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/approvals.md",
+      "title": "Callable API Reference — `approvals`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/authLogin.md",
+      "title": "Callable API Reference — `authLogin`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/authMe.md",
+      "title": "Callable API Reference — `authMe`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/bills.md",
+      "title": "Callable API Reference — `bills`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/branches.md",
+      "title": "Callable API Reference — `branches`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/catalogs.md",
+      "title": "Callable API Reference — `catalogs`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/categories.md",
+      "title": "Callable API Reference — `categories`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/customers.md",
+      "title": "Callable API Reference — `customers`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/deliveries.md",
+      "title": "Callable API Reference — `deliveries`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/departments.md",
+      "title": "Callable API Reference — `departments`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/employees.md",
+      "title": "Callable API Reference — `employees`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/financialAccounts.md",
+      "title": "Callable API Reference — `financialAccounts`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/healthCheck.md",
+      "title": "Callable API Reference — `healthCheck`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/history.md",
+      "title": "Callable API Reference — `history`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/images.md",
+      "title": "Callable API Reference — `images`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/INDEX.md",
+      "title": "Trado Callable API Reference — Master Index",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/jobRoles.md",
+      "title": "Callable API Reference — `jobRoles`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/ledgerVerify.md",
+      "title": "Callable API Reference — `ledgerVerify`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/locations.md",
+      "title": "Callable API Reference — `locations`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/notifications.md",
+      "title": "Callable API Reference — `notifications`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/organizations.md",
+      "title": "Callable API Reference — `organizations`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/outflows.md",
+      "title": "Callable API Reference — `outflows`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/paymentFees.md",
+      "title": "Callable API Reference — `paymentFees`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/payments.md",
+      "title": "Callable API Reference — `payments`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/plans.md",
+      "title": "Callable API Reference — `plans`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/platformUsers.md",
+      "title": "Callable API Reference — `platformUsers`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/products.md",
+      "title": "Callable API Reference — `products`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/reconciliation.md",
+      "title": "Callable API Reference — `reconciliation`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/recurringExpenses.md",
+      "title": "Callable API Reference — `recurringExpenses`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/reports.md",
+      "title": "Callable API Reference — `reports`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/requests.md",
+      "title": "Callable API Reference — `requests`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/returns.md",
+      "title": "Callable API Reference — `returns`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/roles.md",
+      "title": "Callable API Reference — `roles`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/stock.md",
+      "title": "Callable API Reference — `stock`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/stockTransfers.md",
+      "title": "Callable API Reference — `stockTransfers`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/stockVerify.md",
+      "title": "Callable API Reference — `stockVerify`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/storageLocations.md",
+      "title": "Callable API Reference — `storageLocations`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/tasks.md",
+      "title": "Callable API Reference — `tasks`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/teams.md",
+      "title": "Callable API Reference — `teams`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/units.md",
+      "title": "Callable API Reference — `units`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/usage.md",
+      "title": "Callable API Reference — `usage`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/users.md",
+      "title": "Callable API Reference — `users`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/vendors.md",
+      "title": "Callable API Reference — `vendors`",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/CHANGES.md",
-      "title": "Backend Contract Changes (Prompts 60–69)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 22
+      "title": "Backend Contract Changes",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/client-meta-and-idempotency.md",
       "title": "Client Metadata & Idempotency",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 26
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/errors.md",
       "title": "Error Index & Handling",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 42
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/account_transfer.md",
-      "title": "Form Contract: Account Transfer (`account_transfer`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 16
+      "title": "Form Contract: Account Transfer (Contra) (`account_transfer`)",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/approval_request.md",
-      "title": "Form Contract: Approval Request (`approval_request`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 8
+      "title": "Form Contract: Approval Decision (Maker-Checker) (`approval_request`)",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/bill.md",
       "title": "Form Contract: Bill / POS Sale (`bill`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 35
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/branch.md",
       "title": "Form Contract: Branch (`branch`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 37
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/capital_transaction.md",
       "title": "Form Contract: Capital Transaction (`capital_transaction`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 18
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/category.md",
       "title": "Form Contract: Category (`category`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 14
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/customer.md",
       "title": "Form Contract: Customer (`customer`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 66
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/delivery.md",
       "title": "Form Contract: Delivery (`delivery`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 27
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/department.md",
       "title": "Form Contract: Department (`department`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 13
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/employee.md",
       "title": "Form Contract: Employee / User (`employee`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 31
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/expense.md",
       "title": "Form Contract: Expense (Outflow) (`expense`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 47
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/financial_account.md",
       "title": "Form Contract: Financial Account (`financial_account`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 28
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/job_role.md",
       "title": "Form Contract: Job Role (`job_role`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 13
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/organization.md",
       "title": "Form Contract: Organization (`organization`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 94
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/forms/ownership_transfer.md",
+      "title": "Form Contract: Organization Ownership Transfer (`ownership_transfer`)",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/payment.md",
       "title": "Form Contract: Payment (`payment`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 29
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/payment_processing_fee.md",
       "title": "Form Contract: Payment Processing Fee (`payment_processing_fee`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 22
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/plan.md",
       "title": "Form Contract: Subscription Plan (`plan`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 21
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/product.md",
       "title": "Form Contract: Product (`product`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 71
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/purchase.md",
       "title": "Form Contract: Purchase (Outflow) (`purchase`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 47
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/recurring_expense.md",
       "title": "Form Contract: Recurring Expense (`recurring_expense`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 36
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-access_request.md",
       "title": "Request Details Schema: `access_request`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 13
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-billing_query.md",
       "title": "Request Details Schema: `billing_query`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 12
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-bug_report.md",
       "title": "Request Details Schema: `bug_report`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 16
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-data_issue.md",
       "title": "Request Details Schema: `data_issue`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 12
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-data_request.md",
       "title": "Request Details Schema: `data_request`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 12
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-feature_request.md",
       "title": "Request Details Schema: `feature_request`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 14
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-improvement.md",
       "title": "Request Details Schema: `improvement`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 11
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-limit_increase.md",
       "title": "Request Details Schema: `limit_increase`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 12
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-module_request.md",
       "title": "Request Details Schema: `module_request`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 11
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-org_profile_change.md",
       "title": "Request Details Schema: `org_profile_change`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 11
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-other.md",
       "title": "Request Details Schema: `other`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 9
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-ownership_transfer.md",
       "title": "Request Details Schema: `ownership_transfer`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 12
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-plan_change.md",
       "title": "Request Details Schema: `plan_change`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 12
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-security_concern.md",
       "title": "Request Details Schema: `security_concern`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 11
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request-details-support_question.md",
       "title": "Request Details Schema: `support_question`",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 10
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/request.md",
       "title": "Form Contract: Request / Support Ticket (`request`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 28
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/forms/requests_settings.md",
+      "title": "Form Contract: Platform Requests Settings (`requests_settings`)",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/return.md",
       "title": "Form Contract: Return (`return`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 23
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/role.md",
       "title": "Form Contract: Custom Role (`role`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 15
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/forms/sharing_policy.md",
+      "title": "Form Contract: Multi-Branch Sharing Policy (`sharing_policy`)",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/stock_adjustment.md",
       "title": "Form Contract: Stock Adjustment / Wastage (`stock_adjustment`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 17
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/stock_transfer.md",
       "title": "Form Contract: Stock Transfer (`stock_transfer`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 27
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/storage_location.md",
       "title": "Form Contract: Storage Location (`storage_location`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 31
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/task.md",
       "title": "Form Contract: Task (`task`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 18
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/team.md",
       "title": "Form Contract: Team (`team`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 14
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/unit.md",
       "title": "Form Contract: Unit (`unit`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 17
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/forms/usage_limits.md",
+      "title": "Form Contract: Organization Usage Limits (`usage_limits`)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/forms/user_profile.md",
+      "title": "Form Contract: User Self-Profile (`user_profile`)",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/forms/vendor.md",
       "title": "Form Contract: Vendor (`vendor`)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 65
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/images.md",
+      "title": "Image Pipeline & Payload Contract (D-5, D-6, D-15)",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/permissions.md",
       "title": "Permission Catalog & UI Gating",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 168
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/README.md",
-      "title": "Trado Flutter Contract Pack (v1.0.0)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 25
+      "title": "Trado Flutter Contract Pack (v2.0.0)",
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/responses.md",
       "title": "Response Conventions (D-18)",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 40
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/serialization.md",
       "title": "Data Serialization & Type Conventions",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 25
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/state-machines.md",
       "title": "Document State Machines & Status Transitions",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 16
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/SUMMARY.md",
       "title": "Trado Flutter Backend Contract — Summary Cheatsheet",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 108
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/flutter-contract/usage-limits.md",
       "title": "Subscription Usage Limits & Real-Time Warnings",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 26
+      "classification": "GENERATED",
+      "lineCount": null
     },
     {
       "path": "docs/generated/contract-changes.md",
@@ -793,6 +1093,12 @@
       "title": "Requests & Support Desk Module — Implementation Plan (RB1)",
       "classification": "KEEP+UPDATE",
       "lineCount": 231
+    },
+    {
+      "path": "docs/plans/2026-11-18-gap-closure.md",
+      "title": "Hybrid Prompt 76 — BX0 Truth Reconciliation, Gap Closure Plan & Owner Approval Tables",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 323
     },
     {
       "path": "docs/process/ask-protocol.md",

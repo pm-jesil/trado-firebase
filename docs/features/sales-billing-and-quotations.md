@@ -256,7 +256,13 @@ interface FinalizeBillRequest {
 
 ---
 
-## 6. Manual Emulator Testing Commands
+## 6. Document Printing & PDF Policy (CP-3, Q-B8 / A-25)
+
+Server-side PDF generation is **deferred**. Clients (Flutter / Web) render and print invoices, receipts, quotations, delivery challans, and credit notes directly from the frozen structured document snapshot returned by `billsGet` / `billsCreate` (including `billNumber`, `issueDate`, `customerSnapshot`, `items[]` with frozen unit/rate/tax/discount amounts, `taxSnapshot` with slab breakdown and legal labels `taxName`/`registrationLabel`/`invoiceTitle`, `subtotal`, `taxTotal`, `totalAmount`, `paidAmount`, `balanceAmount`, and organization header details) without additional round-trips.
+
+---
+
+## 7. Manual Emulator Testing Commands
 
 ```powershell
 # 1. Run Retail POS Lifecycle End-to-End Suite

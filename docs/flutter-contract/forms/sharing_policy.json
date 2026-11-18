@@ -1,0 +1,157 @@
+{
+  "entity": "sharing_policy",
+  "label": "Multi-Branch Sharing Policy",
+  "callables": {
+    "update": "sharingPoliciesUpdate",
+    "actions": []
+  },
+  "fields": [
+    {
+      "path": "branchId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "branch_001"
+    },
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "organization_001"
+    },
+    {
+      "path": "policies.products",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "organization_shared",
+        "branch_scoped"
+      ],
+      "uiHint": "dropdown",
+      "example": "organization_shared"
+    },
+    {
+      "path": "policies.categories",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "organization_shared",
+        "branch_scoped"
+      ],
+      "uiHint": "dropdown",
+      "example": "organization_shared"
+    },
+    {
+      "path": "policies.customers",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "organization_shared",
+        "branch_scoped"
+      ],
+      "uiHint": "dropdown",
+      "example": "organization_shared"
+    },
+    {
+      "path": "policies.vendors",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "organization_shared",
+        "branch_scoped"
+      ],
+      "uiHint": "dropdown",
+      "example": "organization_shared"
+    },
+    {
+      "path": "policies.sales",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "organization_shared",
+        "branch_scoped"
+      ],
+      "uiHint": "dropdown",
+      "example": "organization_shared"
+    },
+    {
+      "path": "policies.purchases",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "organization_shared",
+        "branch_scoped"
+      ],
+      "uiHint": "dropdown",
+      "example": "organization_shared"
+    },
+    {
+      "path": "policies.expenses",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "organization_shared",
+        "branch_scoped"
+      ],
+      "uiHint": "dropdown",
+      "example": "organization_shared"
+    },
+    {
+      "path": "policies.stock",
+      "type": "literal",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "branch_scoped"
+      ],
+      "uiHint": "text",
+      "example": "Sample stock"
+    },
+    {
+      "path": "policies.deliveries",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "organization_shared",
+        "branch_scoped"
+      ],
+      "uiHint": "dropdown",
+      "example": "organization_shared"
+    }
+  ]
+}

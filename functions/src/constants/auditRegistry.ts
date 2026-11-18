@@ -194,6 +194,8 @@ export const AUDIT_REGISTRY: Record<string, AuditRegistryEntry> = {
   requestsSetPriority: { action: "request.set_priority", category: "mutation", collection: "requests", inputFields: [] },
   requestsAddInternalNote: { action: "request.add_internal_note", category: "mutation", collection: "requests", inputFields: [] },
   requestsApply: { action: "request.apply", category: "mutation", collection: "requests", inputFields: ["overrideReason"] },
+  requestsSettingsGet: { action: "request.settings_get", category: "admin", collection: null, inputFields: [] },
+  requestsSettingsUpdate: { action: "request.settings_update", category: "admin", collection: null, inputFields: ["reason"] },
   usageGetPlatformSummary: { action: "usage.get_platform_summary", category: "admin", collection: null, inputFields: [] },
   usageGetOrganizations: { action: "usage.get_organizations", category: "admin", collection: null, inputFields: [] },
   usageGetBranches: { action: "usage.get_branches", category: "admin", collection: null, inputFields: [] },

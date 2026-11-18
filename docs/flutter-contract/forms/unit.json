@@ -3,7 +3,9 @@
   "label": "Unit",
   "callables": {
     "create": "unitsCreate",
-    "update": "unitsUpdate"
+    "list": "unitsList",
+    "update": "unitsUpdate",
+    "actions": []
   },
   "fields": [
     {
@@ -15,7 +17,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "idempotencyKey",
@@ -29,7 +31,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "organizationId",
@@ -39,8 +41,8 @@
       "nullable": true,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "name",

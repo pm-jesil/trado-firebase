@@ -1,66 +1,68 @@
 {
   "entity": "account_transfer",
-  "label": "Account Transfer",
+  "label": "Account Transfer (Contra)",
   "callables": {
     "create": "accountTransfersCreate",
-    "update": "accountTransfersList"
+    "get": "accountTransfersGet",
+    "list": "accountTransfersList",
+    "actions": []
   },
   "fields": [
     {
       "path": "organizationId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "sourceAccountId",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample sourceAccountId"
+      "example": "sourceAccount_001"
     },
     {
       "path": "destinationAccountId",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample destinationAccountId"
+      "uiHint": "text",
+      "example": "destinationAccount_001"
     },
     {
       "path": "amount",
       "type": "number",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -74,7 +76,7 @@
       "path": "transferType",
       "type": "enum",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -92,7 +94,7 @@
       "path": "notes",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 500
@@ -105,7 +107,7 @@
       "path": "idempotencyKey",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 8,
@@ -113,7 +115,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     }
   ]
 }

@@ -631,6 +631,16 @@
       "maxWrites": 6,
       "maxDeletes": 1
     },
+    "requestsSettingsGet": {
+      "maxReads": 4,
+      "maxWrites": 1,
+      "maxDeletes": 0
+    },
+    "requestsSettingsUpdate": {
+      "maxReads": 4,
+      "maxWrites": 4,
+      "maxDeletes": 0
+    },
     "requestsAssign": {
       "maxReads": 4,
       "maxWrites": 5,

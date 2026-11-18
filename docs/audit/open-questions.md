@@ -24,6 +24,18 @@ Questions raised when business semantics require owner clarification. Answered q
 | **Q-RQ11** | Bug report diagnostics opt-in | `RESOLVED` | RB3 | Bug Reports | ACCEPT (diagnostics require explicit user opt-in) (A-15) |
 | **Q-RQ12** | Existing orgs permission migration | `RESOLVED` | RB6 | Database Migration | ACCEPT (idempotent migration to system roles) (A-16) |
 | **Q-RQ13** | Dark launch feature flag | `RESOLVED` | RB3, RB4 | Feature Gate | ACCEPT (`requestsEnabled = false` default) (A-17) |
+| **Q-B1** | Organization field classes (S0/S1/S2, permission-only) | `AWAITING_CONFIRMATION` | BX2 | `organizationsUpdate`, Contract | Principle accepted (A-18); C-1 table in `docs/plans/2026-11-18-gap-closure.md` awaiting confirmation |
+| **Q-B2** | Bank accounts editability & API/audit masking | `RESOLVED` | BX2 | `organizationsUpdate`, `organizationsGet` | S1 via `org:manage_bank_details`, masked last-4 in audit & API (A-19) |
+| **Q-B3** | Requests reopen window (`reopenWindowDays`) | `RESOLVED` | BX3 | Requests Lifecycle | 14 days default, Super Admin configurable (A-20) |
+| **Q-B4** | Requests 7 category groups in `requestsMeta` | `RESOLVED` | BX3 | `requestsMeta`, Contract | 7 groups, contract-driven (A-21) |
+| **Q-B5** | Attachment cap (5 files × 5 MB) | `RESOLVED` | BX3 | Storage & Schemas | ACCEPT (5 × 5 MB) (A-22) |
+| **Q-B6** | Optional `ids` filter on `productsList` | `RESOLVED` | BX4 | `productsList`, Contract | ACCEPT (1–50 unique IDs + `missingIds`) (A-23) |
+| **Q-B7** | Live location UI deferred + MG-41 work-session gap | `RESOLVED` | BX4 | Locations Guide, Gap Register | Document & defer UI; register MG-41 work-session tracking (A-24) |
+| **Q-B8** | Server-side PDF generation deferred | `RESOLVED` | BX4 | Documents Guide | Defer; render on client from snapshot (A-25) |
+| **Q-B9** | `requestsSettingsUpdate` & `requestsSettingsGet` | `RESOLVED` | BX3 | Requests Governance | ACCEPT (`platform:requests_configure`, audited, bounded) (A-26) |
+| **Q-B10** | Duplication allowlist review (`DUP-074..DUP-100`) | `AWAITING_CONFIRMATION` | BX3 | `duplication-allowlist.json` | Prefer refactor; table in `docs/plans/2026-11-18-gap-closure.md` awaiting confirmation (A-27) |
+| **Q-B11** | Commit policy (`AGENTS.md` forbids vs local-only commits) | `OPEN` | BX6 | Git Operations | Flagged conflict: `AGENTS.md` forbids commits/tags; awaiting owner override or confirmation |
+| **Q-B12** | Honest test tiers & timeouts | `RESOLVED` | BX4 | Test Suites & `verify:full` | ACCEPT (no silent skip, emulator tier separated) (A-28) |
 
 ---
 

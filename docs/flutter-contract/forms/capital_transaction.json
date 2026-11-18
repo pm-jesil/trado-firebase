@@ -3,38 +3,39 @@
   "label": "Capital Transaction",
   "callables": {
     "create": "capitalTransactionsCreate",
-    "update": "capitalTransactionsList"
+    "list": "capitalTransactionsList",
+    "actions": []
   },
   "fields": [
     {
       "path": "organizationId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "type",
       "type": "enum",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -50,20 +51,20 @@
       "path": "financialAccountId",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample financialAccountId"
+      "example": "financialAccount_001"
     },
     {
       "path": "amount",
       "type": "number",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "format": "safeint",
@@ -78,7 +79,7 @@
       "path": "currency",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 3,
@@ -86,13 +87,13 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample currency"
+      "example": "INR"
     },
     {
       "path": "sourceReference",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 100
@@ -105,33 +106,33 @@
       "path": "description",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 500
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample description"
+      "example": "2026-11-18"
     },
     {
       "path": "supportingDocumentPath",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 500
       },
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "text",
       "example": "Sample supportingDocumentPath"
     },
     {
       "path": "idempotencyKey",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 8,
@@ -139,7 +140,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     }
   ]
 }

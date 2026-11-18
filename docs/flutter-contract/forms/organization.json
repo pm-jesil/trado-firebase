@@ -3,7 +3,73 @@
   "label": "Organization",
   "callables": {
     "create": "organizationsCreate",
-    "update": "organizationsUpdate"
+    "get": "organizationsGet",
+    "list": "organizationsList",
+    "update": "organizationsUpdate",
+    "actions": [
+      {
+        "name": "organizationsDeactivate",
+        "kind": "delete"
+      },
+      {
+        "name": "organizationsReactivate",
+        "kind": "update"
+      },
+      {
+        "name": "organizationsSetSubscription",
+        "kind": "update"
+      },
+      {
+        "name": "organizationsTransferOwnership",
+        "kind": "action"
+      }
+    ]
+  },
+  "operations": {
+    "update": {
+      "super_admin": [
+        "addresses",
+        "bankAccounts",
+        "businessCategory",
+        "businessType",
+        "contact",
+        "contactEmail",
+        "contactPhone",
+        "contacts",
+        "displayName",
+        "financialYearStartMonth",
+        "image",
+        "legalName",
+        "moduleToggles",
+        "name",
+        "salesChannels",
+        "settings",
+        "showCostToTenant",
+        "taxId",
+        "timezone",
+        "uploadId",
+        "website"
+      ],
+      "permission:org:manage_legal_profile": [
+        "legalName",
+        "taxId"
+      ],
+      "permission:org:manage_bank_details": [
+        "bankAccounts"
+      ],
+      "permission:org:update": [
+        "addresses",
+        "contact",
+        "contactEmail",
+        "contactPhone",
+        "contacts",
+        "displayName",
+        "image",
+        "settings",
+        "uploadId",
+        "website"
+      ]
+    }
   },
   "fields": [
     {
@@ -16,8 +82,8 @@
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
@@ -28,7 +94,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "idempotencyKey",
@@ -42,7 +108,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "name",
@@ -56,7 +122,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample name"
+      "example": "Sample name",
+      "editableBy": "super_admin"
     },
     {
       "path": "legalName",
@@ -70,7 +137,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample legalName"
+      "example": "Sample legalName",
+      "editableBy": "permission:org:manage_legal_profile"
     },
     {
       "path": "businessType",
@@ -92,7 +160,8 @@
         "pos_counter"
       ],
       "uiHint": "dropdown",
-      "example": "retail_only"
+      "example": "retail_only",
+      "editableBy": "super_admin"
     },
     {
       "path": "businessCategory",
@@ -122,8 +191,9 @@
         "services_repair",
         "general"
       ],
-      "uiHint": "date_picker",
-      "example": "bicycle"
+      "uiHint": "dropdown",
+      "example": "bicycle",
+      "editableBy": "super_admin"
     },
     {
       "path": "country",
@@ -137,7 +207,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample country"
+      "example": "IN"
     },
     {
       "path": "currency",
@@ -151,7 +221,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample currency"
+      "example": "INR"
     },
     {
       "path": "currencyDecimals",
@@ -235,7 +305,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample planId"
+      "example": "plan_001"
     },
     {
       "path": "createOwner",
@@ -245,7 +315,7 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "switch",
       "example": true
     },
     {
@@ -270,7 +340,7 @@
       },
       "enumValues": [],
       "uiHint": "email",
-      "example": "Sample ownerEmail"
+      "example": "owner@example.com"
     },
     {
       "path": "ownerName",
@@ -295,7 +365,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "phone",
-      "example": "Sample ownerPhone"
+      "example": "+919876543210"
     },
     {
       "path": "credentialMode",
@@ -340,7 +410,8 @@
       },
       "enumValues": [],
       "uiHint": "numeric",
-      "example": 1
+      "example": 1,
+      "editableBy": "super_admin"
     },
     {
       "path": "taxId",
@@ -353,7 +424,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample taxId"
+      "example": "tax_001",
+      "editableBy": "permission:org:manage_legal_profile"
     },
     {
       "path": "website",
@@ -366,7 +438,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample website"
+      "example": "https://example.com",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].id",
@@ -379,7 +452,8 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].id"
+      "example": "addresses___id_001",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].label",
@@ -392,7 +466,8 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].label"
+      "example": "Sample label",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].line1",
@@ -406,7 +481,8 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].line1"
+      "example": "Sample line1",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].line2",
@@ -419,7 +495,8 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].line2"
+      "example": "Sample line2",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].area",
@@ -432,7 +509,8 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].area"
+      "example": "Sample area",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].city",
@@ -446,7 +524,8 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].city"
+      "example": "Sample city",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].state",
@@ -459,8 +538,9 @@
         "maxLength": 100
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample addresses[].state"
+      "uiHint": "textarea",
+      "example": "Sample state",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].postalCode",
@@ -474,7 +554,8 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].postalCode"
+      "example": "Sample postalCode",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].country",
@@ -488,7 +569,8 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].country"
+      "example": "IN",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].geoPoint.latitude",
@@ -503,8 +585,9 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": 1
+      "uiHint": "textarea",
+      "example": 1,
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].geoPoint.longitude",
@@ -520,7 +603,8 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": 1
+      "example": 1,
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].contactName",
@@ -533,7 +617,8 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].contactName"
+      "example": "Sample contactName",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].phone",
@@ -544,7 +629,8 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "phone",
-      "example": "Sample addresses[].phone"
+      "example": "+919876543210",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].isDefaultBilling",
@@ -555,7 +641,8 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "textarea",
-      "example": true
+      "example": true,
+      "editableBy": "permission:org:update"
     },
     {
       "path": "addresses[].isDefaultShipping",
@@ -566,7 +653,8 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "textarea",
-      "example": true
+      "example": true,
+      "editableBy": "permission:org:update"
     },
     {
       "path": "bankAccounts[].id",
@@ -579,7 +667,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].id"
+      "example": "bankAccounts___id_001",
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "bankAccounts[].label",
@@ -592,7 +681,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].label"
+      "example": "Sample label",
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "bankAccounts[].accountHolderName",
@@ -606,7 +696,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].accountHolderName"
+      "example": "Sample accountHolderName",
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "bankAccounts[].bankName",
@@ -620,7 +711,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].bankName"
+      "example": "Sample bankName",
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "bankAccounts[].accountNumber",
@@ -634,7 +726,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].accountNumber"
+      "example": "Sample accountNumber",
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "bankAccounts[].routingType",
@@ -652,7 +745,8 @@
         "other"
       ],
       "uiHint": "dropdown",
-      "example": "ifsc"
+      "example": "ifsc",
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "bankAccounts[].routingCode",
@@ -665,7 +759,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].routingCode"
+      "example": "Sample routingCode",
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "bankAccounts[].upiId",
@@ -678,7 +773,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].upiId"
+      "example": "bankAccounts___upi_001",
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "bankAccounts[].currency",
@@ -692,7 +788,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].currency"
+      "example": "INR",
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "bankAccounts[].isDefault",
@@ -703,7 +800,8 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "switch",
-      "example": true
+      "example": true,
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "bankAccounts[].showOnInvoice",
@@ -714,7 +812,8 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "switch",
-      "example": true
+      "example": true,
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "bankAccounts[].status",
@@ -727,8 +826,9 @@
         "active",
         "archived"
       ],
-      "uiHint": "date_picker",
-      "example": "active"
+      "uiHint": "dropdown",
+      "example": "active",
+      "editableBy": "permission:org:manage_bank_details"
     },
     {
       "path": "image.path",
@@ -742,7 +842,8 @@
       },
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": "Sample image.path"
+      "example": "Sample path",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "image.contentType",
@@ -757,7 +858,8 @@
         "image/webp"
       ],
       "uiHint": "image_picker",
-      "example": "image/jpeg"
+      "example": "image/jpeg",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "image.width",
@@ -774,7 +876,8 @@
       },
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": 1
+      "example": 1,
+      "editableBy": "permission:org:update"
     },
     {
       "path": "image.height",
@@ -791,7 +894,8 @@
       },
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": 1
+      "example": 1,
+      "editableBy": "permission:org:update"
     },
     {
       "path": "image.sizeBytes",
@@ -808,7 +912,8 @@
       },
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": 1
+      "example": 1,
+      "editableBy": "permission:org:update"
     },
     {
       "path": "image.updatedAt",
@@ -819,7 +924,8 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": "Sample image.updatedAt"
+      "example": "2026-11-18",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "image.thumbnailPath",
@@ -833,7 +939,8 @@
       },
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": "Sample image.thumbnailPath"
+      "example": "Sample thumbnailPath",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "uploadId",
@@ -843,8 +950,9 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample uploadId"
+      "uiHint": "image_picker",
+      "example": "upload_001",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "defaultBranchName",
@@ -889,7 +997,8 @@
         "online"
       ],
       "uiHint": "dropdown",
-      "example": "pos"
+      "example": "pos",
+      "editableBy": "super_admin"
     },
     {
       "path": "timezone",
@@ -903,7 +1012,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample timezone"
+      "example": "Asia/Kolkata",
+      "editableBy": "super_admin"
     },
     {
       "path": "contact.name",
@@ -917,7 +1027,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample contact.name"
+      "example": "Sample name",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contact.email",
@@ -931,7 +1042,8 @@
       },
       "enumValues": [],
       "uiHint": "email",
-      "example": "Sample contact.email"
+      "example": "owner@example.com",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contact.phone",
@@ -945,7 +1057,8 @@
       },
       "enumValues": [],
       "uiHint": "phone",
-      "example": "Sample contact.phone"
+      "example": "+919876543210",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contact.altPhone",
@@ -959,7 +1072,8 @@
       },
       "enumValues": [],
       "uiHint": "phone",
-      "example": "Sample contact.altPhone"
+      "example": "+919876543210",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].id",
@@ -973,7 +1087,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample contacts[].id"
+      "example": "contacts___id_001",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].name",
@@ -987,7 +1102,8 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample contacts[].name"
+      "example": "Sample name",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].designation",
@@ -999,8 +1115,9 @@
         "maxLength": 100
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample contacts[].designation"
+      "uiHint": "text",
+      "example": "2026-11-18",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].phone",
@@ -1013,7 +1130,8 @@
       },
       "enumValues": [],
       "uiHint": "phone",
-      "example": "Sample contacts[].phone"
+      "example": "+919876543210",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].email",
@@ -1026,7 +1144,8 @@
       },
       "enumValues": [],
       "uiHint": "email",
-      "example": "Sample contacts[].email"
+      "example": "owner@example.com",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].type",
@@ -1043,7 +1162,8 @@
         "other"
       ],
       "uiHint": "dropdown",
-      "example": "primary"
+      "example": "primary",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].isPrimary",
@@ -1054,7 +1174,8 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "switch",
-      "example": true
+      "example": true,
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].notifyBy",
@@ -1070,7 +1191,8 @@
         "none"
       ],
       "uiHint": "dropdown",
-      "example": "email"
+      "example": "email",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].isActive",
@@ -1081,7 +1203,8 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "switch",
-      "example": true
+      "example": true,
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].createdAt",
@@ -1094,7 +1217,8 @@
       },
       "enumValues": [],
       "uiHint": "date_picker",
-      "example": "Sample contacts[].createdAt"
+      "example": "2026-11-18T12:00:00.000Z",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].updatedAt",
@@ -1107,7 +1231,8 @@
       },
       "enumValues": [],
       "uiHint": "date_picker",
-      "example": "Sample contacts[].updatedAt"
+      "example": "2026-11-18",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].createdBy",
@@ -1117,8 +1242,9 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample contacts[].createdBy"
+      "uiHint": "text",
+      "example": "Sample createdBy",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "contacts[].updatedBy",
@@ -1129,7 +1255,8 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "date_picker",
-      "example": "Sample contacts[].updatedBy"
+      "example": "2026-11-18",
+      "editableBy": "permission:org:update"
     },
     {
       "path": "subscription.status",
@@ -1146,7 +1273,7 @@
         "suspended",
         "cancelled"
       ],
-      "uiHint": "date_picker",
+      "uiHint": "dropdown",
       "example": "trial"
     },
     {
@@ -1160,7 +1287,7 @@
       },
       "enumValues": [],
       "uiHint": "date_picker",
-      "example": "Sample subscription.startsAt"
+      "example": "2026-11-18T12:00:00.000Z"
     },
     {
       "path": "subscription.expiresOn",
@@ -1173,7 +1300,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample subscription.expiresOn"
+      "example": "2026-11-18"
     },
     {
       "path": "subscription.durationDays",
@@ -1189,7 +1316,7 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "numeric",
       "example": 1
     },
     {

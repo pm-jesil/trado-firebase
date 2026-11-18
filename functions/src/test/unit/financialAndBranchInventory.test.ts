@@ -460,7 +460,7 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
           `Permission "${perm}" must be registered in AppPermissions catalog`
         );
       }
-      assert.strictEqual(permissions.length, 147, "AppPermissions catalog must contain exactly 147 keys");
+      assert.strictEqual(permissions.length, 149, "AppPermissions catalog must contain exactly 149 keys (incl. org:manage_legal_profile & org:manage_bank_details)");
     });
 
     it("Maps maker-checker approval permissions for account and stock transfers", () => {
@@ -498,15 +498,13 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
     });
   });
 
-  describe("5. Organization Governance Policy (FB-2, FB-4)", () => {
-    it("Allows Admin role to update non-sensitive organization fields", () => {
+  describe("5. Organization Governance Policy (FB-2, FB-4, D-54)", () => {
+    it("Allows plain org:update (S2) on non-sensitive organization fields only", () => {
       const adminPolicy = ORGANIZATION_FIELD_POLICY.admin;
       assert.ok(adminPolicy, "ORGANIZATION_FIELD_POLICY.admin must exist");
 
-      const allowedForAdmin = [
-        "legalName",
+      const allowedForS2 = [
         "displayName",
-        "taxId",
         "website",
         "contactEmail",
         "contactPhone",
@@ -515,30 +513,33 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
         "settings",
       ];
 
-      for (const field of allowedForAdmin) {
+      for (const field of allowedForS2) {
         assert.ok(
           adminPolicy.has(field),
-          `Admin policy must allow non-sensitive field "${field}"`
+          `S2 policy must allow non-sensitive field "${field}"`
         );
       }
     });
 
-    it("Protects sensitive organization fields from Admin and keeps them Super Admin only", () => {
+    it("Protects S0 (Super Admin only) and S1 (dedicated permission) fields from plain org:update", () => {
       const adminPolicy = ORGANIZATION_FIELD_POLICY.admin;
-      const superAdminOnly = [
+      const protectedFromPlainUpdate = [
         "name",
         "businessType",
         "businessCategory",
         "financialYearStartMonth",
         "moduleToggles",
         "showCostToTenant",
+        "legalName",
+        "taxId",
+        "bankAccounts",
       ];
 
-      for (const field of superAdminOnly) {
+      for (const field of protectedFromPlainUpdate) {
         assert.strictEqual(
           adminPolicy.has(field),
           false,
-          `Sensitive field "${field}" must NOT be editable by tenant Admin`
+          `Sensitive field "${field}" must NOT be editable via plain org:update`
         );
       }
     });

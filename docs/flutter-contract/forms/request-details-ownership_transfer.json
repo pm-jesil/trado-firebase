@@ -12,7 +12,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample newOwnerUserId"
+      "example": "newOwnerUser_001"
     },
     {
       "path": "newOwnerEmail",
@@ -24,7 +24,7 @@
       },
       "enumValues": [],
       "uiHint": "email",
-      "example": "Sample newOwnerEmail"
+      "example": "owner@example.com"
     },
     {
       "path": "effectiveFrom",
@@ -33,7 +33,7 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "text",
+      "uiHint": "date_picker",
       "example": "Sample effectiveFrom"
     },
     {
@@ -46,8 +46,8 @@
         "maxLength": 2000
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample reason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     }
   ]
 }

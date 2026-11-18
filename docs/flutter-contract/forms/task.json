@@ -3,7 +3,19 @@
   "label": "Task",
   "callables": {
     "create": "tasksCreate",
-    "update": "tasksUpdateStatus"
+    "list": "tasksList",
+    "update": "tasksUpdate",
+    "delete": "tasksDelete",
+    "actions": [
+      {
+        "name": "tasksUpdateStatus",
+        "kind": "update"
+      },
+      {
+        "name": "tasksAssign",
+        "kind": "update"
+      }
+    ]
   },
   "fields": [
     {
@@ -15,7 +27,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "idempotencyKey",
@@ -26,7 +38,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "organizationId",
@@ -36,14 +48,14 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "title",
       "type": "string",
       "requiredCreate": true,
-      "updatable": false,
+      "updatable": true,
       "nullable": false,
       "bounds": {
         "minLength": 2,
@@ -57,33 +69,33 @@
       "path": "description",
       "type": "string",
       "requiredCreate": false,
-      "updatable": false,
+      "updatable": true,
       "nullable": false,
       "bounds": {
         "maxLength": 2000
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample description"
+      "example": "2026-11-18"
     },
     {
       "path": "assignedToMembershipId",
       "type": "string",
       "requiredCreate": true,
-      "updatable": false,
+      "updatable": true,
       "nullable": false,
       "bounds": {
         "minLength": 3
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample assignedToMembershipId"
+      "example": "assignedToMembership_001"
     },
     {
       "path": "priority",
       "type": "enum",
       "requiredCreate": false,
-      "updatable": false,
+      "updatable": true,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -99,14 +111,14 @@
       "path": "dueAt",
       "type": "string",
       "requiredCreate": false,
-      "updatable": false,
+      "updatable": true,
       "nullable": false,
       "bounds": {
         "format": "datetime"
       },
       "enumValues": [],
       "uiHint": "date_picker",
-      "example": "Sample dueAt"
+      "example": "2026-11-18T12:00:00.000Z"
     },
     {
       "path": "relatedEntityType",
@@ -123,7 +135,7 @@
         "vendor",
         "product"
       ],
-      "uiHint": "date_picker",
+      "uiHint": "dropdown",
       "example": "bill"
     },
     {
@@ -134,8 +146,8 @@
       "nullable": true,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample relatedEntityId"
+      "uiHint": "text",
+      "example": "relatedEntity_001"
     }
   ]
 }

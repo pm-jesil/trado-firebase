@@ -25,7 +25,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample entityId"
+      "example": "entity_001"
     },
     {
       "path": "whatIsWrong",
@@ -37,7 +37,7 @@
         "maxLength": 2000
       },
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "text",
       "example": "Sample whatIsWrong"
     },
     {

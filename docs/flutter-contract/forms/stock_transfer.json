@@ -3,103 +3,126 @@
   "label": "Stock Transfer",
   "callables": {
     "create": "stockTransfersCreate",
-    "update": "stockTransfersDispatch"
+    "get": "stockTransfersGet",
+    "list": "stockTransfersList",
+    "actions": [
+      {
+        "name": "stockTransfersSubmit",
+        "kind": "action"
+      },
+      {
+        "name": "stockTransfersDispatch",
+        "kind": "action"
+      },
+      {
+        "name": "stockTransfersReceive",
+        "kind": "action"
+      },
+      {
+        "name": "stockTransfersCancel",
+        "kind": "delete"
+      },
+      {
+        "name": "stockTransfersResolveDiscrepancy",
+        "kind": "action"
+      }
+    ]
   },
   "fields": [
     {
       "path": "organizationId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "sourceBranchId",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample sourceBranchId"
+      "example": "sourceBranch_001"
     },
     {
       "path": "destinationBranchId",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
-      "nullable": false,
-      "bounds": {
-        "minLength": 2
-      },
-      "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample destinationBranchId"
-    },
-    {
-      "path": "sourceLocationId",
-      "type": "string",
-      "requiredCreate": false,
-      "updatable": true,
-      "nullable": false,
-      "bounds": {
-        "minLength": 2
-      },
-      "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample sourceLocationId"
-    },
-    {
-      "path": "destinationLocationId",
-      "type": "string",
-      "requiredCreate": false,
-      "updatable": true,
-      "nullable": false,
-      "bounds": {
-        "minLength": 2
-      },
-      "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample destinationLocationId"
-    },
-    {
-      "path": "items[].productId",
-      "type": "string",
-      "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample items[].productId"
+      "example": "destinationBranch_001"
+    },
+    {
+      "path": "sourceLocationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "sourceLocation_001"
+    },
+    {
+      "path": "destinationLocationId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "destinationLocation_001"
+    },
+    {
+      "path": "items[].productId",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "items___product_001"
     },
     {
       "path": "items[].requestedQty",
       "type": "number",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -113,7 +136,7 @@
       "path": "items[].quantity",
       "type": "number",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -127,7 +150,7 @@
       "path": "items[].unit",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 1,
@@ -135,13 +158,13 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample items[].unit"
+      "example": "Sample unit"
     },
     {
       "path": "items[].conversionFactor",
       "type": "number",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -155,46 +178,46 @@
       "path": "items[].batchNumber",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 100
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample items[].batchNumber"
+      "uiHint": "text",
+      "example": "Sample batchNumber"
     },
     {
       "path": "items[].expiryDate",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 50
       },
       "enumValues": [],
       "uiHint": "date_picker",
-      "example": "Sample items[].expiryDate"
+      "example": "2026-11-18"
     },
     {
       "path": "items[].notes",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 200
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample items[].notes"
+      "example": "Sample notes"
     },
     {
       "path": "items[].serialNumbers[]",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 1,
@@ -202,40 +225,40 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample items[].serialNumbers[]"
+      "example": "Sample serialNumbers[]"
     },
     {
       "path": "handlingFee",
       "type": "number",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "handlingFeeFinancialAccountId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample handlingFeeFinancialAccountId"
+      "example": "handlingFeeFinancialAccount_001"
     },
     {
       "path": "notes",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 500
@@ -248,7 +271,7 @@
       "path": "idempotencyKey",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 8,
@@ -256,7 +279,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     }
   ]
 }

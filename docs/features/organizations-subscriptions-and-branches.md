@@ -338,7 +338,15 @@ interface SwitchBranchContextRequest {
 
 ---
 
-## 6. Manual Emulator Testing Commands
+## 6. Session Organization Selection & Multi-Organization Switch (CP-4 — ON HOLD)
+
+- **Single active membership:** `authMe` / `authLogin` automatically resolve that organization as `primaryOrganization` (`contextStatus: "active"`).
+- **Multiple active memberships:** `sessionContext.ts` selects the membership marked `isPrimary: true`. If none is marked primary, `authMe` returns `contextStatus: "organization_selection_required"` with `primaryOrganization: null`, `permissions: []`, and candidate `organizations[]`.
+- **No switch callable (ON HOLD):** No backend callable exists to change `isPrimary` across organizations. Both `authMe` and `authLogin` validate strict Zod schemas (`AuthMeSchema`, `AuthLoginSchema`) and **reject `requestedOrgId` with `UNKNOWN_FIELD`**. Multi-organization switching remains **ON HOLD** (frozen backend backlog item FB-1).
+
+---
+
+## 7. Manual Emulator Testing Commands
 
 To test and verify organization and branch lifecycles manually against local emulators:
 

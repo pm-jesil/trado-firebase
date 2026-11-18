@@ -3,7 +3,15 @@
   "label": "Financial Account",
   "callables": {
     "create": "financialAccountsCreate",
-    "update": "financialAccountsUpdate"
+    "get": "financialAccountsGet",
+    "list": "financialAccountsList",
+    "update": "financialAccountsUpdate",
+    "actions": [
+      {
+        "name": "financialAccountsGetLedger",
+        "kind": "list"
+      }
+    ]
   },
   "fields": [
     {
@@ -16,8 +24,8 @@
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
@@ -28,7 +36,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "name",
@@ -88,7 +96,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample currency"
+      "example": "INR"
     },
     {
       "path": "assignedBranchIds[]",
@@ -115,7 +123,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankDetails.bankName"
+      "example": "Sample bankName"
     },
     {
       "path": "bankDetails.accountNumberMasked",
@@ -129,7 +137,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankDetails.accountNumberMasked"
+      "example": "Sample accountNumberMasked"
     },
     {
       "path": "bankDetails.ifscOrSwift",
@@ -143,7 +151,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankDetails.ifscOrSwift"
+      "example": "Sample ifscOrSwift"
     },
     {
       "path": "bankDetails.bankBranchName",
@@ -156,7 +164,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankDetails.bankBranchName"
+      "example": "Sample bankBranchName"
     },
     {
       "path": "bankDetails.upiId",
@@ -169,7 +177,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankDetails.upiId"
+      "example": "bankDetails_upi_001"
     },
     {
       "path": "feeRule.feePercent",
@@ -184,8 +192,8 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "feeRule.feeFixed",
@@ -199,8 +207,8 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "feeRule.feeTaxPercent",
@@ -215,8 +223,8 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "feeRule.settlementDays",
@@ -230,8 +238,8 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "openingBalance",
@@ -241,8 +249,8 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "isDefault",
@@ -280,7 +288,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     }
   ]
 }

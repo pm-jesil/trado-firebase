@@ -6,7 +6,7 @@ Every callable and trigger has exactly one action. Events are written by the cou
 
 | Category | Exports |
 |---|---|
-| `admin` | 19 |
+| `admin` | 21 |
 | `auth` | 2 |
 | `export` | 3 |
 | `file` | 3 |
@@ -159,6 +159,8 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `requestsList` | `request.list` | `request` | `list` | `audit.action.request.list` | No | No | none | `requests` | — |
 | `requestsMeta` | `request.meta` | `request` | `meta` | `audit.action.request.meta` | No | Yes | mutation | `requests` | — |
 | `requestsSetPriority` | `request.set_priority` | `request` | `set_priority` | `audit.action.request.set_priority` | No | Yes | mutation | `requests` | — |
+| `requestsSettingsGet` | `request.settings_get` | `request` | `settings_get` | `audit.action.request.settings_get` | No | No | admin | — | — |
+| `requestsSettingsUpdate` | `request.settings_update` | `request` | `settings_update` | `audit.action.request.settings_update` | No | No | admin | — | `reason` |
 | `requestsSlaAndLifecycleSweep` | `request.sla_and_lifecycle_sweep` | `request` | `sla_and_lifecycle_sweep` | `audit.action.request.sla_and_lifecycle_sweep` | No | No | system | `requests` | — |
 | `requestsTransition` | `request.transition` | `request` | `transition` | `audit.action.request.transition` | No | Yes | mutation | `requests` | `note`, `overrideReason`, `reason` |
 | `requestsUpdate` | `request.update` | `request` | `update` | `audit.action.request.update` | No | Yes | mutation | `requests` | — |

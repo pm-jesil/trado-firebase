@@ -656,14 +656,6 @@
       "cap": 10
     },
     {
-      "id": "DUP-077",
-      "kind": "OWNED",
-      "collection": "requests",
-      "field": "organizationName",
-      "owner": "requests",
-      "reason": "Snapshot of organization name at creation time for platform request inbox without cross-tenant joins."
-    },
-    {
       "id": "DUP-078",
       "kind": "R4",
       "collection": "requests",

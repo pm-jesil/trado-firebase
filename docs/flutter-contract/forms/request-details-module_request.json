@@ -38,8 +38,8 @@
         "maxLength": 2000
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample reason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     }
   ]
 }

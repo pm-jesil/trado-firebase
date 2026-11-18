@@ -70,8 +70,7 @@ async function createTenantOwnerPersona(superAdminToken, orgPrefix = "TestOrg", 
   } else if (superAdminToken && superAdminToken.idToken) {
     resolvedToken = superAdminToken.idToken;
   } else if (typeof superAdminToken === "string" && !superAdminToken.includes(".")) {
-    orgPrefix = superAdminToken;
-    resolvedToken = null;
+    throw new Error(`Invalid persona or non-JWT token "${superAdminToken}" passed to createTenantOwnerPersona (TT-9 / BM-20: silent Super Admin fallback is forbidden).`);
   }
 
   if (!resolvedToken) {

@@ -3,7 +3,9 @@
   "label": "Recurring Expense",
   "callables": {
     "create": "recurringExpensesCreate",
-    "update": "recurringExpensesUpdate"
+    "list": "recurringExpensesList",
+    "update": "recurringExpensesUpdate",
+    "actions": []
   },
   "fields": [
     {
@@ -16,8 +18,8 @@
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
@@ -28,7 +30,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "idempotencyKey",
@@ -42,7 +44,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "name",
@@ -69,7 +71,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample vendorId"
+      "example": "vendor_001"
     },
     {
       "path": "payee",
@@ -111,7 +113,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample payeeMembershipId"
+      "example": "payeeMembership_001"
     },
     {
       "path": "expenseCategoryId",
@@ -123,8 +125,8 @@
         "maxLength": 60
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample expenseCategoryId"
+      "uiHint": "text",
+      "example": "expenseCategory_001"
     },
     {
       "path": "lines[].productId",
@@ -135,7 +137,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample lines[].productId"
+      "example": "lines___product_001"
     },
     {
       "path": "lines[].itemName",
@@ -149,7 +151,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample lines[].itemName"
+      "example": "Sample itemName"
     },
     {
       "path": "lines[].categoryId",
@@ -159,8 +161,8 @@
       "nullable": true,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample lines[].categoryId"
+      "uiHint": "text",
+      "example": "lines___category_001"
     },
     {
       "path": "lines[].quantity",
@@ -188,7 +190,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample lines[].unit"
+      "example": "Sample unit"
     },
     {
       "path": "lines[].unitPrice",
@@ -253,8 +255,8 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample lines[].batch"
+      "uiHint": "text",
+      "example": "Sample batch"
     },
     {
       "path": "lines[].expiryDate",
@@ -267,7 +269,7 @@
       },
       "enumValues": [],
       "uiHint": "date_picker",
-      "example": "Sample lines[].expiryDate"
+      "example": "2026-11-18"
     },
     {
       "path": "lines[].damagedQuantity",
@@ -293,8 +295,8 @@
         "maxLength": 300
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample lines[].damageReason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     },
     {
       "path": "lines[].serialNumbers[]",
@@ -308,7 +310,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample lines[].serialNumbers[]"
+      "example": "Sample serialNumbers[]"
     },
     {
       "path": "frequency",
@@ -368,8 +370,8 @@
         "format": "regex"
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample startOn"
+      "uiHint": "date_picker",
+      "example": "2026-11-18"
     },
     {
       "path": "endOn",
@@ -382,7 +384,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample endOn"
+      "example": "2026-11-18"
     }
   ]
 }

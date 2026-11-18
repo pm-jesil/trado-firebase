@@ -1,9 +1,9 @@
 {
   "projectId": "trado-x",
   "region": "asia-south1",
-  "totalExports": 194,
+  "totalExports": 196,
   "summary": {
-    "callableCount": 186,
+    "callableCount": 188,
     "triggerCount": 8,
     "concreteCollectionsCount": 61,
     "categoryCounts": {
@@ -11,7 +11,7 @@
       "CALLER_IDENTITY": 5,
       "CONTEXT_SELECTION": 1,
       "ORGANIZATION_ONBOARDING": 4,
-      "PLATFORM_SUPER_ADMIN": 27,
+      "PLATFORM_SUPER_ADMIN": 29,
       "REFERENCE_DATA": 5,
       "DERIVED_TENANT_OPERATION": 73,
       "FILTER_OPTIONAL_TENANT": 69
@@ -497,7 +497,9 @@
         "requestsAssign",
         "requestsSetPriority",
         "requestsAddInternalNote",
-        "requestsApply"
+        "requestsApply",
+        "requestsSettingsGet",
+        "requestsSettingsUpdate"
       ]
     },
     "REFERENCE_DATA": {

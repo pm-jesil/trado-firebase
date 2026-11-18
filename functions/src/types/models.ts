@@ -1580,7 +1580,6 @@ export interface RequestDoc {
   appliedAt?: string | null;
   appliedBy?: string | null;
   applyResult?: Record<string, unknown> | null;
-  organizationName: string;
   requesterName: string;
   currentPlanName?: string | null;
   requestedPlanName?: string | null;

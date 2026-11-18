@@ -62,20 +62,101 @@ import { fetchPage } from "../services/pagination.js";
  * D-15: `logoUrl` and `imageUrls` are removed from all write paths. The image is set via
  *        `uploadId` (processed by imageEngine) or `image: ImageRef` (typed, no url field).
  */
+/**
+ * Permission-Driven Organization Field Edit Policy (D-54, Q-B1 / A-18, Q-B2 / A-19).
+ *
+ * Decided strictly by permission codes — NEVER by role names:
+ *   - S0 (Super Admin only): identity, entitlements, billing, and system configuration fields.
+ *   - S1 (Sensitive tenant profile): requires dedicated permission (`org:manage_legal_profile` for
+ *     `legalName`/`taxId`; `org:manage_bank_details` for `bankAccounts`). Owner role holds `*` by default.
+ *   - S2 (Non-sensitive operational profile): requires `org:update`.
+ *
+ * Fail closed: any field not in ORGANIZATION_FIELD_CLASS is rejected by `canEditOrganizationField`
+ * and caught at build/test time by `organizationEditPolicy.test.ts` (BM-4).
+ */
+export type OrganizationFieldClass = "S0" | "S1" | "S2";
+
+export interface OrganizationFieldRule {
+  fieldClass: OrganizationFieldClass;
+  /** null means Super Admin only (S0). */
+  requiredPermission: string | null;
+}
+
+export const ORGANIZATION_FIELD_CLASS: Record<string, OrganizationFieldRule> = {
+  // S0 — Super Admin only
+  name: { fieldClass: "S0", requiredPermission: null },
+  businessType: { fieldClass: "S0", requiredPermission: null },
+  businessCategory: { fieldClass: "S0", requiredPermission: null },
+  financialYearStartMonth: { fieldClass: "S0", requiredPermission: null },
+  moduleToggles: { fieldClass: "S0", requiredPermission: null },
+  salesChannels: { fieldClass: "S0", requiredPermission: null },
+  timezone: { fieldClass: "S0", requiredPermission: null },
+  showCostToTenant: { fieldClass: "S0", requiredPermission: null },
+  // S1 — Sensitive legal & bank fields (dedicated permission, never plain org:update)
+  legalName: { fieldClass: "S1", requiredPermission: AppPermissions.ORG_MANAGE_LEGAL_PROFILE },
+  taxId: { fieldClass: "S1", requiredPermission: AppPermissions.ORG_MANAGE_LEGAL_PROFILE },
+  bankAccounts: { fieldClass: "S1", requiredPermission: AppPermissions.ORG_MANAGE_BANK_DETAILS },
+  // S2 — Non-sensitive operational fields (org:update)
+  displayName: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
+  image: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
+  uploadId: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
+  website: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
+  contactEmail: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
+  contactPhone: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
+  contact: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
+  contacts: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
+  addresses: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
+  settings: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
+};
+
+export interface OrgPolicyActor {
+  isSuperAdmin: boolean;
+  can: (permission: string) => boolean;
+}
+
+/**
+ * Single authoritative decision function for organization field edits (D-54).
+ * Uses permission codes exclusively (never role names). Fails closed on unclassified fields.
+ */
+export function canEditOrganizationField(actor: OrgPolicyActor, field: string): boolean {
+  const rule = ORGANIZATION_FIELD_CLASS[field];
+  if (!rule) return false; // fail closed
+  if (actor.isSuperAdmin) return true;
+  if (rule.fieldClass === "S0" || !rule.requiredPermission) return false;
+  return actor.can(rule.requiredPermission);
+}
+
+/**
+ * Masks bank account numbers to last 4 characters for API responses (Q-B2 / A-19, MG-37).
+ */
+export function maskBankAccounts<T extends { accountNumber?: string | null; iban?: string | null }>(
+  accounts: T[] | undefined | null
+): T[] {
+  if (!Array.isArray(accounts)) return [];
+  return accounts.map((acc) => ({
+    ...acc,
+    ...(typeof acc.accountNumber === "string" && acc.accountNumber.length > 0
+      ? { accountNumber: `****${acc.accountNumber.slice(-4)}` }
+      : {}),
+    ...(typeof acc.iban === "string" && acc.iban.length > 0
+      ? { iban: `****${acc.iban.slice(-4)}` }
+      : {}),
+  }));
+}
+
+/** Derived compatibility sets for contract generation & legacy references (single source: ORGANIZATION_FIELD_CLASS). */
 export const ORGANIZATION_FIELD_POLICY: Record<"superAdmin" | "owner" | "admin", ReadonlySet<string>> = {
-  superAdmin: new Set([
-    "name", "legalName", "displayName", "businessType", "businessCategory", "financialYearStartMonth", "moduleToggles", "salesChannels", "timezone",
-    "image", "uploadId", "taxId", "website", "contactEmail", "contactPhone", "contact", "contacts",
-    "addresses", "bankAccounts", "settings", "showCostToTenant",
-  ]),
-  owner: new Set([
-    "legalName", "displayName", "image", "uploadId", "taxId", "website", "contactEmail", "contactPhone", "contact", "contacts",
-    "addresses", "bankAccounts", "settings",
-  ]),
-  admin: new Set([
-    "legalName", "displayName", "image", "uploadId", "taxId", "website", "contactEmail", "contactPhone", "contact", "contacts",
-    "addresses", "settings",
-  ]),
+  superAdmin: new Set(Object.keys(ORGANIZATION_FIELD_CLASS)),
+  owner: new Set(
+    Object.entries(ORGANIZATION_FIELD_CLASS)
+      .filter(([, r]) => r.fieldClass === "S1" || r.fieldClass === "S2")
+      .map(([k]) => k)
+  ),
+  admin: new Set(
+    Object.entries(ORGANIZATION_FIELD_CLASS)
+      .filter(([, r]) => r.fieldClass === "S2")
+      .map(([k]) => k)
+  ),
 };
 
 /** Default sales channels by business type when none are supplied at creation. */
@@ -335,26 +416,29 @@ export const organizationsUpdate = onCall({ region: "asia-south1" }, async (requ
   const input = parseInput(UpdateOrganizationSchema, request.data);
 
   const isSuperAdmin = request.auth.token.isSuperAdmin === true;
-  let tier: "superAdmin" | "owner" | "admin" = "superAdmin";
+  let policyActor: OrgPolicyActor;
 
-  if (!isSuperAdmin) {
-    const memDoc = await db.collection("memberships").doc(`${request.auth.uid}_${input.organizationId}`).get();
-    if (!memDoc.exists) {
-      throw new HttpsError("permission-denied", "Not a member of this organization.");
+  if (isSuperAdmin) {
+    policyActor = { isSuperAdmin: true, can: () => true };
+  } else {
+    const ctx = await resolveRequestContext(request, {
+      organizationId: input.organizationId,
+    });
+    const hasAnyOrgEditPerm =
+      ctx.can(AppPermissions.ORG_UPDATE) ||
+      ctx.can(AppPermissions.ORG_MANAGE_LEGAL_PROFILE) ||
+      ctx.can(AppPermissions.ORG_MANAGE_BANK_DETAILS);
+    if (!hasAnyOrgEditPerm) {
+      throw new HttpsError(
+        "permission-denied",
+        `[${GateReason.PERMISSION_DENIED}] Insufficient permissions: "org:update" is required.`,
+        { reason: GateReason.PERMISSION_DENIED }
+      );
     }
-    const memData = memDoc.data() as MembershipDoc;
-    if (memData.status !== "active") {
-      throw new HttpsError("permission-denied", "Membership is inactive.");
-    }
-    if (memData.roleId === "role_org_owner") {
-      tier = "owner";
-    } else {
-      await resolveRequestContext(request, {
-        organizationId: input.organizationId,
-        requiredPermission: AppPermissions.ORG_UPDATE,
-      });
-      tier = "admin";
-    }
+    policyActor = {
+      isSuperAdmin: false,
+      can: (perm: string) => ctx.can(perm),
+    };
   }
 
   const orgRef = db.collection("organizations").doc(input.organizationId);
@@ -370,9 +454,24 @@ export const organizationsUpdate = onCall({ region: "asia-south1" }, async (requ
     }
   }
 
-  // Field-level write control: every supplied field must be editable by the caller's tier
+  // Field-level write control (D-54): validate EVERY supplied field BEFORE side effects (atomic rejection).
   const fields: Record<string, unknown> = { ...input };
   delete fields.organizationId;
+  delete fields.branchId;
+
+  const requestedBeforeAttach = Object.keys(fields).filter((k) => fields[k] !== undefined);
+  if (requestedBeforeAttach.length === 0) {
+    throw new HttpsError("invalid-argument", "No updatable fields supplied.");
+  }
+
+  const forbidden = requestedBeforeAttach.filter((f) => !canEditOrganizationField(policyActor, f));
+  if (forbidden.length > 0) {
+    throw new HttpsError(
+      "permission-denied",
+      `[${GateReason.FIELD_NOT_EDITABLE}] Field(s) not editable with current permissions: ${forbidden.join(", ")}.`,
+      { reason: GateReason.FIELD_NOT_EDITABLE, fields: forbidden }
+    );
+  }
 
   if (fields.uploadId) {
     const attachedImage = await attachUploadedImage({
@@ -387,18 +486,7 @@ export const organizationsUpdate = onCall({ region: "asia-south1" }, async (requ
     fields.image = attachedImage;
   }
 
-  const requested = Object.keys(fields).filter((k) => (fields as Record<string, unknown>)[k] !== undefined);
-  const forbidden = requested.filter((f) => !ORGANIZATION_FIELD_POLICY[tier].has(f));
-  if (forbidden.length > 0) {
-    throw new HttpsError(
-      "permission-denied",
-      `[${GateReason.FIELD_NOT_EDITABLE}] Field(s) not editable by ${tier}: ${forbidden.join(", ")}.`,
-      { reason: GateReason.FIELD_NOT_EDITABLE, fields: forbidden }
-    );
-  }
-  if (requested.length === 0) {
-    throw new HttpsError("invalid-argument", "No updatable fields supplied.");
-  }
+  const requested = Object.keys(fields).filter((k) => fields[k] !== undefined);
 
   if (fields.contacts !== undefined && Array.isArray(fields.contacts)) {
     const contactsList = fields.contacts as Array<{ isPrimary?: boolean; email?: string | null; phone?: string | null }>;
@@ -742,7 +830,8 @@ export const organizationsGet = onCall({ region: "asia-south1" }, async (request
     /** D-15: computed display URL — never stored. */
     imageUrl: hydrateImageUrl(data.image),
     addresses: data.addresses ?? [],
-    bankAccounts: data.bankAccounts ?? [],
+    /** Q-B2 / A-19 (MG-37): mask bank account numbers to last 4 digits on API responses. */
+    bankAccounts: maskBankAccounts(data.bankAccounts),
     settings: data.settings,
     salesChannels: data.salesChannels,
     moduleToggles: data.moduleToggles,
@@ -764,6 +853,7 @@ export const organizationsGet = onCall({ region: "asia-south1" }, async (request
         id: snap.id,
         organizationId: snap.id,
         ...cleanData,
+        bankAccounts: maskBankAccounts(data.bankAccounts),
         ownerStatus: data.ownerStatus ?? (data.ownerUserId ? "active" : "pending"),
         /** D-15: computed display URL added at read time. */
         imageUrl: hydrateImageUrl(data.image),

@@ -16,7 +16,10 @@
         "moduleToggles",
         "salesChannels",
         "timezone",
-        "showCostToTenant"
+        "showCostToTenant",
+        "legalName",
+        "taxId",
+        "bankAccounts"
       ],
       "uiHint": "dropdown",
       "example": "name"
@@ -41,8 +44,8 @@
         "maxLength": 2000
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample reason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     }
   ]
 }

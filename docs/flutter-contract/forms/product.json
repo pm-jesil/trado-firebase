@@ -3,7 +3,15 @@
   "label": "Product",
   "callables": {
     "create": "productsCreate",
-    "update": "productsUpdate"
+    "get": "productsGet",
+    "list": "productsList",
+    "update": "productsUpdate",
+    "actions": [
+      {
+        "name": "productsGetPriceHistory",
+        "kind": "read"
+      }
+    ]
   },
   "fields": [
     {
@@ -18,7 +26,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "organizationId",
@@ -30,8 +38,8 @@
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
@@ -42,7 +50,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "name",
@@ -69,7 +77,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample description"
+      "example": "2026-11-18"
     },
     {
       "path": "categoryId",
@@ -79,8 +87,8 @@
       "nullable": true,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample categoryId"
+      "uiHint": "text",
+      "example": "category_001"
     },
     {
       "path": "baseUnit",
@@ -176,7 +184,7 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "numeric",
       "example": 1
     },
     {
@@ -226,7 +234,7 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "switch",
+      "uiHint": "date_picker",
       "example": true
     },
     {
@@ -264,8 +272,8 @@
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample storageLocationId"
+      "uiHint": "text",
+      "example": "storageLocation_001"
     },
     {
       "path": "lowStockThreshold",
@@ -289,7 +297,7 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "switch",
       "example": true
     },
     {
@@ -371,8 +379,8 @@
         "maxLength": 30
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample alternateUnits[].unit"
+      "uiHint": "text",
+      "example": "Sample unit"
     },
     {
       "path": "alternateUnits[].factor",
@@ -385,7 +393,7 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "numeric",
       "example": 1
     },
     {
@@ -399,8 +407,8 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "alternateUnits[].wholesalePrice",
@@ -413,8 +421,8 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "alternateUnits[].barcode",
@@ -426,8 +434,8 @@
         "maxLength": 100
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample alternateUnits[].barcode"
+      "uiHint": "text",
+      "example": "Sample barcode"
     },
     {
       "path": "alternateUnits[].isPurchaseUnit",
@@ -437,7 +445,7 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "switch",
       "example": true
     },
     {
@@ -448,7 +456,7 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "switch",
       "example": true
     },
     {
@@ -472,8 +480,8 @@
         "maxLength": 200
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample taxExemptionReason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     },
     {
       "path": "isDiscountable",
@@ -499,8 +507,8 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "isReturnable",
@@ -584,7 +592,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample weight.unit"
+      "example": "Sample unit"
     },
     {
       "path": "dimensions.length",
@@ -640,7 +648,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample dimensions.unit"
+      "example": "Sample unit"
     },
     {
       "path": "size",
@@ -724,7 +732,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample jewellery.purity"
+      "example": "Sample purity"
     },
     {
       "path": "jewellery.makingCharge",
@@ -766,7 +774,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample jewellery.hallmarkId"
+      "example": "jewellery_hallmark_001"
     },
     {
       "path": "jewellery.priceByDailyRate",
@@ -776,7 +784,7 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "switch",
       "example": true
     },
     {
@@ -790,7 +798,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample variantGroupId"
+      "example": "variantGroup_001"
     },
     {
       "path": "variantAttributes.*",
@@ -802,8 +810,8 @@
         "maxLength": 60
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample variantAttributes.*"
+      "uiHint": "text",
+      "example": "Sample *"
     },
     {
       "path": "visibilityScope",

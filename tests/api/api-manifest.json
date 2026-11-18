@@ -5379,6 +5379,65 @@
       "coveredInE2ETest": false
     },
     {
+      "exportName": "requestsSettingsGet",
+      "logicalName": "requests.settingsGet",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "platform_super_admin_context",
+      "requiredPermissions": [
+        "platform:requests_configure"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "GetRequestsSettingsSchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "platformSettings"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "requestsSettingsUpdate",
+      "logicalName": "requests.settingsUpdate",
+      "phase": 3,
+      "domain": "requests",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {
+        "isSuperAdmin": true
+      },
+      "activeContextDerivation": "platform_super_admin_context",
+      "requiredPermissions": [
+        "platform:requests_configure"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "UpdateRequestsSettingsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "platformSettings"
+      ],
+      "firestoreCollectionsWritten": [
+        "platformSettings",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "REQUESTS_SETTINGS_UPDATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
       "exportName": "stockTransfersCreate",
       "logicalName": "stockTransfers.create",
       "phase": 3,

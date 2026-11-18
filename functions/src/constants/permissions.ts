@@ -29,6 +29,8 @@ export const AppPermissions = {
   // Organization Level
   ORG_VIEW: "org:view",
   ORG_UPDATE: "org:update",
+  ORG_MANAGE_LEGAL_PROFILE: "org:manage_legal_profile", // S1: edit legalName and taxId (owner default)
+  ORG_MANAGE_BANK_DETAILS: "org:manage_bank_details", // S1: edit organization invoice bankAccounts (owner default)
   ORG_SETTINGS: "org:settings",
   ORG_CREATE: "org:create",
   ORG_MODULES: "org:modules",

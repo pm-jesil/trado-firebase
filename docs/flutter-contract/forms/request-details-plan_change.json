@@ -13,7 +13,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample requestedPlanId"
+      "example": "requestedPlan_001"
     },
     {
       "path": "billingPeriod",
@@ -35,7 +35,7 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "text",
+      "uiHint": "date_picker",
       "example": "Sample effectiveFrom"
     },
     {
@@ -48,8 +48,8 @@
         "maxLength": 2000
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample reason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     }
   ]
 }

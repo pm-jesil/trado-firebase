@@ -24,7 +24,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample roleId"
+      "example": "role_001"
     },
     {
       "path": "branchId",
@@ -36,7 +36,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "reason",
@@ -48,8 +48,8 @@
         "maxLength": 2000
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample reason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     },
     {
       "path": "until",
@@ -58,7 +58,7 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "text",
+      "uiHint": "date_picker",
       "example": "Sample until"
     }
   ]

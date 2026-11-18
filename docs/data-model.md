@@ -919,7 +919,6 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-022 | R3 | `products` | `weightedAverageCost` | Moving-average cost per base unit; path dependent, re-derived by replaying PURCHASE_IN movements in order. | `prepareStockChangesInTxn` | reconcile:productWac |
 | DUP-075 | BOUNDED_ARRAY | `requests` | `attachments` | Request attachments array capped at 5 in RequestAttachmentSchema, keeping ticket document small. | — | cap 5 |
 | DUP-076 | BOUNDED_ARRAY | `requests` | `labels` | Request categorization labels array capped at 10 in CreateRequestSchema. | — | cap 10 |
-| DUP-077 | OWNED | `requests` | `organizationName` | Snapshot of organization name at creation time for platform request inbox without cross-tenant joins. | — | — |
 | DUP-074 | OWNED | `requests` | `requester.roleLabel` | Snapshot of requester role label at creation time for display in ticket header without role hydration. | — | — |
 | DUP-078 | R4 | `requests` | `requestId` | Document self ID stored on ticket record for query filtering and client reference. | — | — |
 | DUP-057 | BOUNDED_ARRAY | `returns` | `items` | Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 200 |

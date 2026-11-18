@@ -573,16 +573,34 @@ async function run() {
   assert.ok(Array.isArray(payAgeing.vendors));
   ok("Payables ageing report computed with standard aging buckets");
 
-  console.log("\n--- SCENARIO 9: Organization Governance & Field Policy (FB-2, FB-4) ---");
-  // Admin role edits allowed non-sensitive fields
+  console.log("\n--- SCENARIO 9: Organization Governance & Field Policy (FB-2, FB-4, D-54) ---");
+  // Admin role with org:update edits allowed S2 non-sensitive fields (D-54)
   const updateRes = await callFunction(adminEmployee, "organizationsUpdate", {
     organizationId: orgId,
-    legalName: "Acme Industrial Global Ltd",
-    taxId: "GSTIN-29AAAAA0000A1Z5",
+    displayName: "Acme Industrial Global Store",
     contactEmail: "admin@acme-global.com",
   });
   assert.equal(updateRes.success, true);
-  ok("Admin persona successfully updated non-sensitive organization profile fields");
+  ok("Admin persona successfully updated non-sensitive S2 organization profile fields");
+
+  // Admin persona attempting to edit S1 fields (legalName, taxId) without org:manage_legal_profile is rejected
+  await assertCallableError(
+    callFunction(adminEmployee, "organizationsUpdate", {
+      organizationId: orgId,
+      legalName: "Acme Illegal Legal Name",
+    }),
+    "permission-denied"
+  );
+  ok("Admin persona forbidden from editing S1 legal profile fields without org:manage_legal_profile (FIELD_NOT_EDITABLE)");
+
+  // Owner persona with org:manage_legal_profile (Owner default) updates S1 legalName & taxId
+  const ownerLegalUpdate = await callFunction(owner, "organizationsUpdate", {
+    organizationId: orgId,
+    legalName: "Acme Industrial Global Ltd",
+    taxId: "GSTIN-29AAAAA0000A1Z5",
+  });
+  assert.equal(ownerLegalUpdate.success, true);
+  ok("Owner persona successfully updated S1 legalName and taxId");
 
   // Admin persona attempting to edit Super-Admin-only field is rejected
   await assertCallableError(

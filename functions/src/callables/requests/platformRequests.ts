@@ -33,6 +33,8 @@ import {
   SetRequestPrioritySchema,
   AddInternalNoteSchema,
   ApplyRequestSchema,
+  GetRequestsSettingsSchema,
+  UpdateRequestsSettingsSchema,
 } from "../../validation/schemas.js";
 import {
   RequestDoc,
@@ -41,6 +43,7 @@ import {
   OrganizationDoc,
   SubscriptionPlanDoc,
   MetricLimitConfig,
+  PlatformSettingsRequestsDoc,
 } from "../../types/models.js";
 import {
   assertRequestsFeatureEnabled,
@@ -49,6 +52,8 @@ import {
   computePlanChangeBlockers,
   validateStateTransition,
   OPEN_STATUSES,
+  DEFAULT_REQUESTS_SETTINGS,
+  DEFAULT_SLA_HOURS,
 } from "../../services/requestsService.js";
 import { getCallerName } from "./helpers.js";
 
@@ -57,7 +62,7 @@ import { getCallerName } from "./helpers.js";
  * The single, atomic state transition entry point for requesters and handlers (D-37).
  */
 export const requestsTransition = onCall({ region: "asia-south1" }, async (request) => {
-  await assertRequestsFeatureEnabled();
+  const settings = await assertRequestsFeatureEnabled();
   const context = await resolveRequestContext(request, {
     allowPlatformSuperAdmin: true,
   });
@@ -81,6 +86,7 @@ export const requestsTransition = onCall({ region: "asia-south1" }, async (reque
     const isOrgManager = (context.organizationId === current.organizationId) &&
       (context.isOwner || context.can(AppPermissions.REQUEST_MANAGE_ORG));
 
+    const now = new Date();
     const { nextStatus } = validateStateTransition(
       current.status,
       input.action as RequestAction,
@@ -88,10 +94,16 @@ export const requestsTransition = onCall({ region: "asia-south1" }, async (reque
       isPlatformHandler,
       isOrgManager,
       isRequester,
-      current.audience as RequestAudience
+      current.audience as RequestAudience,
+      {
+        resolvedAt: current.resolvedAt,
+        closedAt: current.closedAt,
+        statusChangedAt: current.statusChangedAt,
+        reopenWindowDays: settings.reopenWindowDays,
+        now,
+      }
     );
 
-    const now = new Date();
     const nowIso = now.toISOString();
     const updates: Partial<RequestDoc> = {
       status: nextStatus,
@@ -619,4 +631,90 @@ export const requestsApply = onCall({ region: "asia-south1" }, async (request) =
 
     return { success: true, requestId: current.requestId, status: RequestStatus.APPLIED, applyResult, request: updatedRequest };
   });
+});
+
+/**
+ * 17. requestsSettingsGet (Q-B9 / A-26, RH-9)
+ * Super Admin only (`platform:requests_configure`). Returns current `platformSettings/requests`
+ * merged with safe defaults (`requestsEnabled: false` on a fresh database).
+ */
+export const requestsSettingsGet = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth || request.auth.token.isSuperAdmin !== true) {
+    throw new HttpsError(
+      "permission-denied",
+      "Super Admin privileges with platform:requests_configure are required to read requests settings."
+    );
+  }
+  parseInput(GetRequestsSettingsSchema, request.data || {});
+  const snap = await db.collection("platformSettings").doc("requests").get();
+  const raw = snap.exists ? (snap.data() as Partial<PlatformSettingsRequestsDoc>) : {};
+  const settings: PlatformSettingsRequestsDoc = {
+    ...DEFAULT_REQUESTS_SETTINGS,
+    ...raw,
+    sla: { ...DEFAULT_SLA_HOURS, ...(raw.sla || {}) },
+    limits: { ...DEFAULT_REQUESTS_SETTINGS.limits, ...(raw.limits || {}) },
+  };
+  return {
+    settings,
+    persisted: snap.exists,
+  };
+});
+
+/**
+ * 18. requestsSettingsUpdate (Q-B9 / A-26, RH-9)
+ * Super Admin only (`platform:requests_configure`). Updates `platformSettings/requests` with
+ * validated bounds on SLA targets, volume limits, and lifecycle windows (`reopenWindowDays`).
+ * Audited automatically via meteredFirestore + auditRecorder (D-23).
+ */
+export const requestsSettingsUpdate = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth || request.auth.token.isSuperAdmin !== true) {
+    throw new HttpsError(
+      "permission-denied",
+      "Super Admin privileges with platform:requests_configure are required to update requests settings."
+    );
+  }
+  const input = parseInput(UpdateRequestsSettingsSchema, request.data);
+  const settingsRef = db.collection("platformSettings").doc("requests");
+
+  const updated = await db.runTransaction(async (txn) => {
+    const snap = await txn.get(settingsRef);
+    const existing = snap.exists ? (snap.data() as Partial<PlatformSettingsRequestsDoc>) : {};
+    const mergedSla = {
+      urgent: { ...DEFAULT_SLA_HOURS.urgent, ...(existing.sla?.urgent || {}), ...(input.sla?.urgent || {}) },
+      high: { ...DEFAULT_SLA_HOURS.high, ...(existing.sla?.high || {}), ...(input.sla?.high || {}) },
+      normal: { ...DEFAULT_SLA_HOURS.normal, ...(existing.sla?.normal || {}), ...(input.sla?.normal || {}) },
+      low: { ...DEFAULT_SLA_HOURS.low, ...(existing.sla?.low || {}), ...(input.sla?.low || {}) },
+    };
+    for (const [prio, win] of Object.entries(mergedSla)) {
+      if (win.firstResponseHours > win.resolutionHours) {
+        throw new HttpsError(
+          "invalid-argument",
+          `SLA "${prio}": firstResponseHours (${win.firstResponseHours}) cannot exceed resolutionHours (${win.resolutionHours}).`
+        );
+      }
+    }
+    const next: PlatformSettingsRequestsDoc = {
+      requestsEnabled: input.requestsEnabled ?? existing.requestsEnabled ?? DEFAULT_REQUESTS_SETTINGS.requestsEnabled,
+      sla: mergedSla,
+      limits: {
+        maxOpenPerUser: input.limits?.maxOpenPerUser ?? existing.limits?.maxOpenPerUser ?? DEFAULT_REQUESTS_SETTINGS.limits.maxOpenPerUser,
+        maxOpenPerOrg: input.limits?.maxOpenPerOrg ?? existing.limits?.maxOpenPerOrg ?? DEFAULT_REQUESTS_SETTINGS.limits.maxOpenPerOrg,
+        maxCreationsPerHourPerUser: input.limits?.maxCreationsPerHourPerUser ?? existing.limits?.maxCreationsPerHourPerUser ?? DEFAULT_REQUESTS_SETTINGS.limits.maxCreationsPerHourPerUser,
+      },
+      autoCloseDays: input.autoCloseDays ?? existing.autoCloseDays ?? DEFAULT_REQUESTS_SETTINGS.autoCloseDays,
+      reopenWindowDays: input.reopenWindowDays ?? existing.reopenWindowDays ?? DEFAULT_REQUESTS_SETTINGS.reopenWindowDays,
+      needsInfoReminderDays: input.needsInfoReminderDays ?? existing.needsInfoReminderDays ?? DEFAULT_REQUESTS_SETTINGS.needsInfoReminderDays,
+      needsInfoAutoCancelDays: input.needsInfoAutoCancelDays ?? existing.needsInfoAutoCancelDays ?? DEFAULT_REQUESTS_SETTINGS.needsInfoAutoCancelDays,
+      updatedAt: new Date().toISOString(),
+      updatedBy: request.auth!.uid,
+    };
+    txn.set(settingsRef, next, { merge: true });
+    return next;
+  });
+
+  return {
+    success: true,
+    settings: updated,
+    permissionRequired: AppPermissions.PLATFORM_REQUESTS_CONFIGURE,
+  };
 });

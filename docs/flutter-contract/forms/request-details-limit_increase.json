@@ -49,8 +49,8 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "reason",
@@ -62,8 +62,8 @@
         "maxLength": 2000
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample reason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     }
   ]
 }

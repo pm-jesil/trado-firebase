@@ -56,8 +56,10 @@ import {
   OPEN_STATUSES,
   TERMINAL_STATUSES,
   DEFAULT_SLA_HOURS,
+  REQUEST_CATEGORY_GROUPS,
 } from "../../services/requestsService.js";
 import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../../services/idempotency.js";
+import { canEditOrganizationField, ORGANIZATION_FIELD_CLASS } from "../organizations.js";
 import { getCallerName, SENSITIVE_CATEGORIES } from "./helpers.js";
 
 /**
@@ -65,7 +67,7 @@ import { getCallerName, SENSITIVE_CATEGORIES } from "./helpers.js";
  */
 export const requestsMeta = onCall({ region: "asia-south1" }, async (request) => {
   parseInput(GetRequestsMetaSchema, request.data);
-  await assertRequestsFeatureEnabled();
+  const settings = await assertRequestsFeatureEnabled();
   const context = await resolveRequestContext(request);
 
   const orgId = context.organizationId;
@@ -97,17 +99,35 @@ export const requestsMeta = onCall({ region: "asia-south1" }, async (request) =>
     return true;
   });
 
+  const availableSet = new Set(availableCategories);
+  const groups = REQUEST_CATEGORY_GROUPS.map((g) => ({
+    id: g.id,
+    label: g.label,
+    order: g.order,
+    categories: g.categories.filter((c) => availableSet.has(c)),
+  })).filter((g) => g.categories.length > 0);
+
+  const orgProfileChangeFields = Object.keys(ORGANIZATION_FIELD_CLASS).filter(
+    (f) => !canEditOrganizationField({ isSuperAdmin: context.isSuperAdmin, can: (p) => context.can(p) }, f)
+  );
+
   return {
     availableCategories,
+    groups,
+    allGroups: REQUEST_CATEGORY_GROUPS,
+    orgProfileChangeFields,
     userOpenCount,
     orgOpenCount,
-    limits: {
-      maxOpenPerUser: 10,
-      maxOpenPerOrg: 50,
-      maxCreationsPerHourPerUser: 10,
-    },
+    limits: settings.limits,
     openPlanChangeId,
-    slaHours: DEFAULT_SLA_HOURS,
+    slaHours: settings.sla || DEFAULT_SLA_HOURS,
+    reopenWindowDays: settings.reopenWindowDays,
+    autoCloseDays: settings.autoCloseDays,
+    attachments: {
+      maxCount: 5,
+      maxSizeBytes: 5 * 1024 * 1024,
+      acceptedMimeTypes: ["image/jpeg", "image/png", "image/webp", "application/pdf"],
+    },
     allowDiagnostics: true,
   };
 });
@@ -187,6 +207,22 @@ export const requestsCreate = onCall({ region: "asia-south1" }, async (request) 
       `[${RequestReason.REQUEST_DETAILS_INVALID}] Details failed validation: ${parsedDetails.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; ")}`,
       { issues: parsedDetails.error.issues }
     );
+  }
+
+  // BS-16 / C-2 #7: org_profile_change refuses fields the requester can already edit directly.
+  if (input.category === RequestCategory.ORG_PROFILE_CHANGE) {
+    const targetField = (parsedDetails.data as { field: string }).field;
+    const canEditDirectly = canEditOrganizationField(
+      { isSuperAdmin: context.isSuperAdmin, can: (p) => context.can(p) },
+      targetField
+    );
+    if (canEditDirectly) {
+      throw new HttpsError(
+        "failed-precondition",
+        `[${RequestReason.REQUEST_DETAILS_INVALID}] You already have permission to edit "${targetField}" directly; please edit it yourself in organization settings.`,
+        { reason: RequestReason.REQUEST_DETAILS_INVALID, field: targetField }
+      );
+    }
   }
 
   // 2. Validate Attachments
@@ -283,7 +319,6 @@ export const requestsCreate = onCall({ region: "asia-south1" }, async (request) 
         slaState: SlaState.ON_TRACK,
         slaPausedAt: null,
         slaTotalPausedMs: 0,
-        organizationName: context.organization.name,
         requesterName: getCallerName(request, context),
         currentPlanName,
         requestedPlanName,

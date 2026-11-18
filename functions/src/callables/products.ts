@@ -370,6 +370,36 @@ export const productsList = onCall({ region: "asia-south1" }, async (request) =>
   const ctx = await resolveRequestContext(request, { requiredPermission: PRODUCT_READ, operation: "read" });
   const orgId = ctx.organizationId;
 
+  // CP-1 (Q-B6, A-23): Optional batch retrieval by 1..50 unique IDs.
+  // Pagination is ignored; other filters are AND-ed; cross-tenant, deleted, or out-of-scope IDs
+  // appear indistinguishably in `missingIds` so existence is never leaked.
+  if (input.ids && input.ids.length > 0) {
+    const snaps = await Promise.all(
+      input.ids.map((id) => db.collection("products").doc(id).get())
+    );
+    const items = [];
+    const foundIds = new Set<string>();
+    for (const snap of snaps) {
+      if (!snap.exists) continue;
+      const data = snap.data() as ProductDoc & { deletedAt?: string | null; status?: string };
+      if (data.organizationId !== orgId) continue;
+      if (data.deletedAt || data.status === "deleted") continue;
+      if (!isVisibleToBranch(data, ctx.branchId)) continue;
+      if (input.categoryId && data.categoryId !== input.categoryId) continue;
+      if (input.isActive !== undefined && data.isActive !== input.isActive) continue;
+      foundIds.add(snap.id);
+      items.push(redactProduct({ productId: snap.id, ...data }, ctx));
+    }
+    const missingIds = input.ids.filter((id) => !foundIds.has(id));
+    const batchRes: { items: typeof items; count: number; nextCursor: string | null; missingIds?: string[] } = {
+      items,
+      count: items.length,
+      nextCursor: null,
+      missingIds,
+    };
+    return batchRes;
+  }
+
   let query: FirebaseFirestore.Query = db.collection("products").where("organizationId", "==", orgId);
 
   if (input.categoryId) {
@@ -384,7 +414,12 @@ export const productsList = onCall({ region: "asia-south1" }, async (request) =>
     .filter((doc) => isVisibleToBranch(doc.data() as ProductDoc, ctx.branchId))
     .map((doc) => redactProduct({ productId: doc.id, ...(doc.data() as ProductDoc) }, ctx));
 
-  return { items, count: items.length, nextCursor };
+  const listRes: { items: typeof items; count: number; nextCursor: string | null; missingIds?: string[] } = {
+    items,
+    count: items.length,
+    nextCursor,
+  };
+  return listRes;
 });
 
 export const productsGet = onCall({ region: "asia-south1" }, async (request) => {

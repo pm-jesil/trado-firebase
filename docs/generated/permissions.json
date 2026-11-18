@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-17T23:08:46.138Z",
-  "totalPermissions": 147,
+  "generatedAt": "2026-11-18T17:37:44.342Z",
+  "totalPermissions": 149,
   "permissions": [
     {
       "name": "ALL",
@@ -187,6 +187,24 @@
       "allowedRoles": [
         "role_org_owner",
         "role_admin"
+      ]
+    },
+    {
+      "name": "ORG_MANAGE_LEGAL_PROFILE",
+      "code": "org:manage_legal_profile",
+      "module": "org",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ORG_MANAGE_BANK_DETAILS",
+      "code": "org:manage_bank_details",
+      "module": "org",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
       ]
     },
     {

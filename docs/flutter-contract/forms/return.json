@@ -3,14 +3,20 @@
   "label": "Return",
   "callables": {
     "create": "returnsCreate",
-    "update": "returnsList"
+    "list": "returnsList",
+    "actions": [
+      {
+        "name": "documentsDecide",
+        "kind": "action"
+      }
+    ]
   },
   "fields": [
     {
       "path": "idempotencyKey",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 8,
@@ -18,37 +24,37 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "organizationId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "returnType",
       "type": "enum",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -62,33 +68,33 @@
       "path": "referenceId",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample referenceId"
+      "example": "reference_001"
     },
     {
       "path": "items[].productId",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample items[].productId"
+      "example": "items___product_001"
     },
     {
       "path": "items[].sourceLineId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 1,
@@ -96,13 +102,13 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample items[].sourceLineId"
+      "example": "items___sourceLine_001"
     },
     {
       "path": "items[].serialNumbers[]",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 1,
@@ -110,13 +116,13 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample items[].serialNumbers[]"
+      "example": "Sample serialNumbers[]"
     },
     {
       "path": "items[].quantity",
       "type": "number",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -130,7 +136,7 @@
       "path": "items[].refundAmount",
       "type": "number",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -144,21 +150,21 @@
       "path": "items[].reason",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 1,
         "maxLength": 200
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample items[].reason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     },
     {
       "path": "items[].disposition",
       "type": "enum",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -172,7 +178,7 @@
       "path": "refundMethod",
       "type": "enum",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -187,20 +193,20 @@
       "path": "refundFinancialAccountId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample refundFinancialAccountId"
+      "example": "refundFinancialAccount_001"
     },
     {
       "path": "notes",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 500

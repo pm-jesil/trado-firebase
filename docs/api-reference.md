@@ -1235,6 +1235,8 @@ node tools/api-explorer/server.js
 - `requestsSetPriority`
 - `requestsAddInternalNote`
 - `requestsApply`
+- `requestsSettingsGet`
+- `requestsSettingsUpdate`
 
 ### Triggers & Scheduled Jobs
 - `onRequestActivityWritten`

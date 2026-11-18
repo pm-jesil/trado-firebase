@@ -73,7 +73,7 @@ Gate order for `tenant-gate`: authenticated → user active → membership activ
 | `organizationsReactivate` | organizations.ts | platform-only | — | — |  |
 | `organizationsSetSubscription` | organizations.ts | platform-only | — | — |  |
 | `organizationsTransferOwnership` | organizations.ts | NONE | — | — | Super Admin or current Owner transfers ownership (dual tier) |
-| `organizationsUpdate` | organizations.ts | tenant-gate | `org:update` | staff | field-policy matrix (ORGANIZATION_FIELD_POLICY) + subscription check, hand-rolled tiers |
+| `organizationsUpdate` | organizations.ts | NONE | — | — | field-policy matrix (ORGANIZATION_FIELD_POLICY) + subscription check, hand-rolled tiers |
 | `outflowsCreate` | outflows.ts | tenant-gate | `purchase:create`, `outflow:create`, `expense:create`, `(by input)` | purchases, expenses |  |
 | `outflowsGet` | outflows.ts | tenant-gate | `outflow:view`, `purchase:view`, `expense:view` | expenses, purchases |  |
 | `outflowsList` | outflows.ts | tenant-gate | `outflow:view`, `purchase:view`, `expense:view` | expenses, purchases |  |

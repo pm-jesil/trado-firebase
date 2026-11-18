@@ -101,7 +101,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample diagnostics.*"
+      "example": "Sample *"
     }
   ]
 }

@@ -82,6 +82,8 @@ const CLASSIFICATION_DEFINITIONS = {
       "requestsSetPriority",
       "requestsAddInternalNote",
       "requestsApply",
+      "requestsSettingsGet",
+      "requestsSettingsUpdate",
     ],
   },
   REFERENCE_DATA: {

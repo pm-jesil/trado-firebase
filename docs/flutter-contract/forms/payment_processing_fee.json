@@ -3,38 +3,53 @@
   "label": "Payment Processing Fee",
   "callables": {
     "create": "paymentsRecordFee",
-    "update": "paymentsGetFee"
+    "get": "paymentsGetFee",
+    "list": "paymentsListFees",
+    "actions": [
+      {
+        "name": "paymentsVerifyFee",
+        "kind": "action"
+      },
+      {
+        "name": "paymentsDisputeFee",
+        "kind": "action"
+      },
+      {
+        "name": "paymentsReverseFee",
+        "kind": "action"
+      }
+    ]
   },
   "fields": [
     {
       "path": "organizationId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "sourceDocumentType",
       "type": "enum",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -48,44 +63,44 @@
       "path": "sourceDocumentId",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample sourceDocumentId"
+      "example": "sourceDocument_001"
     },
     {
       "path": "paymentId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample paymentId"
+      "example": "payment_001"
     },
     {
       "path": "financialAccountId",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample financialAccountId"
+      "example": "financialAccount_001"
     },
     {
       "path": "paymentMethod",
       "type": "enum",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -103,7 +118,7 @@
       "path": "feeAmount",
       "type": "number",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "format": "safeint",
@@ -118,7 +133,7 @@
       "path": "feeTaxAmount",
       "type": "number",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "format": "safeint",
@@ -133,7 +148,7 @@
       "path": "settlementTiming",
       "type": "enum",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -147,7 +162,7 @@
       "path": "settlementReference",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 100
@@ -160,18 +175,18 @@
       "path": "feeExpenseCategoryId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample feeExpenseCategoryId"
+      "uiHint": "text",
+      "example": "feeExpenseCategory_001"
     },
     {
       "path": "notes",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 500
@@ -184,7 +199,7 @@
       "path": "idempotencyKey",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 8,
@@ -192,7 +207,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     }
   ]
 }

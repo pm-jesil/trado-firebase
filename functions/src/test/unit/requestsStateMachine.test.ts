@@ -300,4 +300,70 @@ describe("Prompt 74 — Requests Unified State Machine Cross-Product (D-37)", ()
       );
     });
   });
+
+  describe("4. Reopen Window Boundary (Q-B3 / RH-10) & 7 Category Groups (Q-B4 / RH-11)", () => {
+    it("[requestsTransition#ok] allows requester to reopen on day 14 of 14-day window (resolved and closed)", () => {
+      const anchor = new Date("2026-11-01T00:00:00.000Z");
+      const day14 = new Date(anchor.getTime() + 14 * 86_400_000);
+      for (const status of [RequestStatus.RESOLVED, RequestStatus.CLOSED]) {
+        const res = validateStateTransition(
+          status,
+          RequestAction.REOPEN,
+          RequestKind.WORK,
+          false,
+          false,
+          true,
+          RequestAudience.PLATFORM,
+          { resolvedAt: anchor.toISOString(), reopenWindowDays: 14, now: day14 }
+        );
+        assert.strictEqual(res.nextStatus, RequestStatus.IN_REVIEW);
+      }
+    });
+
+    it("[requestsTransition#REQUEST_REOPEN_WINDOW_CLOSED] rejects requester reopen on day 15 (past 14-day window) while allowing handler anytime", () => {
+      const anchor = new Date("2026-11-01T00:00:00.000Z");
+      const day15 = new Date(anchor.getTime() + 15 * 86_400_000);
+      for (const status of [RequestStatus.RESOLVED, RequestStatus.CLOSED]) {
+        assert.throws(
+          () =>
+            validateStateTransition(
+              status,
+              RequestAction.REOPEN,
+              RequestKind.WORK,
+              false,
+              false,
+              true,
+              RequestAudience.PLATFORM,
+              { resolvedAt: anchor.toISOString(), reopenWindowDays: 14, now: day15 }
+            ),
+          (err: any) => err.details?.reason === "REQUEST_REOPEN_WINDOW_CLOSED"
+        );
+        const handlerRes = validateStateTransition(
+          status,
+          RequestAction.REOPEN,
+          RequestKind.WORK,
+          true,
+          false,
+          false,
+          RequestAudience.PLATFORM,
+          { resolvedAt: anchor.toISOString(), reopenWindowDays: 14, now: day15 }
+        );
+        assert.strictEqual(handlerRes.nextStatus, RequestStatus.IN_REVIEW);
+      }
+    });
+
+    it("[requestsMeta#ok] defines 7 ordered category groups covering all 15 RequestCategory values", async () => {
+      const { REQUEST_CATEGORY_GROUPS } = await import("../../services/requestsService.js");
+      const { RequestCategory } = await import("../../constants/enums.js");
+      assert.strictEqual(REQUEST_CATEGORY_GROUPS.length, 7);
+      assert.deepStrictEqual(
+        REQUEST_CATEGORY_GROUPS.map((g) => g.order),
+        [1, 2, 3, 4, 5, 6, 7]
+      );
+      const grouped = REQUEST_CATEGORY_GROUPS.flatMap((g) => g.categories);
+      const allCats = Object.values(RequestCategory);
+      assert.strictEqual(grouped.length, allCats.length);
+      assert.deepStrictEqual([...grouped].sort(), [...allCats].sort());
+    });
+  });
 });

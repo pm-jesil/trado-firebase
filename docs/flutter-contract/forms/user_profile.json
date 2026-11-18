@@ -1,0 +1,174 @@
+{
+  "entity": "user_profile",
+  "label": "User Self-Profile",
+  "callables": {
+    "update": "usersUpdateMe",
+    "get": "authMe",
+    "actions": [
+      {
+        "name": "notificationsRegisterFcmToken",
+        "kind": "action"
+      }
+    ]
+  },
+  "fields": [
+    {
+      "path": "name",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2,
+        "maxLength": 100
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample name"
+    },
+    {
+      "path": "phone",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 30
+      },
+      "enumValues": [],
+      "uiHint": "phone",
+      "example": "+919876543210"
+    },
+    {
+      "path": "image.path",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": "Sample path"
+    },
+    {
+      "path": "image.contentType",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+      ],
+      "uiHint": "image_picker",
+      "example": "image/jpeg"
+    },
+    {
+      "path": "image.width",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 10000,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": 1
+    },
+    {
+      "path": "image.height",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 10000,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": 1
+    },
+    {
+      "path": "image.sizeBytes",
+      "type": "number",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "format": "safeint",
+        "min": 1,
+        "minInclusive": true,
+        "max": 10485760,
+        "maxInclusive": true
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": 1
+    },
+    {
+      "path": "image.updatedAt",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": "2026-11-18"
+    },
+    {
+      "path": "image.thumbnailPath",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 500
+      },
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": "Sample thumbnailPath"
+    },
+    {
+      "path": "uploadId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "image_picker",
+      "example": "upload_001"
+    },
+    {
+      "path": "clientRequestId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "idem_20261118_0001"
+    }
+  ]
+}

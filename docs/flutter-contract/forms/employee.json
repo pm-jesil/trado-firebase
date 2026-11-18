@@ -3,7 +3,11 @@
   "label": "Employee / User",
   "callables": {
     "create": "employeesCreate",
-    "update": "employeesUpdate"
+    "get": "employeesGet",
+    "list": "employeesList",
+    "update": "employeesUpdate",
+    "delete": "employeesDeactivate",
+    "actions": []
   },
   "fields": [
     {
@@ -15,7 +19,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "idempotencyKey",
@@ -29,7 +33,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "organizationId",
@@ -41,8 +45,8 @@
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "email",
@@ -55,7 +59,7 @@
       },
       "enumValues": [],
       "uiHint": "email",
-      "example": "Sample email"
+      "example": "owner@example.com"
     },
     {
       "path": "name",
@@ -80,7 +84,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "phone",
-      "example": "Sample phone"
+      "example": "+919876543210"
     },
     {
       "path": "image.path",
@@ -94,7 +98,7 @@
       },
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": "Sample image.path"
+      "example": "Sample path"
     },
     {
       "path": "image.contentType",
@@ -171,7 +175,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": "Sample image.updatedAt"
+      "example": "2026-11-18"
     },
     {
       "path": "image.thumbnailPath",
@@ -185,7 +189,7 @@
       },
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": "Sample image.thumbnailPath"
+      "example": "Sample thumbnailPath"
     },
     {
       "path": "uploadId",
@@ -195,8 +199,8 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample uploadId"
+      "uiHint": "image_picker",
+      "example": "upload_001"
     },
     {
       "path": "initialPassword",
@@ -223,7 +227,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample roleId"
+      "example": "role_001"
     },
     {
       "path": "departmentId",
@@ -234,7 +238,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample departmentId"
+      "example": "department_001"
     },
     {
       "path": "jobRoleIds[]",
@@ -256,7 +260,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample teamId"
+      "example": "team_001"
     },
     {
       "path": "reportingToIds[]",
@@ -300,7 +304,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample defaultBranchId"
+      "example": "defaultBranch_001"
     }
   ]
 }

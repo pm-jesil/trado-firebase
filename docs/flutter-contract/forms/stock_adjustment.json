@@ -3,14 +3,20 @@
   "label": "Stock Adjustment / Wastage",
   "callables": {
     "create": "stockAdjust",
-    "update": "stockGetLevels"
+    "list": "stockMovementsList",
+    "actions": [
+      {
+        "name": "stockVerify",
+        "kind": "read"
+      }
+    ]
   },
   "fields": [
     {
       "path": "idempotencyKey",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 8,
@@ -18,63 +24,63 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "organizationId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "storageLocationId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
-      "nullable": false,
-      "bounds": {
-        "minLength": 2
-      },
-      "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample storageLocationId"
-    },
-    {
-      "path": "productId",
-      "type": "string",
-      "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample productId"
+      "example": "storageLocation_001"
+    },
+    {
+      "path": "productId",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "product_001"
     },
     {
       "path": "quantity",
       "type": "number",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
@@ -85,21 +91,21 @@
       "path": "reason",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2,
         "maxLength": 500
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample reason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     },
     {
       "path": "reasonCode",
       "type": "enum",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -113,14 +119,14 @@
         "opening_stock",
         "other"
       ],
-      "uiHint": "dropdown",
+      "uiHint": "textarea",
       "example": "damaged"
     },
     {
       "path": "serialNumbers[]",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 1,

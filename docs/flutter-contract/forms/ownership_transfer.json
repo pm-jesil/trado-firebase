@@ -1,0 +1,82 @@
+{
+  "entity": "ownership_transfer",
+  "label": "Organization Ownership Transfer",
+  "callables": {
+    "actions": [
+      {
+        "name": "organizationsTransferOwnership",
+        "kind": "action"
+      }
+    ]
+  },
+  "fields": [
+    {
+      "path": "organizationId",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "organization_001"
+    },
+    {
+      "path": "newOwnerUserId",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 2
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "newOwnerUser_001"
+    },
+    {
+      "path": "previousOwnerAction",
+      "type": "enum",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "demote_to_admin",
+        "deactivate"
+      ],
+      "uiHint": "dropdown",
+      "example": "demote_to_admin"
+    },
+    {
+      "path": "reason",
+      "type": "string",
+      "requiredCreate": true,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 5,
+        "maxLength": 300
+      },
+      "enumValues": [],
+      "uiHint": "textarea",
+      "example": "2026-11-18"
+    },
+    {
+      "path": "clientRequestId",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "minLength": 8,
+        "maxLength": 128
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "idem_20261118_0001"
+    }
+  ]
+}

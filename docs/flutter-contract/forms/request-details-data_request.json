@@ -39,8 +39,8 @@
         "maxLength": 2000
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample reason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     },
     {
       "path": "confirmationText",
@@ -51,7 +51,7 @@
         "maxLength": 100
       },
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "text",
       "example": "Sample confirmationText"
     }
   ]

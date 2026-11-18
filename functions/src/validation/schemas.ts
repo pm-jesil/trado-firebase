@@ -653,6 +653,14 @@ export const ListProductsSchema = z.strictObject({
   organizationId: z.string().trim().min(2).optional(), // Derived server-side from active context
   categoryId: z.string().trim().optional(),
   isActive: z.boolean().optional(),
+  ids: z
+    .array(z.string().trim().min(1))
+    .min(1)
+    .max(50)
+    .refine((arr) => new Set(arr).size === arr.length, {
+      message: "Duplicate product IDs are not allowed in ids filter.",
+    })
+    .optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
 });
@@ -1733,6 +1741,7 @@ export const BillingQueryDetailsSchema = z.strictObject({
 
 export const OrgProfileChangeDetailsSchema = z.strictObject({
   field: z.enum([
+    // S0 (Super Admin only)
     "name",
     "businessType",
     "businessCategory",
@@ -1741,6 +1750,10 @@ export const OrgProfileChangeDetailsSchema = z.strictObject({
     "salesChannels",
     "timezone",
     "showCostToTenant",
+    // S1 (sensitive legal/bank fields — refused for callers who already hold the edit permission, BS-16)
+    "legalName",
+    "taxId",
+    "bankAccounts",
   ]),
   proposedValue: z.unknown(),
   reason: z.string().trim().min(5).max(2000),
@@ -2009,6 +2022,33 @@ export const ListPlansCatalogSchema = z.strictObject({
 });
 
 export const GetRequestsMetaSchema = RequestScopedQuerySchema;
+
+const SlaWindowBoundsSchema = z.strictObject({
+  firstResponseHours: z.number().int().min(1).max(720),
+  resolutionHours: z.number().int().min(1).max(2160),
+});
+
+export const GetRequestsSettingsSchema = z.strictObject({});
+
+export const UpdateRequestsSettingsSchema = z.strictObject({
+  requestsEnabled: z.boolean().optional(),
+  sla: z.strictObject({
+    urgent: SlaWindowBoundsSchema.optional(),
+    high: SlaWindowBoundsSchema.optional(),
+    normal: SlaWindowBoundsSchema.optional(),
+    low: SlaWindowBoundsSchema.optional(),
+  }).optional(),
+  limits: z.strictObject({
+    maxOpenPerUser: z.number().int().min(1).max(1000).optional(),
+    maxOpenPerOrg: z.number().int().min(1).max(10000).optional(),
+    maxCreationsPerHourPerUser: z.number().int().min(1).max(500).optional(),
+  }).optional(),
+  autoCloseDays: z.number().int().min(1).max(90).optional(),
+  reopenWindowDays: z.number().int().min(1).max(90).optional(),
+  needsInfoReminderDays: z.number().int().min(1).max(30).optional(),
+  needsInfoAutoCancelDays: z.number().int().min(1).max(90).optional(),
+  reason: z.string().trim().min(3).max(500).optional(),
+});
 
 // ============================================================
 // Financial Accounts & Ledger Validation Schemas

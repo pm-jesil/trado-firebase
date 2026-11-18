@@ -3,7 +3,47 @@
   "label": "Request / Support Ticket",
   "callables": {
     "create": "requestsCreate",
-    "update": "requestsUpdate"
+    "get": "requestsGet",
+    "list": "requestsList",
+    "update": "requestsUpdate",
+    "actions": [
+      {
+        "name": "requestsTransition",
+        "kind": "action"
+      },
+      {
+        "name": "requestsApply",
+        "kind": "action"
+      },
+      {
+        "name": "requestsAddComment",
+        "kind": "action"
+      },
+      {
+        "name": "requestsAddInternalNote",
+        "kind": "action"
+      },
+      {
+        "name": "requestsAssign",
+        "kind": "update"
+      },
+      {
+        "name": "requestsSetPriority",
+        "kind": "update"
+      },
+      {
+        "name": "requestsActivityList",
+        "kind": "list"
+      },
+      {
+        "name": "requestsCounts",
+        "kind": "read"
+      },
+      {
+        "name": "requestsMeta",
+        "kind": "read"
+      }
+    ]
   },
   "fields": [
     {
@@ -16,8 +56,8 @@
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
@@ -28,7 +68,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "audience",
@@ -68,7 +108,7 @@
         "security_concern",
         "access_request"
       ],
-      "uiHint": "date_picker",
+      "uiHint": "dropdown",
       "example": "plan_change"
     },
     {
@@ -97,7 +137,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample description"
+      "example": "2026-11-18"
     },
     {
       "path": "details.*",
@@ -108,7 +148,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample details.*"
+      "example": "Sample *"
     },
     {
       "path": "priority",
@@ -152,8 +192,8 @@
         "maxLength": 50
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample relatedEntity.type"
+      "uiHint": "text",
+      "example": "Sample type"
     },
     {
       "path": "relatedEntity.id",
@@ -166,8 +206,8 @@
         "maxLength": 128
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample relatedEntity.id"
+      "uiHint": "text",
+      "example": "relatedEntity_id_001"
     },
     {
       "path": "relatedEntity.label",
@@ -180,8 +220,8 @@
         "maxLength": 120
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample relatedEntity.label"
+      "uiHint": "text",
+      "example": "Sample label"
     },
     {
       "path": "attachments[].storagePath",
@@ -194,8 +234,8 @@
         "maxLength": 500
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample attachments[].storagePath"
+      "uiHint": "text",
+      "example": "Sample storagePath"
     },
     {
       "path": "attachments[].filename",
@@ -208,8 +248,8 @@
         "maxLength": 255
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample attachments[].filename"
+      "uiHint": "text",
+      "example": "Sample filename"
     },
     {
       "path": "attachments[].mimeType",
@@ -224,7 +264,7 @@
         "image/webp",
         "application/pdf"
       ],
-      "uiHint": "date_picker",
+      "uiHint": "dropdown",
       "example": "image/jpeg"
     },
     {
@@ -241,7 +281,7 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "numeric",
       "example": 1
     },
     {
@@ -255,7 +295,7 @@
       },
       "enumValues": [],
       "uiHint": "date_picker",
-      "example": "Sample attachments[].uploadedAt"
+      "example": "2026-11-18T12:00:00.000Z"
     },
     {
       "path": "labels[]",
@@ -283,7 +323,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "clientRequestId",
@@ -297,7 +337,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample clientRequestId"
+      "example": "idem_20261118_0001"
     }
   ]
 }

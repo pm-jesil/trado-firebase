@@ -2,48 +2,76 @@
 
 - **Date:** 2026-11-18
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** 76 (Trado Firebase: Phase 6 Final Verification Gate; Backend Hardening Emulator-Verified)
-- **Current State:** PHASE 6 DELIVERED & EMULATOR-VERIFIED [cov:C-4]. Clean TypeScript build (0 errors). Suite verification:
-  - **Unit tests:** 307/307 pass across 87 suites (`npm --prefix functions run test:unit`).
-  - **Master Scenarios:** 152/152 checks pass across 4 suites (`test:scenarios`):
-    - `test-real-world-scenarios.cjs`: 22/22 checks pass.
-    - `test-subscription-limits-and-audit-visibility.cjs`: 37/37 checks pass.
-    - `test-requests-scenarios.cjs`: 43/43 checks pass.
-    - `test-financial-branch-inventory-scenarios.cjs`: 50/50 checks pass [cov:C-4].
-  - **Security Rules:** 79/79 tests pass across Firestore (61 collections) and Storage matrices (`test:rules`).
-  - **Event Triggers:** 6 trigger execution paths verified (`test:triggers`).
-  - **Schema Contract Sweep:** Part A: 4,143/4,143 cases pass; Part B: 334/334 unknown field probes rejected with `UNKNOWN_FIELD`.
-  - **Maximal Roundtrip Proof:** 50/72 callables exercised, 567 leaf paths proven (`test:roundtrip`).
-  - **Seed Repeatability:** Verified 0 document growth on repeat seed across 61 collections (562 documents) (`test:seed`).
-  - **Data Integrity & Consistency (`check:data`):**
-    - 61 collections, 1,684 documents scanned.
-    - 0 dangling / cross-tenant references.
-    - 0 unregistered value copies (duplication).
-    - 0 cache reconciliation findings across 459 reconciliations.
-    - 0 date discipline findings across 3,362 date values.
-    - 0 same-document duplicates, alias families, or unregistered derived values.
-    - 0 removed fields in stored data.
-  - **Firestore Composite Indexes:** 1,435 query shapes across 47 collections; 50 composite indexes declared in `firestore.indexes.json`; 0 missing.
-  - **API Drift:** 194/194 Cloud Function exports documented in `docs/api-reference.md`.
-  - **Gate Conformance:** 151 callables analysed, 0 client-supplied organizationId bypasses.
-  - **Flutter Contract:** 207 items across 11 docs & 23 entity forms, 0 violations (`SUMMARY.md` 108 lines).
-  - **Cost Profiles & Budgets:** 185 callables measured, 185 budgets, 0 over budget.
-  - **Write-Path Typing:** 112 production files scanned, 0 `any` casts or annotations (`check:no-any-writes`).
-  - **Impact Verification (`verify:changed`):** 97 units total, 0 stale, 0 untraced, 0 unmapped files, 0 failures.
-- **Delivered in Prompt 76 (Phases 0–6):**
-  1. **Phase 0 Baseline:** Established read-only baseline; confirmed 10 architectural gaps G1–G10.
-  2. **Phase 1 Accounting Integrity:** Integer money minor units (`money.ts`), posting rules engine (`postingRules.ts`), returns cash refund ledger wiring (G1), fee lifecycle maker-checker & reversals (G2), double-entry trial balance (G3), system-wide invariant verification (`ledgerVerify`, G4).
-  3. **Phase 2 Stock Transfers:** Unit conversions (`conversionFactor`, `baseQuantity`), WAC carry, in-transit isolation (D-49), serial transitions, cancellation, discrepancy write-off & return-to-source, `stockVerify` (G6).
-  4. **Phase 3 Worldwide Tax & Currency:** Country defaults & minor unit naming across 11 countries (G8), 3-decimal currencies (BHD, OMR, KWD) with integer fils arithmetic, dynamic DB-backed multi-slab tax regimes (G7).
-  5. **Phase 4 Flagship Seed:** Bahrain Bicycle Shop (BHD, 3 decimals) and UAE Kitchenware (AED) specs with 0-growth repeat guarantee (G9).
-  6. **Phase 5 Cleanup & Splits:** Domain module splits for `reports/`, `requests/`, `bills/`; list endpoint filter parameters; zero `any`; zero dead fields; zero removed fields (G10).
-  7. **Phase 6 Verification Gate:** Verification gate passed cleanly across 97 verification units [cov:C-4].
-- **Pending List-then-confirm Item:**
-  - **Duplicate Skills Directories (`.agents/skills` vs `.claude/skills`):** Both directories are identical (88 files across 13 skills). Per AGENTS.md rule *"Never edit the git state of .claude/"*, user confirmation is requested on whether to:
-    1. Remove `.agents/skills` and retain `.claude/skills`.
-    2. Symlink `.agents/skills -> .claude/skills`.
-    3. Keep both as-is.
-- **Next Command:**
+- **Prompt:** Hybrid Prompt 76 — Trado Firebase Backend (1 of 4): Close Every Open Gap — COMPLETE SIGN-OFF (`run-77-final`)
+- **Current State:** **ALL PHASES BX0, BX1, BX2, BX3, BX4, BX5, BX6 FULLY DELIVERED, EMULATOR-VERIFIED & STATICALLY AUDITED.**
+- **Delivered Across Prompt 76:**
+  1. **BX0 Truth Reconciliation:**
+     - Created `functions/scripts/report-numbers.js` and `reportNumbers.test.ts` (D-N1 source-derived numbers).
+     - Full reconciliation delivered in `docs/plans/2026-11-18-gap-closure.md`: R-1..R-20 verdicts, TB-1..TB-15 tables, new gaps MG-36..MG-41.
+     - Recorded decisions D-53..D-61 and answered questions A-18..A-28 in `docs/decisions/decision-register.md` and `docs/audit/open-questions.md`.
+  2. **BX1 Flutter Contract Pack & API Reference (`scripts/generate-flutter-contract.js` & `scripts/check-flutter-contract.js`):**
+     - Generated `docs/flutter-contract/callables.json`, `callables/INDEX.md`, and 42 `callables/<domain>.md` files for 188 callables (`responseDocumented: 188/188`).
+     - Generated `permissions.json` (147 concrete permissions + 2 wildcards with descriptions, default roles, scope notes, 0 aliases).
+     - Generated `images.md` (fixed `storagePath` vs `path`/`uploadId` across contract docs) and `auth.md` (`primaryOrganization.timezone`, `organization_selection_required`, `requestedOrgId` rejected).
+     - Expanded `errors.md` to 69 codes and `state-machines.md` to 13 state machines.
+     - Upgraded `forms/*.json` to 35 entity/action forms (fixed `approval_request` to `DocumentDecisionSchema`/`documentsDecide`, added `requests_settings`, `user_profile`, `ownership_transfer`, `sharing_policy`, `usage_limits`; fixed `customer.priceGroup` to text `"retail"`).
+     - Added `.checksum.json` tamper guard (158 tracked files) and `functions/scripts/helpers/contract-shape.cjs` (`assertResponseShape`).
+     - Added unit test `contractGuardAndPermissions.test.ts` (4/4 pass).
+  3. **BX2 Organization Field Edit Policy:**
+     - Implemented `ORGANIZATION_FIELD_CLASS`, `canEditOrganizationField`, and `maskBankAccounts` in `functions/src/callables/organizations.ts` (permission-only: `org:manage_legal_profile`, `org:manage_bank_details`, `org:update`; zero role-name checks; atomic rejection).
+     - Updated `organizationsGet` to mask bank account numbers to `****XXXX` on responses (Q-B2, MG-37).
+     - Created migration script `functions/scripts/migrate-org-owner-permissions.cjs` (dry-run/apply, idempotent, audited).
+     - Added unit test `functions/src/test/unit/organizationEditPolicy.test.ts` (8 actors × 21 fields matrix = 168 cells, BM-4..BM-6 verified).
+     - Verified live emulator tests in `verify-bx2-emulator.cjs` (BS-11..BS-15 pass).
+  4. **BX3 Requests Hardening to Full Spec:**
+     - Added `requestsSettingsGet` and `requestsSettingsUpdate` (`platform:requests_configure`, bounded SLA/limits/windows, audited) in `functions/src/callables/requests/platformRequests.ts` and `schemas.ts`.
+     - Added 7 ordered `REQUEST_CATEGORY_GROUPS` to `requestsService.ts` and `requestsMeta`.
+     - Fixed MG-36 fail-open bug: `assertRequestsFeatureEnabled()` now fails closed with `FEATURE_DISABLED` when document is missing.
+     - Enforced `reopenWindowDays` (default 14 days) in `validateStateTransition` and `requestsTransition`.
+     - Enforced BS-16: `org_profile_change` refuses fields caller can already edit directly and accepts S0 fields.
+     - Added unit test `requestsExhaustiveSpec.test.ts` (RH-2 exhaustive 1,008-cell state grid, RH-3 45 per-category tests, RH-4 internal note redaction, RH-6 transaction read-after-write detector, RH-9 settings bounds, RH-13 no hard delete).
+     - Refactored DUP-077: removed stored `organizationName` from `requests` collection, `models.ts`, and `tenantRequests.ts`.
+     - Upgraded `migrate-requests-permissions.cjs` to support `--apply`, audit logging, and custom-role preservation.
+     - Upgraded `functions/scripts/test-requests-scenarios.cjs` to cover F-RQ4 (plan downgrade blocker override) and F-RQ11 (SLA pause accumulation).
+  5. **BX4 Test-Tier Repair & Remaining Capabilities:**
+     - Added CP-1 `productsList` optional 1–50 unique `ids` filter + `missingIds` with cross-tenant isolation and cost redaction.
+     - Added `"pubsub": { "port": 8085 }` to `firebase.json` (both `subscriptionAndUsageSweep` and `requestsSlaAndLifecycleSweep` initialize cleanly).
+     - Added Storage and PubSub reachability safety abort in `functions/scripts/helpers/emulator-helper.cjs`.
+     - Moved live provisioning integration test out of `membershipProvisioning.test.ts` into `test-membership-provisioning.cjs`.
+     - Created `functions/scripts/report-outcome-coverage.js` (outcome tag coverage matrix).
+     - Added `scriptSyntaxAndProductsBatch.test.ts` (`node --check` syntax gate on all `*.cjs` scripts).
+     - Removed plain-string silent Super Admin fallback in `auth-personas.cjs` (BM-20).
+     - Documented CP-3 PDF deferral in `sales-billing-and-quotations.md` and CP-4 multi-org Switch ON HOLD in `organizations-subscriptions-and-branches.md`.
+  6. **BX5 Verification at the Gate:**
+     - **BM-1..BM-20 Seeded Defect Proofs:** 20/20 detected (`verify-bm1-bm20.cjs`, 20 injected, 20 detected, 0 undetected).
+     - **TypeScript Build:** 0 errors (`npm --prefix functions run build`).
+     - **Pure Unit Tests:** **369/369 pass (96 suites, 0 skipped, 0 silent skips, `--test-timeout=15000`)**.
+     - **Static Guards:** All 35 `npm run test:static` checks PASSED (exit code 0; 0 `any` writes, 0 dead fields, 0 banned words, 0 schema duplication violations, 196/196 exports documented, 640 flutter contract items verified with 0 violations).
+     - **Live 12-Step Emulator Gate:** **12/12 steps PASSED (failed=0/12)**:
+       1. `SEED` (code 0)
+       2. `SCENARIO_REAL_WORLD` (code 0)
+       3. `SCENARIO_SUBSCRIPTION_AUDIT` (code 0)
+       4. `SCENARIO_REQUESTS_FULL` (code 0)
+       5. `SCENARIO_FINANCE_BRANCH` (code 0)
+       6. `MEMBERSHIP_PROVISIONING` (code 0)
+       7. `BX2_ORG_POLICY_ACCEPTANCE` (code 0)
+       8. `BX1_BX4_ACCEPTANCE` (code 0)
+       9. `RULES_FIRESTORE_STORAGE` (code 0)
+       10. `CHECK_DATA_DUP` (code 0)
+       11. `CHECK_DATA_SAME_DOC` (code 0)
+       12. `CHECK_DATA_RAW_CENSUS` (code 0)
+
+- **Source Numbers (from `report-numbers.js`):**
+  - Total exports: **196** (188 callables, 6 triggers, 2 schedules)
+  - Collections referenced: **61** (62 models in `models.ts`)
+  - Permissions: **149** (147 concrete + 2 wildcards)
+  - Flutter Contract: 13 docs, 35 entity forms (748 fields), 15 request detail forms, 158 checksummed files, `SUMMARY.md` 66 lines
+  - Error codes: 63 unique thrown, 69 documented in `errors.md` (0 undocumented)
+  - State machines: 13 in code, 13 in contract
+  - Duplication allowlist: 92 exceptions (DUP-077 removed)
+
+- **Next Command (Prompt 77 — Money, Stock and Account Integrity):**
   ```powershell
+  # Prompt 77 entry command
   npm --prefix functions run verify:status
   ```

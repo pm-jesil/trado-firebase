@@ -3,7 +3,14 @@
   "label": "Team",
   "callables": {
     "create": "teamsCreate",
-    "update": "teamsUpdate"
+    "list": "teamsList",
+    "update": "teamsUpdate",
+    "actions": [
+      {
+        "name": "teamsAssignMember",
+        "kind": "action"
+      }
+    ]
   },
   "fields": [
     {
@@ -15,7 +22,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "idempotencyKey",
@@ -29,7 +36,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "organizationId",
@@ -41,8 +48,8 @@
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "name",
@@ -69,7 +76,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample description"
+      "example": "2026-11-18"
     },
     {
       "path": "leaderMembershipId",
@@ -82,7 +89,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample leaderMembershipId"
+      "example": "leaderMembership_001"
     }
   ]
 }

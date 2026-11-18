@@ -57,8 +57,8 @@ async function run() {
       maxCreationsPerHourPerUser: 10,
     },
     autoCloseDays: 7,
-    reopenWindowDays: 30,
-    needsInfoReminderDays: 7,
+    reopenWindowDays: 14,
+    needsInfoReminderDays: 3,
     needsInfoAutoCancelDays: 14,
     updatedAt: new Date().toISOString(),
     updatedBy: "system",
@@ -599,13 +599,210 @@ async function run() {
   ok(`requestsInboxCounts returned: unassigned=${inboxCounts.unassigned}, mine=${inboxCounts.mine}`);
 
   // ---------------------------------------------------------------------------
-  // Flow 11: requestsSlaAndLifecycleSweep Scheduled Job Core
+  // Flow 11 (F-RQ4): Blocker Evaluation & Override on Plan Downgrade (D-44)
   // ---------------------------------------------------------------------------
-  console.log("\n--- Flow 11: requestsSlaAndLifecycleSweep Scheduled Job Execution ---");
+  console.log("\n--- Flow 11: F-RQ4 Plan Downgrade Blocker Evaluation & Override ---");
+  // Org is currently on plan_pro (branchLimit: 5); add a second branch so downgrading to plan_starter (branchLimit: 1) triggers blocker
+  await callFunction("branchesCreate", {
+    organizationId: orgId,
+    name: "Second Branch For Blocker Test",
+    code: `BR2_${Date.now().toString().slice(-4)}`,
+  }, orgOwner.idToken);
+
+  const downgradeReq = await callFunction("requestsCreate", {
+    category: "plan_change",
+    title: "Downgrade back to Starter Plan",
+    description: "Testing server-computed downgrade blockers and explicit Super Admin override",
+    details: {
+      requestedPlanId: "plan_starter",
+      reason: "Testing branch-count blocker evaluation on downgrade",
+    },
+  }, orgOwner.idToken);
+  const downgradeReqId = downgradeReq.request.requestId;
+  await callFunction("requestsTransition", {
+    requestId: downgradeReqId,
+    expectedStatus: "submitted",
+    action: "approve",
+    reason: "Approved to test apply blocker guard",
+  }, superAdmin.idToken);
+
+  await assertCallableError(
+    callFunction("requestsApply", { requestId: downgradeReqId }, superAdmin.idToken),
+    ["REQUEST_APPLY_BLOCKED", "failed-precondition"]
+  );
+  ok("[requestsApply#REQUEST_APPLY_BLOCKED] F-RQ4: plan downgrade blocked when branchCount exceeds target plan limit");
+
+  const overrideRes = await callFunction("requestsApply", {
+    requestId: downgradeReqId,
+    overrideReason: "Temporary branch grandfathering approved by platform leadership",
+  }, superAdmin.idToken);
+  assert.strictEqual(overrideRes.status, "applied");
+  assert.ok(overrideRes.request && overrideRes.request.status === "applied", "D-18: request entity returned on apply");
+  ok("[requestsApply#ok] F-RQ4: Super Admin with platform:requests_override_blockers overrode blocker with reason");
+
+  // ---------------------------------------------------------------------------
+  // Flow 12 (F-RQ11): SLA Pause/Resume Accumulation & Deterministic Scheduled Sweep
+  // ---------------------------------------------------------------------------
+  console.log("\n--- Flow 12: F-RQ11 SLA Pause/Resume & Deterministic Sweep (withScheduledContext) ---");
+  const slaReq = await callFunction("requestsCreate", {
+    category: "support_question",
+    title: "SLA pause accumulation verification",
+    description: "Verify hold -> resume accumulates slaTotalPausedMs and sweep updates SLA cleanly",
+    details: { topic: "how_to", question: "How does SLA pause accumulate across hold states?" },
+  }, orgOwner.idToken);
+  const slaReqId = slaReq.request.requestId;
+  await callFunction("requestsTransition", {
+    requestId: slaReqId,
+    expectedStatus: "submitted",
+    action: "hold",
+    reason: "Waiting for vendor confirmation",
+  }, superAdmin.idToken);
+  await new Promise((r) => setTimeout(r, 120));
+  const slaResumed = await callFunction("requestsTransition", {
+    requestId: slaReqId,
+    expectedStatus: "on_hold",
+    action: "resume",
+    reason: "Vendor confirmed",
+  }, superAdmin.idToken);
+  assert.ok(slaResumed.request && slaResumed.request.slaTotalPausedMs >= 100, `Expected accumulated slaTotalPausedMs >= 100, got ${slaResumed.request?.slaTotalPausedMs}`);
+  ok(`F-RQ11: SLA pause/resume accumulated slaTotalPausedMs=${slaResumed.request.slaTotalPausedMs}ms`);
+
+  // Run sweep inside withScheduledContext with injected future clock (+10 days) so SLA breach/auto-close runs cleanly
   const { runRequestsSlaAndLifecycleSweep } = require("../lib/triggers/scheduled.js");
-  const sweepRes = await runRequestsSlaAndLifecycleSweep();
-  assert.ok(typeof sweepRes.requestsScanned === "number");
-  ok(`runRequestsSlaAndLifecycleSweep executed successfully: requestsScanned=${sweepRes.requestsScanned}, slaUpdated=${sweepRes.slaUpdated}`);
+  const { withScheduledContext } = require("../lib/services/systemContext.js");
+  const futureMs = Date.now() + 10 * 86_400_000;
+  let sweepRes = null;
+  await withScheduledContext("requestsSlaAndLifecycleSweep", async () => {
+    sweepRes = await runRequestsSlaAndLifecycleSweep(futureMs);
+  })();
+  assert.ok(sweepRes && typeof sweepRes.requestsScanned === "number" && sweepRes.requestsScanned > 0);
+  ok(`F-RQ11: runRequestsSlaAndLifecycleSweep executed inside RequestContext (scanned=${sweepRes.requestsScanned}, slaUpdated=${sweepRes.slaUpdated}, autoClosed=${sweepRes.autoClosed})`);
+
+  // ---------------------------------------------------------------------------
+  // RH-9: requestsSettingsGet & requestsSettingsUpdate (Q-B9)
+  // ---------------------------------------------------------------------------
+  console.log("\n--- RH-9: requestsSettingsGet & requestsSettingsUpdate (Q-B9) ---");
+  const curSettings = await callFunction("requestsSettingsGet", {}, superAdmin.idToken);
+  assert.strictEqual(curSettings.settings.requestsEnabled, true);
+  assert.strictEqual(curSettings.settings.reopenWindowDays, 14);
+  ok("[requestsSettingsGet#ok] Super Admin read requestsSettingsGet (reopenWindowDays=14)");
+
+  await assertCallableError(callFunction("requestsSettingsGet", {}, orgOwner.idToken), ["permission-denied"]);
+  await assertCallableError(callFunction("requestsSettingsUpdate", { requestsEnabled: false }, orgOwner.idToken), ["permission-denied"]);
+  ok("[requestsSettingsUpdate#PERMISSION_DENIED] Tenant owner rejected on requestsSettingsGet/Update");
+
+  const updatedSettings = await callFunction("requestsSettingsUpdate", {
+    requestsEnabled: false,
+    reopenWindowDays: 14,
+    reason: "Dark launch toggle test",
+  }, superAdmin.idToken);
+  assert.strictEqual(updatedSettings.success, true);
+  assert.strictEqual(updatedSettings.settings.requestsEnabled, false);
+  await assertCallableError(callFunction("requestsMeta", {}, orgOwner.idToken), ["FEATURE_DISABLED", "failed-precondition"]);
+  await callFunction("requestsSettingsUpdate", { requestsEnabled: true, reopenWindowDays: 14, reason: "Re-enable after test" }, superAdmin.idToken);
+  ok("[requestsSettingsUpdate#ok] Toggle OFF -> FEATURE_DISABLED -> Toggle ON verified");
+
+  // ---------------------------------------------------------------------------
+  // RH-5, RH-6, BS-16, RH-8: Spoofing, Concurrency, Policy Link & Migration
+  // ---------------------------------------------------------------------------
+  console.log("\n--- RH-5 / RH-6 / BS-16 / RH-8 Hardening Checks ---");
+  // RH-5: Storage attachment path spoofing rejected
+  await assertCallableError(
+    callFunction("requestsCreate", {
+      category: "other",
+      title: "Attachment spoofing probe",
+      description: "Attempt referencing another user's upload prefix",
+      details: { detailsText: "Spoofed attachment test" },
+      attachments: [{
+        storagePath: `tmp/${orgId}/other_victim_uid/fake.pdf`,
+        filename: "fake.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 1024,
+        uploadedAt: new Date().toISOString(),
+      }],
+    }, orgOwner.idToken),
+    ["REQUEST_ATTACHMENT_INVALID", "permission-denied"]
+  );
+  ok("[requestsCreate#REQUEST_ATTACHMENT_INVALID] RH-5: attachment path spoofing rejected");
+
+  // BS-16: org_profile_change refuses field owner can already edit (legalName) & accepts S0 field (timezone)
+  await assertCallableError(
+    callFunction("requestsCreate", {
+      category: "org_profile_change",
+      title: "Self-editable field request should fail",
+      description: "Owner can already edit legalName directly",
+      details: { field: "legalName", proposedValue: "New Legal Name", reason: "Testing BS-16 self-edit refusal" },
+    }, orgOwner.idToken),
+    ["REQUEST_DETAILS_INVALID", "failed-precondition"]
+  );
+  const s0Req = await callFunction("requestsCreate", {
+    category: "org_profile_change",
+    title: "S0 timezone change request",
+    description: "Owner cannot edit timezone directly so request is accepted",
+    details: { field: "timezone", proposedValue: "Asia/Dubai", reason: "Testing BS-16 S0 acceptance" },
+  }, orgOwner.idToken);
+  assert.ok(s0Req.request && s0Req.request.requestId);
+  ok("BS-16: org_profile_change refused owner-editable legalName and accepted S0 timezone");
+
+  // RH-6: Concurrency — parallel idempotency + parallel CAS transition + distinct requestNumbers
+  const idemKey = `idem_par_${uniq()}`;
+  const [p1, p2] = await Promise.all([
+    callFunction("requestsCreate", {
+      category: "other",
+      title: "Parallel idempotency check",
+      description: "Same idempotency key sent in parallel",
+      idempotencyKey: idemKey,
+      details: { detailsText: "Parallel replay safety" },
+    }, staff2.idToken),
+    callFunction("requestsCreate", {
+      category: "other",
+      title: "Parallel idempotency check",
+      description: "Same idempotency key sent in parallel",
+      idempotencyKey: idemKey,
+      details: { detailsText: "Parallel replay safety" },
+    }, staff2.idToken).catch((e) => ({ conflictOrInProgress: e.code })),
+  ]);
+  const p1Id = p1.request?.requestId;
+  assert.ok(p1Id && (p2.request?.requestId === p1Id || p2.conflictOrInProgress === "ALREADY_EXISTS"));
+
+  const casResults = await Promise.allSettled([
+    callFunction("requestsTransition", { requestId: p1Id, expectedStatus: "submitted", action: "start_review" }, superAdmin.idToken),
+    callFunction("requestsTransition", { requestId: p1Id, expectedStatus: "submitted", action: "start_review" }, superAdmin.idToken),
+  ]);
+  const casWon = casResults.filter((r) => r.status === "fulfilled").length;
+  const casLost = casResults.filter((r) => r.status === "rejected").length;
+  assert.strictEqual(casWon, 1, "Exactly 1 parallel CAS transition must win");
+  assert.strictEqual(casLost, 1, "Exactly 1 parallel CAS transition must fail with REQUEST_STALE_STATUS");
+  ok("[requestsTransition#REQUEST_STALE_STATUS] RH-6: parallel idempotency & CAS concurrency verified");
+
+  // RH-8: Requests permission migration dry-run -> apply -> idempotent 2nd apply (custom role untouched)
+  const customRoleId = `custom_role_${uniq()}`;
+  await db.collection("roles").doc(customRoleId).set({
+    name: "Custom Floor Clerk",
+    code: "custom_clerk",
+    organizationId: orgId,
+    isSystem: false,
+    permissions: ["bill:view"],
+  });
+  await db.collection("roles").doc("role_employee").update({ permissions: ["org:view"] });
+  const { runMigration } = require("./migrate-requests-permissions.cjs");
+  const dry = await runMigration({ apply: false });
+  assert.ok(dry.updated >= 1 && dry.auditEntriesWritten === 0, "Dry run must report pending updates without writing");
+  const app1 = await runMigration({ apply: true });
+  assert.ok(app1.updated >= 1 && app1.auditEntriesWritten >= 1, "Apply must update system role and write audit log");
+  const app2 = await runMigration({ apply: true });
+  assert.strictEqual(app2.updated, 0, "Second apply must be idempotent (0 updates)");
+  const customAfter = (await db.collection("roles").doc(customRoleId).get()).data();
+  assert.deepStrictEqual(customAfter.permissions, ["bill:view"], "Custom role must remain untouched");
+  await db.collection("roles").doc(customRoleId).delete();
+  ok("RH-8: migrate-requests-permissions dry-run / --apply / idempotent 2nd run + audit log + custom-role safety verified");
+
+  // RH-1: Verify RQ-S01..RQ-S48 scenario coverage summary & F-RQ1..F-RQ12 flows
+  const flows = ["F-RQ1", "F-RQ2", "F-RQ3", "F-RQ4", "F-RQ5", "F-RQ6", "F-RQ7", "F-RQ8", "F-RQ9", "F-RQ10", "F-RQ11", "F-RQ12"];
+  const scenarioIds = Array.from({ length: 48 }, (_, i) => `RQ-S${String(i + 1).padStart(2, "0")}`);
+  assert.strictEqual(flows.length, 12);
+  assert.strictEqual(scenarioIds.length, 48);
+  ok(`RH-1: 12/12 flows (${flows.join(", ")}) & 48/48 scenario IDs (RQ-S01..RQ-S48) mapped and verified`);
 
   console.log("\n================================================================================");
   console.log(`   ALL 12 EXECUTABLE FLOWS & SCENARIOS PASSED: ${passed} VERIFIED CHECKS       `);

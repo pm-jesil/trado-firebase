@@ -3,14 +3,17 @@
   "label": "Expense (Outflow)",
   "callables": {
     "create": "outflowsCreate",
-    "update": "outflowsVoid"
+    "get": "outflowsGet",
+    "list": "outflowsList",
+    "void": "outflowsVoid",
+    "actions": []
   },
   "fields": [
     {
       "path": "idempotencyKey",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 8,
@@ -18,37 +21,37 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "organizationId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "kind",
       "type": "enum",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -62,29 +65,29 @@
       "path": "docDate",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
       "uiHint": "date_picker",
-      "example": "Sample docDate"
+      "example": "2026-11-18"
     },
     {
       "path": "vendorId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": true,
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample vendorId"
+      "example": "vendor_001"
     },
     {
       "path": "payee",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 1,
@@ -98,20 +101,20 @@
       "path": "recurringTemplateId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample recurringTemplateId"
+      "uiHint": "text",
+      "example": "recurringTemplate_001"
     },
     {
       "path": "invoiceNumber",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
@@ -122,29 +125,29 @@
       "path": "dueDate",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
       "uiHint": "date_picker",
-      "example": "Sample dueDate"
+      "example": "2026-11-18"
     },
     {
       "path": "lines[].productId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": true,
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample lines[].productId"
+      "example": "lines___product_001"
     },
     {
       "path": "lines[].itemName",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 1,
@@ -152,24 +155,24 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample lines[].itemName"
+      "example": "Sample itemName"
     },
     {
       "path": "lines[].categoryId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": true,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample lines[].categoryId"
+      "uiHint": "text",
+      "example": "lines___category_001"
     },
     {
       "path": "lines[].quantity",
       "type": "number",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -183,7 +186,7 @@
       "path": "lines[].unit",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 1,
@@ -191,13 +194,13 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample lines[].unit"
+      "example": "Sample unit"
     },
     {
       "path": "lines[].unitPrice",
       "type": "number",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -211,7 +214,7 @@
       "path": "lines[].discountAmount",
       "type": "number",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -225,7 +228,7 @@
       "path": "lines[].taxPercent",
       "type": "number",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -241,7 +244,7 @@
       "path": "lines[].addToStock",
       "type": "boolean",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
@@ -252,31 +255,31 @@
       "path": "lines[].batch",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample lines[].batch"
+      "uiHint": "text",
+      "example": "Sample batch"
     },
     {
       "path": "lines[].expiryDate",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "format": "regex"
       },
       "enumValues": [],
       "uiHint": "date_picker",
-      "example": "Sample lines[].expiryDate"
+      "example": "2026-11-18"
     },
     {
       "path": "lines[].damagedQuantity",
       "type": "number",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -290,20 +293,20 @@
       "path": "lines[].damageReason",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 300
       },
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample lines[].damageReason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     },
     {
       "path": "lines[].serialNumbers[]",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 1,
@@ -311,13 +314,13 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample lines[].serialNumbers[]"
+      "example": "Sample serialNumbers[]"
     },
     {
       "path": "paidAmount",
       "type": "number",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -331,7 +334,7 @@
       "path": "paymentMethod",
       "type": "enum",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -349,33 +352,33 @@
       "path": "financialAccountId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample financialAccountId"
+      "example": "financialAccount_001"
     },
     {
       "path": "storageLocationId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample storageLocationId"
+      "uiHint": "text",
+      "example": "storageLocation_001"
     },
     {
       "path": "splitPayments[].method",
       "type": "enum",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -393,7 +396,7 @@
       "path": "splitPayments[].amount",
       "type": "number",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "format": "safeint",
@@ -408,33 +411,33 @@
       "path": "splitPayments[].financialAccountId",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample splitPayments[].financialAccountId"
+      "example": "splitPayments___financialAccount_001"
     },
     {
       "path": "splitPayments[].notes",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 300
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample splitPayments[].notes"
+      "example": "Sample notes"
     },
     {
       "path": "notes",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 1000
@@ -447,7 +450,7 @@
       "path": "payeeType",
       "type": "enum",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [
@@ -462,31 +465,31 @@
       "path": "payeeMembershipId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "minLength": 2
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample payeeMembershipId"
+      "example": "payeeMembership_001"
     },
     {
       "path": "expenseCategoryId",
       "type": "string",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample expenseCategoryId"
+      "uiHint": "text",
+      "example": "expenseCategory_001"
     },
     {
       "path": "billDiscountAmount",
       "type": "number",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -500,7 +503,7 @@
       "path": "billDiscountPercent",
       "type": "number",
       "requiredCreate": false,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "min": 0,
@@ -509,20 +512,20 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "attachmentPaths[]",
       "type": "string",
       "requiredCreate": true,
-      "updatable": true,
+      "updatable": false,
       "nullable": false,
       "bounds": {
         "maxLength": 500
       },
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "text",
       "example": "Sample attachmentPaths[]"
     }
   ]

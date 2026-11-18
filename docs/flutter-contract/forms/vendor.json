@@ -3,7 +3,10 @@
   "label": "Vendor",
   "callables": {
     "create": "vendorsCreate",
-    "update": "vendorsUpdate"
+    "get": "vendorsGet",
+    "list": "vendorsList",
+    "update": "vendorsUpdate",
+    "actions": []
   },
   "fields": [
     {
@@ -17,8 +20,8 @@
         "maxLength": 300
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample duplicateOverrideReason"
+      "uiHint": "textarea",
+      "example": "2026-11-18"
     },
     {
       "path": "idempotencyKey",
@@ -32,7 +35,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "organizationId",
@@ -44,8 +47,8 @@
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
@@ -56,7 +59,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "partyType",
@@ -109,7 +112,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "phone",
-      "example": "Sample phone"
+      "example": "+919876543210"
     },
     {
       "path": "additionalPhones[]",
@@ -122,7 +125,7 @@
       },
       "enumValues": [],
       "uiHint": "phone",
-      "example": "Sample additionalPhones[]"
+      "example": "+919876543210"
     },
     {
       "path": "email",
@@ -135,7 +138,7 @@
       },
       "enumValues": [],
       "uiHint": "email",
-      "example": "Sample email"
+      "example": "owner@example.com"
     },
     {
       "path": "image.path",
@@ -149,7 +152,7 @@
       },
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": "Sample image.path"
+      "example": "Sample path"
     },
     {
       "path": "image.contentType",
@@ -226,7 +229,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": "Sample image.updatedAt"
+      "example": "2026-11-18"
     },
     {
       "path": "image.thumbnailPath",
@@ -240,7 +243,7 @@
       },
       "enumValues": [],
       "uiHint": "image_picker",
-      "example": "Sample image.thumbnailPath"
+      "example": "Sample thumbnailPath"
     },
     {
       "path": "uploadId",
@@ -250,8 +253,8 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample uploadId"
+      "uiHint": "image_picker",
+      "example": "upload_001"
     },
     {
       "path": "taxId",
@@ -264,7 +267,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample taxId"
+      "example": "tax_001"
     },
     {
       "path": "addresses[].id",
@@ -277,7 +280,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].id"
+      "example": "addresses___id_001"
     },
     {
       "path": "addresses[].label",
@@ -290,7 +293,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].label"
+      "example": "Sample label"
     },
     {
       "path": "addresses[].line1",
@@ -304,7 +307,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].line1"
+      "example": "Sample line1"
     },
     {
       "path": "addresses[].line2",
@@ -317,7 +320,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].line2"
+      "example": "Sample line2"
     },
     {
       "path": "addresses[].area",
@@ -330,7 +333,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].area"
+      "example": "Sample area"
     },
     {
       "path": "addresses[].city",
@@ -344,7 +347,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].city"
+      "example": "Sample city"
     },
     {
       "path": "addresses[].state",
@@ -357,8 +360,8 @@
         "maxLength": 100
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample addresses[].state"
+      "uiHint": "textarea",
+      "example": "Sample state"
     },
     {
       "path": "addresses[].postalCode",
@@ -372,7 +375,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].postalCode"
+      "example": "Sample postalCode"
     },
     {
       "path": "addresses[].country",
@@ -386,7 +389,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].country"
+      "example": "IN"
     },
     {
       "path": "addresses[].geoPoint.latitude",
@@ -401,7 +404,7 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "textarea",
       "example": 1
     },
     {
@@ -431,7 +434,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample addresses[].contactName"
+      "example": "Sample contactName"
     },
     {
       "path": "addresses[].phone",
@@ -442,7 +445,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "phone",
-      "example": "Sample addresses[].phone"
+      "example": "+919876543210"
     },
     {
       "path": "addresses[].isDefaultBilling",
@@ -477,7 +480,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].id"
+      "example": "bankAccounts___id_001"
     },
     {
       "path": "bankAccounts[].label",
@@ -490,7 +493,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].label"
+      "example": "Sample label"
     },
     {
       "path": "bankAccounts[].accountHolderName",
@@ -504,7 +507,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].accountHolderName"
+      "example": "Sample accountHolderName"
     },
     {
       "path": "bankAccounts[].bankName",
@@ -518,7 +521,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].bankName"
+      "example": "Sample bankName"
     },
     {
       "path": "bankAccounts[].accountNumber",
@@ -532,7 +535,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].accountNumber"
+      "example": "Sample accountNumber"
     },
     {
       "path": "bankAccounts[].routingType",
@@ -563,7 +566,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].routingCode"
+      "example": "Sample routingCode"
     },
     {
       "path": "bankAccounts[].upiId",
@@ -576,7 +579,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].upiId"
+      "example": "bankAccounts___upi_001"
     },
     {
       "path": "bankAccounts[].currency",
@@ -590,7 +593,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample bankAccounts[].currency"
+      "example": "INR"
     },
     {
       "path": "bankAccounts[].isDefault",
@@ -625,7 +628,7 @@
         "active",
         "archived"
       ],
-      "uiHint": "date_picker",
+      "uiHint": "dropdown",
       "example": "active"
     },
     {
@@ -639,7 +642,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample contacts[].id"
+      "example": "contacts___id_001"
     },
     {
       "path": "contacts[].name",
@@ -653,7 +656,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample contacts[].name"
+      "example": "Sample name"
     },
     {
       "path": "contacts[].designation",
@@ -665,8 +668,8 @@
         "maxLength": 100
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample contacts[].designation"
+      "uiHint": "text",
+      "example": "2026-11-18"
     },
     {
       "path": "contacts[].phone",
@@ -677,7 +680,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "phone",
-      "example": "Sample contacts[].phone"
+      "example": "+919876543210"
     },
     {
       "path": "contacts[].email",
@@ -688,7 +691,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "email",
-      "example": "Sample contacts[].email"
+      "example": "owner@example.com"
     },
     {
       "path": "contacts[].whatsApp",
@@ -698,8 +701,8 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample contacts[].whatsApp"
+      "uiHint": "text",
+      "example": "Sample whatsApp"
     },
     {
       "path": "paymentTermsDays",
@@ -727,8 +730,8 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "visibilityScope",

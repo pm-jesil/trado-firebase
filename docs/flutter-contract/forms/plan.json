@@ -3,7 +3,24 @@
   "label": "Subscription Plan",
   "callables": {
     "create": "plansCreate",
-    "update": "plansUpdate"
+    "get": "plansGet",
+    "list": "plansList",
+    "update": "plansUpdate",
+    "delete": "plansDelete",
+    "actions": [
+      {
+        "name": "plansArchive",
+        "kind": "delete"
+      },
+      {
+        "name": "plansPreviewImpact",
+        "kind": "read"
+      },
+      {
+        "name": "plansCatalogList",
+        "kind": "list"
+      }
+    ]
   },
   "fields": [
     {
@@ -16,8 +33,8 @@
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
@@ -28,7 +45,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "idempotencyKey",
@@ -42,7 +59,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     },
     {
       "path": "name",
@@ -84,7 +101,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample currency"
+      "example": "INR"
     },
     {
       "path": "storageLimitMb",
@@ -97,8 +114,8 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "monthlyDocumentVolumeLimit",
@@ -111,8 +128,8 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "seatLimits.admin",
@@ -126,8 +143,8 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "seatLimits.staff",
@@ -141,8 +158,8 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "branchLimit",
@@ -156,8 +173,8 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
+      "uiHint": "money_paise",
+      "example": 2500
     },
     {
       "path": "moduleFlags.*",

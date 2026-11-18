@@ -190,29 +190,123 @@ export const OPEN_STATUSES: ReadonlySet<RequestStatus> = new Set([
 ]);
 
 /**
- * Assert platform requests feature is enabled (A-17, Q-RQ13).
+ * Canonical 7 Category Groups (Appendix A, Q-B4 / A-21).
+ * Returned by `requestsMeta` and exported to the contract so clients render contract-driven groups.
+ */
+export interface RequestCategoryGroup {
+  id: string;
+  label: string;
+  order: number;
+  categories: RequestCategory[];
+}
+
+export const REQUEST_CATEGORY_GROUPS: RequestCategoryGroup[] = [
+  {
+    id: "plan_and_billing",
+    label: "Plan & billing",
+    order: 1,
+    categories: [
+      RequestCategory.PLAN_CHANGE,
+      RequestCategory.LIMIT_INCREASE,
+      RequestCategory.MODULE_REQUEST,
+      RequestCategory.BILLING_QUERY,
+    ],
+  },
+  {
+    id: "organization",
+    label: "Organization",
+    order: 2,
+    categories: [
+      RequestCategory.ORG_PROFILE_CHANGE,
+      RequestCategory.OWNERSHIP_TRANSFER,
+    ],
+  },
+  {
+    id: "problems",
+    label: "Problems",
+    order: 3,
+    categories: [
+      RequestCategory.BUG_REPORT,
+      RequestCategory.DATA_ISSUE,
+    ],
+  },
+  {
+    id: "ideas",
+    label: "Ideas",
+    order: 4,
+    categories: [
+      RequestCategory.FEATURE_REQUEST,
+      RequestCategory.IMPROVEMENT,
+    ],
+  },
+  {
+    id: "help",
+    label: "Help",
+    order: 5,
+    categories: [
+      RequestCategory.SUPPORT_QUESTION,
+      RequestCategory.OTHER,
+    ],
+  },
+  {
+    id: "data_and_security",
+    label: "Data & security",
+    order: 6,
+    categories: [
+      RequestCategory.DATA_REQUEST,
+      RequestCategory.SECURITY_CONCERN,
+    ],
+  },
+  {
+    id: "access",
+    label: "Access",
+    order: 7,
+    categories: [
+      RequestCategory.ACCESS_REQUEST,
+    ],
+  },
+];
+
+export const DEFAULT_REQUESTS_SETTINGS: PlatformSettingsRequestsDoc = {
+  requestsEnabled: false,
+  sla: DEFAULT_SLA_HOURS,
+  limits: {
+    maxOpenPerUser: 10,
+    maxOpenPerOrg: 50,
+    maxCreationsPerHourPerUser: 10,
+  },
+  autoCloseDays: 7,
+  reopenWindowDays: 14,
+  needsInfoReminderDays: 3,
+  needsInfoAutoCancelDays: 14,
+};
+
+/**
+ * Assert platform requests feature is enabled (A-17, Q-RQ13, MG-36).
+ * Fails closed (`FEATURE_DISABLED`) when `platformSettings/requests` does not exist or `requestsEnabled !== true`.
  */
 export async function assertRequestsFeatureEnabled(): Promise<PlatformSettingsRequestsDoc> {
   const snap = await db.collection("platformSettings").doc("requests").get();
   if (!snap.exists) {
-    // Default seed if not yet created: feature disabled
-    return {
-      requestsEnabled: false,
-      sla: DEFAULT_SLA_HOURS,
-      limits: {
-        maxOpenPerUser: 10,
-        maxOpenPerOrg: 50,
-        maxCreationsPerHourPerUser: 10,
-      },
-      autoCloseDays: 7,
-      reopenWindowDays: 14,
-      needsInfoReminderDays: 3,
-      needsInfoAutoCancelDays: 14,
-    };
+    throw new HttpsError(
+      "failed-precondition",
+      `[${RequestReason.FEATURE_DISABLED}] Requests system is currently disabled.`,
+      { reason: RequestReason.FEATURE_DISABLED }
+    );
   }
-  const config = snap.data() as PlatformSettingsRequestsDoc;
+  const raw = snap.data() as Partial<PlatformSettingsRequestsDoc>;
+  const config: PlatformSettingsRequestsDoc = {
+    ...DEFAULT_REQUESTS_SETTINGS,
+    ...raw,
+    sla: { ...DEFAULT_SLA_HOURS, ...(raw.sla || {}) },
+    limits: { ...DEFAULT_REQUESTS_SETTINGS.limits, ...(raw.limits || {}) },
+  };
   if (config.requestsEnabled !== true) {
-    throw new HttpsError("failed-precondition", `[${RequestReason.FEATURE_DISABLED}] Requests system is currently disabled.`);
+    throw new HttpsError(
+      "failed-precondition",
+      `[${RequestReason.FEATURE_DISABLED}] Requests system is currently disabled.`,
+      { reason: RequestReason.FEATURE_DISABLED }
+    );
   }
   return config;
 }
@@ -371,7 +465,14 @@ export function validateStateTransition(
   isPlatformHandler: boolean,
   isOrgManager: boolean,
   isRequester: boolean,
-  requestAudience: RequestAudience
+  requestAudience: RequestAudience,
+  options?: {
+    resolvedAt?: string | null;
+    closedAt?: string | null;
+    statusChangedAt?: string | null;
+    reopenWindowDays?: number;
+    now?: Date;
+  }
 ): { nextStatus: RequestStatus } {
   // Common requester actions
   if (action === RequestAction.RESPOND) {
@@ -405,11 +506,31 @@ export function validateStateTransition(
   }
 
   if (action === RequestAction.REOPEN) {
+    const isHandler = requestAudience === RequestAudience.ORGANIZATION ? isOrgManager : isPlatformHandler;
+    if (!isRequester && !isHandler) {
+      throw new HttpsError("permission-denied", "Only the requester or an authorized handler can reopen a request.");
+    }
     if (kind !== RequestKind.WORK) {
       throw new HttpsError("failed-precondition", `[${RequestReason.REQUEST_INVALID_TRANSITION}] Approval requests cannot be reopened.`);
     }
     if (![RequestStatus.RESOLVED, RequestStatus.CLOSED].includes(currentStatus)) {
       throw new HttpsError("failed-precondition", `[${RequestReason.REQUEST_INVALID_TRANSITION}] "reopen" only valid from "resolved" or "closed" status.`);
+    }
+    // Q-B3 / A-20 / RH-10: Requesters may reopen only within configured reopenWindowDays (default 14); handlers anytime.
+    if (isRequester && !isHandler) {
+      const windowDays = options?.reopenWindowDays ?? DEFAULT_REQUESTS_SETTINGS.reopenWindowDays;
+      const anchorIso = options?.resolvedAt || options?.closedAt || options?.statusChangedAt;
+      if (anchorIso) {
+        const anchorMs = Date.parse(anchorIso);
+        const nowMs = (options?.now || new Date()).getTime();
+        if (!Number.isNaN(anchorMs) && nowMs - anchorMs > windowDays * 86_400_000) {
+          throw new HttpsError(
+            "failed-precondition",
+            `[${RequestReason.REQUEST_REOPEN_WINDOW_CLOSED}] Reopen window (${windowDays} days) has elapsed. Please submit a new request.`,
+            { reason: RequestReason.REQUEST_REOPEN_WINDOW_CLOSED, reopenWindowDays: windowDays }
+          );
+        }
+      }
     }
     return { nextStatus: RequestStatus.IN_REVIEW };
   }

@@ -3,7 +3,10 @@
   "label": "Storage Location",
   "callables": {
     "create": "storageLocationsCreate",
-    "update": "storageLocationsUpdate"
+    "get": "storageLocationsGet",
+    "list": "storageLocationsList",
+    "update": "storageLocationsUpdate",
+    "actions": []
   },
   "fields": [
     {
@@ -16,8 +19,8 @@
         "minLength": 2
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample organizationId"
+      "uiHint": "text",
+      "example": "organization_001"
     },
     {
       "path": "branchId",
@@ -28,7 +31,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample branchId"
+      "example": "branch_001"
     },
     {
       "path": "name",
@@ -99,7 +102,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample address.id"
+      "example": "address_id_001"
     },
     {
       "path": "address.label",
@@ -112,7 +115,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample address.label"
+      "example": "Sample label"
     },
     {
       "path": "address.line1",
@@ -126,7 +129,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample address.line1"
+      "example": "Sample line1"
     },
     {
       "path": "address.line2",
@@ -139,7 +142,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample address.line2"
+      "example": "Sample line2"
     },
     {
       "path": "address.area",
@@ -152,7 +155,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample address.area"
+      "example": "Sample area"
     },
     {
       "path": "address.city",
@@ -166,7 +169,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample address.city"
+      "example": "Sample city"
     },
     {
       "path": "address.state",
@@ -179,8 +182,8 @@
         "maxLength": 100
       },
       "enumValues": [],
-      "uiHint": "date_picker",
-      "example": "Sample address.state"
+      "uiHint": "textarea",
+      "example": "Sample state"
     },
     {
       "path": "address.postalCode",
@@ -194,7 +197,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample address.postalCode"
+      "example": "Sample postalCode"
     },
     {
       "path": "address.country",
@@ -208,7 +211,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample address.country"
+      "example": "IN"
     },
     {
       "path": "address.geoPoint.latitude",
@@ -223,7 +226,7 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "textarea",
       "example": 1
     },
     {
@@ -253,7 +256,7 @@
       },
       "enumValues": [],
       "uiHint": "textarea",
-      "example": "Sample address.contactName"
+      "example": "Sample contactName"
     },
     {
       "path": "address.phone",
@@ -264,7 +267,7 @@
       "bounds": {},
       "enumValues": [],
       "uiHint": "phone",
-      "example": "Sample address.phone"
+      "example": "+919876543210"
     },
     {
       "path": "address.isDefaultBilling",
@@ -313,7 +316,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample idempotencyKey"
+      "example": "idem_20261118_0001"
     }
   ]
 }

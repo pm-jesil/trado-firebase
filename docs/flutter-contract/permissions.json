@@ -1,0 +1,1868 @@
+{
+  "version": "2.0.0",
+  "totalConcrete": 147,
+  "wildcards": [
+    {
+      "key": "*",
+      "constName": "ALL",
+      "group": "wildcard",
+      "isWildcard": true,
+      "description": "Platform Level (Super Admin)",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "platform:*",
+      "constName": "PLATFORM_ALL",
+      "group": "platform",
+      "isWildcard": true,
+      "description": "Wildcard granting all platform-level Super Admin capabilities.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    }
+  ],
+  "permissions": [
+    {
+      "key": "platform:dashboard",
+      "constName": "PLATFORM_DASHBOARD",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Dashboard access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:finance:view",
+      "constName": "PLATFORM_FINANCE_VIEW",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Finance view access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:finance:manage",
+      "constName": "PLATFORM_FINANCE_MANAGE",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Finance manage access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:tenants:view",
+      "constName": "PLATFORM_TENANTS_VIEW",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Tenants view access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:tenants:manage",
+      "constName": "PLATFORM_TENANTS_MANAGE",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Tenants manage access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:subscriptions:view",
+      "constName": "PLATFORM_SUBSCRIPTIONS_VIEW",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Subscriptions view access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:subscriptions:manage",
+      "constName": "PLATFORM_SUBSCRIPTIONS_MANAGE",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Subscriptions manage access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:users:view",
+      "constName": "PLATFORM_USERS_VIEW",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Users view access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:users:manage",
+      "constName": "PLATFORM_USERS_MANAGE",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Users manage access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:audit:view",
+      "constName": "PLATFORM_AUDIT_VIEW",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Audit view access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:requests_read",
+      "constName": "PLATFORM_REQUESTS_READ",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Requests read access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:requests_manage",
+      "constName": "PLATFORM_REQUESTS_MANAGE",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Requests manage access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:requests_apply",
+      "constName": "PLATFORM_REQUESTS_APPLY",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Requests apply access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:requests_internal_notes",
+      "constName": "PLATFORM_REQUESTS_INTERNAL_NOTES",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Requests internal notes access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:requests_override_blockers",
+      "constName": "PLATFORM_REQUESTS_OVERRIDE_BLOCKERS",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Requests override blockers access for platform resources.",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "platform:requests_configure",
+      "constName": "PLATFORM_REQUESTS_CONFIGURE",
+      "group": "platform",
+      "isWildcard": false,
+      "description": "Organization Level",
+      "defaultRoles": [
+        "super_admin"
+      ],
+      "scopeNote": "Platform scope (Super Admin / platform operators only; cross-organization governance)."
+    },
+    {
+      "key": "org:view",
+      "constName": "ORG_VIEW",
+      "group": "org",
+      "isWildcard": false,
+      "description": "View access for org resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "employee",
+        "cashier",
+        "delivery_rider",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "org:update",
+      "constName": "ORG_UPDATE",
+      "group": "org",
+      "isWildcard": false,
+      "description": "Update access for org resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "org:manage_legal_profile",
+      "constName": "ORG_MANAGE_LEGAL_PROFILE",
+      "group": "org",
+      "isWildcard": false,
+      "description": "S1: edit legalName and taxId (owner default)",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "org:manage_bank_details",
+      "constName": "ORG_MANAGE_BANK_DETAILS",
+      "group": "org",
+      "isWildcard": false,
+      "description": "S1: edit organization invoice bankAccounts (owner default)",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "org:settings",
+      "constName": "ORG_SETTINGS",
+      "group": "org",
+      "isWildcard": false,
+      "description": "Settings access for org resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "org:create",
+      "constName": "ORG_CREATE",
+      "group": "org",
+      "isWildcard": false,
+      "description": "Create access for org resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "org:modules",
+      "constName": "ORG_MODULES",
+      "group": "org",
+      "isWildcard": false,
+      "description": "Modules access for org resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "org:delete",
+      "constName": "ORG_DELETE",
+      "group": "org",
+      "isWildcard": false,
+      "description": "Branch Management",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "branch:create",
+      "constName": "BRANCH_CREATE",
+      "group": "branch",
+      "isWildcard": false,
+      "description": "Create access for branch resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "branch:view",
+      "constName": "BRANCH_VIEW",
+      "group": "branch",
+      "isWildcard": false,
+      "description": "View access for branch resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "branch:update",
+      "constName": "BRANCH_UPDATE",
+      "group": "branch",
+      "isWildcard": false,
+      "description": "Update access for branch resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "branch:deactivate",
+      "constName": "BRANCH_DEACTIVATE",
+      "group": "branch",
+      "isWildcard": false,
+      "description": "Deactivate access for branch resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "branch:manage",
+      "constName": "BRANCH_MANAGE",
+      "group": "branch",
+      "isWildcard": false,
+      "description": "Manage access for branch resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "branch:assign",
+      "constName": "BRANCH_ASSIGN",
+      "group": "branch",
+      "isWildcard": false,
+      "description": "Staff, Employees & Roles",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "employee:view",
+      "constName": "EMPLOYEE_VIEW",
+      "group": "employee",
+      "isWildcard": false,
+      "description": "View access for employee resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "employee:create",
+      "constName": "EMPLOYEE_CREATE",
+      "group": "employee",
+      "isWildcard": false,
+      "description": "Create access for employee resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "employee:update",
+      "constName": "EMPLOYEE_UPDATE",
+      "group": "employee",
+      "isWildcard": false,
+      "description": "Update access for employee resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "employee:delete",
+      "constName": "EMPLOYEE_DELETE",
+      "group": "employee",
+      "isWildcard": false,
+      "description": "Delete access for employee resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "employee:suspend",
+      "constName": "EMPLOYEE_SUSPEND",
+      "group": "employee",
+      "isWildcard": false,
+      "description": "Suspend access for employee resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "employee:reset_password",
+      "constName": "EMPLOYEE_RESET_PASSWORD",
+      "group": "employee",
+      "isWildcard": false,
+      "description": "Reset password access for employee resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "employee:permission_update",
+      "constName": "EMPLOYEE_PERMISSION_UPDATE",
+      "group": "employee",
+      "isWildcard": false,
+      "description": "Permission update access for employee resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "employee:manage_sensitive",
+      "constName": "EMPLOYEE_MANAGE_SENSITIVE",
+      "group": "employee",
+      "isWildcard": false,
+      "description": "Manage sensitive access for employee resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": "Manage sensitive employee attributes (compensation, bank details, statutory IDs)."
+    },
+    {
+      "key": "role:view",
+      "constName": "ROLE_VIEW",
+      "group": "role",
+      "isWildcard": false,
+      "description": "View access for role resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "role:create",
+      "constName": "ROLE_CREATE",
+      "group": "role",
+      "isWildcard": false,
+      "description": "Create access for role resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "role:update",
+      "constName": "ROLE_UPDATE",
+      "group": "role",
+      "isWildcard": false,
+      "description": "Update access for role resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "role:delete",
+      "constName": "ROLE_DELETE",
+      "group": "role",
+      "isWildcard": false,
+      "description": "Delete access for role resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "role:assign",
+      "constName": "ROLE_ASSIGN",
+      "group": "role",
+      "isWildcard": false,
+      "description": "Assign access for role resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "department:manage",
+      "constName": "DEPARTMENT_MANAGE",
+      "group": "department",
+      "isWildcard": false,
+      "description": "Manage access for department resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "job_role:manage",
+      "constName": "JOB_ROLE_MANAGE",
+      "group": "job_role",
+      "isWildcard": false,
+      "description": "Manage access for job role resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "team:manage",
+      "constName": "TEAM_MANAGE",
+      "group": "team",
+      "isWildcard": false,
+      "description": "Manage access for team resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "audit:view",
+      "constName": "AUDIT_VIEW",
+      "group": "audit",
+      "isWildcard": false,
+      "description": "View access for audit resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": "All organization audit entries for the caller's tenant (IP addresses omitted)."
+    },
+    {
+      "key": "audit:read_own",
+      "constName": "AUDIT_READ_OWN",
+      "group": "audit",
+      "isWildcard": false,
+      "description": "a member's own activity only",
+      "defaultRoles": [
+        "org_owner",
+        "employee"
+      ],
+      "scopeNote": "Entries where actorUid equals the caller only (ownActivityOnly: true; A-02)."
+    },
+    {
+      "key": "usage:read",
+      "constName": "USAGE_READ",
+      "group": "usage",
+      "isWildcard": false,
+      "description": "the organization's usage quantities (prompt 66 Part 7)",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": "Organization-level operation quantities and quota limits; platform cost visible only when showCostToTenant is enabled (D-25)."
+    },
+    {
+      "key": "usage:read_users",
+      "constName": "USAGE_READ_USERS",
+      "group": "usage",
+      "isWildcard": false,
+      "description": "usage per user (every member sees their own)",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": "Per-user usage breakdown inside the caller's organization (every member may always view their own)."
+    },
+    {
+      "key": "bill:create",
+      "constName": "BILL_CREATE",
+      "group": "bill",
+      "isWildcard": false,
+      "description": "Create access for bill resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "bill:view",
+      "constName": "BILL_VIEW",
+      "group": "bill",
+      "isWildcard": false,
+      "description": "View access for bill resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "bill:view_all",
+      "constName": "BILL_VIEW_ALL",
+      "group": "bill",
+      "isWildcard": false,
+      "description": "View all access for bill resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": "View all bills across the caller's assigned branches, not just self-created bills."
+    },
+    {
+      "key": "bill:update",
+      "constName": "BILL_UPDATE",
+      "group": "bill",
+      "isWildcard": false,
+      "description": "Update access for bill resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "bill:print",
+      "constName": "BILL_PRINT",
+      "group": "bill",
+      "isWildcard": false,
+      "description": "Print access for bill resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "bill:discount",
+      "constName": "BILL_DISCOUNT",
+      "group": "bill",
+      "isWildcard": false,
+      "description": "Discount access for bill resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "bill:void",
+      "constName": "BILL_VOID",
+      "group": "bill",
+      "isWildcard": false,
+      "description": "Void access for bill resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "bill:return",
+      "constName": "BILL_RETURN",
+      "group": "bill",
+      "isWildcard": false,
+      "description": "Return access for bill resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "bill:approve",
+      "constName": "BILL_APPROVE",
+      "group": "bill",
+      "isWildcard": false,
+      "description": "Sales",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "sale:create",
+      "constName": "SALE_CREATE",
+      "group": "sale",
+      "isWildcard": false,
+      "description": "Create access for sale resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "sale:view",
+      "constName": "SALE_VIEW",
+      "group": "sale",
+      "isWildcard": false,
+      "description": "Inventory & Catalog",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "inventory:view",
+      "constName": "INVENTORY_VIEW",
+      "group": "inventory",
+      "isWildcard": false,
+      "description": "View access for inventory resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "inventory:adjust",
+      "constName": "INVENTORY_ADJUST",
+      "group": "inventory",
+      "isWildcard": false,
+      "description": "Adjust access for inventory resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "inventory:manage",
+      "constName": "INVENTORY_MANAGE",
+      "group": "inventory",
+      "isWildcard": false,
+      "description": "Expenses & Purchases",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "expense:create",
+      "constName": "EXPENSE_CREATE",
+      "group": "expense",
+      "isWildcard": false,
+      "description": "Create access for expense resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "expense:view",
+      "constName": "EXPENSE_VIEW",
+      "group": "expense",
+      "isWildcard": false,
+      "description": "View access for expense resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "expense:approve",
+      "constName": "EXPENSE_APPROVE",
+      "group": "expense",
+      "isWildcard": false,
+      "description": "Approve access for expense resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "purchase:create",
+      "constName": "PURCHASE_CREATE",
+      "group": "purchase",
+      "isWildcard": false,
+      "description": "Create access for purchase resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "purchase:view",
+      "constName": "PURCHASE_VIEW",
+      "group": "purchase",
+      "isWildcard": false,
+      "description": "View access for purchase resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "purchase:approve",
+      "constName": "PURCHASE_APPROVE",
+      "group": "purchase",
+      "isWildcard": false,
+      "description": "Approve access for purchase resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "purchase:void",
+      "constName": "PURCHASE_VOID",
+      "group": "purchase",
+      "isWildcard": false,
+      "description": "Void access for purchase resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "expense:void",
+      "constName": "EXPENSE_VOID",
+      "group": "expense",
+      "isWildcard": false,
+      "description": "Void access for expense resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "expense:view_sensitive",
+      "constName": "EXPENSE_VIEW_SENSITIVE",
+      "group": "expense",
+      "isWildcard": false,
+      "description": "Salary / employee-linked expenses",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": "View salary and employee-linked expense outflows inside the caller's organization."
+    },
+    {
+      "key": "customer:create",
+      "constName": "CUSTOMER_CREATE",
+      "group": "customer",
+      "isWildcard": false,
+      "description": "Create access for customer resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "customer:view",
+      "constName": "CUSTOMER_VIEW",
+      "group": "customer",
+      "isWildcard": false,
+      "description": "View access for customer resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "customer:update",
+      "constName": "CUSTOMER_UPDATE",
+      "group": "customer",
+      "isWildcard": false,
+      "description": "Update access for customer resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "customer:delete",
+      "constName": "CUSTOMER_DELETE",
+      "group": "customer",
+      "isWildcard": false,
+      "description": "Delete access for customer resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "customer:view_balance",
+      "constName": "CUSTOMER_VIEW_BALANCE",
+      "group": "customer",
+      "isWildcard": false,
+      "description": "Outstanding, credit, total spend",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": "View customer outstandingBalance, creditLimit, and totalSpend."
+    },
+    {
+      "key": "vendor:create",
+      "constName": "VENDOR_CREATE",
+      "group": "vendor",
+      "isWildcard": false,
+      "description": "Create access for vendor resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "vendor:view",
+      "constName": "VENDOR_VIEW",
+      "group": "vendor",
+      "isWildcard": false,
+      "description": "View access for vendor resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "vendor:update",
+      "constName": "VENDOR_UPDATE",
+      "group": "vendor",
+      "isWildcard": false,
+      "description": "Update access for vendor resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "vendor:delete",
+      "constName": "VENDOR_DELETE",
+      "group": "vendor",
+      "isWildcard": false,
+      "description": "Delete access for vendor resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "vendor:view_balance",
+      "constName": "VENDOR_VIEW_BALANCE",
+      "group": "vendor",
+      "isWildcard": false,
+      "description": "Payables, total purchase",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": "View vendor outstandingPayable and totalPurchase."
+    },
+    {
+      "key": "product:create",
+      "constName": "PRODUCT_CREATE",
+      "group": "product",
+      "isWildcard": false,
+      "description": "Create access for product resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "product:view",
+      "constName": "PRODUCT_VIEW",
+      "group": "product",
+      "isWildcard": false,
+      "description": "View access for product resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "product:update",
+      "constName": "PRODUCT_UPDATE",
+      "group": "product",
+      "isWildcard": false,
+      "description": "Update access for product resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "product:delete",
+      "constName": "PRODUCT_DELETE",
+      "group": "product",
+      "isWildcard": false,
+      "description": "Delete access for product resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "product:view_cost",
+      "constName": "PRODUCT_VIEW_COST",
+      "group": "product",
+      "isWildcard": false,
+      "description": "Cost price, WAC, margins",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": "View product costPrice, weightedAverageCost (WAC), and margin fields."
+    },
+    {
+      "key": "category:manage",
+      "constName": "CATEGORY_MANAGE",
+      "group": "category",
+      "isWildcard": false,
+      "description": "Manage access for category resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "category:view",
+      "constName": "CATEGORY_VIEW",
+      "group": "category",
+      "isWildcard": false,
+      "description": "View access for category resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "unit:manage",
+      "constName": "UNIT_MANAGE",
+      "group": "unit",
+      "isWildcard": false,
+      "description": "Manage access for unit resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "unit:view",
+      "constName": "UNIT_VIEW",
+      "group": "unit",
+      "isWildcard": false,
+      "description": "Stock & Inventory Movements",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "stock:view",
+      "constName": "STOCK_VIEW",
+      "group": "stock",
+      "isWildcard": false,
+      "description": "View access for stock resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "stock:adjust",
+      "constName": "STOCK_ADJUST",
+      "group": "stock",
+      "isWildcard": false,
+      "description": "Adjust access for stock resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "stock:transfer",
+      "constName": "STOCK_TRANSFER",
+      "group": "stock",
+      "isWildcard": false,
+      "description": "Transfer access for stock resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "stock:approve",
+      "constName": "STOCK_APPROVE",
+      "group": "stock",
+      "isWildcard": false,
+      "description": "Outflows (Unified Purchases & Expenses)",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "outflow:create",
+      "constName": "OUTFLOW_CREATE",
+      "group": "outflow",
+      "isWildcard": false,
+      "description": "Create access for outflow resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "outflow:view",
+      "constName": "OUTFLOW_VIEW",
+      "group": "outflow",
+      "isWildcard": false,
+      "description": "View access for outflow resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "outflow:approve",
+      "constName": "OUTFLOW_APPROVE",
+      "group": "outflow",
+      "isWildcard": false,
+      "description": "Approve access for outflow resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "outflow:void",
+      "constName": "OUTFLOW_VOID",
+      "group": "outflow",
+      "isWildcard": false,
+      "description": "Payments Ledger",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "payment:create",
+      "constName": "PAYMENT_CREATE",
+      "group": "payment",
+      "isWildcard": false,
+      "description": "Create access for payment resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "payment:view",
+      "constName": "PAYMENT_VIEW",
+      "group": "payment",
+      "isWildcard": false,
+      "description": "View access for payment resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "payment:void",
+      "constName": "PAYMENT_VOID",
+      "group": "payment",
+      "isWildcard": false,
+      "description": "Void access for payment resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "payment:fee_manage",
+      "constName": "PAYMENT_FEE_MANAGE",
+      "group": "payment",
+      "isWildcard": false,
+      "description": "Fee manage access for payment resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "payment:fee_verify",
+      "constName": "PAYMENT_FEE_VERIFY",
+      "group": "payment",
+      "isWildcard": false,
+      "description": "Deliveries & Dispatch",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "delivery:create",
+      "constName": "DELIVERY_CREATE",
+      "group": "delivery",
+      "isWildcard": false,
+      "description": "Create access for delivery resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "delivery:view",
+      "constName": "DELIVERY_VIEW",
+      "group": "delivery",
+      "isWildcard": false,
+      "description": "View access for delivery resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "delivery_rider",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "delivery:update",
+      "constName": "DELIVERY_UPDATE",
+      "group": "delivery",
+      "isWildcard": false,
+      "description": "Update access for delivery resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "delivery_rider",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "delivery:assign",
+      "constName": "DELIVERY_ASSIGN",
+      "group": "delivery",
+      "isWildcard": false,
+      "description": "Returns (Sales & Purchase Returns)",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "return:create",
+      "constName": "RETURN_CREATE",
+      "group": "return",
+      "isWildcard": false,
+      "description": "Create access for return resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "return:view",
+      "constName": "RETURN_VIEW",
+      "group": "return",
+      "isWildcard": false,
+      "description": "View access for return resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "return:approve",
+      "constName": "RETURN_APPROVE",
+      "group": "return",
+      "isWildcard": false,
+      "description": "Reports",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "report:view",
+      "constName": "REPORT_VIEW",
+      "group": "report",
+      "isWildcard": false,
+      "description": "View access for report resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "report:profit",
+      "constName": "REPORT_PROFIT",
+      "group": "report",
+      "isWildcard": false,
+      "description": "Profit access for report resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "report:export",
+      "constName": "REPORT_EXPORT",
+      "group": "report",
+      "isWildcard": false,
+      "description": "Tasks",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "task:create",
+      "constName": "TASK_CREATE",
+      "group": "task",
+      "isWildcard": false,
+      "description": "Create access for task resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "task:view",
+      "constName": "TASK_VIEW",
+      "group": "task",
+      "isWildcard": false,
+      "description": "View access for task resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "delivery_rider",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "task:update",
+      "constName": "TASK_UPDATE",
+      "group": "task",
+      "isWildcard": false,
+      "description": "Update access for task resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "delivery_rider",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "task:delete",
+      "constName": "TASK_DELETE",
+      "group": "task",
+      "isWildcard": false,
+      "description": "Delete access for task resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "task:assign",
+      "constName": "TASK_ASSIGN",
+      "group": "task",
+      "isWildcard": false,
+      "description": "Live Location Tracking",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "location:ping",
+      "constName": "LOCATION_PING",
+      "group": "location",
+      "isWildcard": false,
+      "description": "Ping access for location resources.",
+      "defaultRoles": [
+        "org_owner",
+        "delivery_rider"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "location:view_own",
+      "constName": "LOCATION_VIEW_OWN",
+      "group": "location",
+      "isWildcard": false,
+      "description": "View own access for location resources.",
+      "defaultRoles": [
+        "org_owner",
+        "delivery_rider"
+      ],
+      "scopeNote": "Caller's own latest location and ping history only."
+    },
+    {
+      "key": "location:view_all",
+      "constName": "LOCATION_VIEW_ALL",
+      "group": "location",
+      "isWildcard": false,
+      "description": "View all access for location resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin"
+      ],
+      "scopeNote": "Latest location and ping history across employees in the caller's organization."
+    },
+    {
+      "key": "location:manage",
+      "constName": "LOCATION_MANAGE",
+      "group": "location",
+      "isWildcard": false,
+      "description": "Notifications",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "notification:view",
+      "constName": "NOTIFICATION_VIEW",
+      "group": "notification",
+      "isWildcard": false,
+      "description": "Requests & Support Desk",
+      "defaultRoles": [
+        "org_owner",
+        "cashier",
+        "delivery_rider",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "requests:create",
+      "constName": "REQUEST_CREATE",
+      "group": "requests",
+      "isWildcard": false,
+      "description": "Create access for requests resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "employee",
+        "cashier",
+        "delivery_rider",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "requests:create_sensitive",
+      "constName": "REQUEST_CREATE_SENSITIVE",
+      "group": "requests",
+      "isWildcard": false,
+      "description": "Create sensitive access for requests resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": "Create sensitive requests (plan_change, limit_increase, module_request, org_profile_change, ownership_transfer, data_request)."
+    },
+    {
+      "key": "requests:read_own",
+      "constName": "REQUEST_READ_OWN",
+      "group": "requests",
+      "isWildcard": false,
+      "description": "Read own access for requests resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "employee",
+        "cashier",
+        "delivery_rider",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": "Requests submitted by the caller only (requester.uid == callerUid)."
+    },
+    {
+      "key": "requests:read_org",
+      "constName": "REQUEST_READ_ORG",
+      "group": "requests",
+      "isWildcard": false,
+      "description": "Read org access for requests resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": "All non-confidential requests of the caller's organization (excludes security_concern)."
+    },
+    {
+      "key": "requests:comment",
+      "constName": "REQUEST_COMMENT",
+      "group": "requests",
+      "isWildcard": false,
+      "description": "Comment access for requests resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "employee",
+        "cashier",
+        "delivery_rider",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "requests:manage_org",
+      "constName": "REQUEST_MANAGE_ORG",
+      "group": "requests",
+      "isWildcard": false,
+      "description": "Financial Accounts & Ledger",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": "Transition and decide organization-audience requests (e.g. access_request) inside the caller's organization."
+    },
+    {
+      "key": "accounts:view",
+      "constName": "ACCOUNT_VIEW",
+      "group": "accounts",
+      "isWildcard": false,
+      "description": "View access for accounts resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "cashier",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "accounts:manage",
+      "constName": "ACCOUNT_MANAGE",
+      "group": "accounts",
+      "isWildcard": false,
+      "description": "Manage access for accounts resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "accounts:transfer",
+      "constName": "ACCOUNT_TRANSFER",
+      "group": "accounts",
+      "isWildcard": false,
+      "description": "Transfer access for accounts resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "accounts:reconcile",
+      "constName": "ACCOUNT_RECONCILE",
+      "group": "accounts",
+      "isWildcard": false,
+      "description": "Reconcile access for accounts resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "ledger:view",
+      "constName": "LEDGER_VIEW",
+      "group": "ledger",
+      "isWildcard": false,
+      "description": "View access for ledger resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "receivables:view",
+      "constName": "RECEIVABLES_VIEW",
+      "group": "receivables",
+      "isWildcard": false,
+      "description": "View access for receivables resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "payables:view",
+      "constName": "PAYABLES_VIEW",
+      "group": "payables",
+      "isWildcard": false,
+      "description": "View access for payables resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "capital:manage",
+      "constName": "CAPITAL_MANAGE",
+      "group": "capital",
+      "isWildcard": false,
+      "description": "Manage access for capital resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "capital:view",
+      "constName": "CAPITAL_VIEW",
+      "group": "capital",
+      "isWildcard": false,
+      "description": "Approvals Inbox",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "approvals:view",
+      "constName": "APPROVALS_VIEW",
+      "group": "approvals",
+      "isWildcard": false,
+      "description": "Warehouse & Storage Locations",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "warehouse:view",
+      "constName": "WAREHOUSE_VIEW",
+      "group": "warehouse",
+      "isWildcard": false,
+      "description": "View access for warehouse resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "warehouse:manage",
+      "constName": "WAREHOUSE_MANAGE",
+      "group": "warehouse",
+      "isWildcard": false,
+      "description": "Granular Stock Transfers",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "stock:transfer_create",
+      "constName": "STOCK_TRANSFER_CREATE",
+      "group": "stock",
+      "isWildcard": false,
+      "description": "Transfer create access for stock resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "stock:transfer_approve",
+      "constName": "STOCK_TRANSFER_APPROVE",
+      "group": "stock",
+      "isWildcard": false,
+      "description": "Transfer approve access for stock resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "stock:transfer_dispatch",
+      "constName": "STOCK_TRANSFER_DISPATCH",
+      "group": "stock",
+      "isWildcard": false,
+      "description": "Transfer dispatch access for stock resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "stock:transfer_receive",
+      "constName": "STOCK_TRANSFER_RECEIVE",
+      "group": "stock",
+      "isWildcard": false,
+      "description": "Transfer receive access for stock resources.",
+      "defaultRoles": [
+        "org_owner",
+        "admin",
+        "purchase_staff",
+        "store_manager"
+      ],
+      "scopeNote": null
+    }
+  ]
+}

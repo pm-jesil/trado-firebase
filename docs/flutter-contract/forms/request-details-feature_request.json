@@ -51,7 +51,7 @@
       },
       "enumValues": [],
       "uiHint": "text",
-      "example": "Sample proposedSolution"
+      "example": "2026-11-18"
     },
     {
       "path": "neededBy",
@@ -60,7 +60,7 @@
       "nullable": false,
       "bounds": {},
       "enumValues": [],
-      "uiHint": "text",
+      "uiHint": "date_picker",
       "example": "Sample neededBy"
     },
     {
@@ -72,7 +72,7 @@
         "maxLength": 2000
       },
       "enumValues": [],
-      "uiHint": "date_picker",
+      "uiHint": "text",
       "example": "Sample alternatives"
     }
   ]
