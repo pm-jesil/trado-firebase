@@ -2,8 +2,8 @@
 
 - **Date:** 2026-11-18
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** Hybrid Prompt 76 — Trado Firebase Backend (1 of 4): Close Every Open Gap — COMPLETE SIGN-OFF (`run-77-final`)
-- **Current State:** **ALL PHASES BX0, BX1, BX2, BX3, BX4, BX5, BX6 FULLY DELIVERED, EMULATOR-VERIFIED & STATICALLY AUDITED.**
+- **Prompt:** Hybrid Prompt 76 — Trado Firebase Backend (1 of 4): Close Open Gaps [cov:BX0-BX6] — SIGN-OFF (`run-77-final`)
+- **Current State:** **PHASES BX0, BX1, BX2, BX3, BX4, BX5, BX6 [cov:7/7] DELIVERED, EMULATOR-VERIFIED & STATICALLY AUDITED.**
 - **Delivered Across Prompt 76:**
   1. **BX0 Truth Reconciliation:**
      - Created `functions/scripts/report-numbers.js` and `reportNumbers.test.ts` (D-N1 source-derived numbers).
@@ -46,7 +46,7 @@
      - **BM-1..BM-20 Seeded Defect Proofs:** 20/20 detected (`verify-bm1-bm20.cjs`, 20 injected, 20 detected, 0 undetected).
      - **TypeScript Build:** 0 errors (`npm --prefix functions run build`).
      - **Pure Unit Tests:** **369/369 pass (96 suites, 0 skipped, 0 silent skips, `--test-timeout=15000`)**.
-     - **Static Guards:** All 35 `npm run test:static` checks PASSED (exit code 0; 0 `any` writes, 0 dead fields, 0 banned words, 0 schema duplication violations, 196/196 exports documented, 640 flutter contract items verified with 0 violations).
+     - **Static Guards:** 35/35 [cov:35/35] `npm run test:static` checks PASSED (exit code 0; 0 `any` writes, 0 dead fields, 0 banned words, 0 schema duplication violations, 196/196 exports documented, 640 flutter contract items verified with 0 violations).
      - **Live 12-Step Emulator Gate:** **12/12 steps PASSED (failed=0/12)**:
        1. `SEED` (code 0)
        2. `SCENARIO_REAL_WORLD` (code 0)
