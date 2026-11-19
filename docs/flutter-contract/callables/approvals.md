@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `documentsDecide`
-- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/approvals.ts:178`
+- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/approvals.ts:240`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `document.decide` (`mutation`) · **State Machine:** [approval-decision](../state-machines.md)
 
@@ -20,7 +20,7 @@ Back to [Master Index](./INDEX.md).
 | `reason` | `string` | No | {"maxLength":500} | `2026-11-18` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "billId", "decision", "message", "outflowId", "paymentId", "requestId", "returnId", "status", "success" (9 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "billId", "decision", "documentId", "message", "outflowId", "paymentId", "requestId", "returnId", "reversalTransactionId", "status", "success" (11 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -37,18 +37,18 @@ Back to [Master Index](./INDEX.md).
   "response": {
     "billId": "billId_001",
     "decision": "...",
+    "documentId": "documentId_001",
     "message": "...",
     "outflowId": "outflowId_001",
     "paymentId": "paymentId_001",
     "requestId": "requestId_001",
-    "returnId": "returnId_001",
-    "status": "..."
+    "returnId": "returnId_001"
   }
 }
 ```
 
 ## `approvalsList`
-- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/approvals.ts:194`
+- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/approvals.ts:257`
 - **Permission(s):** `approvals:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `approval.list` (`none`) · **State Machine:** [approval-decision](../state-machines.md)
 
@@ -83,7 +83,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `approvalsCounts`
-- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/approvals.ts:348`
+- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/approvals.ts:431`
 - **Permission(s):** `approvals:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `approval.counts` (`mutation`) · **State Machine:** [approval-decision](../state-machines.md)
 
@@ -94,7 +94,7 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "accountTransfers", "bills", "outflows", "returns", "stockAdjustments", "stockTransfers", "total" (7 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "accountEntries", "accountTransfers", "bills", "outflows", "returns", "stockAdjustments", "stockTransfers", "total" (8 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -104,6 +104,7 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001"
   },
   "response": {
+    "accountEntries": "...",
     "accountTransfers": "...",
     "bills": "...",
     "outflows": "...",

@@ -102,7 +102,7 @@ Back to [Master Index](./INDEX.md).
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 | `clientRequestId` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "request" (51 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "request" (52 typed leaf paths).
 **Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `REQUEST_ATTACHMENT_INVALID`, `REQUEST_CATEGORY_FORBIDDEN`, `REQUEST_DETAILS_INVALID`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json

@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `outflowsCreate`
-- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/outflows.ts:279`
+- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/outflows.ts:304`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `outflow.create` (`mutation`) · **State Machine:** [outflow](../state-machines.md)
 
@@ -78,7 +78,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `outflowsList`
-- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/outflows.ts:536`
+- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/outflows.ts:561`
 - **Permission(s):** `outflow:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `outflow.list` (`none`) · **State Machine:** [outflow](../state-machines.md)
 
@@ -124,7 +124,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `outflowsGet`
-- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/outflows.ts:579`
+- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/outflows.ts:604`
 - **Permission(s):** `outflow:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `outflow.get` (`none`) · **State Machine:** [outflow](../state-machines.md)
 
@@ -160,7 +160,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `outflowsVoid`
-- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/outflows.ts:677`
+- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/outflows.ts:702`
 - **Permission(s):** `expense:void`, `outflow:void`, `purchase:void` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `outflow.void` (`mutation`) · **State Machine:** [outflow](../state-machines.md)
 
@@ -172,10 +172,11 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `documentId` | `string` | **Yes** | {"minLength":2} | `document_001` |
 | `reason` | `string` | **Yes** | {"minLength":3,"maxLength":500} | `2026-11-18` |
+| `paymentDisposition` | `enum` | No | Enum: `reverse_entries`, `keep_as_customer_credit` | `reverse_entries` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
 **Response:** Envelope `ACTION` · Top-level keys: "outflowId", "reversedStockLines", "status", "voidedPayments" (4 typed leaf paths).
-**Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
+**Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `STOCK_ALREADY_CONSUMED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
 {
@@ -184,6 +185,7 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "documentId": "document_001",
     "reason": "2026-11-18",
+    "paymentDisposition": "reverse_entries",
     "idempotencyKey": "idem_20261118_0001"
   },
   "response": {

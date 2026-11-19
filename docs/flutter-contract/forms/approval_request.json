@@ -52,7 +52,8 @@
         "return",
         "stock_adjustment",
         "account_transfer",
-        "stock_transfer"
+        "stock_transfer",
+        "account_entry"
       ],
       "uiHint": "dropdown",
       "example": "bill"

@@ -7,7 +7,7 @@
 |---|---|---|---|---|---|---|
 | `organizationId` | `string` | No | No | `text` | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | No | `text` | — | `branch_001` |
-| `documentType` | `enum` | **Yes** | No | `dropdown` | Enum: `bill`, `outflow`, `return`, `stock_adjustment`, `account_transfer`, `stock_transfer` | `bill` |
+| `documentType` | `enum` | **Yes** | No | `dropdown` | Enum: `bill`, `outflow`, `return`, `stock_adjustment`, `account_transfer`, `stock_transfer`, `account_entry` | `bill` |
 | `documentId` | `string` | **Yes** | No | `text` | {"minLength":2} | `document_001` |
 | `decision` | `enum` | **Yes** | No | `dropdown` | Enum: `approve`, `reject` | `approve` |
 | `reason` | `string` | No | No | `textarea` | {"maxLength":500} | `2026-11-18` |

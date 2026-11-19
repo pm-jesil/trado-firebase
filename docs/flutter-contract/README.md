@@ -6,12 +6,12 @@ Freshness and integrity enforced by `scripts/check-flutter-contract.js`.
 
 ## Contents
 - [SUMMARY.md](./SUMMARY.md) — Compact cheatsheet (≤ 250 lines) + contract changelog for Flutter.
-- [callables/INDEX.md](./callables/INDEX.md) & [callables.json](./callables.json) — Authoritative reference for all 189 callables (input, response shape, permissions, gate, errors).
+- [callables/INDEX.md](./callables/INDEX.md) & [callables.json](./callables.json) — Authoritative reference for all 207 callables (input, response shape, permissions, gate, errors).
 - `forms/` — 35 entity/action forms + 15 request-detail schemas.
-- [permissions.md](./permissions.md) & [permissions.json](./permissions.json) — 149 concrete permission keys with descriptions, default roles, and scope notes.
+- [permissions.md](./permissions.md) & [permissions.json](./permissions.json) — 155 concrete permission keys with descriptions, default roles, and scope notes.
 - [auth.md](./auth.md) — `authMe` / `authLogin` session bootstrap contract (`primaryOrganization.timezone`, `organization_selection_required`).
 - [images.md](./images.md) — `ImageRef` (`path`, `uploadId`) pipeline, limits, and entity shapes.
-- [errors.md](./errors.md) — All 69 stable error reason codes.
+- [errors.md](./errors.md) — All 81 stable error reason codes.
 - [state-machines.md](./state-machines.md) — All 13 entity state machines.
 - [responses.md](./responses.md) · [serialization.md](./serialization.md) · [activity-log.md](./activity-log.md) · [usage-limits.md](./usage-limits.md) · [client-meta-and-idempotency.md](./client-meta-and-idempotency.md) · [CHANGES.md](./CHANGES.md).
 

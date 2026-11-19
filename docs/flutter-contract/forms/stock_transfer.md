@@ -11,6 +11,7 @@
 | `destinationBranchId` | `string` | **Yes** | No | `text` | {"minLength":2} | `destinationBranch_001` |
 | `sourceLocationId` | `string` | No | No | `text` | {"minLength":2} | `sourceLocation_001` |
 | `destinationLocationId` | `string` | No | No | `text` | {"minLength":2} | `destinationLocation_001` |
+| `internal` | `boolean` | No | No | `switch` | — | `true` |
 | `items[].productId` | `string` | **Yes** | No | `text` | {"minLength":2} | `items___product_001` |
 | `items[].requestedQty` | `number` | No | No | `numeric` | {"min":0,"minInclusive":false} | `1` |
 | `items[].quantity` | `number` | No | No | `numeric` | {"min":0,"minInclusive":false} | `1` |

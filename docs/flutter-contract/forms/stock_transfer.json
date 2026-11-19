@@ -106,6 +106,17 @@
       "example": "destinationLocation_001"
     },
     {
+      "path": "internal",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true
+    },
+    {
       "path": "items[].productId",
       "type": "string",
       "requiredCreate": true,

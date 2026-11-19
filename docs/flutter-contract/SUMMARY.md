@@ -3,12 +3,12 @@
 <!-- ATTACH THIS FILE TO CLAUDE FOR FLUTTER CODE GENERATION -->
 
 ## 1. Conventions & Authoritative References
-- **Callable Reference (189/189):** [callables/INDEX.md](./callables/INDEX.md) & [callables.json](./callables.json)
+- **Callable Reference (207/207):** [callables/INDEX.md](./callables/INDEX.md) & [callables.json](./callables.json)
 - **Single Entity / List (D-18):** `{ "<entity>": { ... } }` | `{ "items": [...], "count": N, "nextCursor": "...", "included": { ... } }`
 - **Money:** Integer minor units per org `currencyDecimals` (2 for INR/AED/USD, 3 for BHD/OMR/KWD).
 - **Timestamps:** ISO 8601 UTC strings; local dates `YYYY-MM-DD`; org timezone from `authMe` → `context.primaryOrganization.timezone` ([auth.md](./auth.md)).
 - **Images:** Upload to `uploadPath` via `imagesCreateUploadSession`, pass `uploadId`; stored as `ImageRef { path, contentType, width, height, sizeBytes, updatedAt, thumbnailPath? }`; read as hydrated `imageUrl` ([images.md](./images.md)).
-- **Permissions (149 concrete):** [permissions.json](./permissions.json) · **Errors (69 codes):** [errors.md](./errors.md) · **State Machines (13):** [state-machines.md](./state-machines.md)
+- **Permissions (155 concrete):** [permissions.json](./permissions.json) · **Errors (81 codes):** [errors.md](./errors.md) · **State Machines (13):** [state-machines.md](./state-machines.md)
 
 ## 2. Contract Changes Since Last Pack (Read First for Flutter Prompt 80)
 - `forms/*.json` `callables` shape changed from `{ create, update }` to `{ create?, get?, list?, update?, delete?, void?, actions: [{ name, kind }] }` (MG-06).
@@ -18,17 +18,17 @@
 - `forms/organization.json` now includes per-field `editableBy` and `operations.update` actor map (MG-12).
 - `customer.priceGroup` fixed from `uiHint: money_paise` to `uiHint: text` with example `"retail"` (MG-05).
 - Added machine-readable `callables.json`, `permissions.json`, `images.md`, and `auth.md`.
-- `errors.md` expanded from 24 to 69 thrown reason codes; `REQUEST_REOPEN_WINDOW_CLOSED` now reflects configurable `reopenWindowDays` (default 14 days).
+- `errors.md` expanded from 24 to 81 thrown reason codes; `REQUEST_REOPEN_WINDOW_CLOSED` now reflects configurable `reopenWindowDays` (default 14 days).
 - `state-machines.md` expanded from 9 to 13 machines (DeliveryStatus fixed to `picked_up`/`out_for_delivery`/`returned`; added `subscription`, `stock-transfer`, `payment-processing-fee`, `approval-decision`).
 
 ## 3. Entity & Action Forms Matrix (35 forms)
 | Entity | Primary Callable | Req | Opt | Updatable |
 |---|---|---|---|---|
-| `organization` | `organizationsCreate` | 17 | 69 | 63 |
+| `organization` | `organizationsCreate` | 17 | 70 | 64 |
 | `branch` | `branchesCreate` | 3 | 26 | 27 |
 | `employee` | `employeesCreate` | 6 | 17 | 18 |
-| `customer` | `customersCreate` | 11 | 47 | 56 |
-| `vendor` | `vendorsCreate` | 11 | 46 | 55 |
+| `customer` | `customersCreate` | 11 | 48 | 57 |
+| `vendor` | `vendorsCreate` | 11 | 47 | 56 |
 | `product` | `productsCreate` | 6 | 57 | 56 |
 | `category` | `categoriesCreate` | 1 | 5 | 5 |
 | `unit` | `unitsCreate` | 2 | 7 | 4 |
@@ -50,7 +50,7 @@
 | `request` | `requestsCreate` | 9 | 11 | 11 |
 | `financial_account` | `financialAccountsCreate` | 4 | 16 | 15 |
 | `storage_location` | `storageLocationsCreate` | 3 | 20 | 20 |
-| `stock_transfer` | `stockTransfersCreate` | 4 | 15 | 0 |
+| `stock_transfer` | `stockTransfersCreate` | 4 | 16 | 0 |
 | `account_transfer` | `accountTransfersCreate` | 3 | 5 | 0 |
 | `payment_processing_fee` | `paymentsRecordFee` | 5 | 9 | 0 |
 | `capital_transaction` | `capitalTransactionsCreate` | 3 | 7 | 0 |

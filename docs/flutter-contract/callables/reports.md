@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `reportsGetRevenue`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:262`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:264`
 - **Permission(s):** `report:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_revenue` (`none`) · **State Machine:** —
 
@@ -40,7 +40,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetProfitLoss`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:338`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:340`
 - **Permission(s):** `report:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_profit_loss` (`none`) · **State Machine:** —
 
@@ -414,7 +414,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetCashBankSummary`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:357`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:359`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_cash_bank_summary` (`none`) · **State Machine:** —
 
@@ -442,6 +442,43 @@ Back to [Master Index](./INDEX.md).
     "count": 1,
     "organizationId": "organizationId_001",
     "totals": "..."
+  }
+}
+```
+
+## `reportsGetBranchSummary`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:440`
+- **Permission(s):** `branch:manage`, `report:view` · **Module:** — · **Feature Flag:** —
+- **Idempotency:** No · **Audit:** `reports.read` (`none`) · **State Machine:** —
+
+**Input (`GetBranchSummarySchema` — strict, unknown fields rejected):**
+
+| Field | Type | Required | Bounds / Enum | Example |
+|---|---|---|---|---|
+| `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
+| `branchId` | `string` | No | {"minLength":2} | `branch_001` |
+| `branchIds[]` | `string` | **Yes** | {"minLength":2} | `Sample branchIds[]` |
+| `scope` | `enum` | No | Enum: `organization`, `branch`, `branches` | `organization` |
+| `from` | `string` | No | — | `Sample from` |
+| `to` | `string` | No | — | `Sample to` |
+
+**Response:** Envelope `ACTION` · Top-level keys: "branchSummaries", "orgTotals", "organizationId", "scope" (20 typed leaf paths).
+**Declared Errors:** `BRANCH_ACCESS_DENIED`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
+
+```json
+{
+  "request": {
+    "organizationId": "organization_001",
+    "branchId": "branch_001",
+    "scope": "organization",
+    "from": "Sample from",
+    "to": "Sample to"
+  },
+  "response": {
+    "branchSummaries": "...",
+    "orgTotals": "...",
+    "organizationId": "organizationId_001",
+    "scope": "..."
   }
 }
 ```

@@ -2,9 +2,9 @@
 # Backend Contract Changes
 
 ## Hybrid Prompt 76 — BX1 Contract & API Reference Overhaul
-1. **Complete Callable Reference (D-55):** Generated `callables.json`, `callables/INDEX.md`, and `callables/<domain>.md` for all 189 callables with TypeScript-derived response descriptors.
+1. **Complete Callable Reference (D-55):** Generated `callables.json`, `callables/INDEX.md`, and `callables/<domain>.md` for all 207 callables with TypeScript-derived response descriptors.
 2. **Structured Form Callables (MG-06, MG-38):** Replaced overloaded `callables.update` with `{ create?, get?, list?, update?, delete?, void?, actions: [{name, kind}] }`; removed 4 non-existent callable names.
 3. **Approval Request & Action Forms (MG-04, MG-15):** Fixed `forms/approval_request.json` (`DocumentDecisionSchema` / `documentsDecide`, non-zero fields) and added `user_profile`, `ownership_transfer`, `sharing_policy`, `usage_limits`.
 4. **UI Hint & ImageRef Fixes (MG-01, MG-05):** Restricted `uiHint: "money_paise"` strictly to numeric fields (`customer.priceGroup` is now `text` with example `"retail"`); added `images.md` and fixed `storagePath` → `path`/`uploadId` docs.
-5. **Auth & Permissions Machine Catalogs (MG-02, MG-03, MG-07):** Added `auth.md` (including `primaryOrganization.timezone`) and `permissions.json` (149 concrete keys with descriptions, default roles, and scope notes).
-6. **Complete Errors & State Machines (TB-4, TB-5):** Expanded `errors.md` to all 69 thrown reason codes (reopen window default 14 days) and `state-machines.md` to all 13 code state machines.
+5. **Auth & Permissions Machine Catalogs (MG-02, MG-03, MG-07):** Added `auth.md` (including `primaryOrganization.timezone`) and `permissions.json` (155 concrete keys with descriptions, default roles, and scope notes).
+6. **Complete Errors & State Machines (TB-4, TB-5):** Expanded `errors.md` to all 81 thrown reason codes (reopen window default 14 days) and `state-machines.md` to all 13 code state machines.

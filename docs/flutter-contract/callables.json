@@ -1,8 +1,8 @@
 {
   "version": "2.0.0",
-  "totalCallables": 189,
-  "responseDocumented": 189,
-  "errorsDeclared": 189,
+  "totalCallables": 207,
+  "responseDocumented": 207,
+  "errorsDeclared": 207,
   "callables": [
     {
       "name": "healthCheck",
@@ -1400,7 +1400,7 @@
       "name": "organizationsCreate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 183,
+      "line": 192,
       "gate": "platform",
       "kind": "create",
       "permissions": [],
@@ -2076,6 +2076,16 @@
           "example": true
         },
         {
+          "path": "bankAccounts[].printOnInvoice",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
           "path": "bankAccounts[].status",
           "type": "enum",
           "required": false,
@@ -2610,7 +2620,7 @@
       "name": "organizationsUpdate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 415,
+      "line": 482,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -3495,6 +3505,16 @@
           "example": true
         },
         {
+          "path": "bankAccounts[].printOnInvoice",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
           "path": "bankAccounts[].status",
           "type": "enum",
           "required": false,
@@ -3709,7 +3729,7 @@
       "name": "organizationsDeactivate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 516,
+      "line": 583,
       "gate": "platform",
       "kind": "delete",
       "permissions": [],
@@ -3798,7 +3818,7 @@
       "name": "organizationsReactivate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 587,
+      "line": 654,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -3883,7 +3903,7 @@
       "name": "organizationsList",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 539,
+      "line": 606,
       "gate": "platform",
       "kind": "list",
       "permissions": [],
@@ -3974,7 +3994,7 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 5 more ...;",
+        "tsType": "{ items: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 6 more ...;",
         "topLevelKeys": [
           "count",
           "hasMore",
@@ -3990,7 +4010,7 @@
           "organizations",
           "totalCount"
         ],
-        "leafCount": 252,
+        "leafCount": 254,
         "sampleLeaves": [
           {
             "path": "items[].bankAccounts[].id",
@@ -4044,6 +4064,11 @@
           },
           {
             "path": "items[].bankAccounts[].showOnInvoice",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].bankAccounts[].printOnInvoice",
             "type": "boolean | undefined",
             "optional": true
           },
@@ -4186,11 +4211,6 @@
             "path": "items[].image.thumbnailPath",
             "type": "string | undefined",
             "optional": true
-          },
-          {
-            "path": "items[].ownerStatus",
-            "type": "\"pending\" | \"active\" | undefined",
-            "optional": true
           }
         ]
       },
@@ -4206,7 +4226,7 @@
       "name": "organizationsSetSubscription",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 693,
+      "line": 760,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -4479,7 +4499,7 @@
       "name": "organizationsGet",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 781,
+      "line": 848,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -4512,7 +4532,7 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "{ organization: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 5 mo",
+        "tsType": "{ organization: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 6 mo",
         "topLevelKeys": [
           "evaluation",
           "organization"
@@ -4521,7 +4541,7 @@
           "evaluation",
           "organization"
         ],
-        "leafCount": 131,
+        "leafCount": 132,
         "sampleLeaves": [
           {
             "path": "organization.bankAccounts[].id",
@@ -4575,6 +4595,11 @@
           },
           {
             "path": "organization.bankAccounts[].showOnInvoice",
+            "type": "boolean | undefined | boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "organization.bankAccounts[].printOnInvoice",
             "type": "boolean | undefined | boolean | undefined",
             "optional": true
           },
@@ -4717,11 +4742,6 @@
             "path": "organization.financialYearStartMonth",
             "type": "number | undefined",
             "optional": true
-          },
-          {
-            "path": "organization.defaultBranchId",
-            "type": "string | undefined",
-            "optional": true
           }
         ]
       },
@@ -4737,7 +4757,7 @@
       "name": "organizationsPreviewDeactivationImpact",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 604,
+      "line": 671,
       "gate": "platform",
       "kind": "read",
       "permissions": [],
@@ -4886,7 +4906,7 @@
       "name": "organizationsGetSubscriptionHistory",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 649,
+      "line": 716,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -5047,7 +5067,7 @@
       "name": "organizationsProvisionUser",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 881,
+      "line": 948,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -5371,7 +5391,7 @@
       "name": "organizationsTransferOwnership",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 944,
+      "line": 1011,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -5515,7 +5535,7 @@
       "name": "organizationsRevealBankAccount",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 1044,
+      "line": 1111,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -5526,11 +5546,11 @@
       "idempotent": false,
       "idempotencyField": null,
       "audit": {
-        "action": "org.reveal_bank_account",
-        "category": "read_sensitive",
+        "action": "organization.reveal_bank_account",
+        "category": "mutation",
         "collection": "organizations"
       },
-      "purpose": "ACTION endpoint in organizations domain (org.reveal_bank_account).",
+      "purpose": "ACTION endpoint in organizations domain (organization.reveal_bank_account).",
       "inputSchema": "RevealBankAccountSchema",
       "inputFields": [
         {
@@ -5571,13 +5591,12 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "{ organizationId: string; bankAccountId: any; bankName: string; accountHolderName: any; accountNumber: string; routingType: any; routingCode: any; upiId: any; iban: any; }",
+        "tsType": "{ organizationId: string; bankAccountId: string; bankName: string; accountHolderName: string; accountNumber: string; routingType: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\"; routingCode: string | null; upiId: string | nu",
         "topLevelKeys": [
           "accountHolderName",
           "accountNumber",
           "bankAccountId",
           "bankName",
-          "iban",
           "organizationId",
           "routingCode",
           "routingType",
@@ -5588,13 +5607,10 @@
           "accountNumber",
           "bankAccountId",
           "bankName",
-          "iban",
           "organizationId",
-          "routingCode",
-          "routingType",
-          "upiId"
+          "routingType"
         ],
-        "leafCount": 9,
+        "leafCount": 8,
         "sampleLeaves": [
           {
             "path": "organizationId",
@@ -5603,7 +5619,7 @@
           },
           {
             "path": "bankAccountId",
-            "type": "any",
+            "type": "string",
             "optional": false
           },
           {
@@ -5613,7 +5629,7 @@
           },
           {
             "path": "accountHolderName",
-            "type": "any",
+            "type": "string",
             "optional": false
           },
           {
@@ -5623,23 +5639,18 @@
           },
           {
             "path": "routingType",
-            "type": "any",
+            "type": "\"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\"",
             "optional": false
           },
           {
             "path": "routingCode",
-            "type": "any",
-            "optional": false
+            "type": "string | null",
+            "optional": true
           },
           {
             "path": "upiId",
-            "type": "any",
-            "optional": false
-          },
-          {
-            "path": "iban",
-            "type": "any",
-            "optional": false
+            "type": "string | null",
+            "optional": true
           }
         ]
       },
@@ -16233,6 +16244,16 @@
           "example": true
         },
         {
+          "path": "bankAccounts[].printOnInvoice",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
           "path": "bankAccounts[].status",
           "type": "enum",
           "required": false,
@@ -17032,6 +17053,16 @@
           "example": true
         },
         {
+          "path": "bankAccounts[].printOnInvoice",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
           "path": "bankAccounts[].status",
           "type": "enum",
           "required": false,
@@ -17301,7 +17332,7 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: { organizationId: string; customerCode: string; name: string; legalName?: string | null | undefined; partyType?: \"organization\" | \"person\" | undefined; image?: ImageRef | null | undefined; ... 20 more ...; customerId: string; }[]; ",
+        "tsType": "{ items: { organizationId: string; customerCode: string; name: string; legalName?: string | null | undefined; partyType?: \"organization\" | \"person\" | undefined; image?: ImageRef | null | undefined; ... 21 more ...; customerId: string; }[]; ",
         "topLevelKeys": [
           "count",
           "items",
@@ -17311,7 +17342,7 @@
           "count",
           "items"
         ],
-        "leafCount": 65,
+        "leafCount": 67,
         "sampleLeaves": [
           {
             "path": "items[].organizationId",
@@ -17580,10 +17611,11 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "{ organizationId: string; customerCode: string; name: string; legalName?: string | null | undefined; partyType?: \"organization\" | \"person\" | undefined; image?: ImageRef | null | undefined; ... 20 more ...; customerId: string; }",
+        "tsType": "{ organizationId: string; customerCode: string; name: string; legalName?: string | null | undefined; partyType?: \"organization\" | \"person\" | undefined; image?: ImageRef | null | undefined; ... 21 more ...; customerId: string; }",
         "topLevelKeys": [
           "additionalPhones",
           "addresses",
+          "advanceBalance",
           "bankAccounts",
           "contacts",
           "createdAt",
@@ -17629,7 +17661,7 @@
           "sharedForBranchIds",
           "totalSpend"
         ],
-        "leafCount": 63,
+        "leafCount": 65,
         "sampleLeaves": [
           {
             "path": "organizationId",
@@ -18418,6 +18450,16 @@
         },
         {
           "path": "bankAccounts[].showOnInvoice",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
+          "path": "bankAccounts[].printOnInvoice",
           "type": "boolean",
           "required": false,
           "nullable": false,
@@ -19216,6 +19258,16 @@
           "example": true
         },
         {
+          "path": "bankAccounts[].printOnInvoice",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
           "path": "bankAccounts[].status",
           "type": "enum",
           "required": false,
@@ -19485,7 +19537,7 @@
           "count",
           "items"
         ],
-        "leafCount": 64,
+        "leafCount": 65,
         "sampleLeaves": [
           {
             "path": "items[].organizationId",
@@ -19800,7 +19852,7 @@
           "vendorCode",
           "vendorId"
         ],
-        "leafCount": 62,
+        "leafCount": 63,
         "sampleLeaves": [
           {
             "path": "organizationId",
@@ -20016,7 +20068,7 @@
       "name": "outflowsCreate",
       "domain": "outflows",
       "file": "functions/src/callables/outflows.ts",
-      "line": 279,
+      "line": 304,
       "gate": "tenant",
       "kind": "create",
       "permissions": [],
@@ -20614,7 +20666,7 @@
       "name": "outflowsList",
       "domain": "outflows",
       "file": "functions/src/callables/outflows.ts",
-      "line": 536,
+      "line": 561,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -21012,7 +21064,7 @@
       "name": "outflowsGet",
       "domain": "outflows",
       "file": "functions/src/callables/outflows.ts",
-      "line": 579,
+      "line": 604,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -21371,7 +21423,7 @@
       "name": "outflowsVoid",
       "domain": "outflows",
       "file": "functions/src/callables/outflows.ts",
-      "line": 677,
+      "line": 702,
       "gate": "tenant",
       "kind": "delete",
       "permissions": [
@@ -21439,6 +21491,19 @@
           "example": "2026-11-18"
         },
         {
+          "path": "paymentDisposition",
+          "type": "enum",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [
+            "reverse_entries",
+            "keep_as_customer_credit"
+          ],
+          "uiHint": "dropdown",
+          "example": "reverse_entries"
+        },
+        {
           "path": "idempotencyKey",
           "type": "string",
           "required": false,
@@ -21493,6 +21558,7 @@
         "IDEMPOTENCY_CONFLICT",
         "INVALID_ARGUMENT",
         "PERMISSION_DENIED",
+        "STOCK_ALREADY_CONSUMED",
         "UNAUTHENTICATED",
         "UNKNOWN_FIELD"
       ],
@@ -21502,7 +21568,7 @@
       "name": "billsCreate",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsMutations.ts",
-      "line": 84,
+      "line": 86,
       "gate": "tenant",
       "kind": "create",
       "permissions": [
@@ -21976,7 +22042,7 @@
       "name": "billsFinalize",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsMutations.ts",
-      "line": 348,
+      "line": 350,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -22795,7 +22861,7 @@
       "name": "billsUpdateDraft",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsMutations.ts",
-      "line": 310,
+      "line": 312,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -23059,7 +23125,7 @@
       "name": "billsVoid",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsMutations.ts",
-      "line": 580,
+      "line": 582,
       "gate": "tenant",
       "kind": "delete",
       "permissions": [
@@ -23125,6 +23191,19 @@
           "example": "2026-11-18"
         },
         {
+          "path": "paymentDisposition",
+          "type": "enum",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [
+            "reverse_entries",
+            "keep_as_customer_credit"
+          ],
+          "uiHint": "dropdown",
+          "example": "reverse_entries"
+        },
+        {
           "path": "idempotencyKey",
           "type": "string",
           "required": false,
@@ -23140,9 +23219,11 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "Record<string, unknown> | { billId: string; status: string; reversedStockLines?: undefined; voidedPayments?: undefined; } | { billId: string; status: string; reversedStockLines: number; voidedPayments: number; } | undefined",
+        "tsType": "Record<string, unknown> | { billId: string; status: string; reversedStockLines?: undefined; voidedPayments?: undefined; reversedPaymentLegs?: undefined; paymentDisposition?: undefined; } | { ...; } | undefined",
         "topLevelKeys": [
           "billId",
+          "paymentDisposition",
+          "reversedPaymentLegs",
           "reversedStockLines",
           "status",
           "voidedPayments"
@@ -23151,7 +23232,7 @@
           "billId",
           "status"
         ],
-        "leafCount": 4,
+        "leafCount": 6,
         "sampleLeaves": [
           {
             "path": "billId",
@@ -23171,6 +23252,16 @@
           {
             "path": "voidedPayments",
             "type": "undefined | number",
+            "optional": true
+          },
+          {
+            "path": "reversedPaymentLegs",
+            "type": "undefined | number",
+            "optional": true
+          },
+          {
+            "path": "paymentDisposition",
+            "type": "undefined | \"reverse_entries\" | \"keep_as_customer_credit\"",
             "optional": true
           }
         ]
@@ -24596,7 +24687,7 @@
       "name": "documentsDecide",
       "domain": "approvals",
       "file": "functions/src/callables/approvals.ts",
-      "line": 178,
+      "line": 240,
       "gate": "tenant",
       "kind": "action",
       "permissions": [],
@@ -24646,7 +24737,8 @@
             "return",
             "stock_adjustment",
             "account_transfer",
-            "stock_transfer"
+            "stock_transfer",
+            "account_entry"
           ],
           "uiHint": "dropdown",
           "example": "bill"
@@ -24708,17 +24800,20 @@
         "topLevelKeys": [
           "billId",
           "decision",
+          "documentId",
           "message",
           "outflowId",
           "paymentId",
           "requestId",
           "returnId",
+          "reversalTransactionId",
           "status",
           "success"
         ],
         "requiredTopKeys": [
           "billId",
           "decision",
+          "documentId",
           "message",
           "outflowId",
           "requestId",
@@ -24726,7 +24821,7 @@
           "status",
           "success"
         ],
-        "leafCount": 9,
+        "leafCount": 11,
         "sampleLeaves": [
           {
             "path": "billId",
@@ -24772,6 +24867,16 @@
             "path": "message",
             "type": "string",
             "optional": false
+          },
+          {
+            "path": "documentId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "reversalTransactionId",
+            "type": "string | null | undefined",
+            "optional": true
           }
         ]
       },
@@ -24787,7 +24892,7 @@
       "name": "approvalsList",
       "domain": "approvals",
       "file": "functions/src/callables/approvals.ts",
-      "line": 194,
+      "line": 257,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -24839,7 +24944,8 @@
             "return",
             "stock_adjustment",
             "account_transfer",
-            "stock_transfer"
+            "stock_transfer",
+            "account_entry"
           ],
           "uiHint": "dropdown",
           "example": "bill"
@@ -24950,7 +25056,7 @@
       "name": "approvalsCounts",
       "domain": "approvals",
       "file": "functions/src/callables/approvals.ts",
-      "line": 348,
+      "line": 431,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -24993,8 +25099,9 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "{ bills: number; outflows: number; returns: number; stockAdjustments: number; accountTransfers: number; stockTransfers: number; total: number; }",
+        "tsType": "{ bills: number; outflows: number; returns: number; stockAdjustments: number; accountTransfers: number; stockTransfers: number; accountEntries: number; total: number; }",
         "topLevelKeys": [
+          "accountEntries",
           "accountTransfers",
           "bills",
           "outflows",
@@ -25004,6 +25111,7 @@
           "total"
         ],
         "requiredTopKeys": [
+          "accountEntries",
           "accountTransfers",
           "bills",
           "outflows",
@@ -25012,7 +25120,7 @@
           "stockTransfers",
           "total"
         ],
-        "leafCount": 7,
+        "leafCount": 8,
         "sampleLeaves": [
           {
             "path": "bills",
@@ -25041,6 +25149,11 @@
           },
           {
             "path": "stockTransfers",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "accountEntries",
             "type": "number",
             "optional": false
           },
@@ -25340,7 +25453,7 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "Record<string, unknown> | { financialAccountId: string; account: { currentBalance: number; organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; ... 16 more ...; financialAccountId: string; ",
+        "tsType": "Record<string, unknown> | { financialAccountId: string; account: { currentBalance: number; organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; ... 18 more ...; financialAccountId: string; ",
         "topLevelKeys": [
           "account",
           "financialAccountId",
@@ -25351,7 +25464,7 @@
           "financialAccountId",
           "message"
         ],
-        "leafCount": 30,
+        "leafCount": 32,
         "sampleLeaves": [
           {
             "path": "financialAccountId",
@@ -25462,6 +25575,16 @@
             "path": "account.isDefault",
             "type": "boolean",
             "optional": false
+          },
+          {
+            "path": "account.printOnInvoice",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "account.feeMode",
+            "type": "\"none\" | \"manual\" | \"estimated\" | undefined",
+            "optional": true
           },
           {
             "path": "account.isActive",
@@ -25881,7 +26004,7 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 14 more ...; financialAccountId: string; }[]; count: numbe",
+        "tsType": "{ items: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 16 more ...; financialAccountId: string; }[]; count: numbe",
         "topLevelKeys": [
           "count",
           "hasMore",
@@ -25895,7 +26018,7 @@
           "items",
           "totalCount"
         ],
-        "leafCount": 32,
+        "leafCount": 34,
         "sampleLeaves": [
           {
             "path": "items[].organizationId",
@@ -26001,6 +26124,16 @@
             "path": "items[].isDefault",
             "type": "boolean",
             "optional": false
+          },
+          {
+            "path": "items[].printOnInvoice",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].feeMode",
+            "type": "\"none\" | \"manual\" | \"estimated\" | undefined",
+            "optional": true
           },
           {
             "path": "items[].isActive",
@@ -26126,14 +26259,14 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "{ financialAccount: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 14 more ...; financialAccountId: string; }; }",
+        "tsType": "{ financialAccount: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 16 more ...; financialAccountId: string; }; }",
         "topLevelKeys": [
           "financialAccount"
         ],
         "requiredTopKeys": [
           "financialAccount"
         ],
-        "leafCount": 28,
+        "leafCount": 30,
         "sampleLeaves": [
           {
             "path": "financialAccount.organizationId",
@@ -26239,6 +26372,16 @@
             "path": "financialAccount.isDefault",
             "type": "boolean",
             "optional": false
+          },
+          {
+            "path": "financialAccount.printOnInvoice",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "financialAccount.feeMode",
+            "type": "\"none\" | \"manual\" | \"estimated\" | undefined",
+            "optional": true
           },
           {
             "path": "financialAccount.isActive",
@@ -26608,7 +26751,7 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "Record<string, unknown> | { transferId: string; transfer: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined; ... 2",
+        "tsType": "Record<string, unknown> | { transferId: string; transfer: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | u",
         "topLevelKeys": [
           "message",
           "transfer",
@@ -26619,7 +26762,7 @@
           "transfer",
           "transferId"
         ],
-        "leafCount": 26,
+        "leafCount": 33,
         "sampleLeaves": [
           {
             "path": "transferId",
@@ -26638,7 +26781,17 @@
           },
           {
             "path": "transfer.transferType",
-            "type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined",
+            "type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.mode",
+            "type": "\"instant\" | \"in_transit\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.reference",
+            "type": "string | undefined",
             "optional": true
           },
           {
@@ -26668,7 +26821,7 @@
           },
           {
             "path": "transfer.status",
-            "type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\"",
+            "type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\" | \"in_transit\" | \"pending_confirmation\" | \"disputed\"",
             "optional": false
           },
           {
@@ -26714,6 +26867,31 @@
           {
             "path": "transfer.rejectionReason",
             "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.confirmedByUid",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.confirmedAt",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.disputedByUid",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.disputedAt",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.disputeReason",
+            "type": "string | null | undefined",
             "optional": true
           },
           {
@@ -26870,7 +27048,7 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined; ... 20 more ...; transferId: string; }[]; count: numbe",
+        "tsType": "{ items: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | undefined; ... 27 more ...; transferId: string; }[",
         "topLevelKeys": [
           "count",
           "hasMore",
@@ -26884,7 +27062,7 @@
           "items",
           "totalCount"
         ],
-        "leafCount": 28,
+        "leafCount": 35,
         "sampleLeaves": [
           {
             "path": "items[].organizationId",
@@ -26898,7 +27076,17 @@
           },
           {
             "path": "items[].transferType",
-            "type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined",
+            "type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].mode",
+            "type": "\"instant\" | \"in_transit\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].reference",
+            "type": "string | undefined",
             "optional": true
           },
           {
@@ -26928,7 +27116,7 @@
           },
           {
             "path": "items[].status",
-            "type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\"",
+            "type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\" | \"in_transit\" | \"pending_confirmation\" | \"disputed\"",
             "optional": false
           },
           {
@@ -26974,6 +27162,31 @@
           {
             "path": "items[].rejectionReason",
             "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].confirmedByUid",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].confirmedAt",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].disputedByUid",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].disputedAt",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].disputeReason",
+            "type": "string | null | undefined",
             "optional": true
           },
           {
@@ -27095,14 +27308,14 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "{ transfer: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined; ... 20 more ...; transferId: string; }; }",
+        "tsType": "{ transfer: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | undefined; ... 27 more ...; transferId: string;",
         "topLevelKeys": [
           "transfer"
         ],
         "requiredTopKeys": [
           "transfer"
         ],
-        "leafCount": 24,
+        "leafCount": 31,
         "sampleLeaves": [
           {
             "path": "transfer.organizationId",
@@ -27116,7 +27329,17 @@
           },
           {
             "path": "transfer.transferType",
-            "type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined",
+            "type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.mode",
+            "type": "\"instant\" | \"in_transit\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.reference",
+            "type": "string | undefined",
             "optional": true
           },
           {
@@ -27146,7 +27369,7 @@
           },
           {
             "path": "transfer.status",
-            "type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\"",
+            "type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\" | \"in_transit\" | \"pending_confirmation\" | \"disputed\"",
             "optional": false
           },
           {
@@ -27192,6 +27415,31 @@
           {
             "path": "transfer.rejectionReason",
             "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.confirmedByUid",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.confirmedAt",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.disputedByUid",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.disputedAt",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.disputeReason",
+            "type": "string | null | undefined",
             "optional": true
           },
           {
@@ -27656,6 +27904,2855 @@
       "stateMachine": null
     },
     {
+      "name": "accountEntriesList",
+      "domain": "accountEntries",
+      "file": "functions/src/callables/accountEntries.ts",
+      "line": 48,
+      "gate": "tenant",
+      "kind": "list",
+      "permissions": [
+        "accounts:view",
+        "ledger:view"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": false,
+      "idempotencyField": null,
+      "audit": {
+        "action": "accountEntries.list",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "LIST endpoint in accountEntries domain (accountEntries.list).",
+      "inputSchema": "ListAccountEntriesSchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "financialAccountId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "financialAccount_001"
+        },
+        {
+          "path": "status",
+          "type": "enum",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [
+            "created",
+            "added",
+            "verified",
+            "approved",
+            "rejected",
+            "reversed"
+          ],
+          "uiHint": "dropdown",
+          "example": "created"
+        },
+        {
+          "path": "needsReview",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
+          "path": "subEntryType",
+          "type": "enum",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [
+            "transaction_charge",
+            "gateway_fee",
+            "bank_charge",
+            "adjustment",
+            "rounding",
+            "tip",
+            "other"
+          ],
+          "uiHint": "dropdown",
+          "example": "transaction_charge"
+        },
+        {
+          "path": "feeStatus",
+          "type": "enum",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [
+            "pending",
+            "recorded",
+            "waived",
+            "disputed"
+          ],
+          "uiHint": "dropdown",
+          "example": "pending"
+        },
+        {
+          "path": "parentEntryId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "parentEntry_001"
+        },
+        {
+          "path": "from",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "format": "regex"
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "Sample from"
+        },
+        {
+          "path": "to",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "format": "regex"
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "Sample to"
+        },
+        {
+          "path": "limit",
+          "type": "number",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "format": "safeint",
+            "min": 1,
+            "minInclusive": true,
+            "max": 200,
+            "maxInclusive": true
+          },
+          "enumValues": [],
+          "uiHint": "money_paise",
+          "example": 2500
+        },
+        {
+          "path": "startAfterId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "startAfter_001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "{ entries: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }[]; nextCursor: string | null; totalCount: nu",
+        "topLevelKeys": [
+          "entries",
+          "nextCursor",
+          "totalCount"
+        ],
+        "requiredTopKeys": [
+          "entries",
+          "totalCount"
+        ],
+        "leafCount": 49,
+        "sampleLeaves": [
+          {
+            "path": "entries[].organizationId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].branchId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].financialAccountId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].transactionNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].type",
+            "type": "AccountTransactionType",
+            "optional": false
+          },
+          {
+            "path": "entries[].direction",
+            "type": "\"out\" | \"in\"",
+            "optional": false
+          },
+          {
+            "path": "entries[].amount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "entries[].balanceAfter",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "entries[].amountMinor",
+            "type": "number | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].balanceAfterMinor",
+            "type": "number | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].currency",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].status",
+            "type": "AccountEntryStatus | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].sourceDocumentType",
+            "type": "\"return\" | \"account_transfer\" | \"bill\" | \"outflow\" | \"manual\" | \"payment\" | \"reconciliation\" | \"fee\" | \"capital\" | \"cash_count\"",
+            "optional": false
+          },
+          {
+            "path": "entries[].sourceDocumentId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].partyType",
+            "type": "\"vendor\" | \"customer\" | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].partyId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].description",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].parentEntryId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].subEntryType",
+            "type": "SubEntryType | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].feeStatus",
+            "type": "\"pending\" | \"disputed\" | \"recorded\" | \"waived\" | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].needsReview",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].reviewReasons[]",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].reversedTransactionId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].reversalTransactionId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].workflow.createdBy",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.createdAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.updatedByUids[]",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.verifiedBy[].uid",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.verifiedBy[].verifiedAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.verifiedBy[].note",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].workflow.approvedBy[].uid",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.approvedBy[].approvedAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.approvedBy[].note",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "entries[].workflow.rejectedBy.uid",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.rejectedBy.rejectedAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.rejectedBy.reason",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.reversedBy.uid",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.reversedBy.reversedAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.reversedBy.reason",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entries[].workflow.notes",
+            "type": "string | undefined",
+            "optional": true
+          }
+        ]
+      },
+      "errors": [
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountEntriesGet",
+      "domain": "accountEntries",
+      "file": "functions/src/callables/accountEntries.ts",
+      "line": 114,
+      "gate": "tenant",
+      "kind": "read",
+      "permissions": [
+        "accounts:view",
+        "ledger:view"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": false,
+      "idempotencyField": null,
+      "audit": {
+        "action": "accountEntries.read",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "READ endpoint in accountEntries domain (accountEntries.read).",
+      "inputSchema": "GetAccountEntrySchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "entryId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "entry_001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "{ entry: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }; subEntries: { ...; }[]; reversedEntry: Partia",
+        "topLevelKeys": [
+          "entry",
+          "reversalEntry",
+          "reversedEntry",
+          "subEntries"
+        ],
+        "requiredTopKeys": [
+          "entry",
+          "subEntries"
+        ],
+        "leafCount": 96,
+        "sampleLeaves": [
+          {
+            "path": "entry.organizationId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.branchId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.financialAccountId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.transactionNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.type",
+            "type": "AccountTransactionType",
+            "optional": false
+          },
+          {
+            "path": "entry.direction",
+            "type": "\"out\" | \"in\"",
+            "optional": false
+          },
+          {
+            "path": "entry.amount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "entry.balanceAfter",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "entry.amountMinor",
+            "type": "number | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.balanceAfterMinor",
+            "type": "number | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.currency",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.status",
+            "type": "AccountEntryStatus | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.sourceDocumentType",
+            "type": "\"return\" | \"account_transfer\" | \"bill\" | \"outflow\" | \"manual\" | \"payment\" | \"reconciliation\" | \"fee\" | \"capital\" | \"cash_count\"",
+            "optional": false
+          },
+          {
+            "path": "entry.sourceDocumentId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.partyType",
+            "type": "\"vendor\" | \"customer\" | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.partyId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.description",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.parentEntryId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.subEntryType",
+            "type": "SubEntryType | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.feeStatus",
+            "type": "\"pending\" | \"disputed\" | \"recorded\" | \"waived\" | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.needsReview",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.reviewReasons[]",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.reversedTransactionId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.reversalTransactionId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.workflow.createdBy",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.createdAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.updatedByUids[]",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.verifiedBy[].uid",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.verifiedBy[].verifiedAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.verifiedBy[].note",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.workflow.approvedBy[].uid",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.approvedBy[].approvedAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.approvedBy[].note",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.workflow.rejectedBy.uid",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.rejectedBy.rejectedAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.rejectedBy.reason",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.reversedBy.uid",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.reversedBy.reversedAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.reversedBy.reason",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "entry.workflow.notes",
+            "type": "string | undefined",
+            "optional": true
+          }
+        ]
+      },
+      "errors": [
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountEntriesCounts",
+      "domain": "accountEntries",
+      "file": "functions/src/callables/accountEntries.ts",
+      "line": 171,
+      "gate": "tenant",
+      "kind": "action",
+      "permissions": [
+        "accounts:view",
+        "ledger:view"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": false,
+      "idempotencyField": null,
+      "audit": {
+        "action": "accountEntries.action",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "ACTION endpoint in accountEntries domain (accountEntries.action).",
+      "inputSchema": "GetAccountEntryCountsSchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "financialAccountId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "financialAccount_001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "{ total: number; byStatus: { created: number; added: number; verified: number; approved: number; rejected: number; reversed: number; }; needsReview: number; pendingFee: number; }",
+        "topLevelKeys": [
+          "byStatus",
+          "needsReview",
+          "pendingFee",
+          "total"
+        ],
+        "requiredTopKeys": [
+          "byStatus",
+          "needsReview",
+          "pendingFee",
+          "total"
+        ],
+        "leafCount": 9,
+        "sampleLeaves": [
+          {
+            "path": "total",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "byStatus.created",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "byStatus.added",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "byStatus.verified",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "byStatus.approved",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "byStatus.rejected",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "byStatus.reversed",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "needsReview",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "pendingFee",
+            "type": "number",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountEntriesVerify",
+      "domain": "accountEntries",
+      "file": "functions/src/callables/accountEntries.ts",
+      "line": 224,
+      "gate": "tenant",
+      "kind": "action",
+      "permissions": [
+        "accounts:manage",
+        "accounts:verify",
+        "approvals:self_approve"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": true,
+      "idempotencyField": "idempotencyKey",
+      "audit": {
+        "action": "accountEntries.action",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "ACTION endpoint in accountEntries domain (accountEntries.action).",
+      "inputSchema": "VerifyAccountEntrySchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "entryId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "entry_001"
+        },
+        {
+          "path": "note",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "maxLength": 500
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "Sample note"
+        },
+        {
+          "path": "idempotencyKey",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "idem_20261118_0001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "Record<string, unknown> | { entryId: string; status: string; verifiedByCount: number; } | undefined",
+        "topLevelKeys": [
+          "entryId",
+          "status",
+          "verifiedByCount"
+        ],
+        "requiredTopKeys": [
+          "entryId",
+          "status",
+          "verifiedByCount"
+        ],
+        "leafCount": 3,
+        "sampleLeaves": [
+          {
+            "path": "entryId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "status",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "verifiedByCount",
+            "type": "number",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "IDEMPOTENCY_CONFLICT",
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "SELF_REVIEW_FORBIDDEN",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountEntriesApprove",
+      "domain": "accountEntries",
+      "file": "functions/src/callables/accountEntries.ts",
+      "line": 287,
+      "gate": "tenant",
+      "kind": "update",
+      "permissions": [
+        "accounts:approve",
+        "accounts:manage",
+        "approvals:self_approve"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": true,
+      "idempotencyField": "idempotencyKey",
+      "audit": {
+        "action": "accountEntries.update",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "UPDATE endpoint in accountEntries domain (accountEntries.update).",
+      "inputSchema": "ApproveAccountEntrySchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "entryId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "entry_001"
+        },
+        {
+          "path": "note",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "maxLength": 500
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "Sample note"
+        },
+        {
+          "path": "idempotencyKey",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "idem_20261118_0001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "Record<string, unknown> | { entryId: string; status: string; approvedByCount: number; } | undefined",
+        "topLevelKeys": [
+          "approvedByCount",
+          "entryId",
+          "status"
+        ],
+        "requiredTopKeys": [
+          "approvedByCount",
+          "entryId",
+          "status"
+        ],
+        "leafCount": 3,
+        "sampleLeaves": [
+          {
+            "path": "entryId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "status",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "approvedByCount",
+            "type": "number",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "IDEMPOTENCY_CONFLICT",
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "SELF_REVIEW_FORBIDDEN",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD",
+        "VERIFIER_APPROVER_SAME"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountEntriesReject",
+      "domain": "accountEntries",
+      "file": "functions/src/callables/accountEntries.ts",
+      "line": 362,
+      "gate": "tenant",
+      "kind": "update",
+      "permissions": [
+        "accounts:approve",
+        "accounts:manage",
+        "approvals:self_approve"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": true,
+      "idempotencyField": "idempotencyKey",
+      "audit": {
+        "action": "accountEntries.update",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "UPDATE endpoint in accountEntries domain (accountEntries.update).",
+      "inputSchema": "RejectAccountEntrySchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "entryId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "entry_001"
+        },
+        {
+          "path": "reason",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "enumValues": [],
+          "uiHint": "textarea",
+          "example": "2026-11-18"
+        },
+        {
+          "path": "idempotencyKey",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "idem_20261118_0001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "Record<string, unknown> | { entryId: string; status: string; reversalTransactionId: string | null; } | undefined",
+        "topLevelKeys": [
+          "entryId",
+          "reversalTransactionId",
+          "status"
+        ],
+        "requiredTopKeys": [
+          "entryId",
+          "status"
+        ],
+        "leafCount": 3,
+        "sampleLeaves": [
+          {
+            "path": "entryId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "status",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "reversalTransactionId",
+            "type": "string | null",
+            "optional": true
+          }
+        ]
+      },
+      "errors": [
+        "IDEMPOTENCY_CONFLICT",
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "SELF_REVIEW_FORBIDDEN",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountEntriesReverse",
+      "domain": "accountEntries",
+      "file": "functions/src/callables/accountEntries.ts",
+      "line": 445,
+      "gate": "tenant",
+      "kind": "action",
+      "permissions": [
+        "accounts:manage",
+        "accounts:reverse"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": true,
+      "idempotencyField": "idempotencyKey",
+      "audit": {
+        "action": "accountEntries.action",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "ACTION endpoint in accountEntries domain (accountEntries.action).",
+      "inputSchema": "ReverseAccountEntrySchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "entryId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "entry_001"
+        },
+        {
+          "path": "reason",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "enumValues": [],
+          "uiHint": "textarea",
+          "example": "2026-11-18"
+        },
+        {
+          "path": "idempotencyKey",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "idem_20261118_0001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "Record<string, unknown> | { originalEntryId: string; reversalTransactionId: string; reversalTransactionNumber: string; status: string; } | undefined",
+        "topLevelKeys": [
+          "originalEntryId",
+          "reversalTransactionId",
+          "reversalTransactionNumber",
+          "status"
+        ],
+        "requiredTopKeys": [
+          "originalEntryId",
+          "reversalTransactionId",
+          "reversalTransactionNumber",
+          "status"
+        ],
+        "leafCount": 4,
+        "sampleLeaves": [
+          {
+            "path": "originalEntryId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "reversalTransactionId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "reversalTransactionNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "status",
+            "type": "string",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "ALREADY_REVERSED",
+        "IDEMPOTENCY_CONFLICT",
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "SELF_REVIEW_FORBIDDEN",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountEntriesUpdateNote",
+      "domain": "accountEntries",
+      "file": "functions/src/callables/accountEntries.ts",
+      "line": 522,
+      "gate": "tenant",
+      "kind": "update",
+      "permissions": [
+        "accounts:manage"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": false,
+      "idempotencyField": null,
+      "audit": {
+        "action": "accountEntries.update",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "UPDATE endpoint in accountEntries domain (accountEntries.update).",
+      "inputSchema": "UpdateAccountEntryNoteSchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "entryId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "entry_001"
+        },
+        {
+          "path": "note",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "Sample note"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "{ entryId: string; description: string; updatedAt: string; }",
+        "topLevelKeys": [
+          "description",
+          "entryId",
+          "updatedAt"
+        ],
+        "requiredTopKeys": [
+          "description",
+          "entryId",
+          "updatedAt"
+        ],
+        "leafCount": 3,
+        "sampleLeaves": [
+          {
+            "path": "entryId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "description",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "updatedAt",
+            "type": "string",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountEntriesCreateSubEntry",
+      "domain": "accountEntries",
+      "file": "functions/src/callables/accountEntries.ts",
+      "line": 554,
+      "gate": "tenant",
+      "kind": "create",
+      "permissions": [
+        "accounts:entry_create",
+        "accounts:manage"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": true,
+      "idempotencyField": "idempotencyKey",
+      "audit": {
+        "action": "accountEntries.create",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "CREATE endpoint in accountEntries domain (accountEntries.create).",
+      "inputSchema": "CreateSubEntrySchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "parentEntryId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "parentEntry_001"
+        },
+        {
+          "path": "subEntryType",
+          "type": "enum",
+          "required": true,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [
+            "transaction_charge",
+            "gateway_fee",
+            "bank_charge",
+            "adjustment",
+            "rounding",
+            "tip",
+            "other"
+          ],
+          "uiHint": "dropdown",
+          "example": "transaction_charge"
+        },
+        {
+          "path": "amount",
+          "type": "number",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "format": "safeint",
+            "min": 0,
+            "minInclusive": false
+          },
+          "enumValues": [],
+          "uiHint": "money_paise",
+          "example": 2500
+        },
+        {
+          "path": "financialAccountId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "financialAccount_001"
+        },
+        {
+          "path": "direction",
+          "type": "enum",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [
+            "in",
+            "out"
+          ],
+          "uiHint": "dropdown",
+          "example": "in"
+        },
+        {
+          "path": "notes",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "maxLength": 500
+          },
+          "enumValues": [],
+          "uiHint": "textarea",
+          "example": "Sample notes"
+        },
+        {
+          "path": "idempotencyKey",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "idem_20261118_0001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "Record<string, unknown> | { subEntryId: string; transactionNumber: string; parentEntryId: string; subEntryType: \"other\" | \"adjustment\" | \"transaction_charge\" | \"gateway_fee\" | \"bank_charge\" | \"rounding\" | \"tip\"; amount: number; direction: \"",
+        "topLevelKeys": [
+          "amount",
+          "direction",
+          "parentEntryId",
+          "subEntryId",
+          "subEntryType",
+          "transactionNumber"
+        ],
+        "requiredTopKeys": [
+          "amount",
+          "direction",
+          "parentEntryId",
+          "subEntryId",
+          "subEntryType",
+          "transactionNumber"
+        ],
+        "leafCount": 6,
+        "sampleLeaves": [
+          {
+            "path": "subEntryId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "transactionNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "parentEntryId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "subEntryType",
+            "type": "\"other\" | \"adjustment\" | \"transaction_charge\" | \"gateway_fee\" | \"bank_charge\" | \"rounding\" | \"tip\"",
+            "optional": false
+          },
+          {
+            "path": "amount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "direction",
+            "type": "\"out\" | \"in\"",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "IDEMPOTENCY_CONFLICT",
+        "INVALID_ARGUMENT",
+        "MAX_DEPTH_EXCEEDED",
+        "PERMISSION_DENIED",
+        "SUB_ENTRY_EXCEEDS_PARENT",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountingPolicyGet",
+      "domain": "accountEntries",
+      "file": "functions/src/callables/accountEntries.ts",
+      "line": 656,
+      "gate": "tenant",
+      "kind": "read",
+      "permissions": [
+        "accounts:view",
+        "org:manage_approval_policy"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": false,
+      "idempotencyField": null,
+      "audit": {
+        "action": "accountEntries.read",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "READ endpoint in accountEntries domain (accountEntries.read).",
+      "inputSchema": "GetAccountingPolicySchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        }
+      ],
+      "response": {
+        "envelope": "ENTITY",
+        "tsType": "{ policy: any; }",
+        "topLevelKeys": [
+          "policy"
+        ],
+        "requiredTopKeys": [
+          "policy"
+        ],
+        "leafCount": 1,
+        "sampleLeaves": [
+          {
+            "path": "policy",
+            "type": "any",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountingPolicyUpdate",
+      "domain": "accountEntries",
+      "file": "functions/src/callables/accountEntries.ts",
+      "line": 679,
+      "gate": "tenant",
+      "kind": "update",
+      "permissions": [
+        "org:manage_approval_policy"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": false,
+      "idempotencyField": null,
+      "audit": {
+        "action": "accountEntries.update",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "UPDATE endpoint in accountEntries domain (accountEntries.update).",
+      "inputSchema": "UpdateAccountingPolicySchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "minorUnitsThresholds.*",
+          "type": "number",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "format": "safeint",
+            "min": 0,
+            "minInclusive": true
+          },
+          "enumValues": [],
+          "uiHint": "numeric",
+          "example": 1
+        },
+        {
+          "path": "selfApprovalPolicy",
+          "type": "enum",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [
+            "off",
+            "up_to_limit",
+            "on"
+          ],
+          "uiHint": "dropdown",
+          "example": "off"
+        },
+        {
+          "path": "selfApprovalLimits.*",
+          "type": "number",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "format": "safeint",
+            "min": 0,
+            "minInclusive": true
+          },
+          "enumValues": [],
+          "uiHint": "money_paise",
+          "example": 2500
+        },
+        {
+          "path": "roundingMode",
+          "type": "enum",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [
+            "half_up",
+            "half_even"
+          ],
+          "uiHint": "dropdown",
+          "example": "half_up"
+        },
+        {
+          "path": "roundToNearestRupee",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
+          "path": "cashRoundingFils",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        }
+      ],
+      "response": {
+        "envelope": "ENTITY",
+        "tsType": "{ policy: any; }",
+        "topLevelKeys": [
+          "policy"
+        ],
+        "requiredTopKeys": [
+          "policy"
+        ],
+        "leafCount": 1,
+        "sampleLeaves": [
+          {
+            "path": "policy",
+            "type": "any",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountTransfersConfirm",
+      "domain": "cashFlows",
+      "file": "functions/src/callables/cashFlows.ts",
+      "line": 46,
+      "gate": "tenant",
+      "kind": "update",
+      "permissions": [
+        "accounts:transfer"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": true,
+      "idempotencyField": "idempotencyKey",
+      "audit": {
+        "action": "cashFlows.update",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "UPDATE endpoint in cashFlows domain (cashFlows.update).",
+      "inputSchema": "ConfirmAccountTransferSchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "transferId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "transfer_001"
+        },
+        {
+          "path": "notes",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "maxLength": 500
+          },
+          "enumValues": [],
+          "uiHint": "textarea",
+          "example": "Sample notes"
+        },
+        {
+          "path": "idempotencyKey",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "idem_20261118_0001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "Record<string, unknown> | { transferId: string; transferNumber: string; status: string; confirmedByUid: string; confirmedAt: string; destinationTransactionId: string; } | undefined",
+        "topLevelKeys": [
+          "confirmedAt",
+          "confirmedByUid",
+          "destinationTransactionId",
+          "status",
+          "transferId",
+          "transferNumber"
+        ],
+        "requiredTopKeys": [
+          "confirmedAt",
+          "confirmedByUid",
+          "destinationTransactionId",
+          "status",
+          "transferId",
+          "transferNumber"
+        ],
+        "leafCount": 6,
+        "sampleLeaves": [
+          {
+            "path": "transferId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "transferNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "status",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "confirmedByUid",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "confirmedAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "destinationTransactionId",
+            "type": "string",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "ALREADY_COMPLETED",
+        "IDEMPOTENCY_CONFLICT",
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "SELF_CONFIRMATION_FORBIDDEN",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountTransfersDispute",
+      "domain": "cashFlows",
+      "file": "functions/src/callables/cashFlows.ts",
+      "line": 145,
+      "gate": "tenant",
+      "kind": "action",
+      "permissions": [
+        "accounts:transfer"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": true,
+      "idempotencyField": "idempotencyKey",
+      "audit": {
+        "action": "cashFlows.action",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "ACTION endpoint in cashFlows domain (cashFlows.action).",
+      "inputSchema": "DisputeAccountTransferSchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "transferId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "transfer_001"
+        },
+        {
+          "path": "reason",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "enumValues": [],
+          "uiHint": "textarea",
+          "example": "2026-11-18"
+        },
+        {
+          "path": "idempotencyKey",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "idem_20261118_0001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "Record<string, unknown> | { transferId: string; transferNumber: string; status: string; disputedByUid: string; disputedAt: string; disputeReason: string; } | undefined",
+        "topLevelKeys": [
+          "disputeReason",
+          "disputedAt",
+          "disputedByUid",
+          "status",
+          "transferId",
+          "transferNumber"
+        ],
+        "requiredTopKeys": [
+          "disputeReason",
+          "disputedAt",
+          "disputedByUid",
+          "status",
+          "transferId",
+          "transferNumber"
+        ],
+        "leafCount": 6,
+        "sampleLeaves": [
+          {
+            "path": "transferId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "transferNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "status",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "disputedByUid",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "disputedAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "disputeReason",
+            "type": "string",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "ALREADY_COMPLETED",
+        "IDEMPOTENCY_CONFLICT",
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "cashCountsCreate",
+      "domain": "cashFlows",
+      "file": "functions/src/callables/cashFlows.ts",
+      "line": 212,
+      "gate": "tenant",
+      "kind": "create",
+      "permissions": [
+        "accounts:manage"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": true,
+      "idempotencyField": "idempotencyKey",
+      "audit": {
+        "action": "cashFlows.create",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "CREATE endpoint in cashFlows domain (cashFlows.create).",
+      "inputSchema": "CreateCashCountSchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "financialAccountId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "financialAccount_001"
+        },
+        {
+          "path": "denominations.*",
+          "type": "number",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "format": "safeint",
+            "min": 0,
+            "minInclusive": true
+          },
+          "enumValues": [],
+          "uiHint": "numeric",
+          "example": 1
+        },
+        {
+          "path": "notes",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "maxLength": 500
+          },
+          "enumValues": [],
+          "uiHint": "textarea",
+          "example": "Sample notes"
+        },
+        {
+          "path": "idempotencyKey",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "idem_20261118_0001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "Record<string, unknown> | { countId: string; countNumber: string; countedAmount: number; systemBalance: number; varianceAmount: number; varianceTransactionId: string | null; needsApproval: boolean | undefined; } | undefined",
+        "topLevelKeys": [
+          "countId",
+          "countNumber",
+          "countedAmount",
+          "needsApproval",
+          "systemBalance",
+          "varianceAmount",
+          "varianceTransactionId"
+        ],
+        "requiredTopKeys": [
+          "countId",
+          "countNumber",
+          "countedAmount",
+          "systemBalance",
+          "varianceAmount"
+        ],
+        "leafCount": 7,
+        "sampleLeaves": [
+          {
+            "path": "countId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "countNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "countedAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "systemBalance",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "varianceAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "varianceTransactionId",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "needsApproval",
+            "type": "boolean | undefined",
+            "optional": true
+          }
+        ]
+      },
+      "errors": [
+        "IDEMPOTENCY_CONFLICT",
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "cashCountsList",
+      "domain": "cashFlows",
+      "file": "functions/src/callables/cashFlows.ts",
+      "line": 341,
+      "gate": "tenant",
+      "kind": "list",
+      "permissions": [
+        "accounts:view"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": false,
+      "idempotencyField": null,
+      "audit": {
+        "action": "cashFlows.list",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "LIST endpoint in cashFlows domain (cashFlows.list).",
+      "inputSchema": "ListCashCountsSchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "financialAccountId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "financialAccount_001"
+        },
+        {
+          "path": "limit",
+          "type": "number",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "format": "safeint",
+            "min": 1,
+            "minInclusive": true,
+            "max": 100,
+            "maxInclusive": true
+          },
+          "enumValues": [],
+          "uiHint": "money_paise",
+          "example": 2500
+        },
+        {
+          "path": "startAfterId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "startAfter_001"
+        }
+      ],
+      "response": {
+        "envelope": "LIST",
+        "tsType": "{ items: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 10 more ...; countId: string; }[]; nextCurso",
+        "topLevelKeys": [
+          "items",
+          "nextCursor",
+          "totalCount"
+        ],
+        "requiredTopKeys": [
+          "items",
+          "totalCount"
+        ],
+        "leafCount": 20,
+        "sampleLeaves": [
+          {
+            "path": "items[].organizationId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "items[].branchId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].countNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "items[].financialAccountId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "items[].countedAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "items[].systemBalance",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "items[].varianceAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "items[].denominations",
+            "type": "Record<string, number>",
+            "optional": false
+          },
+          {
+            "path": "items[].varianceTransactionId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].needsApproval",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].approvedBy",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].approvedAt",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].notes",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].createdAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "items[].createdBy",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "items[].updatedAt",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].updatedBy",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].countId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "nextCursor",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "totalCount",
+            "type": "number",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "cashCountsGet",
+      "domain": "cashFlows",
+      "file": "functions/src/callables/cashFlows.ts",
+      "line": 374,
+      "gate": "tenant",
+      "kind": "read",
+      "permissions": [
+        "accounts:view"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": false,
+      "idempotencyField": null,
+      "audit": {
+        "action": "cashFlows.read",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "READ endpoint in cashFlows domain (cashFlows.read).",
+      "inputSchema": "GetCashCountSchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "countId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "count_001"
+        }
+      ],
+      "response": {
+        "envelope": "ENTITY",
+        "tsType": "{ count: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 10 more ...; countId: string; }; }",
+        "topLevelKeys": [
+          "count"
+        ],
+        "requiredTopKeys": [
+          "count"
+        ],
+        "leafCount": 18,
+        "sampleLeaves": [
+          {
+            "path": "count.organizationId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "count.branchId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "count.countNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "count.financialAccountId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "count.countedAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "count.systemBalance",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "count.varianceAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "count.denominations",
+            "type": "Record<string, number>",
+            "optional": false
+          },
+          {
+            "path": "count.varianceTransactionId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "count.needsApproval",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "count.approvedBy",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "count.approvedAt",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "count.notes",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "count.createdAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "count.createdBy",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "count.updatedAt",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "count.updatedBy",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "count.countId",
+            "type": "string",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "accountEntriesRecordFee",
+      "domain": "cashFlows",
+      "file": "functions/src/callables/cashFlows.ts",
+      "line": 395,
+      "gate": "tenant",
+      "kind": "update",
+      "permissions": [
+        "accounts:entry_create",
+        "accounts:manage"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": true,
+      "idempotencyField": "idempotencyKey",
+      "audit": {
+        "action": "cashFlows.update",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "UPDATE endpoint in cashFlows domain (cashFlows.update).",
+      "inputSchema": "RecordEntryFeeSchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "entryId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "entry_001"
+        },
+        {
+          "path": "feeAmount",
+          "type": "number",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "format": "safeint",
+            "min": 0,
+            "minInclusive": false
+          },
+          "enumValues": [],
+          "uiHint": "money_paise",
+          "example": 2500
+        },
+        {
+          "path": "feeTaxAmount",
+          "type": "number",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "format": "safeint",
+            "min": 0,
+            "minInclusive": true
+          },
+          "enumValues": [],
+          "uiHint": "money_paise",
+          "example": 2500
+        },
+        {
+          "path": "notes",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "maxLength": 500
+          },
+          "enumValues": [],
+          "uiHint": "textarea",
+          "example": "Sample notes"
+        },
+        {
+          "path": "idempotencyKey",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "idem_20261118_0001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "Record<string, unknown> | { parentEntryId: string; subEntryId: string; subEntryTransactionNumber: string; feeAmount: number; feeStatus: string; } | undefined",
+        "topLevelKeys": [
+          "feeAmount",
+          "feeStatus",
+          "parentEntryId",
+          "subEntryId",
+          "subEntryTransactionNumber"
+        ],
+        "requiredTopKeys": [
+          "feeAmount",
+          "feeStatus",
+          "parentEntryId",
+          "subEntryId",
+          "subEntryTransactionNumber"
+        ],
+        "leafCount": 5,
+        "sampleLeaves": [
+          {
+            "path": "parentEntryId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "subEntryId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "subEntryTransactionNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "feeAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "feeStatus",
+            "type": "string",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "FEE_ALREADY_RECORDED",
+        "IDEMPOTENCY_CONFLICT",
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
       "name": "paymentsRecordFee",
       "domain": "paymentFees",
       "file": "functions/src/callables/paymentFees.ts",
@@ -27936,7 +31033,7 @@
           },
           {
             "path": "status",
-            "type": "\"pending_verification\" | \"verified\"",
+            "type": "\"verified\" | \"pending_verification\"",
             "optional": false
           },
           {
@@ -29066,7 +32163,7 @@
           },
           {
             "path": "discrepancies[].entity",
-            "type": "\"vendor\" | \"financialAccount\" | \"accountTransaction\" | \"journalEntry\" | \"customer\"",
+            "type": "\"vendor\" | \"customer\" | \"financialAccount\" | \"accountTransaction\" | \"journalEntry\"",
             "optional": false
           },
           {
@@ -30475,6 +33572,16 @@
           "example": "destinationLocation_001"
         },
         {
+          "path": "internal",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
           "path": "items[].productId",
           "type": "string",
           "required": true,
@@ -30640,7 +33747,7 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "Record<string, unknown> | { transferId: string; transfer: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; ... 27 more ...; transferId: string; }; ",
+        "tsType": "Record<string, unknown> | { transferId: string; transfer: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; ... 28 more ...; transferId: string; }; ",
         "topLevelKeys": [
           "message",
           "transfer",
@@ -30651,7 +33758,7 @@
           "transfer",
           "transferId"
         ],
-        "leafCount": 56,
+        "leafCount": 57,
         "sampleLeaves": [
           {
             "path": "transferId",
@@ -30686,6 +33793,11 @@
           {
             "path": "transfer.destinationLocationId",
             "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.internal",
+            "type": "boolean | undefined",
             "optional": true
           },
           {
@@ -30847,11 +33959,6 @@
             "path": "transfer.discrepancyStatus",
             "type": "\"none\" | \"pending_resolution\" | \"resolved\" | undefined",
             "optional": true
-          },
-          {
-            "path": "transfer.submittedAt",
-            "type": "string | undefined",
-            "optional": true
           }
         ]
       },
@@ -30868,7 +33975,7 @@
       "name": "stockTransfersSubmit",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 252,
+      "line": 260,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -30999,7 +34106,7 @@
       "name": "stockTransfersCancel",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 308,
+      "line": 316,
       "gate": "tenant",
       "kind": "delete",
       "permissions": [
@@ -31142,7 +34249,7 @@
       "name": "stockTransfersDispatch",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 365,
+      "line": 431,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -31378,7 +34485,7 @@
       "name": "stockTransfersReceive",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 667,
+      "line": 733,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -31623,7 +34730,7 @@
       "name": "stockTransfersResolveDiscrepancy",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 962,
+      "line": 1028,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -31807,7 +34914,7 @@
       "name": "stockTransfersList",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 1118,
+      "line": 1235,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -31915,7 +35022,7 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; destinationLocationId?: string | undefined; ... 26 more ...; transferId: string; }[]; cou",
+        "tsType": "{ items: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; destinationLocationId?: string | undefined; ... 27 more ...; transferId: string; }[]; cou",
         "topLevelKeys": [
           "count",
           "hasMore",
@@ -31929,7 +35036,7 @@
           "items",
           "totalCount"
         ],
-        "leafCount": 58,
+        "leafCount": 59,
         "sampleLeaves": [
           {
             "path": "items[].organizationId",
@@ -31959,6 +35066,11 @@
           {
             "path": "items[].destinationLocationId",
             "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].internal",
+            "type": "boolean | undefined",
             "optional": true
           },
           {
@@ -32125,11 +35237,6 @@
             "path": "items[].submittedAt",
             "type": "string | undefined",
             "optional": true
-          },
-          {
-            "path": "items[].submittedBy",
-            "type": "string | undefined",
-            "optional": true
           }
         ]
       },
@@ -32145,7 +35252,7 @@
       "name": "stockTransfersGet",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 1172,
+      "line": 1289,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -32200,14 +35307,14 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "{ transfer: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; destinationLocationId?: string | undefined; ... 26 more ...; transferId: string; }; }",
+        "tsType": "{ transfer: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; destinationLocationId?: string | undefined; ... 27 more ...; transferId: string; }; }",
         "topLevelKeys": [
           "transfer"
         ],
         "requiredTopKeys": [
           "transfer"
         ],
-        "leafCount": 54,
+        "leafCount": 55,
         "sampleLeaves": [
           {
             "path": "transfer.organizationId",
@@ -32237,6 +35344,11 @@
           {
             "path": "transfer.destinationLocationId",
             "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "transfer.internal",
+            "type": "boolean | undefined",
             "optional": true
           },
           {
@@ -32401,11 +35513,6 @@
           },
           {
             "path": "transfer.submittedAt",
-            "type": "string | undefined",
-            "optional": true
-          },
-          {
-            "path": "transfer.submittedBy",
             "type": "string | undefined",
             "optional": true
           }
@@ -35787,7 +38894,7 @@
       "name": "reportsGetRevenue",
       "domain": "reports",
       "file": "functions/src/callables/reports/financialReports.ts",
-      "line": 262,
+      "line": 264,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -35925,7 +39032,7 @@
       "name": "reportsGetProfitLoss",
       "domain": "reports",
       "file": "functions/src/callables/reports/financialReports.ts",
-      "line": 338,
+      "line": 340,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -37994,7 +41101,7 @@
       "name": "reportsGetCashBankSummary",
       "domain": "reports",
       "file": "functions/src/callables/reports/financialReports.ts",
-      "line": 357,
+      "line": 359,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -38151,6 +41258,228 @@
         ]
       },
       "errors": [
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": null
+    },
+    {
+      "name": "reportsGetBranchSummary",
+      "domain": "reports",
+      "file": "functions/src/callables/reports/financialReports.ts",
+      "line": 440,
+      "gate": "tenant",
+      "kind": "read",
+      "permissions": [
+        "branch:manage",
+        "report:view"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": false,
+      "idempotencyField": null,
+      "audit": {
+        "action": "reports.read",
+        "category": "none",
+        "collection": null
+      },
+      "purpose": "READ endpoint in reports domain (reports.read).",
+      "inputSchema": "GetBranchSummarySchema",
+      "inputFields": [
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "branchIds[]",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "Sample branchIds[]"
+        },
+        {
+          "path": "scope",
+          "type": "enum",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [
+            "organization",
+            "branch",
+            "branches"
+          ],
+          "uiHint": "dropdown",
+          "example": "organization"
+        },
+        {
+          "path": "from",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "Sample from"
+        },
+        {
+          "path": "to",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "Sample to"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "{ organizationId: string; scope: \"organization\" | \"branches\" | \"branch\"; branchSummaries: { branchId: string; branchName: string; branchCode: string; sales: { totalRevenue: number; billCount: number; }; outflows: { ...; }; liquidity: { ...;",
+        "topLevelKeys": [
+          "branchSummaries",
+          "orgTotals",
+          "organizationId",
+          "scope"
+        ],
+        "requiredTopKeys": [
+          "branchSummaries",
+          "orgTotals",
+          "organizationId",
+          "scope"
+        ],
+        "leafCount": 20,
+        "sampleLeaves": [
+          {
+            "path": "organizationId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "scope",
+            "type": "\"organization\" | \"branches\" | \"branch\"",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].branchId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].branchName",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].branchCode",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].sales.totalRevenue",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].sales.billCount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].outflows.totalPurchases",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].outflows.totalExpenses",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].outflows.outflowCount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].liquidity.cashBalance",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].liquidity.bankBalance",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].liquidity.totalLiquidity",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branchSummaries[].liquidity.accountCount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "orgTotals.totalRevenue",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "orgTotals.totalBills",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "orgTotals.totalPurchases",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "orgTotals.totalExpenses",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "orgTotals.totalLiquidity",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "orgTotals.branchCount",
+            "type": "number",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "BRANCH_ACCESS_DENIED",
         "INVALID_ARGUMENT",
         "PERMISSION_DENIED",
         "UNAUTHENTICATED",
@@ -40799,7 +44128,7 @@
           },
           {
             "path": "locations[].expiresAt",
-            "type": "any",
+            "type": "Timestamp",
             "optional": true
           }
         ]
@@ -41994,15 +45323,20 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "Record<string, unknown> | { request: RequestDoc; } | undefined",
+        "tsType": "Record<string, unknown> | { request: { requestId: string; requestNumber: string; audience: \"platform\" | \"organization\" | RequestAudience; category: RequestCategory; ... 36 more ...; requestedPlanName?: string | ... 1 more ... | undefined; }",
         "topLevelKeys": [
           "request"
         ],
         "requiredTopKeys": [
           "request"
         ],
-        "leafCount": 51,
+        "leafCount": 52,
         "sampleLeaves": [
+          {
+            "path": "request.requestId",
+            "type": "string",
+            "optional": false
+          },
           {
             "path": "request.requestNumber",
             "type": "string",
@@ -42197,11 +45531,6 @@
             "path": "request.firstResponseAt",
             "type": "string | null | undefined",
             "optional": true
-          },
-          {
-            "path": "request.slaState",
-            "type": "SlaState | \"on_track\" | \"at_risk\" | \"breached\" | \"paused\"",
-            "optional": false
           }
         ]
       },

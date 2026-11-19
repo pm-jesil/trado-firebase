@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "totalConcrete": 149,
+  "totalConcrete": 155,
   "wildcards": [
     {
       "key": "*",
@@ -1728,6 +1728,50 @@
       "scopeNote": null
     },
     {
+      "key": "accounts:entry_create",
+      "constName": "ACCOUNT_ENTRY_CREATE",
+      "group": "accounts",
+      "isWildcard": false,
+      "description": "Entry create access for accounts resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "accounts:verify",
+      "constName": "ACCOUNT_VERIFY",
+      "group": "accounts",
+      "isWildcard": false,
+      "description": "Verify access for accounts resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "accounts:approve",
+      "constName": "ACCOUNT_APPROVE",
+      "group": "accounts",
+      "isWildcard": false,
+      "description": "Approve access for accounts resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "accounts:reverse",
+      "constName": "ACCOUNT_REVERSE",
+      "group": "accounts",
+      "isWildcard": false,
+      "description": "Reverse access for accounts resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
       "key": "ledger:view",
       "constName": "LEDGER_VIEW",
       "group": "ledger",
@@ -1784,7 +1828,7 @@
       "constName": "CAPITAL_VIEW",
       "group": "capital",
       "isWildcard": false,
-      "description": "Approvals Inbox",
+      "description": "Approvals Inbox & Self-Approval (Q-F3, U-14)",
       "defaultRoles": [
         "org_owner",
         "admin",
@@ -1797,11 +1841,33 @@
       "constName": "APPROVALS_VIEW",
       "group": "approvals",
       "isWildcard": false,
-      "description": "Warehouse & Storage Locations",
+      "description": "View access for approvals resources.",
       "defaultRoles": [
         "org_owner",
         "admin",
         "store_manager"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "approvals:decide",
+      "constName": "APPROVALS_DECIDE",
+      "group": "approvals",
+      "isWildcard": false,
+      "description": "Decide access for approvals resources.",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "approvals:self_approve",
+      "constName": "APPROVALS_SELF_APPROVE",
+      "group": "approvals",
+      "isWildcard": false,
+      "description": "Warehouse & Storage Locations",
+      "defaultRoles": [
+        "org_owner"
       ],
       "scopeNote": null
     },

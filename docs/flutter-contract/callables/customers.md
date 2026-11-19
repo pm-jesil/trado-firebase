@@ -47,7 +47,7 @@ Back to [Master Index](./INDEX.md).
 | `addresses[].isDefaultBilling` | `boolean` | No | — | `true` |
 | `addresses[].isDefaultShipping` | `boolean` | No | — | `true` |
 | `bankAccounts[].id` | `string` | No | {"minLength":1} | `bankAccounts___id_001` |
-| *...* | *+23 nested fields* | | | *See `callables.json`* |
+| *...* | *+24 nested fields* | | | *See `callables.json`* |
 
 **Response:** Envelope `ACTION` · Top-level keys: "customerCode", "customerId", "message", "name", "organizationId", "status" (6 typed leaf paths).
 **Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
@@ -119,7 +119,7 @@ Back to [Master Index](./INDEX.md).
 | `addresses[].isDefaultBilling` | `boolean` | No | — | `true` |
 | `addresses[].isDefaultShipping` | `boolean` | No | — | `true` |
 | `bankAccounts[].id` | `string` | No | {"minLength":1} | `bankAccounts___id_001` |
-| *...* | *+23 nested fields* | | | *See `callables.json`* |
+| *...* | *+24 nested fields* | | | *See `callables.json`* |
 
 **Response:** Envelope `ACTION` · Top-level keys: "message", "success" (2 typed leaf paths).
 **Declared Errors:** `FIELD_NOT_EDITABLE`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
@@ -158,7 +158,7 @@ Back to [Master Index](./INDEX.md).
 | `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "items", "nextCursor" (65 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "items", "nextCursor" (67 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -191,7 +191,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `customerId` | `string` | **Yes** | {"minLength":2} | `customer_001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "additionalPhones", "addresses", "bankAccounts", "contacts", "createdAt", "createdBy", "creditLimit", "creditPeriodDays", "customerCode", "customerId", "email", "image", "isActive", "isDefault", "legalName", "name", "organizationId", "outstandingBalance", "partyType", "phone", "priceGroup", "sharedForBranchIds", "taxId", "totalSpend", "updatedAt", "updatedBy", "visibilityScope" (63 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "additionalPhones", "addresses", "advanceBalance", "bankAccounts", "contacts", "createdAt", "createdBy", "creditLimit", "creditPeriodDays", "customerCode", "customerId", "email", "image", "isActive", "isDefault", "legalName", "name", "organizationId", "outstandingBalance", "partyType", "phone", "priceGroup", "sharedForBranchIds", "taxId", "totalSpend", "updatedAt", "updatedBy", "visibilityScope" (65 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -204,12 +204,12 @@ Back to [Master Index](./INDEX.md).
   "response": {
     "additionalPhones": "...",
     "addresses": "...",
+    "advanceBalance": "...",
     "bankAccounts": "...",
     "contacts": "...",
     "createdAt": "...",
     "createdBy": "...",
-    "creditLimit": "...",
-    "creditPeriodDays": "..."
+    "creditLimit": "..."
   }
 }
 ```

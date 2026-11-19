@@ -50,6 +50,7 @@
 | `bankAccounts[].currency` | `string` | No | Yes | `text` | {"maxLength":3,"minLength":3} | `INR` |
 | `bankAccounts[].isDefault` | `boolean` | No | Yes | `switch` | — | `true` |
 | `bankAccounts[].showOnInvoice` | `boolean` | No | Yes | `switch` | — | `true` |
+| `bankAccounts[].printOnInvoice` | `boolean` | No | Yes | `switch` | — | `true` |
 | `bankAccounts[].status` | `enum` | No | Yes | `dropdown` | Enum: `active`, `archived` | `active` |
 | `contacts[].id` | `string` | No | Yes | `text` | {"minLength":1} | `contacts___id_001` |
 | `contacts[].name` | `string` | **Yes** | Yes | `text` | {"minLength":1,"maxLength":100} | `Sample name` |

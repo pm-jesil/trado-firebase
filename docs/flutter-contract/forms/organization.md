@@ -56,6 +56,7 @@
 | `bankAccounts[].currency` | `string` | No | Yes | `text` | {"maxLength":3,"minLength":3} | `INR` |
 | `bankAccounts[].isDefault` | `boolean` | No | Yes | `switch` | — | `true` |
 | `bankAccounts[].showOnInvoice` | `boolean` | No | Yes | `switch` | — | `true` |
+| `bankAccounts[].printOnInvoice` | `boolean` | No | Yes | `switch` | — | `true` |
 | `bankAccounts[].status` | `enum` | No | Yes | `dropdown` | Enum: `active`, `archived` | `active` |
 | `image.path` | `string` | No | Yes | `image_picker` | {"minLength":5,"maxLength":500} | `Sample path` |
 | `image.contentType` | `enum` | No | Yes | `image_picker` | Enum: `image/jpeg`, `image/png`, `image/webp` | `image/jpeg` |

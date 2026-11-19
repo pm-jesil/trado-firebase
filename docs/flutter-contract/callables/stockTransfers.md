@@ -18,6 +18,7 @@ Back to [Master Index](./INDEX.md).
 | `destinationBranchId` | `string` | **Yes** | {"minLength":2} | `destinationBranch_001` |
 | `sourceLocationId` | `string` | No | {"minLength":2} | `sourceLocation_001` |
 | `destinationLocationId` | `string` | No | {"minLength":2} | `destinationLocation_001` |
+| `internal` | `boolean` | No | — | `true` |
 | `items[].productId` | `string` | **Yes** | {"minLength":2} | `items___product_001` |
 | `items[].requestedQty` | `number` | No | {"min":0,"minInclusive":false} | `1` |
 | `items[].quantity` | `number` | No | {"min":0,"minInclusive":false} | `1` |
@@ -32,7 +33,7 @@ Back to [Master Index](./INDEX.md).
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "message", "transfer", "transferId" (56 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "message", "transfer", "transferId" (57 typed leaf paths).
 **Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -43,7 +44,8 @@ Back to [Master Index](./INDEX.md).
     "sourceBranchId": "sourceBranch_001",
     "destinationBranchId": "destinationBranch_001",
     "sourceLocationId": "sourceLocation_001",
-    "destinationLocationId": "destinationLocation_001"
+    "destinationLocationId": "destinationLocation_001",
+    "internal": true
   },
   "response": {
     "message": "...",
@@ -54,7 +56,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersSubmit`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:252`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:260`
 - **Permission(s):** `stock:transfer_create` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.submit` (`mutation`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -90,7 +92,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersCancel`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/stockTransfers.ts:308`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/stockTransfers.ts:316`
 - **Permission(s):** `stock:transfer_create` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.cancel` (`mutation`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -128,7 +130,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersDispatch`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/stockTransfers.ts:365`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/stockTransfers.ts:431`
 - **Permission(s):** `stock:transfer_dispatch` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.dispatch` (`mutation`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -171,7 +173,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersReceive`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:667`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:733`
 - **Permission(s):** `stock:transfer_receive` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.receive` (`mutation`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -216,7 +218,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersResolveDiscrepancy`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:962`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:1028`
 - **Permission(s):** `stock:transfer_receive` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.resolve_discrepancy` (`mutation`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -260,7 +262,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersList`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/stockTransfers.ts:1118`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/stockTransfers.ts:1235`
 - **Permission(s):** `stock:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.list` (`none`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -276,7 +278,7 @@ Back to [Master Index](./INDEX.md).
 | `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (58 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (59 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -299,7 +301,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersGet`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/stockTransfers.ts:1172`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/stockTransfers.ts:1289`
 - **Permission(s):** `stock:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.get` (`none`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -311,7 +313,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `transferId` | `string` | **Yes** | {"minLength":2} | `transfer_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "transfer" (54 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "transfer" (55 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json

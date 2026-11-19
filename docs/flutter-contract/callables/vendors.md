@@ -47,7 +47,7 @@ Back to [Master Index](./INDEX.md).
 | `addresses[].isDefaultBilling` | `boolean` | No | — | `true` |
 | `addresses[].isDefaultShipping` | `boolean` | No | — | `true` |
 | `bankAccounts[].id` | `string` | No | {"minLength":1} | `bankAccounts___id_001` |
-| *...* | *+22 nested fields* | | | *See `callables.json`* |
+| *...* | *+23 nested fields* | | | *See `callables.json`* |
 
 **Response:** Envelope `ACTION` · Top-level keys: "message", "name", "organizationId", "status", "vendorCode", "vendorId" (6 typed leaf paths).
 **Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
@@ -119,7 +119,7 @@ Back to [Master Index](./INDEX.md).
 | `addresses[].isDefaultBilling` | `boolean` | No | — | `true` |
 | `addresses[].isDefaultShipping` | `boolean` | No | — | `true` |
 | `bankAccounts[].id` | `string` | No | {"minLength":1} | `bankAccounts___id_001` |
-| *...* | *+22 nested fields* | | | *See `callables.json`* |
+| *...* | *+23 nested fields* | | | *See `callables.json`* |
 
 **Response:** Envelope `ACTION` · Top-level keys: "message", "success" (2 typed leaf paths).
 **Declared Errors:** `FIELD_NOT_EDITABLE`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
@@ -158,7 +158,7 @@ Back to [Master Index](./INDEX.md).
 | `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "items", "nextCursor" (64 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "items", "nextCursor" (65 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -191,7 +191,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `vendorId` | `string` | **Yes** | {"minLength":2} | `vendor_001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "additionalPhones", "addresses", "bankAccounts", "contacts", "createdAt", "createdBy", "creditLimit", "email", "image", "isActive", "isDefault", "legalName", "name", "organizationId", "outstandingPayable", "partyType", "paymentTermsDays", "phone", "sharedForBranchIds", "taxId", "totalPurchase", "updatedAt", "updatedBy", "vendorCode", "vendorId", "visibilityScope" (62 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "additionalPhones", "addresses", "bankAccounts", "contacts", "createdAt", "createdBy", "creditLimit", "email", "image", "isActive", "isDefault", "legalName", "name", "organizationId", "outstandingPayable", "partyType", "paymentTermsDays", "phone", "sharedForBranchIds", "taxId", "totalPurchase", "updatedAt", "updatedBy", "vendorCode", "vendorId", "visibilityScope" (63 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json

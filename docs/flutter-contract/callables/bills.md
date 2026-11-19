@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `billsCreate`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/bills/billsMutations.ts:84`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/bills/billsMutations.ts:86`
 - **Permission(s):** `sale:create` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `bill.create` (`mutation`) · **State Machine:** [bill](../state-machines.md)
 
@@ -68,7 +68,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `billsFinalize`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/bills/billsMutations.ts:348`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/bills/billsMutations.ts:350`
 - **Permission(s):** `bill:create`, `bill:update`, `delivery:update` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `bill.finalize` (`mutation`) · **State Machine:** [bill](../state-machines.md)
 
@@ -184,7 +184,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `billsUpdateDraft`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/bills/billsMutations.ts:310`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/bills/billsMutations.ts:312`
 - **Permission(s):** `bill:view_all` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `bill.update_draft` (`mutation`) · **State Machine:** [bill](../state-machines.md)
 
@@ -230,7 +230,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `billsVoid`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/bills/billsMutations.ts:580`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/bills/billsMutations.ts:582`
 - **Permission(s):** `bill:void` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `bill.void` (`mutation`) · **State Machine:** [bill](../state-machines.md)
 
@@ -242,9 +242,10 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `documentId` | `string` | **Yes** | {"minLength":2} | `document_001` |
 | `reason` | `string` | **Yes** | {"minLength":3,"maxLength":500} | `2026-11-18` |
+| `paymentDisposition` | `enum` | No | Enum: `reverse_entries`, `keep_as_customer_credit` | `reverse_entries` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "billId", "reversedStockLines", "status", "voidedPayments" (4 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "billId", "paymentDisposition", "reversedPaymentLegs", "reversedStockLines", "status", "voidedPayments" (6 typed leaf paths).
 **Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -254,10 +255,13 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "documentId": "document_001",
     "reason": "2026-11-18",
+    "paymentDisposition": "reverse_entries",
     "idempotencyKey": "idem_20261118_0001"
   },
   "response": {
     "billId": "billId_001",
+    "paymentDisposition": "...",
+    "reversedPaymentLegs": "...",
     "reversedStockLines": "...",
     "status": "...",
     "voidedPayments": "..."

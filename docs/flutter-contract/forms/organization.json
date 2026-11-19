@@ -815,6 +815,18 @@
       "editableBy": "permission:org:manage_bank_details"
     },
     {
+      "path": "bankAccounts[].printOnInvoice",
+      "type": "boolean",
+      "requiredCreate": false,
+      "updatable": true,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [],
+      "uiHint": "switch",
+      "example": true,
+      "editableBy": "permission:org:manage_bank_details"
+    },
+    {
       "path": "bankAccounts[].status",
       "type": "enum",
       "requiredCreate": false,

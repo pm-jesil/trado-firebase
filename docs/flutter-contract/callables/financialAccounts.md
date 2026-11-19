@@ -33,7 +33,7 @@ Back to [Master Index](./INDEX.md).
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "account", "financialAccountId", "message" (30 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "account", "financialAccountId", "message" (32 typed leaf paths).
 **Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -115,7 +115,7 @@ Back to [Master Index](./INDEX.md).
 | `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (32 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (34 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -149,7 +149,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `financialAccountId` | `string` | **Yes** | {"minLength":2} | `financialAccount_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "financialAccount" (28 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "financialAccount" (30 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -224,7 +224,7 @@ Back to [Master Index](./INDEX.md).
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "message", "transfer", "transferId" (26 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "message", "transfer", "transferId" (33 typed leaf paths).
 **Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -264,7 +264,7 @@ Back to [Master Index](./INDEX.md).
 | `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (28 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (35 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -299,7 +299,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `transferId` | `string` | **Yes** | {"minLength":2} | `transfer_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "transfer" (24 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "transfer" (31 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
