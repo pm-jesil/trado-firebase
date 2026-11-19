@@ -1,12 +1,12 @@
 # Stored field catalog
 
-Generated 2026-11-18T10:07:17.091Z by `scripts/generate-field-catalog.js` from `functions/src/types/models.ts` (TypeScript checker) and the raw field census (`census-mwlvchlc`). Do not edit.
+Generated 2026-11-19T06:46:12.601Z by `scripts/generate-field-catalog.js` from `functions/src/types/models.ts` (TypeScript checker) and the raw field census (`census-mwn6qp0q`). Do not edit.
 
 61 collections, 1441 typed stored leaf paths, 1068 with a description, 5 collections without a document interface.
 
 ## `accountTransactions` (`AccountTransactionDoc`)
 
-Typed leaf paths: 20. Documents observed in the census: 21. Stored but untyped paths: 0.
+Typed leaf paths: 20. Documents observed in the census: 35. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -33,7 +33,7 @@ Typed leaf paths: 20. Documents observed in the census: 21. Stored but untyped p
 
 ## `accountTransfers` (`AccountTransferDoc`)
 
-Typed leaf paths: 23. Documents observed in the census: 1. Stored but untyped paths: 0.
+Typed leaf paths: 23. Documents observed in the census: 2. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -63,7 +63,7 @@ Typed leaf paths: 23. Documents observed in the census: 1. Stored but untyped pa
 
 ## `requests/activity` — no document interface
 
-Typed leaf paths: 0. Documents observed in the census: 32. Stored but untyped paths: 15.
+Typed leaf paths: 0. Documents observed in the census: 81. Stored but untyped paths: 15.
 
 Stored but untyped:
 
@@ -85,7 +85,7 @@ Stored but untyped:
 
 ## `auditLogs` (`AuditLogDoc`)
 
-Typed leaf paths: 54. Documents observed in the census: 524. Stored but untyped paths: 302.
+Typed leaf paths: 54. Documents observed in the census: 1036. Stored but untyped paths: 400.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -146,6 +146,7 @@ Typed leaf paths: 54. Documents observed in the census: 524. Stored but untyped 
 
 Stored but untyped:
 
+- `actorRole`
 - `changes.fields[]`
 - `changes.fields[].after.accountNumberMasked`
 - `changes.fields[].after.action`
@@ -153,19 +154,26 @@ Stored but untyped:
 - `changes.fields[].after.admin`
 - `changes.fields[].after.allowNegativeStock`
 - `changes.fields[].after.altPhone`
+- `changes.fields[].after.analytics`
+- `changes.fields[].after.approvals.allowSelfApproval`
 - `changes.fields[].after.approvals.amountThreshold`
 - `changes.fields[].after.approvals.enabled`
+- `changes.fields[].after.approvals.modules.account_transfer`
 - `changes.fields[].after.approvals.modules.expense`
 - `changes.fields[].after.approvals.modules.purchase`
 - `changes.fields[].after.approvals.modules.return`
 - `changes.fields[].after.approvals.modules.sale`
 - `changes.fields[].after.approvals.modules.stock_adjustment`
+- `changes.fields[].after.approvals.modules.stock_transfer`
+- `changes.fields[].after.approvals.thresholds.k1`
 - `changes.fields[].after.area`
 - `changes.fields[].after.audit:read_own`
 - `changes.fields[].after.audit:view`
 - `changes.fields[].after.bankBranchName`
 - `changes.fields[].after.bankName`
 - `changes.fields[].after.bill:create`
+- `changes.fields[].after.bill:discount`
+- `changes.fields[].after.bill:view`
 - `changes.fields[].after.billing`
 - `changes.fields[].after.billingAddress`
 - `changes.fields[].after.billingPeriod`
@@ -184,24 +192,30 @@ Stored but untyped:
 - `changes.fields[].after.businessConfig.salesMode`
 - `changes.fields[].after.categories`
 - `changes.fields[].after.city`
+- `changes.fields[].after.colour`
 - `changes.fields[].after.contactName`
 - `changes.fields[].after.contactPerson`
+- `changes.fields[].after.contentType`
 - `changes.fields[].after.country`
 - `changes.fields[].after.customers`
 - `changes.fields[].after.defaultFinancialAccountId`
 - `changes.fields[].after.defaultSalesMode`
 - `changes.fields[].after.deliveries`
 - `changes.fields[].after.description`
+- `changes.fields[].after.detailsText`
 - `changes.fields[].after.diagnostics.appVersion`
 - `changes.fields[].after.diagnostics.platform`
 - `changes.fields[].after.diagnostics.route`
 - `changes.fields[].after.diagnosticsOptIn`
 - `changes.fields[].after.email`
+- `changes.fields[].after.employee:view`
 - `changes.fields[].after.enabled`
 - `changes.fields[].after.expected`
 - `changes.fields[].after.expense:create`
+- `changes.fields[].after.expense:view`
 - `changes.fields[].after.expenses`
 - `changes.fields[].after.externalReference`
+- `changes.fields[].after.field`
 - `changes.fields[].after.firestoreReads.dailyLimit`
 - `changes.fields[].after.firestoreReads.enabled`
 - `changes.fields[].after.firestoreReads.enforcementMode`
@@ -214,6 +228,7 @@ Stored but untyped:
 - `changes.fields[].after.firestoreWrites.hardThresholdPercent`
 - `changes.fields[].after.firestoreWrites.monthlyLimit`
 - `changes.fields[].after.firestoreWrites.warningThresholdPercent`
+- `changes.fields[].after.firestoreWrites.weeklyLimit`
 - `changes.fields[].after.functionsInvocations.dailyLimit`
 - `changes.fields[].after.functionsInvocations.enabled`
 - `changes.fields[].after.functionsInvocations.enforcementMode`
@@ -226,6 +241,8 @@ Stored but untyped:
 - `changes.fields[].after.grossWeightGrams`
 - `changes.fields[].after.hallmarkId`
 - `changes.fields[].after.height`
+- `changes.fields[].after.high.firstResponseHours`
+- `changes.fields[].after.high.resolutionHours`
 - `changes.fields[].after.id`
 - `changes.fields[].after.ifscOrSwift`
 - `changes.fields[].after.inventory`
@@ -251,8 +268,21 @@ Stored but untyped:
 - `changes.fields[].after.limit`
 - `changes.fields[].after.line1`
 - `changes.fields[].after.line2`
+- `changes.fields[].after.liveLocation`
+- `changes.fields[].after.location:ping`
+- `changes.fields[].after.location:view_own`
+- `changes.fields[].after.locationPings.dailyLimit`
+- `changes.fields[].after.locationPings.enabled`
+- `changes.fields[].after.locationPings.enforcementMode`
+- `changes.fields[].after.locationPings.hardThresholdPercent`
+- `changes.fields[].after.locationPings.warningThresholdPercent`
+- `changes.fields[].after.low.firstResponseHours`
+- `changes.fields[].after.low.resolutionHours`
 - `changes.fields[].after.makingCharge`
 - `changes.fields[].after.makingChargeType`
+- `changes.fields[].after.maxCreationsPerHourPerUser`
+- `changes.fields[].after.maxOpenPerOrg`
+- `changes.fields[].after.maxOpenPerUser`
 - `changes.fields[].after.metric`
 - `changes.fields[].after.moduleKey`
 - `changes.fields[].after.moduleOverrides`
@@ -260,7 +290,18 @@ Stored but untyped:
 - `changes.fields[].after.name`
 - `changes.fields[].after.netWeightGrams`
 - `changes.fields[].after.newPlanId`
+- `changes.fields[].after.normal.firstResponseHours`
+- `changes.fields[].after.normal.resolutionHours`
+- `changes.fields[].after.notification:view`
+- `changes.fields[].after.numbering.k1`
+- `changes.fields[].after.org:update`
+- `changes.fields[].after.org:view`
 - `changes.fields[].after.outflow:create`
+- `changes.fields[].after.overriddenBlockers[].allowed`
+- `changes.fields[].after.overriddenBlockers[].code`
+- `changes.fields[].after.overriddenBlockers[].current`
+- `changes.fields[].after.overriddenBlockers[].message`
+- `changes.fields[].after.path`
 - `changes.fields[].after.payments`
 - `changes.fields[].after.period`
 - `changes.fields[].after.permissionKeys[]`
@@ -270,11 +311,17 @@ Stored but untyped:
 - `changes.fields[].after.previousPlanId`
 - `changes.fields[].after.priceByDailyRate`
 - `changes.fields[].after.product:view`
+- `changes.fields[].after.product:view_cost`
 - `changes.fields[].after.products`
+- `changes.fields[].after.proposedValue`
+- `changes.fields[].after.purchase:create`
+- `changes.fields[].after.purchase:view`
 - `changes.fields[].after.purchases`
 - `changes.fields[].after.purity`
+- `changes.fields[].after.question`
 - `changes.fields[].after.reason`
 - `changes.fields[].after.regime`
+- `changes.fields[].after.report:view`
 - `changes.fields[].after.requestedLimit`
 - `changes.fields[].after.requestedPlanId`
 - `changes.fields[].after.requests:comment`
@@ -283,24 +330,37 @@ Stored but untyped:
 - `changes.fields[].after.requests:manage_org`
 - `changes.fields[].after.requests:read_org`
 - `changes.fields[].after.requests:read_own`
+- `changes.fields[].after.return:create`
+- `changes.fields[].after.return:view`
 - `changes.fields[].after.returns`
 - `changes.fields[].after.roleLabel`
 - `changes.fields[].after.sale:create`
 - `changes.fields[].after.sales`
 - `changes.fields[].after.severity`
+- `changes.fields[].after.size`
+- `changes.fields[].after.sizeBytes`
 - `changes.fields[].after.staff`
 - `changes.fields[].after.state`
 - `changes.fields[].after.stepsToReproduce`
 - `changes.fields[].after.stock`
+- `changes.fields[].after.stock:adjust`
+- `changes.fields[].after.stock:view`
+- `changes.fields[].after.storage`
 - `changes.fields[].after.suspectedImpact`
+- `changes.fields[].after.task:update`
+- `changes.fields[].after.task:view`
 - `changes.fields[].after.tasks`
 - `changes.fields[].after.taxAmount`
 - `changes.fields[].after.taxId`
 - `changes.fields[].after.taxRatePercent`
 - `changes.fields[].after.taxType`
+- `changes.fields[].after.topic`
 - `changes.fields[].after.uid`
 - `changes.fields[].after.unit`
+- `changes.fields[].after.updatedAt`
 - `changes.fields[].after.upiId`
+- `changes.fields[].after.urgent.firstResponseHours`
+- `changes.fields[].after.urgent.resolutionHours`
 - `changes.fields[].after.value`
 - `changes.fields[].after.vendors`
 - `changes.fields[].after.width`
@@ -351,6 +411,7 @@ Stored but untyped:
 - `changes.fields[].after[].isDefaultShipping`
 - `changes.fields[].after[].isPrimary`
 - `changes.fields[].after[].isPurchaseUnit`
+- `changes.fields[].after[].isReturnable`
 - `changes.fields[].after[].isSaleUnit`
 - `changes.fields[].after[].itemName`
 - `changes.fields[].after[].label`
@@ -399,6 +460,7 @@ Stored but untyped:
 - `changes.fields[].after[].wholesalePrice`
 - `changes.fields[].before.bill:create`
 - `changes.fields[].before.categories`
+- `changes.fields[].before.contentType`
 - `changes.fields[].before.customers`
 - `changes.fields[].before.deliveries`
 - `changes.fields[].before.expenses`
@@ -408,25 +470,50 @@ Stored but untyped:
 - `changes.fields[].before.firestoreWrites.hardThresholdPercent`
 - `changes.fields[].before.firestoreWrites.monthlyLimit`
 - `changes.fields[].before.firestoreWrites.warningThresholdPercent`
+- `changes.fields[].before.firestoreWrites.weeklyLimit`
+- `changes.fields[].before.height`
+- `changes.fields[].before.high.firstResponseHours`
+- `changes.fields[].before.high.resolutionHours`
 - `changes.fields[].before.isPlatform`
+- `changes.fields[].before.low.firstResponseHours`
+- `changes.fields[].before.low.resolutionHours`
+- `changes.fields[].before.maxCreationsPerHourPerUser`
+- `changes.fields[].before.maxOpenPerOrg`
+- `changes.fields[].before.maxOpenPerUser`
 - `changes.fields[].before.name`
+- `changes.fields[].before.normal.firstResponseHours`
+- `changes.fields[].before.normal.resolutionHours`
+- `changes.fields[].before.path`
+- `changes.fields[].before.phone`
 - `changes.fields[].before.products`
 - `changes.fields[].before.purchases`
 - `changes.fields[].before.sales`
+- `changes.fields[].before.sizeBytes`
 - `changes.fields[].before.stock`
 - `changes.fields[].before.uid`
+- `changes.fields[].before.updatedAt`
+- `changes.fields[].before.urgent.firstResponseHours`
+- `changes.fields[].before.urgent.resolutionHours`
 - `changes.fields[].before.vendors`
+- `changes.fields[].before.width`
 - `changes.fields[].before[]`
 - `changes.fields[].before[].baseQuantity`
 - `changes.fields[].before[].conversionFactor`
+- `changes.fields[].before[].costSnapshot`
 - `changes.fields[].before[].designation`
+- `changes.fields[].before[].discountValue`
 - `changes.fields[].before[].discrepancyReason`
 - `changes.fields[].before[].dispatchedBaseQuantity`
 - `changes.fields[].before[].dispatchedQty`
 - `changes.fields[].before[].email`
 - `changes.fields[].before[].id`
+- `changes.fields[].before[].isActive`
+- `changes.fields[].before[].isPrimary`
+- `changes.fields[].before[].lineId`
+- `changes.fields[].before[].lineTotal`
 - `changes.fields[].before[].name`
 - `changes.fields[].before[].phone`
+- `changes.fields[].before[].priceSnapshot`
 - `changes.fields[].before[].productId`
 - `changes.fields[].before[].quantity`
 - `changes.fields[].before[].receivedBaseQuantity`
@@ -434,12 +521,20 @@ Stored but untyped:
 - `changes.fields[].before[].rejectedQty`
 - `changes.fields[].before[].requestedQty`
 - `changes.fields[].before[].shortQty`
+- `changes.fields[].before[].subtotal`
+- `changes.fields[].before[].taxAmount`
+- `changes.fields[].before[].taxCodeSnapshot`
 - `changes.fields[].before[].totalCost`
+- `changes.fields[].before[].trackStock`
+- `changes.fields[].before[].type`
 - `changes.fields[].before[].unit`
 - `changes.fields[].before[].unitCost`
+- `createdAt`
 - `details.action`
+- `details.addedPermissions[]`
 - `details.decision`
 - `details.duplicateOverrideReason`
+- `details.migration`
 - `details.note`
 - `details.notes`
 - `details.overrideReason`
@@ -447,11 +542,14 @@ Stored but untyped:
 - `details.reason`
 - `details.reasonCode`
 - `details.taxExemptionReason`
+- `logId`
+- `scope`
+- `status`
 - `targets[]`
 
 ## `bills` (`BillDoc`)
 
-Typed leaf paths: 92. Documents observed in the census: 13. Stored but untyped paths: 2.
+Typed leaf paths: 92. Documents observed in the census: 46. Stored but untyped paths: 2.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -482,7 +580,7 @@ Typed leaf paths: 92. Documents observed in the census: 13. Stored but untyped p
 | `items[].conversionFactor` | `number | undefined` | no | public | yes | Base units per line unit, frozen at sale time |
 | `items[].baseQuantity` | `number | undefined` | no | public | yes | quantity * conversionFactor (stock unit) |
 | `items[].trackStock` | `boolean | undefined` | no | public | yes | Product trackStock at sale time (serials sold on the line live in serials/, by soldLineId) |
-| `items[].isReturnable` | `boolean | undefined` | no | public | no | false when the product was non-returnable at sale time |
+| `items[].isReturnable` | `boolean | undefined` | no | public | yes | false when the product was non-returnable at sale time |
 | `items[].subtotal` | `number` | yes | public | yes | Total of the lines before document-level discount and tax. |
 | `items[].discountValue` | `number` | yes | public | yes |  |
 | `items[].taxAmount` | `number` | yes | public | yes | Tax amount. |
@@ -497,9 +595,9 @@ Typed leaf paths: 92. Documents observed in the census: 13. Stored but untyped p
 | `balanceAmount` | `number` | yes | public | yes | Amount still to be paid. |
 | `paymentStatus` | `PaymentStatus` | yes | public | yes | Payment state of the document (unpaid, partially paid, paid). |
 | `status` | `"active" | "pending_approval" | "rejected" | BillStatus | "draft" | "voided" | "cancelled" | "refunded"` | yes | public | yes | Lifecycle status of the record (values: the field's enum). |
-| `approvalNote` | `string | null | undefined` | no | public | no | Approval state lives in status (pending_approval / rejected) + approvedBy/rejectedBy |
-| `requestedPaidAmount` | `number | undefined` | no | public | no | Tender held until approval |
-| `requestedPaymentMethod` | `PaymentMethod | undefined` | no | public | no | Payment method asked for in the approval request. |
+| `approvalNote` | `string | null | undefined` | no | public | yes | Approval state lives in status (pending_approval / rejected) + approvedBy/rejectedBy |
+| `requestedPaidAmount` | `number | undefined` | no | public | yes | Tender held until approval |
+| `requestedPaymentMethod` | `PaymentMethod | undefined` | no | public | yes | Payment method asked for in the approval request. |
 | `stockReserved` | `boolean | undefined` | no | public | yes |  |
 | `finalizedAt` | `string | undefined` | no | public | yes | quotation / proforma converted to an invoice |
 | `finalizedBy` | `string | undefined` | no | public | yes |  |
@@ -531,11 +629,11 @@ Typed leaf paths: 92. Documents observed in the census: 13. Stored but untyped p
 | `reviewedBy` | `string | undefined` | no | public | no |  |
 | `verifiedAt` | `string | undefined` | no | public | no |  |
 | `verifiedBy` | `string | undefined` | no | public | no |  |
-| `approvedAt` | `string | undefined` | no | public | no | Time the record was approved (ISO-8601). |
-| `approvedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the approver. |
+| `approvedAt` | `string | undefined` | no | public | yes | Time the record was approved (ISO-8601). |
+| `approvedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the approver. |
 | `rejectedAt` | `string | undefined` | no | public | no | Time the record was rejected (ISO-8601). |
 | `rejectedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who rejected it. |
-| `approvalReason` | `string | null | undefined` | no | public | no | Reason the approver gave. |
+| `approvalReason` | `string | null | undefined` | no | public | yes | Reason the approver gave. |
 | `postedAt` | `string | undefined` | no | public | no |  |
 | `postedBy` | `string | undefined` | no | public | no |  |
 | `reversedAt` | `string | undefined` | no | public | no |  |
@@ -544,9 +642,9 @@ Typed leaf paths: 92. Documents observed in the census: 13. Stored but untyped p
 | `cancelledAt` | `string | undefined` | no | public | no |  |
 | `cancelledBy` | `string | undefined` | no | public | no |  |
 | `cancelReason` | `string | undefined` | no | public | no |  |
-| `voidedAt` | `string | undefined` | no | public | no | Time the document was voided (ISO-8601). |
-| `voidedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who voided the document. |
-| `voidReason` | `string | undefined` | no | public | no | Reason the document was voided. |
+| `voidedAt` | `string | undefined` | no | public | yes | Time the document was voided (ISO-8601). |
+| `voidedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who voided the document. |
+| `voidReason` | `string | undefined` | no | public | yes | Reason the document was voided. |
 
 Stored but untyped:
 
@@ -555,7 +653,7 @@ Stored but untyped:
 
 ## `branchProductStock` — no document interface
 
-Typed leaf paths: 0. Documents observed in the census: 10. Stored but untyped paths: 6.
+Typed leaf paths: 0. Documents observed in the census: 12. Stored but untyped paths: 6.
 
 Stored but untyped:
 
@@ -568,31 +666,41 @@ Stored but untyped:
 
 ## `branchUsageDaily` (`BranchUsageDailyDoc`)
 
-Typed leaf paths: 5. Documents observed in the census: 0. Stored but untyped paths: 0.
+Typed leaf paths: 5. Documents observed in the census: 2. Stored but untyped paths: 2.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
-| `organizationId` | `string` | yes | public | no | Id of the organization (tenant) the record belongs to. |
-| `branchId` | `string` | yes | public | no | Id of the branch the record belongs to or applies to. |
-| `date` | `string` | yes | public | no | YYYY-MM-DD |
+| `organizationId` | `string` | yes | public | yes | Id of the organization (tenant) the record belongs to. |
+| `branchId` | `string` | yes | public | yes | Id of the branch the record belongs to or applies to. |
+| `date` | `string` | yes | public | yes | YYYY-MM-DD |
 | `clientReported` | `Partial<ServiceUsageCounts>` | no | public | no | untrusted client estimates |
-| `updatedAt` | `string | undefined` | no | public | no | Time the record was last changed (ISO-8601). |
+| `updatedAt` | `string | undefined` | no | public | yes | Time the record was last changed (ISO-8601). |
+
+Stored but untyped:
+
+- `clientReported.locationPings`
+- `clientReported.storageOperations`
 
 ## `branchUsageMonthly` (`BranchUsageMonthlyDoc`)
 
-Typed leaf paths: 5. Documents observed in the census: 0. Stored but untyped paths: 0.
+Typed leaf paths: 5. Documents observed in the census: 2. Stored but untyped paths: 2.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
-| `organizationId` | `string` | yes | public | no | Id of the organization (tenant) the record belongs to. |
-| `branchId` | `string` | yes | public | no | Id of the branch the record belongs to or applies to. |
-| `month` | `string` | yes | public | no | YYYY-MM |
+| `organizationId` | `string` | yes | public | yes | Id of the organization (tenant) the record belongs to. |
+| `branchId` | `string` | yes | public | yes | Id of the branch the record belongs to or applies to. |
+| `month` | `string` | yes | public | yes | YYYY-MM |
 | `clientReported` | `Partial<ServiceUsageCounts>` | no | public | no | untrusted client estimates |
-| `updatedAt` | `string | undefined` | no | public | no | Time the record was last changed (ISO-8601). |
+| `updatedAt` | `string | undefined` | no | public | yes | Time the record was last changed (ISO-8601). |
+
+Stored but untyped:
+
+- `clientReported.locationPings`
+- `clientReported.storageOperations`
 
 ## `organizations/branches` (`BranchDoc`)
 
-Typed leaf paths: 35. Documents observed in the census: 24. Stored but untyped paths: 2.
+Typed leaf paths: 35. Documents observed in the census: 84. Stored but untyped paths: 2.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -639,7 +747,7 @@ Stored but untyped:
 
 ## `capitalTransactions` (`CapitalTransactionDoc`)
 
-Typed leaf paths: 13. Documents observed in the census: 2. Stored but untyped paths: 0.
+Typed leaf paths: 13. Documents observed in the census: 4. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -659,7 +767,7 @@ Typed leaf paths: 13. Documents observed in the census: 2. Stored but untyped pa
 
 ## `categories` (`CategoryDoc`)
 
-Typed leaf paths: 10. Documents observed in the census: 8. Stored but untyped paths: 0.
+Typed leaf paths: 10. Documents observed in the census: 12. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -686,7 +794,7 @@ Stored but untyped:
 
 ## `customers` (`CustomerDoc`)
 
-Typed leaf paths: 62. Documents observed in the census: 12. Stored but untyped paths: 4.
+Typed leaf paths: 62. Documents observed in the census: 33. Stored but untyped paths: 4.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -762,7 +870,7 @@ Stored but untyped:
 
 ## `dailySummaries` (`DailySummaryDoc`)
 
-Typed leaf paths: 16. Documents observed in the census: 8. Stored but untyped paths: 0.
+Typed leaf paths: 16. Documents observed in the census: 33. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -785,7 +893,7 @@ Typed leaf paths: 16. Documents observed in the census: 8. Stored but untyped pa
 
 ## `deliveries` (`DeliveryDoc`)
 
-Typed leaf paths: 27. Documents observed in the census: 3. Stored but untyped paths: 0.
+Typed leaf paths: 27. Documents observed in the census: 9. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -810,7 +918,7 @@ Typed leaf paths: 27. Documents observed in the census: 3. Stored but untyped pa
 | `cod.amount` | `number` | yes | public | no | Amount to collect on delivery. |
 | `cod.isCollected` | `boolean` | yes | public | no | Whether the cash-on-delivery amount was collected. |
 | `cod.collectedAt` | `string | null | undefined` | no | public | no | Time the cash-on-delivery amount was collected (ISO-8601). |
-| `deliveredAt` | `string | undefined` | no | public | no | Time the delivery was completed (ISO-8601). |
+| `deliveredAt` | `string | undefined` | no | public | yes | Time the delivery was completed (ISO-8601). |
 | `notes` | `string | undefined` | no | public | yes | Free-text notes. |
 | `createdAt` | `string` | yes | public | yes | Time the record was created (ISO-8601). |
 | `createdBy` | `string` | yes | public | yes | Firebase Auth uid of the user who created the record. |
@@ -819,7 +927,7 @@ Typed leaf paths: 27. Documents observed in the census: 3. Stored but untyped pa
 
 ## `departments` (`DepartmentDoc`)
 
-Typed leaf paths: 8. Documents observed in the census: 2. Stored but untyped paths: 0.
+Typed leaf paths: 8. Documents observed in the census: 4. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -834,19 +942,19 @@ Typed leaf paths: 8. Documents observed in the census: 2. Stored but untyped pat
 
 ## `users/devices` (`DeviceDoc`)
 
-Typed leaf paths: 5. Documents observed in the census: 1. Stored but untyped paths: 0.
+Typed leaf paths: 5. Documents observed in the census: 3. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
 | `fcmToken` | `string` | yes | sensitive | yes |  |
 | `platform` | `"android" | "ios" | "web"` | yes | public | yes |  |
-| `lastLoginAt` | `string | undefined` | no | public | no | written by authLogin on every sign-in from this device |
+| `lastLoginAt` | `string | undefined` | no | public | yes | written by authLogin on every sign-in from this device |
 | `createdAt` | `string` | yes | public | yes | Time the record was created (ISO-8601). |
 | `updatedAt` | `string` | yes | public | yes | Time the record was last changed (ISO-8601). |
 
 ## `documentCounters` (`DocumentCounterDoc`)
 
-Typed leaf paths: 5. Documents observed in the census: 36. Stored but untyped paths: 0.
+Typed leaf paths: 5. Documents observed in the census: 117. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -858,7 +966,7 @@ Typed leaf paths: 5. Documents observed in the census: 36. Stored but untyped pa
 
 ## `financialAccounts` (`FinancialAccountDoc`)
 
-Typed leaf paths: 27. Documents observed in the census: 9. Stored but untyped paths: 0.
+Typed leaf paths: 27. Documents observed in the census: 12. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -892,7 +1000,7 @@ Typed leaf paths: 27. Documents observed in the census: 9. Stored but untyped pa
 
 ## `idempotencyRecords` (`IdempotencyRecordDoc`)
 
-Typed leaf paths: 11. Documents observed in the census: 126. Stored but untyped paths: 126.
+Typed leaf paths: 11. Documents observed in the census: 214. Stored but untyped paths: 202.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -992,7 +1100,9 @@ Stored but untyped:
 - `result.name`
 - `result.newStock`
 - `result.nextRunOn`
+- `result.notified`
 - `result.organizationId`
+- `result.originalQuotationNumber`
 - `result.outflowId`
 - `result.outflowNumber`
 - `result.ownerMembershipId`
@@ -1006,14 +1116,87 @@ Stored but untyped:
 - `result.planId`
 - `result.previousStock`
 - `result.price`
+- `result.printSnapshot.billNumber`
+- `result.printSnapshot.customer`
+- `result.printSnapshot.documentType`
+- `result.printSnapshot.invoiceTitle`
+- `result.printSnapshot.issueDate`
+- `result.printSnapshot.items[].discountAmount`
+- `result.printSnapshot.items[].lineId`
+- `result.printSnapshot.items[].name`
+- `result.printSnapshot.items[].productId`
+- `result.printSnapshot.items[].quantity`
+- `result.printSnapshot.items[].sku`
+- `result.printSnapshot.items[].taxAmount`
+- `result.printSnapshot.items[].taxRatePercent`
+- `result.printSnapshot.items[].totalAmount`
+- `result.printSnapshot.items[].unit`
+- `result.printSnapshot.items[].unitPrice`
+- `result.printSnapshot.organization.address`
+- `result.printSnapshot.organization.bankAccounts[]`
+- `result.printSnapshot.organization.contactEmail`
+- `result.printSnapshot.organization.contactPhone`
+- `result.printSnapshot.organization.legalName`
+- `result.printSnapshot.organization.name`
+- `result.printSnapshot.organization.taxId`
+- `result.printSnapshot.salesMode`
+- `result.printSnapshot.taxBreakdown[]`
+- `result.printSnapshot.totals.balanceAmount`
+- `result.printSnapshot.totals.discountTotal`
+- `result.printSnapshot.totals.paidAmount`
+- `result.printSnapshot.totals.roundOff`
+- `result.printSnapshot.totals.subTotal`
+- `result.printSnapshot.totals.taxTotal`
+- `result.printSnapshot.totals.totalAmount`
+- `result.printSnapshot.version`
 - `result.priority`
 - `result.productId`
 - `result.quantityAdjusted`
 - `result.reasonCode`
 - `result.relatedEntityId`
 - `result.relatedEntityType`
+- `result.request.assignee`
+- `result.request.attachments[]`
+- `result.request.audience`
+- `result.request.branchId`
+- `result.request.category`
+- `result.request.createdAt`
+- `result.request.currentPlanName`
+- `result.request.description`
+- `result.request.details.detailsText`
+- `result.request.firstResponseAt`
+- `result.request.firstResponseDueAt`
+- `result.request.idempotencyKey`
+- `result.request.kind`
+- `result.request.labels[]`
+- `result.request.lastActivityAt`
+- `result.request.lastActivityBy.isPlatform`
+- `result.request.lastActivityBy.name`
+- `result.request.lastActivityBy.uid`
+- `result.request.organizationId`
+- `result.request.priority`
+- `result.request.relatedEntity`
+- `result.request.requestId`
+- `result.request.requestNumber`
+- `result.request.requestedPlanName`
+- `result.request.requester.name`
+- `result.request.requester.roleLabel`
+- `result.request.requester.uid`
+- `result.request.requesterName`
+- `result.request.resolutionDueAt`
+- `result.request.slaPausedAt`
+- `result.request.slaState`
+- `result.request.slaTotalPausedMs`
+- `result.request.status`
+- `result.request.statusChangedAt`
+- `result.request.statusReason`
+- `result.request.title`
+- `result.request.updatedAt`
+- `result.request.version`
 - `result.returnId`
 - `result.returnNumber`
+- `result.reversedDocumentId`
+- `result.reversedStockLines`
 - `result.roleId`
 - `result.salesMode`
 - `result.seatLimits.admin`
@@ -1036,10 +1219,11 @@ Stored but untyped:
 - `result.userId`
 - `result.vendorCode`
 - `result.vendorId`
+- `result.voidedPayments`
 
 ## `imageUploadSessions` (`ImageUploadSessionDoc`)
 
-Typed leaf paths: 14. Documents observed in the census: 1. Stored but untyped paths: 0.
+Typed leaf paths: 14. Documents observed in the census: 4. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1055,12 +1239,12 @@ Typed leaf paths: 14. Documents observed in the census: 1. Stored but untyped pa
 | `isUsed` | `boolean` | yes | public | yes |  |
 | `createdAt` | `string` | yes | public | yes | Time the record was created (ISO-8601). |
 | `expiresAt` | `string` | yes | public | yes | Time this stops being valid (ISO-8601). |
-| `attachedAt` | `string | undefined` | no | public | no | set by attachUploadedImage when the upload is attached |
-| `finalPath` | `string | undefined` | no | public | no | storage path of the processed image, set on attach |
+| `attachedAt` | `string | undefined` | no | public | yes | set by attachUploadedImage when the upload is attached |
+| `finalPath` | `string | undefined` | no | public | yes | storage path of the processed image, set on attach |
 
 ## `jobRoles` (`JobRoleDoc`)
 
-Typed leaf paths: 9. Documents observed in the census: 8. Stored but untyped paths: 0.
+Typed leaf paths: 9. Documents observed in the census: 10. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1105,7 +1289,7 @@ Typed leaf paths: 22. Documents observed in the census: 0. Stored but untyped pa
 
 ## `latestLocations` (`LatestLocationDoc`)
 
-Typed leaf paths: 11. Documents observed in the census: 1. Stored but untyped paths: 0.
+Typed leaf paths: 12. Documents observed in the census: 3. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1120,10 +1304,11 @@ Typed leaf paths: 11. Documents observed in the census: 1. Stored but untyped pa
 | `source` | `"foreground" | "background"` | yes | public | yes | Whether the location was recorded with the app in the foreground or the background. |
 | `recordedAt` | `string` | yes | public | yes | ISO 8601 string |
 | `updatedAt` | `string` | yes | public | yes | Time the record was last changed (ISO-8601). |
+| `expiresAt` | `Timestamp` | no | public | yes | BC3: Firestore Timestamp TTL for pruning inactive latestLocations |
 
 ## `locationPings` (`LocationPingDoc`)
 
-Typed leaf paths: 13. Documents observed in the census: 1. Stored but untyped paths: 0.
+Typed leaf paths: 13. Documents observed in the census: 3. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1143,7 +1328,7 @@ Typed leaf paths: 13. Documents observed in the census: 1. Stored but untyped pa
 
 ## `membershipBranches` (`MembershipBranchDoc`)
 
-Typed leaf paths: 11. Documents observed in the census: 60. Stored but untyped paths: 0.
+Typed leaf paths: 11. Documents observed in the census: 164. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1161,7 +1346,7 @@ Typed leaf paths: 11. Documents observed in the census: 60. Stored but untyped p
 
 ## `memberships` (`MembershipDoc`)
 
-Typed leaf paths: 17. Documents observed in the census: 48. Stored but untyped paths: 22.
+Typed leaf paths: 17. Documents observed in the census: 140. Stored but untyped paths: 45.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1176,7 +1361,7 @@ Typed leaf paths: 17. Documents observed in the census: 48. Stored but untyped p
 | `status` | `EntityStatus` | yes | public | yes | Lifecycle status of the record (values: the field's enum). |
 | `isPrimary` | `boolean` | yes | public | yes | Whether this is the primary entry of its list. |
 | `primaryBranchId` | `string | undefined` | no | public | yes | Canonical default active operating branch for this membership (assignments: membershipBranches) |
-| `locationTrackingEnabled` | `boolean | undefined` | no | public | no | Explicit consent flag for employee live-location tracking |
+| `locationTrackingEnabled` | `boolean | undefined` | no | public | yes | Explicit consent flag for employee live-location tracking |
 | `dataScopes` | `Partial<Record<"sales" | "purchases" | "expenses" | "deliveries" | "returns" | "payments" | "stock" | "tasks", "self" | "team" | "branch" | "organization">>` | no | public | no | Optional per-module data scope override (self | team | branch | organization). |
 | `createdAt` | `string` | yes | public | yes | Time the record was created (ISO-8601). |
 | `createdBy` | `string` | yes | public | yes | Firebase Auth uid of the user who created the record. |
@@ -1196,17 +1381,40 @@ Stored but untyped:
 - `permissions.audit:read_own`
 - `permissions.audit:view`
 - `permissions.bill:create`
+- `permissions.bill:discount`
+- `permissions.bill:update`
+- `permissions.bill:view`
+- `permissions.customer:view`
+- `permissions.employee:view`
 - `permissions.expense:create`
+- `permissions.expense:view`
+- `permissions.inventory:view`
 - `permissions.k1`
+- `permissions.location:ping`
+- `permissions.location:view_own`
+- `permissions.notification:view`
+- `permissions.org:update`
+- `permissions.org:view`
 - `permissions.outflow:create`
+- `permissions.payment:create`
 - `permissions.product:view`
+- `permissions.product:view_cost`
+- `permissions.purchase:create`
+- `permissions.purchase:view`
+- `permissions.report:view`
 - `permissions.requests:comment`
 - `permissions.requests:create`
 - `permissions.requests:create_sensitive`
 - `permissions.requests:manage_org`
 - `permissions.requests:read_org`
 - `permissions.requests:read_own`
+- `permissions.return:create`
+- `permissions.return:view`
 - `permissions.sale:create`
+- `permissions.stock:adjust`
+- `permissions.stock:view`
+- `permissions.task:update`
+- `permissions.task:view`
 
 ## `modules` (`ModuleDoc`)
 
@@ -1220,7 +1428,7 @@ Typed leaf paths: 3. Documents observed in the census: 12. Stored but untyped pa
 
 ## `monthlySummaries` (`MonthlySummaryDoc`)
 
-Typed leaf paths: 11. Documents observed in the census: 8. Stored but untyped paths: 0.
+Typed leaf paths: 11. Documents observed in the census: 32. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1238,7 +1446,7 @@ Typed leaf paths: 11. Documents observed in the census: 8. Stored but untyped pa
 
 ## `notificationOutbox` (`NotificationOutboxDoc`)
 
-Typed leaf paths: 10. Documents observed in the census: 22. Stored but untyped paths: 2.
+Typed leaf paths: 10. Documents observed in the census: 113. Stored but untyped paths: 2.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1260,7 +1468,7 @@ Stored but untyped:
 
 ## `notifications` (`NotificationDoc`)
 
-Typed leaf paths: 12. Documents observed in the census: 59. Stored but untyped paths: 0.
+Typed leaf paths: 12. Documents observed in the census: 184. Stored but untyped paths: 1.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1277,9 +1485,13 @@ Typed leaf paths: 12. Documents observed in the census: 59. Stored but untyped p
 | `readAt` | `string | null | undefined` | no | public | yes |  |
 | `createdAt` | `string` | yes | public | yes | Time the record was created (ISO-8601). |
 
+Stored but untyped:
+
+- `data.key`
+
 ## `organizationUsageDaily` (`OrganizationUsageDailyDoc`)
 
-Typed leaf paths: 25. Documents observed in the census: 13. Stored but untyped paths: 653.
+Typed leaf paths: 25. Documents observed in the census: 86. Stored but untyped paths: 785.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1287,7 +1499,7 @@ Typed leaf paths: 25. Documents observed in the census: 13. Stored but untyped p
 | `date` | `string` | yes | public | yes | YYYY-MM-DD (UTC: reconciles with the billing export) |
 | `targets` | `Record<string, UsageOps & { calls: number; }>` | no | public | no |  |
 | `clientReported` | `Partial<ServiceUsageCounts>` | no | public | no |  |
-| `updatedAt` | `string | undefined` | no | public | no | Time the record was last changed (ISO-8601). |
+| `updatedAt` | `string | undefined` | no | public | yes | Time the record was last changed (ISO-8601). |
 | `calls` | `number | undefined` | no | public | yes |  |
 | `errors` | `number | undefined` | no | public | yes |  |
 | `denied` | `number | undefined` | no | public | yes |  |
@@ -1335,8 +1547,10 @@ Stored but untyped:
 - `byCallable.auditLogsList.reads`
 - `byCallable.auditLogsList.writes`
 - `byCallable.authLogin.calls`
+- `byCallable.authLogin.reads`
 - `byCallable.authLogin.writes`
 - `byCallable.authMe.calls`
+- `byCallable.authMe.reads`
 - `byCallable.authMe.writes`
 - `byCallable.billsCreate.calls`
 - `byCallable.billsCreate.reads`
@@ -1345,7 +1559,11 @@ Stored but untyped:
 - `byCallable.billsFinalize.reads`
 - `byCallable.billsFinalize.writes`
 - `byCallable.billsGet.calls`
+- `byCallable.billsGet.reads`
+- `byCallable.billsGet.writes`
 - `byCallable.billsList.calls`
+- `byCallable.billsList.reads`
+- `byCallable.billsList.writes`
 - `byCallable.billsPreview.calls`
 - `byCallable.billsPreview.reads`
 - `byCallable.billsPreview.writes`
@@ -1353,6 +1571,7 @@ Stored but untyped:
 - `byCallable.billsUpdateDraft.reads`
 - `byCallable.billsUpdateDraft.writes`
 - `byCallable.billsVoid.calls`
+- `byCallable.billsVoid.reads`
 - `byCallable.billsVoid.writes`
 - `byCallable.branchContextSwitch.calls`
 - `byCallable.branchContextSwitch.reads`
@@ -1361,9 +1580,14 @@ Stored but untyped:
 - `byCallable.branchesCreate.reads`
 - `byCallable.branchesCreate.writes`
 - `byCallable.branchesDeactivate.calls`
+- `byCallable.branchesDeactivate.reads`
 - `byCallable.branchesDeactivate.writes`
 - `byCallable.branchesGetDefault.calls`
+- `byCallable.branchesGetDefault.reads`
+- `byCallable.branchesGetDefault.writes`
 - `byCallable.branchesList.calls`
+- `byCallable.branchesList.reads`
+- `byCallable.branchesList.writes`
 - `byCallable.branchesUpdate.calls`
 - `byCallable.branchesUpdate.reads`
 - `byCallable.branchesUpdate.writes`
@@ -1378,6 +1602,7 @@ Stored but untyped:
 - `byCallable.categoriesCreate.reads`
 - `byCallable.categoriesCreate.writes`
 - `byCallable.categoriesList.calls`
+- `byCallable.categoriesList.reads`
 - `byCallable.categoriesUpdate.calls`
 - `byCallable.categoriesUpdate.deletes`
 - `byCallable.categoriesUpdate.reads`
@@ -1390,6 +1615,8 @@ Stored but untyped:
 - `byCallable.customersGet.reads`
 - `byCallable.customersGet.writes`
 - `byCallable.customersList.calls`
+- `byCallable.customersList.reads`
+- `byCallable.customersList.writes`
 - `byCallable.customersUpdate.calls`
 - `byCallable.customersUpdate.deletes`
 - `byCallable.customersUpdate.reads`
@@ -1398,7 +1625,11 @@ Stored but untyped:
 - `byCallable.deliveriesCreate.reads`
 - `byCallable.deliveriesCreate.writes`
 - `byCallable.deliveriesGet.calls`
+- `byCallable.deliveriesGet.reads`
+- `byCallable.deliveriesGet.writes`
 - `byCallable.deliveriesList.calls`
+- `byCallable.deliveriesList.reads`
+- `byCallable.deliveriesList.writes`
 - `byCallable.deliveriesUpdateStatus.calls`
 - `byCallable.deliveriesUpdateStatus.reads`
 - `byCallable.deliveriesUpdateStatus.writes`
@@ -1406,6 +1637,7 @@ Stored but untyped:
 - `byCallable.departmentsCreate.reads`
 - `byCallable.departmentsCreate.writes`
 - `byCallable.departmentsList.calls`
+- `byCallable.departmentsList.reads`
 - `byCallable.departmentsUpdate.calls`
 - `byCallable.departmentsUpdate.deletes`
 - `byCallable.departmentsUpdate.reads`
@@ -1423,6 +1655,8 @@ Stored but untyped:
 - `byCallable.employeesGet.reads`
 - `byCallable.employeesGet.writes`
 - `byCallable.employeesList.calls`
+- `byCallable.employeesList.reads`
+- `byCallable.employeesList.writes`
 - `byCallable.employeesUpdate.calls`
 - `byCallable.employeesUpdate.reads`
 - `byCallable.employeesUpdate.writes`
@@ -1451,11 +1685,13 @@ Stored but untyped:
 - `byCallable.imagesCreateUploadSession.reads`
 - `byCallable.imagesCreateUploadSession.writes`
 - `byCallable.imagesRemove.calls`
+- `byCallable.imagesRemove.reads`
 - `byCallable.imagesRemove.writes`
 - `byCallable.jobRolesCreate.calls`
 - `byCallable.jobRolesCreate.reads`
 - `byCallable.jobRolesCreate.writes`
 - `byCallable.jobRolesList.calls`
+- `byCallable.jobRolesList.reads`
 - `byCallable.jobRolesUpdate.calls`
 - `byCallable.jobRolesUpdate.deletes`
 - `byCallable.jobRolesUpdate.reads`
@@ -1473,7 +1709,9 @@ Stored but untyped:
 - `byCallable.locationsRecordPing.reads`
 - `byCallable.locationsRecordPing.writes`
 - `byCallable.modulesList.calls`
+- `byCallable.modulesList.reads`
 - `byCallable.notificationsList.calls`
+- `byCallable.notificationsList.reads`
 - `byCallable.notificationsMarkRead.calls`
 - `byCallable.notificationsMarkRead.reads`
 - `byCallable.notificationsMarkRead.writes`
@@ -1504,16 +1742,22 @@ Stored but untyped:
 - `byCallable.organizationsGet.reads`
 - `byCallable.organizationsGet.writes`
 - `byCallable.organizationsGetSubscriptionHistory.calls`
+- `byCallable.organizationsGetSubscriptionHistory.reads`
+- `byCallable.organizationsGetSubscriptionHistory.writes`
+- `byCallable.organizationsList.aggregationReads`
 - `byCallable.organizationsList.calls`
-- `byCallable.organizationsList.writes`
+- `byCallable.organizationsList.reads`
 - `byCallable.organizationsPreviewDeactivationImpact.calls`
-- `byCallable.organizationsPreviewDeactivationImpact.writes`
+- `byCallable.organizationsPreviewDeactivationImpact.reads`
 - `byCallable.organizationsProvisionUser.calls`
 - `byCallable.organizationsProvisionUser.reads`
 - `byCallable.organizationsProvisionUser.writes`
 - `byCallable.organizationsReactivate.calls`
 - `byCallable.organizationsReactivate.reads`
 - `byCallable.organizationsReactivate.writes`
+- `byCallable.organizationsRevealBankAccount.calls`
+- `byCallable.organizationsRevealBankAccount.reads`
+- `byCallable.organizationsRevealBankAccount.writes`
 - `byCallable.organizationsSetSubscription.calls`
 - `byCallable.organizationsSetSubscription.reads`
 - `byCallable.organizationsSetSubscription.writes`
@@ -1527,8 +1771,14 @@ Stored but untyped:
 - `byCallable.outflowsCreate.reads`
 - `byCallable.outflowsCreate.writes`
 - `byCallable.outflowsGet.calls`
+- `byCallable.outflowsGet.reads`
+- `byCallable.outflowsGet.writes`
 - `byCallable.outflowsList.calls`
+- `byCallable.outflowsList.reads`
+- `byCallable.outflowsList.writes`
 - `byCallable.outflowsVoid.calls`
+- `byCallable.outflowsVoid.deletes`
+- `byCallable.outflowsVoid.reads`
 - `byCallable.outflowsVoid.writes`
 - `byCallable.paymentsCreate.calls`
 - `byCallable.paymentsCreate.reads`
@@ -1540,6 +1790,8 @@ Stored but untyped:
 - `byCallable.paymentsGetFee.reads`
 - `byCallable.paymentsGetFee.writes`
 - `byCallable.paymentsList.calls`
+- `byCallable.paymentsList.reads`
+- `byCallable.paymentsList.writes`
 - `byCallable.paymentsListFees.aggregationReads`
 - `byCallable.paymentsListFees.calls`
 - `byCallable.paymentsListFees.reads`
@@ -1554,9 +1806,12 @@ Stored but untyped:
 - `byCallable.paymentsVerifyFee.reads`
 - `byCallable.paymentsVerifyFee.writes`
 - `byCallable.paymentsVoid.calls`
+- `byCallable.paymentsVoid.reads`
 - `byCallable.paymentsVoid.writes`
 - `byCallable.permissionCatalogList.calls`
+- `byCallable.permissionCatalogList.reads`
 - `byCallable.plansArchive.calls`
+- `byCallable.plansArchive.reads`
 - `byCallable.plansArchive.writes`
 - `byCallable.plansCatalogList.calls`
 - `byCallable.plansCatalogList.reads`
@@ -1565,23 +1820,33 @@ Stored but untyped:
 - `byCallable.plansCreate.reads`
 - `byCallable.plansCreate.writes`
 - `byCallable.plansDelete.calls`
+- `byCallable.plansDelete.deletes`
+- `byCallable.plansDelete.reads`
 - `byCallable.plansDelete.writes`
 - `byCallable.plansGet.calls`
+- `byCallable.plansGet.reads`
 - `byCallable.plansList.calls`
+- `byCallable.plansList.reads`
 - `byCallable.plansPreviewImpact.calls`
-- `byCallable.plansPreviewImpact.writes`
+- `byCallable.plansPreviewImpact.reads`
 - `byCallable.plansUpdate.calls`
 - `byCallable.plansUpdate.reads`
 - `byCallable.plansUpdate.writes`
 - `byCallable.platformUsersGet.calls`
-- `byCallable.platformUsersGet.writes`
+- `byCallable.platformUsersGet.reads`
+- `byCallable.platformUsersList.aggregationReads`
 - `byCallable.platformUsersList.calls`
+- `byCallable.platformUsersList.reads`
 - `byCallable.platformUsersList.writes`
 - `byCallable.productsCreate.calls`
 - `byCallable.productsCreate.reads`
 - `byCallable.productsCreate.writes`
 - `byCallable.productsGet.calls`
+- `byCallable.productsGet.reads`
+- `byCallable.productsGet.writes`
 - `byCallable.productsGetPriceHistory.calls`
+- `byCallable.productsGetPriceHistory.reads`
+- `byCallable.productsGetPriceHistory.writes`
 - `byCallable.productsList.calls`
 - `byCallable.productsList.reads`
 - `byCallable.productsList.writes`
@@ -1589,15 +1854,20 @@ Stored but untyped:
 - `byCallable.productsUpdate.reads`
 - `byCallable.productsUpdate.writes`
 - `byCallable.reconcileBranchCounts.calls`
+- `byCallable.reconcileBranchCounts.reads`
 - `byCallable.reconcileBranchCounts.writes`
 - `byCallable.reconcilePartyLedgers.calls`
+- `byCallable.reconcilePartyLedgers.reads`
 - `byCallable.reconcilePartyLedgers.writes`
 - `byCallable.reconcileStockBalances.calls`
+- `byCallable.reconcileStockBalances.reads`
 - `byCallable.reconcileStockBalances.writes`
 - `byCallable.recurringExpensesCreate.calls`
 - `byCallable.recurringExpensesCreate.reads`
 - `byCallable.recurringExpensesCreate.writes`
 - `byCallable.recurringExpensesList.calls`
+- `byCallable.recurringExpensesList.reads`
+- `byCallable.recurringExpensesList.writes`
 - `byCallable.recurringExpensesUpdate.calls`
 - `byCallable.recurringExpensesUpdate.reads`
 - `byCallable.recurringExpensesUpdate.writes`
@@ -1608,13 +1878,16 @@ Stored but untyped:
 - `byCallable.reportsGetCashBankSummary.reads`
 - `byCallable.reportsGetCashBankSummary.writes`
 - `byCallable.reportsGetOutflowSummary.calls`
+- `byCallable.reportsGetOutflowSummary.reads`
 - `byCallable.reportsGetOutflowSummary.writes`
 - `byCallable.reportsGetPartyStatement.calls`
+- `byCallable.reportsGetPartyStatement.reads`
 - `byCallable.reportsGetPartyStatement.writes`
 - `byCallable.reportsGetPayablesAgeing.calls`
 - `byCallable.reportsGetPayablesAgeing.reads`
 - `byCallable.reportsGetPayablesAgeing.writes`
 - `byCallable.reportsGetPlatformOverview.calls`
+- `byCallable.reportsGetPlatformOverview.reads`
 - `byCallable.reportsGetPlatformOverview.writes`
 - `byCallable.reportsGetProfitLoss.calls`
 - `byCallable.reportsGetProfitLoss.reads`
@@ -1663,7 +1936,6 @@ Stored but untyped:
 - `byCallable.requestsGet.writes`
 - `byCallable.requestsInboxCounts.calls`
 - `byCallable.requestsInboxCounts.reads`
-- `byCallable.requestsInboxCounts.writes`
 - `byCallable.requestsInboxList.calls`
 - `byCallable.requestsInboxList.reads`
 - `byCallable.requestsInboxList.writes`
@@ -1676,6 +1948,12 @@ Stored but untyped:
 - `byCallable.requestsSetPriority.calls`
 - `byCallable.requestsSetPriority.reads`
 - `byCallable.requestsSetPriority.writes`
+- `byCallable.requestsSettingsGet.calls`
+- `byCallable.requestsSettingsGet.reads`
+- `byCallable.requestsSettingsGet.writes`
+- `byCallable.requestsSettingsUpdate.calls`
+- `byCallable.requestsSettingsUpdate.reads`
+- `byCallable.requestsSettingsUpdate.writes`
 - `byCallable.requestsTransition.calls`
 - `byCallable.requestsTransition.reads`
 - `byCallable.requestsTransition.writes`
@@ -1686,10 +1964,13 @@ Stored but untyped:
 - `byCallable.returnsCreate.reads`
 - `byCallable.returnsCreate.writes`
 - `byCallable.returnsList.calls`
+- `byCallable.returnsList.reads`
+- `byCallable.returnsList.writes`
 - `byCallable.rolesCreate.calls`
 - `byCallable.rolesCreate.reads`
 - `byCallable.rolesCreate.writes`
 - `byCallable.rolesList.calls`
+- `byCallable.rolesList.reads`
 - `byCallable.rolesUpdate.calls`
 - `byCallable.rolesUpdate.reads`
 - `byCallable.rolesUpdate.writes`
@@ -1700,6 +1981,8 @@ Stored but untyped:
 - `byCallable.stockAdjust.reads`
 - `byCallable.stockAdjust.writes`
 - `byCallable.stockMovementsList.calls`
+- `byCallable.stockMovementsList.reads`
+- `byCallable.stockMovementsList.writes`
 - `byCallable.stockTransfersCancel.calls`
 - `byCallable.stockTransfersCancel.reads`
 - `byCallable.stockTransfersCancel.writes`
@@ -1748,6 +2031,7 @@ Stored but untyped:
 - `byCallable.tasksCreate.reads`
 - `byCallable.tasksCreate.writes`
 - `byCallable.tasksDelete.calls`
+- `byCallable.tasksDelete.deletes`
 - `byCallable.tasksDelete.reads`
 - `byCallable.tasksDelete.writes`
 - `byCallable.tasksList.calls`
@@ -1760,6 +2044,7 @@ Stored but untyped:
 - `byCallable.tasksUpdateStatus.reads`
 - `byCallable.tasksUpdateStatus.writes`
 - `byCallable.taxRegimesList.calls`
+- `byCallable.taxRegimesList.reads`
 - `byCallable.teamsAssignMember.calls`
 - `byCallable.teamsAssignMember.reads`
 - `byCallable.teamsAssignMember.writes`
@@ -1767,6 +2052,8 @@ Stored but untyped:
 - `byCallable.teamsCreate.reads`
 - `byCallable.teamsCreate.writes`
 - `byCallable.teamsList.calls`
+- `byCallable.teamsList.reads`
+- `byCallable.teamsList.writes`
 - `byCallable.teamsUpdate.calls`
 - `byCallable.teamsUpdate.deletes`
 - `byCallable.teamsUpdate.reads`
@@ -1775,10 +2062,15 @@ Stored but untyped:
 - `byCallable.unitsCreate.reads`
 - `byCallable.unitsCreate.writes`
 - `byCallable.unitsList.calls`
+- `byCallable.unitsList.reads`
 - `byCallable.unitsUpdate.calls`
 - `byCallable.unitsUpdate.deletes`
 - `byCallable.unitsUpdate.reads`
 - `byCallable.unitsUpdate.writes`
+- `byCallable.unknown.aggregationReads`
+- `byCallable.unknown.calls`
+- `byCallable.unknown.reads`
+- `byCallable.unknown.writes`
 - `byCallable.usageCalculateDryRunStatement.calls`
 - `byCallable.usageCalculateDryRunStatement.reads`
 - `byCallable.usageCalculateDryRunStatement.writes`
@@ -1786,6 +2078,7 @@ Stored but untyped:
 - `byCallable.usageGetBranches.reads`
 - `byCallable.usageGetBranches.writes`
 - `byCallable.usageGetDetail.calls`
+- `byCallable.usageGetDetail.reads`
 - `byCallable.usageGetLimits.calls`
 - `byCallable.usageGetLimits.reads`
 - `byCallable.usageGetLimits.writes`
@@ -1812,6 +2105,8 @@ Stored but untyped:
 - `byCallable.vendorsGet.reads`
 - `byCallable.vendorsGet.writes`
 - `byCallable.vendorsList.calls`
+- `byCallable.vendorsList.reads`
+- `byCallable.vendorsList.writes`
 - `byCallable.vendorsUpdate.calls`
 - `byCallable.vendorsUpdate.reads`
 - `byCallable.vendorsUpdate.writes`
@@ -1836,6 +2131,9 @@ Stored but untyped:
 - `byCollection.bills.writes`
 - `byCollection.branchProductStock.reads`
 - `byCollection.branchProductStock.writes`
+- `byCollection.branchUsageDaily.reads`
+- `byCollection.branchUsageDaily.writes`
+- `byCollection.branchUsageMonthly.writes`
 - `byCollection.capitalTransactions.aggregationReads`
 - `byCollection.capitalTransactions.reads`
 - `byCollection.capitalTransactions.writes`
@@ -1866,19 +2164,25 @@ Stored but untyped:
 - `byCollection.journalEntries.reads`
 - `byCollection.latestLocations.reads`
 - `byCollection.latestLocations.writes`
+- `byCollection.locationPings.reads`
 - `byCollection.locationPings.writes`
 - `byCollection.membershipBranches.reads`
 - `byCollection.membershipBranches.writes`
 - `byCollection.memberships.reads`
 - `byCollection.memberships.writes`
+- `byCollection.modules.reads`
 - `byCollection.monthlySummaries.reads`
 - `byCollection.monthlySummaries.writes`
 - `byCollection.notificationOutbox.reads`
 - `byCollection.notificationOutbox.writes`
+- `byCollection.notifications.deletes`
 - `byCollection.notifications.reads`
 - `byCollection.notifications.writes`
 - `byCollection.organizationUsageDaily.reads`
+- `byCollection.organizationUsageDaily.writes`
 - `byCollection.organizationUsageMonthly.reads`
+- `byCollection.organizationUsageMonthly.writes`
+- `byCollection.organizations.aggregationReads`
 - `byCollection.organizations.reads`
 - `byCollection.organizations.writes`
 - `byCollection.organizations/{id}/branches.reads`
@@ -1891,7 +2195,10 @@ Stored but untyped:
 - `byCollection.paymentProcessingFees.writes`
 - `byCollection.payments.reads`
 - `byCollection.payments.writes`
+- `byCollection.permissionCatalog.reads`
+- `byCollection.platformCostReconciliation.reads`
 - `byCollection.platformSettings.reads`
+- `byCollection.platformSettings.writes`
 - `byCollection.products.reads`
 - `byCollection.products.writes`
 - `byCollection.recurringExpenses.reads`
@@ -1909,6 +2216,7 @@ Stored but untyped:
 - `byCollection.serials.writes`
 - `byCollection.stockAdjustmentRequests.aggregationReads`
 - `byCollection.stockAdjustmentRequests.reads`
+- `byCollection.stockAdjustmentRequests.writes`
 - `byCollection.stockBalances.reads`
 - `byCollection.stockBalances.writes`
 - `byCollection.stockMovements.reads`
@@ -1919,10 +2227,13 @@ Stored but untyped:
 - `byCollection.storageLocations.aggregationReads`
 - `byCollection.storageLocations.reads`
 - `byCollection.storageLocations.writes`
+- `byCollection.subscriptionPlans.deletes`
 - `byCollection.subscriptionPlans.reads`
 - `byCollection.subscriptionPlans.writes`
+- `byCollection.tasks.deletes`
 - `byCollection.tasks.reads`
 - `byCollection.tasks.writes`
+- `byCollection.taxRegimes.reads`
 - `byCollection.teams.reads`
 - `byCollection.teams.writes`
 - `byCollection.uniqueKeys.deletes`
@@ -1933,6 +2244,8 @@ Stored but untyped:
 - `byCollection.usageCounterShards.reads`
 - `byCollection.usageCounterShards.writes`
 - `byCollection.usageRateCards.reads`
+- `byCollection.userUsageDaily.reads`
+- `byCollection.users.aggregationReads`
 - `byCollection.users.reads`
 - `byCollection.users.writes`
 - `byCollection.users/{id}/devices.reads`
@@ -1940,45 +2253,81 @@ Stored but untyped:
 - `byCollection.vendors.aggregationReads`
 - `byCollection.vendors.reads`
 - `byCollection.vendors.writes`
-- `hourly.07.aggregationReads`
-- `hourly.07.calls`
-- `hourly.07.reads`
-- `hourly.07.writes`
-- `hourly.08.aggregationReads`
-- `hourly.08.calls`
-- `hourly.08.deletes`
-- `hourly.08.reads`
-- `hourly.08.writes`
-- `targets.EVjBquUxQnPEiN50gAMk.calls`
-- `targets.EVjBquUxQnPEiN50gAMk.reads`
-- `targets.EVjBquUxQnPEiN50gAMk.writes`
-- `targets.KPcSmduEaVZmYM0CMN7W.calls`
-- `targets.KPcSmduEaVZmYM0CMN7W.reads`
-- `targets.KPcSmduEaVZmYM0CMN7W.writes`
+- `clientReported.locationPings`
+- `clientReported.storageOperations`
+- `hourly.06.aggregationReads`
+- `hourly.06.calls`
+- `hourly.06.deletes`
+- `hourly.06.reads`
+- `hourly.06.writes`
+- `targets.9QNDptxpl3blX3Tw9QQH.calls`
+- `targets.9QNDptxpl3blX3Tw9QQH.reads`
+- `targets.9QNDptxpl3blX3Tw9QQH.writes`
+- `targets.BAXmRwF9dpd5jlqKgwNS.calls`
+- `targets.BAXmRwF9dpd5jlqKgwNS.reads`
+- `targets.BAXmRwF9dpd5jlqKgwNS.writes`
+- `targets.Bzr5w5DbLiyeFxUuFwrI.calls`
+- `targets.Bzr5w5DbLiyeFxUuFwrI.reads`
+- `targets.Bzr5w5DbLiyeFxUuFwrI.writes`
+- `targets.Dsax2nGz6FfTOFB3Hzc6.calls`
+- `targets.Dsax2nGz6FfTOFB3Hzc6.reads`
+- `targets.Dsax2nGz6FfTOFB3Hzc6.writes`
+- `targets.GR5GgswZcaykCzCrTXqs.calls`
+- `targets.GR5GgswZcaykCzCrTXqs.reads`
+- `targets.GR5GgswZcaykCzCrTXqs.writes`
+- `targets.JcAg2udd9BrxjL1tuLrL.calls`
+- `targets.JcAg2udd9BrxjL1tuLrL.writes`
+- `targets.QpRe7nfd1tAqLwXzdq41.calls`
+- `targets.QpRe7nfd1tAqLwXzdq41.reads`
+- `targets.QpRe7nfd1tAqLwXzdq41.writes`
+- `targets.UMGm38ZwYtr0PJK5SuUm.calls`
+- `targets.UMGm38ZwYtr0PJK5SuUm.reads`
+- `targets.UMGm38ZwYtr0PJK5SuUm.writes`
+- `targets.ZkfEkHgv3IBlCZdOMpL8.calls`
+- `targets.ZkfEkHgv3IBlCZdOMpL8.reads`
+- `targets.ZkfEkHgv3IBlCZdOMpL8.writes`
+- `targets.gVpde9SBCkGFD3mz7bjk.calls`
+- `targets.gVpde9SBCkGFD3mz7bjk.reads`
+- `targets.gVpde9SBCkGFD3mz7bjk.writes`
+- `targets.gjmisIgIhjmX1BDTsTwh.calls`
+- `targets.gjmisIgIhjmX1BDTsTwh.reads`
+- `targets.gjmisIgIhjmX1BDTsTwh.writes`
+- `targets.jjuscosBdAXLbVcN8vRP.calls`
+- `targets.jjuscosBdAXLbVcN8vRP.reads`
+- `targets.jjuscosBdAXLbVcN8vRP.writes`
+- `targets.lQ9p0fKAzG37PIcmSE7K.calls`
 - `targets.platform.calls`
 - `targets.platform.reads`
 - `targets.platform.writes`
-- `targets.yekRSQZnwFC8wJP0bddi.calls`
-- `targets.yekRSQZnwFC8wJP0bddi.reads`
-- `targets.yekRSQZnwFC8wJP0bddi.writes`
-- `targets.zhSpARKTu7iQ4jxJTDyz.calls`
-- `targets.zhSpARKTu7iQ4jxJTDyz.reads`
-- `targets.zhSpARKTu7iQ4jxJTDyz.writes`
+- `targets.q4rzllru3FYg6vQDIsdE.calls`
+- `targets.q4rzllru3FYg6vQDIsdE.reads`
+- `targets.q4rzllru3FYg6vQDIsdE.writes`
+- `targets.rcI5QEbGWgjLJkDMhQ4f.calls`
+- `targets.rcI5QEbGWgjLJkDMhQ4f.reads`
+- `targets.rcI5QEbGWgjLJkDMhQ4f.writes`
+- `targets.ysjjApLtxa7UzYvsjm9j.calls`
+- `targets.ysjjApLtxa7UzYvsjm9j.reads`
+- `targets.ysjjApLtxa7UzYvsjm9j.writes`
 
 ## `organizationUsageMonthly` (`OrganizationUsageMonthlyDoc`)
 
-Typed leaf paths: 4. Documents observed in the census: 0. Stored but untyped paths: 0.
+Typed leaf paths: 4. Documents observed in the census: 2. Stored but untyped paths: 2.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
-| `organizationId` | `string` | yes | public | no | Id of the organization (tenant) the record belongs to. |
-| `month` | `string` | yes | public | no | YYYY-MM |
+| `organizationId` | `string` | yes | public | yes | Id of the organization (tenant) the record belongs to. |
+| `month` | `string` | yes | public | yes | YYYY-MM |
 | `clientReported` | `Partial<ServiceUsageCounts>` | no | public | no | untrusted client estimates |
-| `updatedAt` | `string | undefined` | no | public | no | Time the record was last changed (ISO-8601). |
+| `updatedAt` | `string | undefined` | no | public | yes | Time the record was last changed (ISO-8601). |
+
+Stored but untyped:
+
+- `clientReported.locationPings`
+- `clientReported.storageOperations`
 
 ## `organizations` (`OrganizationDoc`)
 
-Typed leaf paths: 120. Documents observed in the census: 17. Stored but untyped paths: 44.
+Typed leaf paths: 121. Documents observed in the census: 66. Stored but untyped paths: 56.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1998,12 +2347,12 @@ Typed leaf paths: 120. Documents observed in the census: 17. Stored but untyped 
 | `status` | `EntityStatus` | yes | public | yes | Lifecycle status of the record (values: the field's enum). |
 | `planId` | `string` | yes | public | yes | Reference to subscriptionPlans/{planId} |
 | `moduleToggles` | `Record<string, boolean>` | yes | public | yes | Per-tenant feature switches |
-| `image.path` | `string` | yes | public | no | Storage path of the processed image. |
-| `image.contentType` | `"image/jpeg" | "image/png" | "image/webp"` | yes | public | no | MIME type of the stored image. |
-| `image.width` | `number` | yes | public | no | Image width in pixels. |
-| `image.height` | `number` | yes | public | no | Image height in pixels. |
-| `image.sizeBytes` | `number` | yes | public | no | Size of the stored image in bytes. |
-| `image.updatedAt` | `string` | yes | public | no | Time the image was attached (ISO-8601). |
+| `image.path` | `string` | yes | public | yes | Storage path of the processed image. |
+| `image.contentType` | `"image/jpeg" | "image/png" | "image/webp"` | yes | public | yes | MIME type of the stored image. |
+| `image.width` | `number` | yes | public | yes | Image width in pixels. |
+| `image.height` | `number` | yes | public | yes | Image height in pixels. |
+| `image.sizeBytes` | `number` | yes | public | yes | Size of the stored image in bytes. |
+| `image.updatedAt` | `string` | yes | public | yes | Time the image was attached (ISO-8601). |
 | `image.thumbnailPath` | `string | undefined` | no | public | no | thumbnailPath: storage path of the smaller thumbnail asset (products only). |
 | `ownerStatus` | `"pending" | "active" | undefined` | no | public | yes | Whether the organization's Owner account is provisioned (active) or still pending. |
 | `ownerUserId` | `string | null | undefined` | no | public | yes | Firebase Auth uid of the organization's Owner (null until an Owner is provisioned). |
@@ -2021,6 +2370,7 @@ Typed leaf paths: 120. Documents observed in the census: 17. Stored but untyped 
 | `sharingPolicies.deliveries` | `"organization_shared" | "branch_scoped" | undefined` | no | public | yes | Whether deliveries are shared by all branches or kept per branch. |
 | `usageLimitOverrides` | `Partial<Record<keyof ServiceUsageCounts, MetricLimitConfig>>` | no | public | no | Super Admin per-tenant usage limit overrides |
 | `showCostToTenant` | `boolean | undefined` | no | public | no | D-25: tenants see the cost estimate (labelled) only when the Super Admin enables it |
+| `supportAccessExpiresAt` | `string | null | undefined` | no | public | no | BC3 / MG-40: Tenant-granted expiring support access grant for Super Admin |
 | `subscriptionStatus` | `SubscriptionStatus | undefined` | no | public | yes | State of the organization's subscription. |
 | `subscriptionStartsAt` | `string | undefined` | no | public | yes | Time the subscription starts (ISO-8601). |
 | `subscriptionExpiresAt` | `string | undefined` | no | public | yes | End of expiry date in `timezone` |
@@ -2113,17 +2463,23 @@ Stored but untyped:
 - `moduleToggles.reports`
 - `moduleToggles.sales`
 - `moduleToggles.staff`
+- `moduleToggles.tasks`
+- `settings.approvals.allowSelfApproval`
+- `settings.approvals.modules.account_transfer`
 - `settings.approvals.modules.expense`
 - `settings.approvals.modules.purchase`
 - `settings.approvals.modules.return`
 - `settings.approvals.modules.sale`
 - `settings.approvals.modules.stock_adjustment`
+- `settings.approvals.modules.stock_transfer`
+- `settings.approvals.thresholds.k1`
 - `settings.businessConfig.productFields.alternateUnits`
 - `settings.businessConfig.productFields.batch`
 - `settings.businessConfig.productFields.expiry`
 - `settings.businessConfig.productFields.jewellery`
 - `settings.businessConfig.productFields.serial`
 - `settings.businessConfig.productFields.variants`
+- `settings.numbering.k1`
 - `usageLimitOverrides.firestoreReads.dailyLimit`
 - `usageLimitOverrides.firestoreReads.enabled`
 - `usageLimitOverrides.firestoreReads.enforcementMode`
@@ -2136,6 +2492,7 @@ Stored but untyped:
 - `usageLimitOverrides.firestoreWrites.hardThresholdPercent`
 - `usageLimitOverrides.firestoreWrites.monthlyLimit`
 - `usageLimitOverrides.firestoreWrites.warningThresholdPercent`
+- `usageLimitOverrides.firestoreWrites.weeklyLimit`
 - `usageLimitOverrides.functionsInvocations.dailyLimit`
 - `usageLimitOverrides.functionsInvocations.enabled`
 - `usageLimitOverrides.functionsInvocations.enforcementMode`
@@ -2149,10 +2506,15 @@ Stored but untyped:
 - `usageLimitOverrides.k1.monthlyLimit`
 - `usageLimitOverrides.k1.warningThresholdPercent`
 - `usageLimitOverrides.k1.weeklyLimit`
+- `usageLimitOverrides.locationPings.dailyLimit`
+- `usageLimitOverrides.locationPings.enabled`
+- `usageLimitOverrides.locationPings.enforcementMode`
+- `usageLimitOverrides.locationPings.hardThresholdPercent`
+- `usageLimitOverrides.locationPings.warningThresholdPercent`
 
 ## `outflows` (`OutflowDoc`)
 
-Typed leaf paths: 95. Documents observed in the census: 7. Stored but untyped paths: 0.
+Typed leaf paths: 95. Documents observed in the census: 38. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2168,8 +2530,8 @@ Typed leaf paths: 95. Documents observed in the census: 7. Stored but untyped pa
 | `kind` | `OutflowKind` | yes | public | yes | purchase or expense |
 | `status` | `OutflowStatus | "pending_approval" | "rejected"` | yes | public | yes | draft, confirmed, voided (approval state lives here) |
 | `approvalNote` | `string | null | undefined` | no | public | no | Note recorded with the approval decision. |
-| `requestedPaidAmount` | `number | undefined` | no | public | no | Paid amount asked for in the approval request. |
-| `requestedPaymentMethod` | `PaymentMethod | undefined` | no | public | no | Payment method asked for in the approval request. |
+| `requestedPaidAmount` | `number | undefined` | no | public | yes | Paid amount asked for in the approval request. |
+| `requestedPaymentMethod` | `PaymentMethod | undefined` | no | public | yes | Payment method asked for in the approval request. |
 | `docDate` | `string` | yes | public | yes | ISO 8601 date-time of the purchase/expense (not date only) |
 | `payeeType` | `"other" | "vendor" | "employee" | undefined` | no | public | yes | Who is paid (vendor, employee or other). |
 | `payeeMembershipId` | `string | null | undefined` | no | public | yes | Employee-linked expense (salary, advance, reimbursement) |
@@ -2179,7 +2541,7 @@ Typed leaf paths: 95. Documents observed in the census: 7. Stored but untyped pa
 | `createdByMembershipId` | `string | null | undefined` | no | public | yes | Membership id of the member who created the record. |
 | `vendorId` | `string | null | undefined` | no | public | yes | Reference to vendors/{vendorId} |
 | `payee` | `string | undefined` | no | public | yes | Free-text counterparty only when there is no vendorId / payeeMembershipId |
-| `recurringTemplateId` | `string | undefined` | no | public | no | recurringExpenses/{templateId} that generated this expense |
+| `recurringTemplateId` | `string | undefined` | no | public | yes | recurringExpenses/{templateId} that generated this expense |
 | `invoiceNumber` | `string | undefined` | no | public | yes | External vendor invoice # |
 | `dueDate` | `string | null | undefined` | no | public | yes | Date payment is due (YYYY-MM-DD). |
 | `lines[].lineId` | `string` | yes | public | yes | Stable line id ("L1", …): returns, stock movements and price history reference it |
@@ -2196,7 +2558,7 @@ Typed leaf paths: 95. Documents observed in the census: 7. Stored but untyped pa
 | `lines[].addToStock` | `boolean` | yes | public | yes | Whether the received quantity is added to stock. |
 | `lines[].batch` | `string | null | undefined` | no | public | yes | Batch or lot number. |
 | `lines[].expiryDate` | `string | null | undefined` | no | public | yes | Expiry date of the batch received on this line (YYYY-MM-DD). |
-| `lines[].returnedQty` | `number | undefined` | no | public | no | Quantity already returned from this line. |
+| `lines[].returnedQty` | `number | undefined` | no | public | yes | Quantity already returned from this line. |
 | `lines[].conversionFactor` | `number | undefined` | no | public | yes | Base units per line unit, frozen at receipt |
 | `lines[].baseQuantity` | `number | undefined` | no | public | yes | Good units added to stock, in base unit |
 | `lines[].damagedQuantity` | `number | undefined` | no | public | yes | Damaged on receipt (line unit): billed, never stocked, written off |
@@ -2237,9 +2599,9 @@ Typed leaf paths: 95. Documents observed in the census: 7. Stored but untyped pa
 | `verifiedBy` | `string | undefined` | no | public | no |  |
 | `approvedAt` | `string | undefined` | no | public | no | Time the record was approved (ISO-8601). |
 | `approvedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the approver. |
-| `rejectedAt` | `string | undefined` | no | public | no | Time the record was rejected (ISO-8601). |
-| `rejectedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who rejected it. |
-| `approvalReason` | `string | null | undefined` | no | public | no | Reason the approver gave. |
+| `rejectedAt` | `string | undefined` | no | public | yes | Time the record was rejected (ISO-8601). |
+| `rejectedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who rejected it. |
+| `approvalReason` | `string | null | undefined` | no | public | yes | Reason the approver gave. |
 | `postedAt` | `string | undefined` | no | public | no |  |
 | `postedBy` | `string | undefined` | no | public | no |  |
 | `reversedAt` | `string | undefined` | no | public | no |  |
@@ -2248,13 +2610,13 @@ Typed leaf paths: 95. Documents observed in the census: 7. Stored but untyped pa
 | `cancelledAt` | `string | undefined` | no | public | no |  |
 | `cancelledBy` | `string | undefined` | no | public | no |  |
 | `cancelReason` | `string | undefined` | no | public | no |  |
-| `voidedAt` | `string | undefined` | no | public | no | Time the document was voided (ISO-8601). |
-| `voidedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who voided the document. |
-| `voidReason` | `string | undefined` | no | public | no | Reason the document was voided. |
+| `voidedAt` | `string | undefined` | no | public | yes | Time the document was voided (ISO-8601). |
+| `voidedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who voided the document. |
+| `voidReason` | `string | undefined` | no | public | yes | Reason the document was voided. |
 
 ## `paymentProcessingFees` (`PaymentProcessingFeeDoc`)
 
-Typed leaf paths: 33. Documents observed in the census: 1. Stored but untyped paths: 0.
+Typed leaf paths: 33. Documents observed in the census: 2. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2294,7 +2656,7 @@ Typed leaf paths: 33. Documents observed in the census: 1. Stored but untyped pa
 
 ## `payments` (`PaymentDoc`)
 
-Typed leaf paths: 48. Documents observed in the census: 18. Stored but untyped paths: 0.
+Typed leaf paths: 48. Documents observed in the census: 60. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2308,7 +2670,7 @@ Typed leaf paths: 48. Documents observed in the census: 18. Stored but untyped p
 | `direction` | `PaymentDirection` | yes | public | yes | in (collection from customer) or out (payment to vendor) |
 | `partyType` | `PartyType` | yes | public | yes | customer or vendor |
 | `partyId` | `string | null | undefined` | no | public | yes | ID reference to customer or vendor |
-| `partyName` | `string | undefined` | no | public | no | Only for a standalone payment with no partyId and no referenceId (owned free text) |
+| `partyName` | `string | undefined` | no | public | yes | Only for a standalone payment with no partyId and no referenceId (owned free text) |
 | `amount` | `number` | yes | public | yes | Amount in the currency's major unit. |
 | `method` | `PaymentMethod` | yes | public | yes |  |
 | `referenceId` | `string | null | undefined` | no | public | yes | billId or outflowId (ID reference only!) |
@@ -2322,8 +2684,8 @@ Typed leaf paths: 48. Documents observed in the census: 18. Stored but untyped p
 | `status` | `"voided" | "completed"` | yes | public | yes | Lifecycle status of the record (values: the field's enum). |
 | `createdAt` | `string` | yes | public | yes | Time the record was created (ISO-8601). |
 | `createdBy` | `string` | yes | public | yes | Firebase Auth uid of the user who created the record. |
-| `updatedAt` | `string | undefined` | no | public | no | Time the record was last changed (ISO-8601). |
-| `updatedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who last changed the record. |
+| `updatedAt` | `string | undefined` | no | public | yes | Time the record was last changed (ISO-8601). |
+| `updatedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who last changed the record. |
 | `submittedAt` | `string | undefined` | no | public | no |  |
 | `submittedBy` | `string | undefined` | no | public | no |  |
 | `reviewedAt` | `string | undefined` | no | public | no |  |
@@ -2343,13 +2705,13 @@ Typed leaf paths: 48. Documents observed in the census: 18. Stored but untyped p
 | `cancelledAt` | `string | undefined` | no | public | no |  |
 | `cancelledBy` | `string | undefined` | no | public | no |  |
 | `cancelReason` | `string | undefined` | no | public | no |  |
-| `voidedAt` | `string | undefined` | no | public | no | Time the document was voided (ISO-8601). |
-| `voidedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who voided the document. |
-| `voidReason` | `string | undefined` | no | public | no | Reason the document was voided. |
+| `voidedAt` | `string | undefined` | no | public | yes | Time the document was voided (ISO-8601). |
+| `voidedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who voided the document. |
+| `voidReason` | `string | undefined` | no | public | yes | Reason the document was voided. |
 
 ## `permissionCatalog` (`PermissionCatalogDoc`)
 
-Typed leaf paths: 4. Documents observed in the census: 145. Stored but untyped paths: 0.
+Typed leaf paths: 4. Documents observed in the census: 149. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2364,7 +2726,7 @@ Typed leaf paths: 0. Documents observed in the census: 0. Stored but untyped pat
 
 ## `platformSettings` — no document interface
 
-Typed leaf paths: 0. Documents observed in the census: 1. Stored but untyped paths: 18.
+Typed leaf paths: 0. Documents observed in the census: 1. Stored but untyped paths: 8.
 
 Stored but untyped:
 
@@ -2376,20 +2738,10 @@ Stored but untyped:
 - `needsInfoReminderDays`
 - `reopenWindowDays`
 - `requestsEnabled`
-- `sla.high.firstResponseHours`
-- `sla.high.resolutionHours`
-- `sla.low.firstResponseHours`
-- `sla.low.resolutionHours`
-- `sla.normal.firstResponseHours`
-- `sla.normal.resolutionHours`
-- `sla.urgent.firstResponseHours`
-- `sla.urgent.resolutionHours`
-- `updatedAt`
-- `updatedBy`
 
 ## `products` (`ProductDoc`)
 
-Typed leaf paths: 68. Documents observed in the census: 21. Stored but untyped paths: 3.
+Typed leaf paths: 68. Documents observed in the census: 70. Stored but untyped paths: 6.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2464,13 +2816,16 @@ Typed leaf paths: 68. Documents observed in the census: 21. Stored but untyped p
 
 Stored but untyped:
 
+- `variantAttributes.colour`
 - `variantAttributes.frame`
 - `variantAttributes.k1`
+- `variantAttributes.size`
+- `variantAttributes.storage`
 - `variantAttributes.wheels`
 
 ## `recurringExpenses` (`RecurringExpenseDoc`)
 
-Typed leaf paths: 35. Documents observed in the census: 1. Stored but untyped paths: 0.
+Typed leaf paths: 35. Documents observed in the census: 3. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2478,7 +2833,7 @@ Typed leaf paths: 35. Documents observed in the census: 1. Stored but untyped pa
 | `branchId` | `string` | yes | public | yes | Id of the branch the record belongs to or applies to. |
 | `endOn` | `string | null | undefined` | no | public | yes |  |
 | `nextRunOn` | `string` | yes | public | yes | calendar date (organization timezone) of the next generation |
-| `lastGeneratedPeriod` | `string | undefined` | no | public | no | YYYY-MM (monthly) or YYYY-MM-DD (weekly) |
+| `lastGeneratedPeriod` | `string | undefined` | no | public | yes | YYYY-MM (monthly) or YYYY-MM-DD (weekly) |
 | `isActive` | `boolean` | yes | public | yes | Whether the record is active (inactive records are kept, not deleted). |
 | `createdBy` | `string` | yes | public | yes | Firebase Auth uid of the user who created the record. |
 | `createdByMembershipId` | `string | null` | no | public | yes | Membership id of the member who created the record. |
@@ -2512,11 +2867,10 @@ Typed leaf paths: 35. Documents observed in the census: 1. Stored but untyped pa
 
 ## `requests` (`RequestDoc`)
 
-Typed leaf paths: 53. Documents observed in the census: 8. Stored but untyped paths: 33.
+Typed leaf paths: 51. Documents observed in the census: 23. Stored but untyped paths: 43.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
-| `requestId` | `string` | yes | public | yes | Id of the approval request or client request this entry belongs to. |
 | `requestNumber` | `string` | yes | public | yes | REQ-YYYY-000123 |
 | `audience` | `"organization" | RequestAudience | "platform"` | yes | public | yes |  |
 | `category` | `RequestCategory` | yes | public | yes |  |
@@ -2565,7 +2919,6 @@ Typed leaf paths: 53. Documents observed in the census: 8. Stored but untyped pa
 | `appliedAt` | `string | null | undefined` | no | public | yes |  |
 | `appliedBy` | `string | null | undefined` | no | public | yes |  |
 | `applyResult` | `Record<string, unknown>` | no | public | no |  |
-| `organizationName` | `string` | yes | public | yes | Name of the organization. |
 | `requesterName` | `string` | yes | public | yes |  |
 | `currentPlanName` | `string | null | undefined` | no | public | yes |  |
 | `requestedPlanName` | `string | null | undefined` | no | public | yes |  |
@@ -2578,6 +2931,10 @@ Stored but untyped:
 - `applyResult.metric`
 - `applyResult.moduleKey`
 - `applyResult.newPlanId`
+- `applyResult.overriddenBlockers[].allowed`
+- `applyResult.overriddenBlockers[].code`
+- `applyResult.overriddenBlockers[].current`
+- `applyResult.overriddenBlockers[].message`
 - `applyResult.period`
 - `applyResult.previousPlanId`
 - `assignee`
@@ -2587,28 +2944,34 @@ Stored but untyped:
 - `details.area`
 - `details.billingPeriod`
 - `details.description`
+- `details.detailsText`
 - `details.diagnostics.appVersion`
 - `details.diagnostics.platform`
 - `details.diagnostics.route`
 - `details.diagnosticsOptIn`
 - `details.expected`
+- `details.field`
 - `details.metric`
 - `details.moduleKey`
 - `details.period`
 - `details.permissionKeys[]`
+- `details.proposedValue`
+- `details.question`
 - `details.reason`
 - `details.requestedLimit`
 - `details.requestedPlanId`
 - `details.severity`
 - `details.stepsToReproduce`
 - `details.suspectedImpact`
+- `details.topic`
 - `relatedEntity`
+- `requestId`
 - `requester.email`
 - `requester.role`
 
 ## `returns` (`ReturnDoc`)
 
-Typed leaf paths: 54. Documents observed in the census: 2. Stored but untyped paths: 0.
+Typed leaf paths: 54. Documents observed in the census: 10. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2638,7 +3001,7 @@ Typed leaf paths: 54. Documents observed in the census: 2. Stored but untyped pa
 | `requestedItems[].disposition` | `ReturnDisposition` | yes | public | no |  |
 | `requestedItems[].serialNumbers[]` | `string` | yes | public | no |  |
 | `approvalNote` | `string | null | undefined` | no | public | no | Note recorded with the approval decision. |
-| `notes` | `string | undefined` | no | public | no | Free-text notes. |
+| `notes` | `string | undefined` | no | public | yes | Free-text notes. |
 | `createdAt` | `string` | yes | public | yes | Time the record was created (ISO-8601). |
 | `createdBy` | `string` | yes | public | yes | Firebase Auth uid of the user who created the record. |
 | `createdByMembershipId` | `string | null | undefined` | no | public | yes | Membership id of the member who created the record. |
@@ -2650,11 +3013,11 @@ Typed leaf paths: 54. Documents observed in the census: 2. Stored but untyped pa
 | `reviewedBy` | `string | undefined` | no | public | no |  |
 | `verifiedAt` | `string | undefined` | no | public | no |  |
 | `verifiedBy` | `string | undefined` | no | public | no |  |
-| `approvedAt` | `string | undefined` | no | public | no | Time the record was approved (ISO-8601). |
-| `approvedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the approver. |
+| `approvedAt` | `string | undefined` | no | public | yes | Time the record was approved (ISO-8601). |
+| `approvedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the approver. |
 | `rejectedAt` | `string | undefined` | no | public | no | Time the record was rejected (ISO-8601). |
 | `rejectedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who rejected it. |
-| `approvalReason` | `string | null | undefined` | no | public | no | Reason the approver gave. |
+| `approvalReason` | `string | null | undefined` | no | public | yes | Reason the approver gave. |
 | `postedAt` | `string | undefined` | no | public | no |  |
 | `postedBy` | `string | undefined` | no | public | no |  |
 | `reversedAt` | `string | undefined` | no | public | no |  |
@@ -2669,7 +3032,7 @@ Typed leaf paths: 54. Documents observed in the census: 2. Stored but untyped pa
 
 ## `roles` (`RoleDoc`)
 
-Typed leaf paths: 10. Documents observed in the census: 9. Stored but untyped paths: 0.
+Typed leaf paths: 10. Documents observed in the census: 10. Stored but untyped paths: 1.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2684,9 +3047,13 @@ Typed leaf paths: 10. Documents observed in the census: 9. Stored but untyped pa
 | `updatedAt` | `string | undefined` | no | public | yes | Time the record was last changed (ISO-8601). |
 | `updatedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who last changed the record. |
 
+Stored but untyped:
+
+- `migration`
+
 ## `serials` (`SerialDoc`)
 
-Typed leaf paths: 15. Documents observed in the census: 28. Stored but untyped paths: 0.
+Typed leaf paths: 15. Documents observed in the census: 35. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2708,36 +3075,36 @@ Typed leaf paths: 15. Documents observed in the census: 28. Stored but untyped p
 
 ## `stockAdjustmentRequests` (`StockAdjustmentRequestDoc`)
 
-Typed leaf paths: 37. Documents observed in the census: 0. Stored but untyped paths: 0.
+Typed leaf paths: 37. Documents observed in the census: 2. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
-| `organizationId` | `string` | yes | public | no | Id of the organization (tenant) the record belongs to. |
-| `branchId` | `string` | yes | public | no | Id of the branch the record belongs to or applies to. |
-| `productId` | `string` | yes | public | no | Id of the product. |
-| `quantity` | `number` | yes | public | no | signed, base unit |
-| `reason` | `string` | yes | public | no | Reason code or text explaining the outcome. |
-| `reasonCode` | `StockAdjustmentReason | undefined` | no | public | no |  |
+| `organizationId` | `string` | yes | public | yes | Id of the organization (tenant) the record belongs to. |
+| `branchId` | `string` | yes | public | yes | Id of the branch the record belongs to or applies to. |
+| `productId` | `string` | yes | public | yes | Id of the product. |
+| `quantity` | `number` | yes | public | yes | signed, base unit |
+| `reason` | `string` | yes | public | yes | Reason code or text explaining the outcome. |
+| `reasonCode` | `StockAdjustmentReason | undefined` | no | public | yes |  |
 | `serialNumbers[]` | `string` | yes | public | no | owned request data for serial-tracked products |
-| `status` | `"pending_approval" | "rejected" | "approved"` | yes | public | no | Lifecycle status of the record (values: the field's enum). |
-| `approvalNote` | `string | null | undefined` | no | public | no | Note recorded with the approval decision. |
-| `movementId` | `string | undefined` | no | public | no |  |
-| `createdAt` | `string` | yes | public | no | Time the record was created (ISO-8601). |
-| `createdBy` | `string` | yes | public | no | Firebase Auth uid of the user who created the record. |
-| `createdByMembershipId` | `string | null | undefined` | no | public | no | Membership id of the member who created the record. |
-| `updatedAt` | `string | undefined` | no | public | no | Time the record was last changed (ISO-8601). |
-| `updatedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who last changed the record. |
+| `status` | `"pending_approval" | "rejected" | "approved"` | yes | public | yes | Lifecycle status of the record (values: the field's enum). |
+| `approvalNote` | `string | null | undefined` | no | public | yes | Note recorded with the approval decision. |
+| `movementId` | `string | undefined` | no | public | yes |  |
+| `createdAt` | `string` | yes | public | yes | Time the record was created (ISO-8601). |
+| `createdBy` | `string` | yes | public | yes | Firebase Auth uid of the user who created the record. |
+| `createdByMembershipId` | `string | null | undefined` | no | public | yes | Membership id of the member who created the record. |
+| `updatedAt` | `string | undefined` | no | public | yes | Time the record was last changed (ISO-8601). |
+| `updatedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who last changed the record. |
 | `submittedAt` | `string | undefined` | no | public | no |  |
 | `submittedBy` | `string | undefined` | no | public | no |  |
 | `reviewedAt` | `string | undefined` | no | public | no |  |
 | `reviewedBy` | `string | undefined` | no | public | no |  |
 | `verifiedAt` | `string | undefined` | no | public | no |  |
 | `verifiedBy` | `string | undefined` | no | public | no |  |
-| `approvedAt` | `string | undefined` | no | public | no | Time the record was approved (ISO-8601). |
-| `approvedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the approver. |
-| `rejectedAt` | `string | undefined` | no | public | no | Time the record was rejected (ISO-8601). |
-| `rejectedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who rejected it. |
-| `approvalReason` | `string | null | undefined` | no | public | no | Reason the approver gave. |
+| `approvedAt` | `string | undefined` | no | public | yes | Time the record was approved (ISO-8601). |
+| `approvedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the approver. |
+| `rejectedAt` | `string | undefined` | no | public | yes | Time the record was rejected (ISO-8601). |
+| `rejectedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who rejected it. |
+| `approvalReason` | `string | null | undefined` | no | public | yes | Reason the approver gave. |
 | `postedAt` | `string | undefined` | no | public | no |  |
 | `postedBy` | `string | undefined` | no | public | no |  |
 | `reversedAt` | `string | undefined` | no | public | no |  |
@@ -2752,7 +3119,7 @@ Typed leaf paths: 37. Documents observed in the census: 0. Stored but untyped pa
 
 ## `stockBalances` (`StockBalanceDoc`)
 
-Typed leaf paths: 8. Documents observed in the census: 30. Stored but untyped paths: 0.
+Typed leaf paths: 8. Documents observed in the census: 63. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2760,14 +3127,14 @@ Typed leaf paths: 8. Documents observed in the census: 30. Stored but untyped pa
 | `branchId` | `string` | yes | public | yes | Id of the branch the record belongs to or applies to. |
 | `productId` | `string` | yes | public | yes | Id of the product. |
 | `currentStock` | `number` | yes | public | yes | R3 cache of SUM(stockMovements.quantity) for (org, branch, product) |
-| `allocatedStock` | `number | undefined` | no | public | no | R3 cache of open sales-order reservations (available = current - allocated, computed) |
+| `allocatedStock` | `number | undefined` | no | public | yes | R3 cache of open sales-order reservations (available = current - allocated, computed) |
 | `inTransitQty` | `number | undefined` | no | public | yes | Physical inventory in transit between branches |
 | `updatedAt` | `string` | yes | public | yes | Time the record was last changed (ISO-8601). |
 | `updatedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who last changed the record. |
 
 ## `stockMovements` (`StockMovementDoc`)
 
-Typed leaf paths: 15. Documents observed in the census: 69. Stored but untyped paths: 0.
+Typed leaf paths: 15. Documents observed in the census: 159. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2789,7 +3156,7 @@ Typed leaf paths: 15. Documents observed in the census: 69. Stored but untyped p
 
 ## `stockTransfers` (`StockTransferDoc`)
 
-Typed leaf paths: 53. Documents observed in the census: 4. Stored but untyped paths: 0.
+Typed leaf paths: 53. Documents observed in the census: 6. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2849,7 +3216,7 @@ Typed leaf paths: 53. Documents observed in the census: 4. Stored but untyped pa
 
 ## `storageLocations` (`StorageLocationDoc`)
 
-Typed leaf paths: 27. Documents observed in the census: 7. Stored but untyped paths: 0.
+Typed leaf paths: 27. Documents observed in the census: 8. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2883,7 +3250,7 @@ Typed leaf paths: 27. Documents observed in the census: 7. Stored but untyped pa
 
 ## `subscriptionPlans` (`SubscriptionPlanDoc`)
 
-Typed leaf paths: 18. Documents observed in the census: 9. Stored but untyped paths: 14.
+Typed leaf paths: 18. Documents observed in the census: 13. Stored but untyped paths: 16.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2904,10 +3271,11 @@ Typed leaf paths: 18. Documents observed in the census: 9. Stored but untyped pa
 | `createdAt` | `string | undefined` | no | public | yes | Time the record was created (ISO-8601). |
 | `createdBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who created the record. |
 | `updatedAt` | `string | undefined` | no | public | yes | Time the record was last changed (ISO-8601). |
-| `updatedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who last changed the record. |
+| `updatedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who last changed the record. |
 
 Stored but untyped:
 
+- `moduleFlags.analytics`
 - `moduleFlags.billing`
 - `moduleFlags.customers`
 - `moduleFlags.deliveries`
@@ -2916,6 +3284,7 @@ Stored but untyped:
 - `moduleFlags.expenses`
 - `moduleFlags.inventory`
 - `moduleFlags.k1`
+- `moduleFlags.liveLocation`
 - `moduleFlags.purchases`
 - `moduleFlags.reports`
 - `moduleFlags.returns`
@@ -2925,7 +3294,7 @@ Stored but untyped:
 
 ## `tasks` (`TaskDoc`)
 
-Typed leaf paths: 16. Documents observed in the census: 1. Stored but untyped paths: 0.
+Typed leaf paths: 16. Documents observed in the census: 2. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2972,7 +3341,7 @@ Typed leaf paths: 17. Documents observed in the census: 10. Stored but untyped p
 
 ## `teams` (`TeamDoc`)
 
-Typed leaf paths: 9. Documents observed in the census: 2. Stored but untyped paths: 0.
+Typed leaf paths: 9. Documents observed in the census: 6. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2988,7 +3357,7 @@ Typed leaf paths: 9. Documents observed in the census: 2. Stored but untyped pat
 
 ## `uniqueKeys` (`UniqueKeyDoc`)
 
-Typed leaf paths: 5. Documents observed in the census: 85. Stored but untyped paths: 0.
+Typed leaf paths: 5. Documents observed in the census: 207. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -3000,7 +3369,7 @@ Typed leaf paths: 5. Documents observed in the census: 85. Stored but untyped pa
 
 ## `units` (`UnitDoc`)
 
-Typed leaf paths: 12. Documents observed in the census: 8. Stored but untyped paths: 0.
+Typed leaf paths: 12. Documents observed in the census: 11. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -3019,7 +3388,7 @@ Typed leaf paths: 12. Documents observed in the census: 8. Stored but untyped pa
 
 ## `usageCounterShards` (`UsageCounterShardDoc`)
 
-Typed leaf paths: 6. Documents observed in the census: 81. Stored but untyped paths: 25.
+Typed leaf paths: 6. Documents observed in the census: 325. Stored but untyped paths: 43.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -3032,31 +3401,49 @@ Typed leaf paths: 6. Documents observed in the census: 81. Stored but untyped pa
 
 Stored but untyped:
 
-- `branches.05twk9jfVna7Qyp79oIH.2026-11-18.firestoreWrites`
-- `branches.05twk9jfVna7Qyp79oIH.2026-11-18.functionsInvocations`
-- `branches.branch_abu_dhabi.2026-11-18.firestoreWrites`
-- `branches.branch_abu_dhabi.2026-11-18.functionsInvocations`
-- `branches.branch_riffa.2026-11-18.firestoreWrites`
-- `branches.branch_riffa.2026-11-18.functionsInvocations`
-- `branches.branch_sec_1794988681537_5395.2026-11-18.firestoreWrites`
-- `branches.branch_sec_1794988681537_5395.2026-11-18.functionsInvocations`
-- `branches.branchid-pr.2026-11-18.firestoreWrites`
-- `branches.branchid-pr.2026-11-18.functionsInvocations`
-- `branches.dUXtAyoArohLHwSIcX8U.2026-11-18.firestoreReads`
-- `branches.dUXtAyoArohLHwSIcX8U.2026-11-18.firestoreWrites`
-- `branches.dUXtAyoArohLHwSIcX8U.2026-11-18.functionsInvocations`
-- `branches.dUXtAyoArohLHwSIcX8U.2026-11-18.locationPings`
-- `branches.main-branch.2026-11-18.firestoreReads`
-- `branches.main-branch.2026-11-18.firestoreWrites`
-- `branches.main-branch.2026-11-18.functionsInvocations`
-- `branches.main-branch.2026-11-18.locationPings`
-- `branches.sourcebranchid-pr.2026-11-18.firestoreWrites`
-- `branches.sourcebranchid-pr.2026-11-18.functionsInvocations`
-- `days.2026-11-18.firestoreReads`
-- `days.2026-11-18.firestoreWrites`
-- `days.2026-11-18.functionsInvocations`
-- `days.2026-11-18.locationPings`
-- `days.2026-11-18.storageUploadBytes`
+- `branches.NGgZpvEaQrNTdrh87wQB.2026-11-19.firestoreReads`
+- `branches.NGgZpvEaQrNTdrh87wQB.2026-11-19.functionsInvocations`
+- `branches.U12ZQ3L6VvPAmrlhLv0U.2026-11-19.firestoreWrites`
+- `branches.U12ZQ3L6VvPAmrlhLv0U.2026-11-19.functionsInvocations`
+- `branches.UzTG5uaJeQ1C4YH5zN7S.2026-11-19.firestoreWrites`
+- `branches.UzTG5uaJeQ1C4YH5zN7S.2026-11-19.functionsInvocations`
+- `branches.aiy6h5Ale5oDGl0PLB8V.2026-11-19.firestoreReads`
+- `branches.aiy6h5Ale5oDGl0PLB8V.2026-11-19.firestoreWrites`
+- `branches.aiy6h5Ale5oDGl0PLB8V.2026-11-19.functionsInvocations`
+- `branches.bI9htiWOIMz2GzDblddi.2026-11-19.firestoreWrites`
+- `branches.bI9htiWOIMz2GzDblddi.2026-11-19.functionsInvocations`
+- `branches.branch_abu_dhabi.2026-11-19.firestoreWrites`
+- `branches.branch_abu_dhabi.2026-11-19.functionsInvocations`
+- `branches.branch_riffa.2026-11-19.firestoreWrites`
+- `branches.branch_riffa.2026-11-19.functionsInvocations`
+- `branches.branch_sec_1795070339770_94892.2026-11-19.firestoreWrites`
+- `branches.branch_sec_1795070339770_94892.2026-11-19.functionsInvocations`
+- `branches.branch_sec_1795070570648_78025.2026-11-19.firestoreWrites`
+- `branches.branch_sec_1795070570648_78025.2026-11-19.functionsInvocations`
+- `branches.branchid-pr.2026-11-19.firestoreWrites`
+- `branches.branchid-pr.2026-11-19.functionsInvocations`
+- `branches.fCCSsm84wlPMoLKw1htL.2026-11-19.firestoreReads`
+- `branches.fCCSsm84wlPMoLKw1htL.2026-11-19.firestoreWrites`
+- `branches.fCCSsm84wlPMoLKw1htL.2026-11-19.functionsInvocations`
+- `branches.main-branch.2026-11-19.firestoreReads`
+- `branches.main-branch.2026-11-19.firestoreWrites`
+- `branches.main-branch.2026-11-19.functionsInvocations`
+- `branches.main-branch.2026-11-19.locationPings`
+- `branches.nkZI7wKkHZpft9Qw7coN.2026-11-19.firestoreWrites`
+- `branches.nkZI7wKkHZpft9Qw7coN.2026-11-19.functionsInvocations`
+- `branches.nope-branch.2026-11-19.firestoreWrites`
+- `branches.nope-branch.2026-11-19.functionsInvocations`
+- `branches.rFNZK2gN7JU5byfvtDyy.2026-11-19.firestoreReads`
+- `branches.rFNZK2gN7JU5byfvtDyy.2026-11-19.firestoreWrites`
+- `branches.rFNZK2gN7JU5byfvtDyy.2026-11-19.functionsInvocations`
+- `branches.rFNZK2gN7JU5byfvtDyy.2026-11-19.locationPings`
+- `branches.sourcebranchid-pr.2026-11-19.firestoreWrites`
+- `branches.sourcebranchid-pr.2026-11-19.functionsInvocations`
+- `days.2026-11-19.firestoreReads`
+- `days.2026-11-19.firestoreWrites`
+- `days.2026-11-19.functionsInvocations`
+- `days.2026-11-19.locationPings`
+- `days.2026-11-19.storageUploadBytes`
 
 ## `usageRateCards` (`UsageRateCardDoc`)
 
@@ -3089,7 +3476,7 @@ Typed leaf paths: 22. Documents observed in the census: 0. Stored but untyped pa
 
 ## `users` (`UserDoc`)
 
-Typed leaf paths: 20. Documents observed in the census: 48. Stored but untyped paths: 0.
+Typed leaf paths: 20. Documents observed in the census: 148. Stored but untyped paths: 1.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -3112,11 +3499,15 @@ Typed leaf paths: 20. Documents observed in the census: 48. Stored but untyped p
 | `createdAt` | `string` | yes | public | yes | ISO 8601 |
 | `createdBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who created the record. |
 | `updatedAt` | `string | undefined` | no | public | yes | Time the record was last changed (ISO-8601). |
-| `updatedBy` | `string | undefined` | no | public | no | Firebase Auth uid of the user who last changed the record. |
+| `updatedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who last changed the record. |
+
+Stored but untyped:
+
+- `image`
 
 ## `vendors` (`VendorDoc`)
 
-Typed leaf paths: 61. Documents observed in the census: 6. Stored but untyped paths: 4.
+Typed leaf paths: 61. Documents observed in the census: 17. Stored but untyped paths: 4.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|

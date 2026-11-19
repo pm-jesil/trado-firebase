@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-18T17:37:44.342Z",
-  "totalPermissions": 149,
+  "generatedAt": "2026-11-19T00:13:28.438Z",
+  "totalPermissions": 151,
   "permissions": [
     {
       "name": "ALL",
@@ -201,6 +201,15 @@
     {
       "name": "ORG_MANAGE_BANK_DETAILS",
       "code": "org:manage_bank_details",
+      "module": "org",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ORG_MANAGE_APPROVAL_POLICY",
+      "code": "org:manage_approval_policy",
       "module": "org",
       "isPlatform": false,
       "allowedRoles": [
@@ -1272,6 +1281,15 @@
       "allowedRoles": [
         "role_org_owner",
         "role_rider"
+      ]
+    },
+    {
+      "name": "LOCATION_VIEW_TEAM",
+      "code": "locations:view_team",
+      "module": "locations",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
       ]
     },
     {

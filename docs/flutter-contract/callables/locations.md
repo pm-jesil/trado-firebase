@@ -48,8 +48,8 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `locationsGetLatest`
-- **Domain:** `locations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/locations.ts:155`
-- **Permission(s):** `location:view_all`, `location:view_own` · **Module:** — · **Feature Flag:** —
+- **Domain:** `locations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/locations.ts:156`
+- **Permission(s):** `location:view_all`, `location:view_own`, `locations:view_team` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `location.get_latest` (`none`) · **State Machine:** —
 
 **Input (`GetLatestLocationsSchema` — strict, unknown fields rejected):**
@@ -60,7 +60,7 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | — | `organization_001` |
 | `membershipIds[]` | `string` | **Yes** | — | `Sample membershipIds[]` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "locations", "organizationId" (12 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "locations", "organizationId" (13 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -77,8 +77,8 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `locationsGetHistory`
-- **Domain:** `locations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/locations.ts:202`
-- **Permission(s):** `location:view_all`, `location:view_own` · **Module:** — · **Feature Flag:** —
+- **Domain:** `locations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/locations.ts:222`
+- **Permission(s):** `location:view_all`, `location:view_own`, `locations:view_team` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `location.get_history` (`none`) · **State Machine:** —
 
 **Input (`GetLocationHistorySchema` — strict, unknown fields rejected):**

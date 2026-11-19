@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "totalConcrete": 147,
+  "totalConcrete": 149,
   "wildcards": [
     {
       "key": "*",
@@ -248,6 +248,17 @@
       "group": "org",
       "isWildcard": false,
       "description": "S1: edit organization invoice bankAccounts (owner default)",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
+    },
+    {
+      "key": "org:manage_approval_policy",
+      "constName": "ORG_MANAGE_APPROVAL_POLICY",
+      "group": "org",
+      "isWildcard": false,
+      "description": "S1: edit approval thresholds, self-approval policy & numbering (owner default)",
       "defaultRoles": [
         "org_owner"
       ],
@@ -1523,6 +1534,17 @@
         "delivery_rider"
       ],
       "scopeNote": "Caller's own latest location and ping history only."
+    },
+    {
+      "key": "locations:view_team",
+      "constName": "LOCATION_VIEW_TEAM",
+      "group": "locations",
+      "isWildcard": false,
+      "description": "Manager/branch team live location coordinates view (MG-40)",
+      "defaultRoles": [
+        "org_owner"
+      ],
+      "scopeNote": null
     },
     {
       "key": "location:view_all",

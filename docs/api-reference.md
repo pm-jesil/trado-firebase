@@ -21,6 +21,7 @@ This document is the single, authoritative reference for all **134 exported Clou
 | 5 | `organizationsDeactivate` | Callable | Tenancy | `org:manage / org:view` |
 | 6 | `organizationsList` | Callable | Tenancy | `org:manage / org:view` |
 | 6a | `organizationsGet` | Callable | Tenancy | `org:manage / org:view` |
+| 6b | `organizationsRevealBankAccount` | Callable | Tenancy | `org:manage_bank_details` |
 | 7 | `branchesGetDefault` | Callable | Branch Management | `branch:view` |
 | 8 | `branchesList` | Callable | Branch Management | `branch:view` |
 | 9 | `branchesCreate` | Callable | Branch Management | `branch:create` |
@@ -212,6 +213,13 @@ This document is the single, authoritative reference for all **134 exported Clou
 - **Source File**: `functions/src/callables/organizations.ts`
 - **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/organizationsGet` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/organizationsGet` (Emulator)
 - **Summary**: Cloud function handling single organization retrieval with permission-based field trimming (Super Admin any org, Tenant Owner/Admin own org).
+
+#### `organizationsRevealBankAccount`
+
+- **Function Export**: `organizationsRevealBankAccount`
+- **Source File**: `functions/src/callables/organizations.ts`
+- **Calling Path**: `POST https://asia-south1-trado-x.cloudfunctions.net/organizationsRevealBankAccount` (Production) or `http://127.0.0.1:5001/trado-x/asia-south1/organizationsRevealBankAccount` (Emulator)
+- **Summary**: Audited, rate-limited endpoint revealing the unmasked bank account number and routing code exclusively to authorized holders of `org:manage_bank_details`.
 
 ### Module: `./callables/branches.js` (Branches)
 

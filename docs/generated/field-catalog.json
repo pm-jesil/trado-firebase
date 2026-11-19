@@ -1,7 +1,7 @@
 {
   "version": "3.0.0",
-  "generatedAt": "2026-11-18T10:07:17.091Z",
-  "censusRun": "census-mwlvchlc",
+  "generatedAt": "2026-11-19T06:46:12.601Z",
+  "censusRun": "census-mwn6qp0q",
   "totalEntities": 61,
   "totalFields": 1441,
   "describedFields": 1068,
@@ -12,7 +12,7 @@
       "displayName": "Account Transaction",
       "callablePrefix": null,
       "collection": "accountTransactions",
-      "documentsObserved": 21,
+      "documentsObserved": 35,
       "fields": [
         {
           "path": "organizationId",
@@ -203,7 +203,7 @@
       "displayName": "Account Transfer",
       "callablePrefix": "documents",
       "collection": "accountTransfers",
-      "documentsObserved": 1,
+      "documentsObserved": 2,
       "fields": [
         {
           "path": "organizationId",
@@ -421,7 +421,7 @@
       "displayName": "activity",
       "callablePrefix": null,
       "collection": "requests/activity",
-      "documentsObserved": 32,
+      "documentsObserved": 81,
       "fields": [],
       "untypedStoredPaths": [
         "activityId",
@@ -447,7 +447,7 @@
       "displayName": "Audit Log",
       "callablePrefix": "organizations",
       "collection": "auditLogs",
-      "documentsObserved": 524,
+      "documentsObserved": 1036,
       "fields": [
         {
           "path": "occurredAt",
@@ -937,6 +937,7 @@
         }
       ],
       "untypedStoredPaths": [
+        "actorRole",
         "changes.fields[]",
         "changes.fields[].after.accountNumberMasked",
         "changes.fields[].after.action",
@@ -944,19 +945,26 @@
         "changes.fields[].after.admin",
         "changes.fields[].after.allowNegativeStock",
         "changes.fields[].after.altPhone",
+        "changes.fields[].after.analytics",
+        "changes.fields[].after.approvals.allowSelfApproval",
         "changes.fields[].after.approvals.amountThreshold",
         "changes.fields[].after.approvals.enabled",
+        "changes.fields[].after.approvals.modules.account_transfer",
         "changes.fields[].after.approvals.modules.expense",
         "changes.fields[].after.approvals.modules.purchase",
         "changes.fields[].after.approvals.modules.return",
         "changes.fields[].after.approvals.modules.sale",
         "changes.fields[].after.approvals.modules.stock_adjustment",
+        "changes.fields[].after.approvals.modules.stock_transfer",
+        "changes.fields[].after.approvals.thresholds.k1",
         "changes.fields[].after.area",
         "changes.fields[].after.audit:read_own",
         "changes.fields[].after.audit:view",
         "changes.fields[].after.bankBranchName",
         "changes.fields[].after.bankName",
         "changes.fields[].after.bill:create",
+        "changes.fields[].after.bill:discount",
+        "changes.fields[].after.bill:view",
         "changes.fields[].after.billing",
         "changes.fields[].after.billingAddress",
         "changes.fields[].after.billingPeriod",
@@ -975,24 +983,30 @@
         "changes.fields[].after.businessConfig.salesMode",
         "changes.fields[].after.categories",
         "changes.fields[].after.city",
+        "changes.fields[].after.colour",
         "changes.fields[].after.contactName",
         "changes.fields[].after.contactPerson",
+        "changes.fields[].after.contentType",
         "changes.fields[].after.country",
         "changes.fields[].after.customers",
         "changes.fields[].after.defaultFinancialAccountId",
         "changes.fields[].after.defaultSalesMode",
         "changes.fields[].after.deliveries",
         "changes.fields[].after.description",
+        "changes.fields[].after.detailsText",
         "changes.fields[].after.diagnostics.appVersion",
         "changes.fields[].after.diagnostics.platform",
         "changes.fields[].after.diagnostics.route",
         "changes.fields[].after.diagnosticsOptIn",
         "changes.fields[].after.email",
+        "changes.fields[].after.employee:view",
         "changes.fields[].after.enabled",
         "changes.fields[].after.expected",
         "changes.fields[].after.expense:create",
+        "changes.fields[].after.expense:view",
         "changes.fields[].after.expenses",
         "changes.fields[].after.externalReference",
+        "changes.fields[].after.field",
         "changes.fields[].after.firestoreReads.dailyLimit",
         "changes.fields[].after.firestoreReads.enabled",
         "changes.fields[].after.firestoreReads.enforcementMode",
@@ -1005,6 +1019,7 @@
         "changes.fields[].after.firestoreWrites.hardThresholdPercent",
         "changes.fields[].after.firestoreWrites.monthlyLimit",
         "changes.fields[].after.firestoreWrites.warningThresholdPercent",
+        "changes.fields[].after.firestoreWrites.weeklyLimit",
         "changes.fields[].after.functionsInvocations.dailyLimit",
         "changes.fields[].after.functionsInvocations.enabled",
         "changes.fields[].after.functionsInvocations.enforcementMode",
@@ -1017,6 +1032,8 @@
         "changes.fields[].after.grossWeightGrams",
         "changes.fields[].after.hallmarkId",
         "changes.fields[].after.height",
+        "changes.fields[].after.high.firstResponseHours",
+        "changes.fields[].after.high.resolutionHours",
         "changes.fields[].after.id",
         "changes.fields[].after.ifscOrSwift",
         "changes.fields[].after.inventory",
@@ -1042,8 +1059,21 @@
         "changes.fields[].after.limit",
         "changes.fields[].after.line1",
         "changes.fields[].after.line2",
+        "changes.fields[].after.liveLocation",
+        "changes.fields[].after.location:ping",
+        "changes.fields[].after.location:view_own",
+        "changes.fields[].after.locationPings.dailyLimit",
+        "changes.fields[].after.locationPings.enabled",
+        "changes.fields[].after.locationPings.enforcementMode",
+        "changes.fields[].after.locationPings.hardThresholdPercent",
+        "changes.fields[].after.locationPings.warningThresholdPercent",
+        "changes.fields[].after.low.firstResponseHours",
+        "changes.fields[].after.low.resolutionHours",
         "changes.fields[].after.makingCharge",
         "changes.fields[].after.makingChargeType",
+        "changes.fields[].after.maxCreationsPerHourPerUser",
+        "changes.fields[].after.maxOpenPerOrg",
+        "changes.fields[].after.maxOpenPerUser",
         "changes.fields[].after.metric",
         "changes.fields[].after.moduleKey",
         "changes.fields[].after.moduleOverrides",
@@ -1051,7 +1081,18 @@
         "changes.fields[].after.name",
         "changes.fields[].after.netWeightGrams",
         "changes.fields[].after.newPlanId",
+        "changes.fields[].after.normal.firstResponseHours",
+        "changes.fields[].after.normal.resolutionHours",
+        "changes.fields[].after.notification:view",
+        "changes.fields[].after.numbering.k1",
+        "changes.fields[].after.org:update",
+        "changes.fields[].after.org:view",
         "changes.fields[].after.outflow:create",
+        "changes.fields[].after.overriddenBlockers[].allowed",
+        "changes.fields[].after.overriddenBlockers[].code",
+        "changes.fields[].after.overriddenBlockers[].current",
+        "changes.fields[].after.overriddenBlockers[].message",
+        "changes.fields[].after.path",
         "changes.fields[].after.payments",
         "changes.fields[].after.period",
         "changes.fields[].after.permissionKeys[]",
@@ -1061,11 +1102,17 @@
         "changes.fields[].after.previousPlanId",
         "changes.fields[].after.priceByDailyRate",
         "changes.fields[].after.product:view",
+        "changes.fields[].after.product:view_cost",
         "changes.fields[].after.products",
+        "changes.fields[].after.proposedValue",
+        "changes.fields[].after.purchase:create",
+        "changes.fields[].after.purchase:view",
         "changes.fields[].after.purchases",
         "changes.fields[].after.purity",
+        "changes.fields[].after.question",
         "changes.fields[].after.reason",
         "changes.fields[].after.regime",
+        "changes.fields[].after.report:view",
         "changes.fields[].after.requestedLimit",
         "changes.fields[].after.requestedPlanId",
         "changes.fields[].after.requests:comment",
@@ -1074,24 +1121,37 @@
         "changes.fields[].after.requests:manage_org",
         "changes.fields[].after.requests:read_org",
         "changes.fields[].after.requests:read_own",
+        "changes.fields[].after.return:create",
+        "changes.fields[].after.return:view",
         "changes.fields[].after.returns",
         "changes.fields[].after.roleLabel",
         "changes.fields[].after.sale:create",
         "changes.fields[].after.sales",
         "changes.fields[].after.severity",
+        "changes.fields[].after.size",
+        "changes.fields[].after.sizeBytes",
         "changes.fields[].after.staff",
         "changes.fields[].after.state",
         "changes.fields[].after.stepsToReproduce",
         "changes.fields[].after.stock",
+        "changes.fields[].after.stock:adjust",
+        "changes.fields[].after.stock:view",
+        "changes.fields[].after.storage",
         "changes.fields[].after.suspectedImpact",
+        "changes.fields[].after.task:update",
+        "changes.fields[].after.task:view",
         "changes.fields[].after.tasks",
         "changes.fields[].after.taxAmount",
         "changes.fields[].after.taxId",
         "changes.fields[].after.taxRatePercent",
         "changes.fields[].after.taxType",
+        "changes.fields[].after.topic",
         "changes.fields[].after.uid",
         "changes.fields[].after.unit",
+        "changes.fields[].after.updatedAt",
         "changes.fields[].after.upiId",
+        "changes.fields[].after.urgent.firstResponseHours",
+        "changes.fields[].after.urgent.resolutionHours",
         "changes.fields[].after.value",
         "changes.fields[].after.vendors",
         "changes.fields[].after.width",
@@ -1142,6 +1202,7 @@
         "changes.fields[].after[].isDefaultShipping",
         "changes.fields[].after[].isPrimary",
         "changes.fields[].after[].isPurchaseUnit",
+        "changes.fields[].after[].isReturnable",
         "changes.fields[].after[].isSaleUnit",
         "changes.fields[].after[].itemName",
         "changes.fields[].after[].label",
@@ -1190,6 +1251,7 @@
         "changes.fields[].after[].wholesalePrice",
         "changes.fields[].before.bill:create",
         "changes.fields[].before.categories",
+        "changes.fields[].before.contentType",
         "changes.fields[].before.customers",
         "changes.fields[].before.deliveries",
         "changes.fields[].before.expenses",
@@ -1199,25 +1261,50 @@
         "changes.fields[].before.firestoreWrites.hardThresholdPercent",
         "changes.fields[].before.firestoreWrites.monthlyLimit",
         "changes.fields[].before.firestoreWrites.warningThresholdPercent",
+        "changes.fields[].before.firestoreWrites.weeklyLimit",
+        "changes.fields[].before.height",
+        "changes.fields[].before.high.firstResponseHours",
+        "changes.fields[].before.high.resolutionHours",
         "changes.fields[].before.isPlatform",
+        "changes.fields[].before.low.firstResponseHours",
+        "changes.fields[].before.low.resolutionHours",
+        "changes.fields[].before.maxCreationsPerHourPerUser",
+        "changes.fields[].before.maxOpenPerOrg",
+        "changes.fields[].before.maxOpenPerUser",
         "changes.fields[].before.name",
+        "changes.fields[].before.normal.firstResponseHours",
+        "changes.fields[].before.normal.resolutionHours",
+        "changes.fields[].before.path",
+        "changes.fields[].before.phone",
         "changes.fields[].before.products",
         "changes.fields[].before.purchases",
         "changes.fields[].before.sales",
+        "changes.fields[].before.sizeBytes",
         "changes.fields[].before.stock",
         "changes.fields[].before.uid",
+        "changes.fields[].before.updatedAt",
+        "changes.fields[].before.urgent.firstResponseHours",
+        "changes.fields[].before.urgent.resolutionHours",
         "changes.fields[].before.vendors",
+        "changes.fields[].before.width",
         "changes.fields[].before[]",
         "changes.fields[].before[].baseQuantity",
         "changes.fields[].before[].conversionFactor",
+        "changes.fields[].before[].costSnapshot",
         "changes.fields[].before[].designation",
+        "changes.fields[].before[].discountValue",
         "changes.fields[].before[].discrepancyReason",
         "changes.fields[].before[].dispatchedBaseQuantity",
         "changes.fields[].before[].dispatchedQty",
         "changes.fields[].before[].email",
         "changes.fields[].before[].id",
+        "changes.fields[].before[].isActive",
+        "changes.fields[].before[].isPrimary",
+        "changes.fields[].before[].lineId",
+        "changes.fields[].before[].lineTotal",
         "changes.fields[].before[].name",
         "changes.fields[].before[].phone",
+        "changes.fields[].before[].priceSnapshot",
         "changes.fields[].before[].productId",
         "changes.fields[].before[].quantity",
         "changes.fields[].before[].receivedBaseQuantity",
@@ -1225,12 +1312,20 @@
         "changes.fields[].before[].rejectedQty",
         "changes.fields[].before[].requestedQty",
         "changes.fields[].before[].shortQty",
+        "changes.fields[].before[].subtotal",
+        "changes.fields[].before[].taxAmount",
+        "changes.fields[].before[].taxCodeSnapshot",
         "changes.fields[].before[].totalCost",
+        "changes.fields[].before[].trackStock",
+        "changes.fields[].before[].type",
         "changes.fields[].before[].unit",
         "changes.fields[].before[].unitCost",
+        "createdAt",
         "details.action",
+        "details.addedPermissions[]",
         "details.decision",
         "details.duplicateOverrideReason",
+        "details.migration",
         "details.note",
         "details.notes",
         "details.overrideReason",
@@ -1238,6 +1333,9 @@
         "details.reason",
         "details.reasonCode",
         "details.taxExemptionReason",
+        "logId",
+        "scope",
+        "status",
         "targets[]"
       ]
     },
@@ -1247,7 +1345,7 @@
       "displayName": "Bill",
       "callablePrefix": "bills",
       "collection": "bills",
-      "documentsObserved": 13,
+      "documentsObserved": 46,
       "fields": [
         {
           "path": "organizationId",
@@ -1498,7 +1596,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "boolean | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "false when the product was non-returnable at sale time"
         },
         {
@@ -1633,7 +1731,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | null | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Approval state lives in status (pending_approval / rejected) + approvedBy/rejectedBy"
         },
         {
@@ -1642,7 +1740,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "number | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Tender held until approval"
         },
         {
@@ -1651,7 +1749,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "PaymentMethod | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Payment method asked for in the approval request."
         },
         {
@@ -1939,7 +2037,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was approved (ISO-8601)."
         },
         {
@@ -1948,7 +2046,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the approver."
         },
         {
@@ -1975,7 +2073,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | null | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Reason the approver gave."
         },
         {
@@ -2056,7 +2154,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the document was voided (ISO-8601)."
         },
         {
@@ -2065,7 +2163,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the user who voided the document."
         },
         {
@@ -2074,7 +2172,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Reason the document was voided."
         }
       ],
@@ -2089,7 +2187,7 @@
       "displayName": "branch Product Stock",
       "callablePrefix": null,
       "collection": "branchProductStock",
-      "documentsObserved": 10,
+      "documentsObserved": 12,
       "fields": [],
       "untypedStoredPaths": [
         "branchId",
@@ -2106,7 +2204,7 @@
       "displayName": "Branch Usage Daily",
       "callablePrefix": null,
       "collection": "branchUsageDaily",
-      "documentsObserved": 0,
+      "documentsObserved": 2,
       "fields": [
         {
           "path": "organizationId",
@@ -2114,7 +2212,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Id of the organization (tenant) the record belongs to."
         },
         {
@@ -2123,7 +2221,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Id of the branch the record belongs to or applies to."
         },
         {
@@ -2132,7 +2230,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "YYYY-MM-DD"
         },
         {
@@ -2150,11 +2248,14 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was last changed (ISO-8601)."
         }
       ],
-      "untypedStoredPaths": []
+      "untypedStoredPaths": [
+        "clientReported.locationPings",
+        "clientReported.storageOperations"
+      ]
     },
     {
       "entity": "branchUsageMonthly",
@@ -2162,7 +2263,7 @@
       "displayName": "Branch Usage Monthly",
       "callablePrefix": null,
       "collection": "branchUsageMonthly",
-      "documentsObserved": 0,
+      "documentsObserved": 2,
       "fields": [
         {
           "path": "organizationId",
@@ -2170,7 +2271,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Id of the organization (tenant) the record belongs to."
         },
         {
@@ -2179,7 +2280,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Id of the branch the record belongs to or applies to."
         },
         {
@@ -2188,7 +2289,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "YYYY-MM"
         },
         {
@@ -2206,11 +2307,14 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was last changed (ISO-8601)."
         }
       ],
-      "untypedStoredPaths": []
+      "untypedStoredPaths": [
+        "clientReported.locationPings",
+        "clientReported.storageOperations"
+      ]
     },
     {
       "entity": "branch",
@@ -2218,7 +2322,7 @@
       "displayName": "Branch",
       "callablePrefix": "branches",
       "collection": "organizations/branches",
-      "documentsObserved": 24,
+      "documentsObserved": 84,
       "fields": [
         {
           "path": "organizationId",
@@ -2547,7 +2651,7 @@
       "displayName": "Capital Transaction",
       "callablePrefix": "capital",
       "collection": "capitalTransactions",
-      "documentsObserved": 2,
+      "documentsObserved": 4,
       "fields": [
         {
           "path": "organizationId",
@@ -2675,7 +2779,7 @@
       "displayName": "Category",
       "callablePrefix": "categories",
       "collection": "categories",
-      "documentsObserved": 8,
+      "documentsObserved": 12,
       "fields": [
         {
           "path": "organizationId",
@@ -2790,7 +2894,7 @@
       "displayName": "Customer",
       "callablePrefix": "customers",
       "collection": "customers",
-      "documentsObserved": 12,
+      "documentsObserved": 33,
       "fields": [
         {
           "path": "organizationId",
@@ -3364,7 +3468,7 @@
       "displayName": "Daily Summary",
       "callablePrefix": "reports",
       "collection": "dailySummaries",
-      "documentsObserved": 8,
+      "documentsObserved": 33,
       "fields": [
         {
           "path": "organizationId",
@@ -3519,7 +3623,7 @@
       "displayName": "Delivery",
       "callablePrefix": "deliveries",
       "collection": "deliveries",
-      "documentsObserved": 3,
+      "documentsObserved": 9,
       "fields": [
         {
           "path": "organizationId",
@@ -3716,7 +3820,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the delivery was completed (ISO-8601)."
         },
         {
@@ -3773,7 +3877,7 @@
       "displayName": "Department",
       "callablePrefix": "departments",
       "collection": "departments",
-      "documentsObserved": 2,
+      "documentsObserved": 4,
       "fields": [
         {
           "path": "organizationId",
@@ -3856,7 +3960,7 @@
       "displayName": "Device",
       "callablePrefix": "notifications",
       "collection": "users/devices",
-      "documentsObserved": 1,
+      "documentsObserved": 3,
       "fields": [
         {
           "path": "fcmToken",
@@ -3882,7 +3986,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "written by authLogin on every sign-in from this device"
         },
         {
@@ -3912,7 +4016,7 @@
       "displayName": "Document Counter",
       "callablePrefix": null,
       "collection": "documentCounters",
-      "documentsObserved": 36,
+      "documentsObserved": 117,
       "fields": [
         {
           "path": "organizationId",
@@ -3968,7 +4072,7 @@
       "displayName": "Financial Account",
       "callablePrefix": "financial",
       "collection": "financialAccounts",
-      "documentsObserved": 9,
+      "documentsObserved": 12,
       "fields": [
         {
           "path": "organizationId",
@@ -4222,7 +4326,7 @@
       "displayName": "Idempotency Record",
       "callablePrefix": null,
       "collection": "idempotencyRecords",
-      "documentsObserved": 126,
+      "documentsObserved": 214,
       "fields": [
         {
           "path": "scope",
@@ -4407,7 +4511,9 @@
         "result.name",
         "result.newStock",
         "result.nextRunOn",
+        "result.notified",
         "result.organizationId",
+        "result.originalQuotationNumber",
         "result.outflowId",
         "result.outflowNumber",
         "result.ownerMembershipId",
@@ -4421,14 +4527,87 @@
         "result.planId",
         "result.previousStock",
         "result.price",
+        "result.printSnapshot.billNumber",
+        "result.printSnapshot.customer",
+        "result.printSnapshot.documentType",
+        "result.printSnapshot.invoiceTitle",
+        "result.printSnapshot.issueDate",
+        "result.printSnapshot.items[].discountAmount",
+        "result.printSnapshot.items[].lineId",
+        "result.printSnapshot.items[].name",
+        "result.printSnapshot.items[].productId",
+        "result.printSnapshot.items[].quantity",
+        "result.printSnapshot.items[].sku",
+        "result.printSnapshot.items[].taxAmount",
+        "result.printSnapshot.items[].taxRatePercent",
+        "result.printSnapshot.items[].totalAmount",
+        "result.printSnapshot.items[].unit",
+        "result.printSnapshot.items[].unitPrice",
+        "result.printSnapshot.organization.address",
+        "result.printSnapshot.organization.bankAccounts[]",
+        "result.printSnapshot.organization.contactEmail",
+        "result.printSnapshot.organization.contactPhone",
+        "result.printSnapshot.organization.legalName",
+        "result.printSnapshot.organization.name",
+        "result.printSnapshot.organization.taxId",
+        "result.printSnapshot.salesMode",
+        "result.printSnapshot.taxBreakdown[]",
+        "result.printSnapshot.totals.balanceAmount",
+        "result.printSnapshot.totals.discountTotal",
+        "result.printSnapshot.totals.paidAmount",
+        "result.printSnapshot.totals.roundOff",
+        "result.printSnapshot.totals.subTotal",
+        "result.printSnapshot.totals.taxTotal",
+        "result.printSnapshot.totals.totalAmount",
+        "result.printSnapshot.version",
         "result.priority",
         "result.productId",
         "result.quantityAdjusted",
         "result.reasonCode",
         "result.relatedEntityId",
         "result.relatedEntityType",
+        "result.request.assignee",
+        "result.request.attachments[]",
+        "result.request.audience",
+        "result.request.branchId",
+        "result.request.category",
+        "result.request.createdAt",
+        "result.request.currentPlanName",
+        "result.request.description",
+        "result.request.details.detailsText",
+        "result.request.firstResponseAt",
+        "result.request.firstResponseDueAt",
+        "result.request.idempotencyKey",
+        "result.request.kind",
+        "result.request.labels[]",
+        "result.request.lastActivityAt",
+        "result.request.lastActivityBy.isPlatform",
+        "result.request.lastActivityBy.name",
+        "result.request.lastActivityBy.uid",
+        "result.request.organizationId",
+        "result.request.priority",
+        "result.request.relatedEntity",
+        "result.request.requestId",
+        "result.request.requestNumber",
+        "result.request.requestedPlanName",
+        "result.request.requester.name",
+        "result.request.requester.roleLabel",
+        "result.request.requester.uid",
+        "result.request.requesterName",
+        "result.request.resolutionDueAt",
+        "result.request.slaPausedAt",
+        "result.request.slaState",
+        "result.request.slaTotalPausedMs",
+        "result.request.status",
+        "result.request.statusChangedAt",
+        "result.request.statusReason",
+        "result.request.title",
+        "result.request.updatedAt",
+        "result.request.version",
         "result.returnId",
         "result.returnNumber",
+        "result.reversedDocumentId",
+        "result.reversedStockLines",
         "result.roleId",
         "result.salesMode",
         "result.seatLimits.admin",
@@ -4450,7 +4629,8 @@
         "result.userCreated",
         "result.userId",
         "result.vendorCode",
-        "result.vendorId"
+        "result.vendorId",
+        "result.voidedPayments"
       ]
     },
     {
@@ -4459,7 +4639,7 @@
       "displayName": "Image Upload Session",
       "callablePrefix": "images",
       "collection": "imageUploadSessions",
-      "documentsObserved": 1,
+      "documentsObserved": 4,
       "fields": [
         {
           "path": "uploadId",
@@ -4575,7 +4755,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "set by attachUploadedImage when the upload is attached"
         },
         {
@@ -4584,7 +4764,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "storage path of the processed image, set on attach"
         }
       ],
@@ -4596,7 +4776,7 @@
       "displayName": "Job Role",
       "callablePrefix": "job",
       "collection": "jobRoles",
-      "documentsObserved": 8,
+      "documentsObserved": 10,
       "fields": [
         {
           "path": "organizationId",
@@ -4895,9 +5075,9 @@
       "entity": "latestLocation",
       "docName": "LatestLocationDoc",
       "displayName": "Latest Location",
-      "callablePrefix": "locations",
+      "callablePrefix": null,
       "collection": "latestLocations",
-      "documentsObserved": 1,
+      "documentsObserved": 3,
       "fields": [
         {
           "path": "organizationId",
@@ -4997,6 +5177,15 @@
           "validator": "string",
           "verdict": "PRESENT",
           "description": "Time the record was last changed (ISO-8601)."
+        },
+        {
+          "path": "expiresAt",
+          "type": "Timestamp",
+          "requiredOnCreate": false,
+          "sensitivity": "public",
+          "validator": "Timestamp",
+          "verdict": "PRESENT",
+          "description": "BC3: Firestore Timestamp TTL for pruning inactive latestLocations"
         }
       ],
       "untypedStoredPaths": []
@@ -5005,9 +5194,9 @@
       "entity": "locationPing",
       "docName": "LocationPingDoc",
       "displayName": "Location Ping",
-      "callablePrefix": "locations",
+      "callablePrefix": null,
       "collection": "locationPings",
-      "documentsObserved": 1,
+      "documentsObserved": 3,
       "fields": [
         {
           "path": "organizationId",
@@ -5135,7 +5324,7 @@
       "displayName": "Membership Branch",
       "callablePrefix": null,
       "collection": "membershipBranches",
-      "documentsObserved": 60,
+      "documentsObserved": 164,
       "fields": [
         {
           "path": "membershipId",
@@ -5245,7 +5434,7 @@
       "displayName": "Membership",
       "callablePrefix": "organizations",
       "collection": "memberships",
-      "documentsObserved": 48,
+      "documentsObserved": 140,
       "fields": [
         {
           "path": "userId",
@@ -5352,7 +5541,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "boolean | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Explicit consent flag for employee live-location tracking"
         },
         {
@@ -5413,17 +5602,40 @@
         "permissions.audit:read_own",
         "permissions.audit:view",
         "permissions.bill:create",
+        "permissions.bill:discount",
+        "permissions.bill:update",
+        "permissions.bill:view",
+        "permissions.customer:view",
+        "permissions.employee:view",
         "permissions.expense:create",
+        "permissions.expense:view",
+        "permissions.inventory:view",
         "permissions.k1",
+        "permissions.location:ping",
+        "permissions.location:view_own",
+        "permissions.notification:view",
+        "permissions.org:update",
+        "permissions.org:view",
         "permissions.outflow:create",
+        "permissions.payment:create",
         "permissions.product:view",
+        "permissions.product:view_cost",
+        "permissions.purchase:create",
+        "permissions.purchase:view",
+        "permissions.report:view",
         "permissions.requests:comment",
         "permissions.requests:create",
         "permissions.requests:create_sensitive",
         "permissions.requests:manage_org",
         "permissions.requests:read_org",
         "permissions.requests:read_own",
-        "permissions.sale:create"
+        "permissions.return:create",
+        "permissions.return:view",
+        "permissions.sale:create",
+        "permissions.stock:adjust",
+        "permissions.stock:view",
+        "permissions.task:update",
+        "permissions.task:view"
       ]
     },
     {
@@ -5470,7 +5682,7 @@
       "displayName": "Monthly Summary",
       "callablePrefix": null,
       "collection": "monthlySummaries",
-      "documentsObserved": 8,
+      "documentsObserved": 32,
       "fields": [
         {
           "path": "organizationId",
@@ -5580,7 +5792,7 @@
       "displayName": "Notification Outbox",
       "callablePrefix": null,
       "collection": "notificationOutbox",
-      "documentsObserved": 22,
+      "documentsObserved": 113,
       "fields": [
         {
           "path": "organizationId",
@@ -5684,7 +5896,7 @@
       "displayName": "Notification",
       "callablePrefix": "notifications",
       "collection": "notifications",
-      "documentsObserved": 59,
+      "documentsObserved": 184,
       "fields": [
         {
           "path": "organizationId",
@@ -5795,7 +6007,9 @@
           "description": "Time the record was created (ISO-8601)."
         }
       ],
-      "untypedStoredPaths": []
+      "untypedStoredPaths": [
+        "data.key"
+      ]
     },
     {
       "entity": "organizationUsageDaily",
@@ -5803,7 +6017,7 @@
       "displayName": "Organization Usage Daily",
       "callablePrefix": null,
       "collection": "organizationUsageDaily",
-      "documentsObserved": 13,
+      "documentsObserved": 86,
       "fields": [
         {
           "path": "organizationId",
@@ -5847,7 +6061,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was last changed (ISO-8601)."
         },
         {
@@ -6056,8 +6270,10 @@
         "byCallable.auditLogsList.reads",
         "byCallable.auditLogsList.writes",
         "byCallable.authLogin.calls",
+        "byCallable.authLogin.reads",
         "byCallable.authLogin.writes",
         "byCallable.authMe.calls",
+        "byCallable.authMe.reads",
         "byCallable.authMe.writes",
         "byCallable.billsCreate.calls",
         "byCallable.billsCreate.reads",
@@ -6066,7 +6282,11 @@
         "byCallable.billsFinalize.reads",
         "byCallable.billsFinalize.writes",
         "byCallable.billsGet.calls",
+        "byCallable.billsGet.reads",
+        "byCallable.billsGet.writes",
         "byCallable.billsList.calls",
+        "byCallable.billsList.reads",
+        "byCallable.billsList.writes",
         "byCallable.billsPreview.calls",
         "byCallable.billsPreview.reads",
         "byCallable.billsPreview.writes",
@@ -6074,6 +6294,7 @@
         "byCallable.billsUpdateDraft.reads",
         "byCallable.billsUpdateDraft.writes",
         "byCallable.billsVoid.calls",
+        "byCallable.billsVoid.reads",
         "byCallable.billsVoid.writes",
         "byCallable.branchContextSwitch.calls",
         "byCallable.branchContextSwitch.reads",
@@ -6082,9 +6303,14 @@
         "byCallable.branchesCreate.reads",
         "byCallable.branchesCreate.writes",
         "byCallable.branchesDeactivate.calls",
+        "byCallable.branchesDeactivate.reads",
         "byCallable.branchesDeactivate.writes",
         "byCallable.branchesGetDefault.calls",
+        "byCallable.branchesGetDefault.reads",
+        "byCallable.branchesGetDefault.writes",
         "byCallable.branchesList.calls",
+        "byCallable.branchesList.reads",
+        "byCallable.branchesList.writes",
         "byCallable.branchesUpdate.calls",
         "byCallable.branchesUpdate.reads",
         "byCallable.branchesUpdate.writes",
@@ -6099,6 +6325,7 @@
         "byCallable.categoriesCreate.reads",
         "byCallable.categoriesCreate.writes",
         "byCallable.categoriesList.calls",
+        "byCallable.categoriesList.reads",
         "byCallable.categoriesUpdate.calls",
         "byCallable.categoriesUpdate.deletes",
         "byCallable.categoriesUpdate.reads",
@@ -6111,6 +6338,8 @@
         "byCallable.customersGet.reads",
         "byCallable.customersGet.writes",
         "byCallable.customersList.calls",
+        "byCallable.customersList.reads",
+        "byCallable.customersList.writes",
         "byCallable.customersUpdate.calls",
         "byCallable.customersUpdate.deletes",
         "byCallable.customersUpdate.reads",
@@ -6119,7 +6348,11 @@
         "byCallable.deliveriesCreate.reads",
         "byCallable.deliveriesCreate.writes",
         "byCallable.deliveriesGet.calls",
+        "byCallable.deliveriesGet.reads",
+        "byCallable.deliveriesGet.writes",
         "byCallable.deliveriesList.calls",
+        "byCallable.deliveriesList.reads",
+        "byCallable.deliveriesList.writes",
         "byCallable.deliveriesUpdateStatus.calls",
         "byCallable.deliveriesUpdateStatus.reads",
         "byCallable.deliveriesUpdateStatus.writes",
@@ -6127,6 +6360,7 @@
         "byCallable.departmentsCreate.reads",
         "byCallable.departmentsCreate.writes",
         "byCallable.departmentsList.calls",
+        "byCallable.departmentsList.reads",
         "byCallable.departmentsUpdate.calls",
         "byCallable.departmentsUpdate.deletes",
         "byCallable.departmentsUpdate.reads",
@@ -6144,6 +6378,8 @@
         "byCallable.employeesGet.reads",
         "byCallable.employeesGet.writes",
         "byCallable.employeesList.calls",
+        "byCallable.employeesList.reads",
+        "byCallable.employeesList.writes",
         "byCallable.employeesUpdate.calls",
         "byCallable.employeesUpdate.reads",
         "byCallable.employeesUpdate.writes",
@@ -6172,11 +6408,13 @@
         "byCallable.imagesCreateUploadSession.reads",
         "byCallable.imagesCreateUploadSession.writes",
         "byCallable.imagesRemove.calls",
+        "byCallable.imagesRemove.reads",
         "byCallable.imagesRemove.writes",
         "byCallable.jobRolesCreate.calls",
         "byCallable.jobRolesCreate.reads",
         "byCallable.jobRolesCreate.writes",
         "byCallable.jobRolesList.calls",
+        "byCallable.jobRolesList.reads",
         "byCallable.jobRolesUpdate.calls",
         "byCallable.jobRolesUpdate.deletes",
         "byCallable.jobRolesUpdate.reads",
@@ -6194,7 +6432,9 @@
         "byCallable.locationsRecordPing.reads",
         "byCallable.locationsRecordPing.writes",
         "byCallable.modulesList.calls",
+        "byCallable.modulesList.reads",
         "byCallable.notificationsList.calls",
+        "byCallable.notificationsList.reads",
         "byCallable.notificationsMarkRead.calls",
         "byCallable.notificationsMarkRead.reads",
         "byCallable.notificationsMarkRead.writes",
@@ -6225,16 +6465,22 @@
         "byCallable.organizationsGet.reads",
         "byCallable.organizationsGet.writes",
         "byCallable.organizationsGetSubscriptionHistory.calls",
+        "byCallable.organizationsGetSubscriptionHistory.reads",
+        "byCallable.organizationsGetSubscriptionHistory.writes",
+        "byCallable.organizationsList.aggregationReads",
         "byCallable.organizationsList.calls",
-        "byCallable.organizationsList.writes",
+        "byCallable.organizationsList.reads",
         "byCallable.organizationsPreviewDeactivationImpact.calls",
-        "byCallable.organizationsPreviewDeactivationImpact.writes",
+        "byCallable.organizationsPreviewDeactivationImpact.reads",
         "byCallable.organizationsProvisionUser.calls",
         "byCallable.organizationsProvisionUser.reads",
         "byCallable.organizationsProvisionUser.writes",
         "byCallable.organizationsReactivate.calls",
         "byCallable.organizationsReactivate.reads",
         "byCallable.organizationsReactivate.writes",
+        "byCallable.organizationsRevealBankAccount.calls",
+        "byCallable.organizationsRevealBankAccount.reads",
+        "byCallable.organizationsRevealBankAccount.writes",
         "byCallable.organizationsSetSubscription.calls",
         "byCallable.organizationsSetSubscription.reads",
         "byCallable.organizationsSetSubscription.writes",
@@ -6248,8 +6494,14 @@
         "byCallable.outflowsCreate.reads",
         "byCallable.outflowsCreate.writes",
         "byCallable.outflowsGet.calls",
+        "byCallable.outflowsGet.reads",
+        "byCallable.outflowsGet.writes",
         "byCallable.outflowsList.calls",
+        "byCallable.outflowsList.reads",
+        "byCallable.outflowsList.writes",
         "byCallable.outflowsVoid.calls",
+        "byCallable.outflowsVoid.deletes",
+        "byCallable.outflowsVoid.reads",
         "byCallable.outflowsVoid.writes",
         "byCallable.paymentsCreate.calls",
         "byCallable.paymentsCreate.reads",
@@ -6261,6 +6513,8 @@
         "byCallable.paymentsGetFee.reads",
         "byCallable.paymentsGetFee.writes",
         "byCallable.paymentsList.calls",
+        "byCallable.paymentsList.reads",
+        "byCallable.paymentsList.writes",
         "byCallable.paymentsListFees.aggregationReads",
         "byCallable.paymentsListFees.calls",
         "byCallable.paymentsListFees.reads",
@@ -6275,9 +6529,12 @@
         "byCallable.paymentsVerifyFee.reads",
         "byCallable.paymentsVerifyFee.writes",
         "byCallable.paymentsVoid.calls",
+        "byCallable.paymentsVoid.reads",
         "byCallable.paymentsVoid.writes",
         "byCallable.permissionCatalogList.calls",
+        "byCallable.permissionCatalogList.reads",
         "byCallable.plansArchive.calls",
+        "byCallable.plansArchive.reads",
         "byCallable.plansArchive.writes",
         "byCallable.plansCatalogList.calls",
         "byCallable.plansCatalogList.reads",
@@ -6286,23 +6543,33 @@
         "byCallable.plansCreate.reads",
         "byCallable.plansCreate.writes",
         "byCallable.plansDelete.calls",
+        "byCallable.plansDelete.deletes",
+        "byCallable.plansDelete.reads",
         "byCallable.plansDelete.writes",
         "byCallable.plansGet.calls",
+        "byCallable.plansGet.reads",
         "byCallable.plansList.calls",
+        "byCallable.plansList.reads",
         "byCallable.plansPreviewImpact.calls",
-        "byCallable.plansPreviewImpact.writes",
+        "byCallable.plansPreviewImpact.reads",
         "byCallable.plansUpdate.calls",
         "byCallable.plansUpdate.reads",
         "byCallable.plansUpdate.writes",
         "byCallable.platformUsersGet.calls",
-        "byCallable.platformUsersGet.writes",
+        "byCallable.platformUsersGet.reads",
+        "byCallable.platformUsersList.aggregationReads",
         "byCallable.platformUsersList.calls",
+        "byCallable.platformUsersList.reads",
         "byCallable.platformUsersList.writes",
         "byCallable.productsCreate.calls",
         "byCallable.productsCreate.reads",
         "byCallable.productsCreate.writes",
         "byCallable.productsGet.calls",
+        "byCallable.productsGet.reads",
+        "byCallable.productsGet.writes",
         "byCallable.productsGetPriceHistory.calls",
+        "byCallable.productsGetPriceHistory.reads",
+        "byCallable.productsGetPriceHistory.writes",
         "byCallable.productsList.calls",
         "byCallable.productsList.reads",
         "byCallable.productsList.writes",
@@ -6310,15 +6577,20 @@
         "byCallable.productsUpdate.reads",
         "byCallable.productsUpdate.writes",
         "byCallable.reconcileBranchCounts.calls",
+        "byCallable.reconcileBranchCounts.reads",
         "byCallable.reconcileBranchCounts.writes",
         "byCallable.reconcilePartyLedgers.calls",
+        "byCallable.reconcilePartyLedgers.reads",
         "byCallable.reconcilePartyLedgers.writes",
         "byCallable.reconcileStockBalances.calls",
+        "byCallable.reconcileStockBalances.reads",
         "byCallable.reconcileStockBalances.writes",
         "byCallable.recurringExpensesCreate.calls",
         "byCallable.recurringExpensesCreate.reads",
         "byCallable.recurringExpensesCreate.writes",
         "byCallable.recurringExpensesList.calls",
+        "byCallable.recurringExpensesList.reads",
+        "byCallable.recurringExpensesList.writes",
         "byCallable.recurringExpensesUpdate.calls",
         "byCallable.recurringExpensesUpdate.reads",
         "byCallable.recurringExpensesUpdate.writes",
@@ -6329,13 +6601,16 @@
         "byCallable.reportsGetCashBankSummary.reads",
         "byCallable.reportsGetCashBankSummary.writes",
         "byCallable.reportsGetOutflowSummary.calls",
+        "byCallable.reportsGetOutflowSummary.reads",
         "byCallable.reportsGetOutflowSummary.writes",
         "byCallable.reportsGetPartyStatement.calls",
+        "byCallable.reportsGetPartyStatement.reads",
         "byCallable.reportsGetPartyStatement.writes",
         "byCallable.reportsGetPayablesAgeing.calls",
         "byCallable.reportsGetPayablesAgeing.reads",
         "byCallable.reportsGetPayablesAgeing.writes",
         "byCallable.reportsGetPlatformOverview.calls",
+        "byCallable.reportsGetPlatformOverview.reads",
         "byCallable.reportsGetPlatformOverview.writes",
         "byCallable.reportsGetProfitLoss.calls",
         "byCallable.reportsGetProfitLoss.reads",
@@ -6384,7 +6659,6 @@
         "byCallable.requestsGet.writes",
         "byCallable.requestsInboxCounts.calls",
         "byCallable.requestsInboxCounts.reads",
-        "byCallable.requestsInboxCounts.writes",
         "byCallable.requestsInboxList.calls",
         "byCallable.requestsInboxList.reads",
         "byCallable.requestsInboxList.writes",
@@ -6397,6 +6671,12 @@
         "byCallable.requestsSetPriority.calls",
         "byCallable.requestsSetPriority.reads",
         "byCallable.requestsSetPriority.writes",
+        "byCallable.requestsSettingsGet.calls",
+        "byCallable.requestsSettingsGet.reads",
+        "byCallable.requestsSettingsGet.writes",
+        "byCallable.requestsSettingsUpdate.calls",
+        "byCallable.requestsSettingsUpdate.reads",
+        "byCallable.requestsSettingsUpdate.writes",
         "byCallable.requestsTransition.calls",
         "byCallable.requestsTransition.reads",
         "byCallable.requestsTransition.writes",
@@ -6407,10 +6687,13 @@
         "byCallable.returnsCreate.reads",
         "byCallable.returnsCreate.writes",
         "byCallable.returnsList.calls",
+        "byCallable.returnsList.reads",
+        "byCallable.returnsList.writes",
         "byCallable.rolesCreate.calls",
         "byCallable.rolesCreate.reads",
         "byCallable.rolesCreate.writes",
         "byCallable.rolesList.calls",
+        "byCallable.rolesList.reads",
         "byCallable.rolesUpdate.calls",
         "byCallable.rolesUpdate.reads",
         "byCallable.rolesUpdate.writes",
@@ -6421,6 +6704,8 @@
         "byCallable.stockAdjust.reads",
         "byCallable.stockAdjust.writes",
         "byCallable.stockMovementsList.calls",
+        "byCallable.stockMovementsList.reads",
+        "byCallable.stockMovementsList.writes",
         "byCallable.stockTransfersCancel.calls",
         "byCallable.stockTransfersCancel.reads",
         "byCallable.stockTransfersCancel.writes",
@@ -6469,6 +6754,7 @@
         "byCallable.tasksCreate.reads",
         "byCallable.tasksCreate.writes",
         "byCallable.tasksDelete.calls",
+        "byCallable.tasksDelete.deletes",
         "byCallable.tasksDelete.reads",
         "byCallable.tasksDelete.writes",
         "byCallable.tasksList.calls",
@@ -6481,6 +6767,7 @@
         "byCallable.tasksUpdateStatus.reads",
         "byCallable.tasksUpdateStatus.writes",
         "byCallable.taxRegimesList.calls",
+        "byCallable.taxRegimesList.reads",
         "byCallable.teamsAssignMember.calls",
         "byCallable.teamsAssignMember.reads",
         "byCallable.teamsAssignMember.writes",
@@ -6488,6 +6775,8 @@
         "byCallable.teamsCreate.reads",
         "byCallable.teamsCreate.writes",
         "byCallable.teamsList.calls",
+        "byCallable.teamsList.reads",
+        "byCallable.teamsList.writes",
         "byCallable.teamsUpdate.calls",
         "byCallable.teamsUpdate.deletes",
         "byCallable.teamsUpdate.reads",
@@ -6496,10 +6785,15 @@
         "byCallable.unitsCreate.reads",
         "byCallable.unitsCreate.writes",
         "byCallable.unitsList.calls",
+        "byCallable.unitsList.reads",
         "byCallable.unitsUpdate.calls",
         "byCallable.unitsUpdate.deletes",
         "byCallable.unitsUpdate.reads",
         "byCallable.unitsUpdate.writes",
+        "byCallable.unknown.aggregationReads",
+        "byCallable.unknown.calls",
+        "byCallable.unknown.reads",
+        "byCallable.unknown.writes",
         "byCallable.usageCalculateDryRunStatement.calls",
         "byCallable.usageCalculateDryRunStatement.reads",
         "byCallable.usageCalculateDryRunStatement.writes",
@@ -6507,6 +6801,7 @@
         "byCallable.usageGetBranches.reads",
         "byCallable.usageGetBranches.writes",
         "byCallable.usageGetDetail.calls",
+        "byCallable.usageGetDetail.reads",
         "byCallable.usageGetLimits.calls",
         "byCallable.usageGetLimits.reads",
         "byCallable.usageGetLimits.writes",
@@ -6533,6 +6828,8 @@
         "byCallable.vendorsGet.reads",
         "byCallable.vendorsGet.writes",
         "byCallable.vendorsList.calls",
+        "byCallable.vendorsList.reads",
+        "byCallable.vendorsList.writes",
         "byCallable.vendorsUpdate.calls",
         "byCallable.vendorsUpdate.reads",
         "byCallable.vendorsUpdate.writes",
@@ -6557,6 +6854,9 @@
         "byCollection.bills.writes",
         "byCollection.branchProductStock.reads",
         "byCollection.branchProductStock.writes",
+        "byCollection.branchUsageDaily.reads",
+        "byCollection.branchUsageDaily.writes",
+        "byCollection.branchUsageMonthly.writes",
         "byCollection.capitalTransactions.aggregationReads",
         "byCollection.capitalTransactions.reads",
         "byCollection.capitalTransactions.writes",
@@ -6587,19 +6887,25 @@
         "byCollection.journalEntries.reads",
         "byCollection.latestLocations.reads",
         "byCollection.latestLocations.writes",
+        "byCollection.locationPings.reads",
         "byCollection.locationPings.writes",
         "byCollection.membershipBranches.reads",
         "byCollection.membershipBranches.writes",
         "byCollection.memberships.reads",
         "byCollection.memberships.writes",
+        "byCollection.modules.reads",
         "byCollection.monthlySummaries.reads",
         "byCollection.monthlySummaries.writes",
         "byCollection.notificationOutbox.reads",
         "byCollection.notificationOutbox.writes",
+        "byCollection.notifications.deletes",
         "byCollection.notifications.reads",
         "byCollection.notifications.writes",
         "byCollection.organizationUsageDaily.reads",
+        "byCollection.organizationUsageDaily.writes",
         "byCollection.organizationUsageMonthly.reads",
+        "byCollection.organizationUsageMonthly.writes",
+        "byCollection.organizations.aggregationReads",
         "byCollection.organizations.reads",
         "byCollection.organizations.writes",
         "byCollection.organizations/{id}/branches.reads",
@@ -6612,7 +6918,10 @@
         "byCollection.paymentProcessingFees.writes",
         "byCollection.payments.reads",
         "byCollection.payments.writes",
+        "byCollection.permissionCatalog.reads",
+        "byCollection.platformCostReconciliation.reads",
         "byCollection.platformSettings.reads",
+        "byCollection.platformSettings.writes",
         "byCollection.products.reads",
         "byCollection.products.writes",
         "byCollection.recurringExpenses.reads",
@@ -6630,6 +6939,7 @@
         "byCollection.serials.writes",
         "byCollection.stockAdjustmentRequests.aggregationReads",
         "byCollection.stockAdjustmentRequests.reads",
+        "byCollection.stockAdjustmentRequests.writes",
         "byCollection.stockBalances.reads",
         "byCollection.stockBalances.writes",
         "byCollection.stockMovements.reads",
@@ -6640,10 +6950,13 @@
         "byCollection.storageLocations.aggregationReads",
         "byCollection.storageLocations.reads",
         "byCollection.storageLocations.writes",
+        "byCollection.subscriptionPlans.deletes",
         "byCollection.subscriptionPlans.reads",
         "byCollection.subscriptionPlans.writes",
+        "byCollection.tasks.deletes",
         "byCollection.tasks.reads",
         "byCollection.tasks.writes",
+        "byCollection.taxRegimes.reads",
         "byCollection.teams.reads",
         "byCollection.teams.writes",
         "byCollection.uniqueKeys.deletes",
@@ -6654,6 +6967,8 @@
         "byCollection.usageCounterShards.reads",
         "byCollection.usageCounterShards.writes",
         "byCollection.usageRateCards.reads",
+        "byCollection.userUsageDaily.reads",
+        "byCollection.users.aggregationReads",
         "byCollection.users.reads",
         "byCollection.users.writes",
         "byCollection.users/{id}/devices.reads",
@@ -6661,30 +6976,61 @@
         "byCollection.vendors.aggregationReads",
         "byCollection.vendors.reads",
         "byCollection.vendors.writes",
-        "hourly.07.aggregationReads",
-        "hourly.07.calls",
-        "hourly.07.reads",
-        "hourly.07.writes",
-        "hourly.08.aggregationReads",
-        "hourly.08.calls",
-        "hourly.08.deletes",
-        "hourly.08.reads",
-        "hourly.08.writes",
-        "targets.EVjBquUxQnPEiN50gAMk.calls",
-        "targets.EVjBquUxQnPEiN50gAMk.reads",
-        "targets.EVjBquUxQnPEiN50gAMk.writes",
-        "targets.KPcSmduEaVZmYM0CMN7W.calls",
-        "targets.KPcSmduEaVZmYM0CMN7W.reads",
-        "targets.KPcSmduEaVZmYM0CMN7W.writes",
+        "clientReported.locationPings",
+        "clientReported.storageOperations",
+        "hourly.06.aggregationReads",
+        "hourly.06.calls",
+        "hourly.06.deletes",
+        "hourly.06.reads",
+        "hourly.06.writes",
+        "targets.9QNDptxpl3blX3Tw9QQH.calls",
+        "targets.9QNDptxpl3blX3Tw9QQH.reads",
+        "targets.9QNDptxpl3blX3Tw9QQH.writes",
+        "targets.BAXmRwF9dpd5jlqKgwNS.calls",
+        "targets.BAXmRwF9dpd5jlqKgwNS.reads",
+        "targets.BAXmRwF9dpd5jlqKgwNS.writes",
+        "targets.Bzr5w5DbLiyeFxUuFwrI.calls",
+        "targets.Bzr5w5DbLiyeFxUuFwrI.reads",
+        "targets.Bzr5w5DbLiyeFxUuFwrI.writes",
+        "targets.Dsax2nGz6FfTOFB3Hzc6.calls",
+        "targets.Dsax2nGz6FfTOFB3Hzc6.reads",
+        "targets.Dsax2nGz6FfTOFB3Hzc6.writes",
+        "targets.GR5GgswZcaykCzCrTXqs.calls",
+        "targets.GR5GgswZcaykCzCrTXqs.reads",
+        "targets.GR5GgswZcaykCzCrTXqs.writes",
+        "targets.JcAg2udd9BrxjL1tuLrL.calls",
+        "targets.JcAg2udd9BrxjL1tuLrL.writes",
+        "targets.QpRe7nfd1tAqLwXzdq41.calls",
+        "targets.QpRe7nfd1tAqLwXzdq41.reads",
+        "targets.QpRe7nfd1tAqLwXzdq41.writes",
+        "targets.UMGm38ZwYtr0PJK5SuUm.calls",
+        "targets.UMGm38ZwYtr0PJK5SuUm.reads",
+        "targets.UMGm38ZwYtr0PJK5SuUm.writes",
+        "targets.ZkfEkHgv3IBlCZdOMpL8.calls",
+        "targets.ZkfEkHgv3IBlCZdOMpL8.reads",
+        "targets.ZkfEkHgv3IBlCZdOMpL8.writes",
+        "targets.gVpde9SBCkGFD3mz7bjk.calls",
+        "targets.gVpde9SBCkGFD3mz7bjk.reads",
+        "targets.gVpde9SBCkGFD3mz7bjk.writes",
+        "targets.gjmisIgIhjmX1BDTsTwh.calls",
+        "targets.gjmisIgIhjmX1BDTsTwh.reads",
+        "targets.gjmisIgIhjmX1BDTsTwh.writes",
+        "targets.jjuscosBdAXLbVcN8vRP.calls",
+        "targets.jjuscosBdAXLbVcN8vRP.reads",
+        "targets.jjuscosBdAXLbVcN8vRP.writes",
+        "targets.lQ9p0fKAzG37PIcmSE7K.calls",
         "targets.platform.calls",
         "targets.platform.reads",
         "targets.platform.writes",
-        "targets.yekRSQZnwFC8wJP0bddi.calls",
-        "targets.yekRSQZnwFC8wJP0bddi.reads",
-        "targets.yekRSQZnwFC8wJP0bddi.writes",
-        "targets.zhSpARKTu7iQ4jxJTDyz.calls",
-        "targets.zhSpARKTu7iQ4jxJTDyz.reads",
-        "targets.zhSpARKTu7iQ4jxJTDyz.writes"
+        "targets.q4rzllru3FYg6vQDIsdE.calls",
+        "targets.q4rzllru3FYg6vQDIsdE.reads",
+        "targets.q4rzllru3FYg6vQDIsdE.writes",
+        "targets.rcI5QEbGWgjLJkDMhQ4f.calls",
+        "targets.rcI5QEbGWgjLJkDMhQ4f.reads",
+        "targets.rcI5QEbGWgjLJkDMhQ4f.writes",
+        "targets.ysjjApLtxa7UzYvsjm9j.calls",
+        "targets.ysjjApLtxa7UzYvsjm9j.reads",
+        "targets.ysjjApLtxa7UzYvsjm9j.writes"
       ]
     },
     {
@@ -6693,7 +7039,7 @@
       "displayName": "Organization Usage Monthly",
       "callablePrefix": null,
       "collection": "organizationUsageMonthly",
-      "documentsObserved": 0,
+      "documentsObserved": 2,
       "fields": [
         {
           "path": "organizationId",
@@ -6701,7 +7047,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Id of the organization (tenant) the record belongs to."
         },
         {
@@ -6710,7 +7056,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "YYYY-MM"
         },
         {
@@ -6728,11 +7074,14 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was last changed (ISO-8601)."
         }
       ],
-      "untypedStoredPaths": []
+      "untypedStoredPaths": [
+        "clientReported.locationPings",
+        "clientReported.storageOperations"
+      ]
     },
     {
       "entity": "organization",
@@ -6740,7 +7089,7 @@
       "displayName": "Organization",
       "callablePrefix": "images",
       "collection": "organizations",
-      "documentsObserved": 17,
+      "documentsObserved": 66,
       "fields": [
         {
           "path": "name",
@@ -6892,7 +7241,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Storage path of the processed image."
         },
         {
@@ -6901,7 +7250,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "\"image/jpeg\" | \"image/png\" | \"image/webp\"",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "MIME type of the stored image."
         },
         {
@@ -6910,7 +7259,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "number",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Image width in pixels."
         },
         {
@@ -6919,7 +7268,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "number",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Image height in pixels."
         },
         {
@@ -6928,7 +7277,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "number",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Size of the stored image in bytes."
         },
         {
@@ -6937,7 +7286,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the image was attached (ISO-8601)."
         },
         {
@@ -7092,6 +7441,15 @@
           "validator": "boolean | undefined",
           "verdict": "TYPED_NOT_OBSERVED",
           "description": "D-25: tenants see the cost estimate (labelled) only when the Super Admin enables it"
+        },
+        {
+          "path": "supportAccessExpiresAt",
+          "type": "string | null | undefined",
+          "requiredOnCreate": false,
+          "sensitivity": "public",
+          "validator": "string | null | undefined",
+          "verdict": "TYPED_NOT_OBSERVED",
+          "description": "BC3 / MG-40: Tenant-granted expiring support access grant for Super Admin"
         },
         {
           "path": "subscriptionStatus",
@@ -7832,17 +8190,23 @@
         "moduleToggles.reports",
         "moduleToggles.sales",
         "moduleToggles.staff",
+        "moduleToggles.tasks",
+        "settings.approvals.allowSelfApproval",
+        "settings.approvals.modules.account_transfer",
         "settings.approvals.modules.expense",
         "settings.approvals.modules.purchase",
         "settings.approvals.modules.return",
         "settings.approvals.modules.sale",
         "settings.approvals.modules.stock_adjustment",
+        "settings.approvals.modules.stock_transfer",
+        "settings.approvals.thresholds.k1",
         "settings.businessConfig.productFields.alternateUnits",
         "settings.businessConfig.productFields.batch",
         "settings.businessConfig.productFields.expiry",
         "settings.businessConfig.productFields.jewellery",
         "settings.businessConfig.productFields.serial",
         "settings.businessConfig.productFields.variants",
+        "settings.numbering.k1",
         "usageLimitOverrides.firestoreReads.dailyLimit",
         "usageLimitOverrides.firestoreReads.enabled",
         "usageLimitOverrides.firestoreReads.enforcementMode",
@@ -7855,6 +8219,7 @@
         "usageLimitOverrides.firestoreWrites.hardThresholdPercent",
         "usageLimitOverrides.firestoreWrites.monthlyLimit",
         "usageLimitOverrides.firestoreWrites.warningThresholdPercent",
+        "usageLimitOverrides.firestoreWrites.weeklyLimit",
         "usageLimitOverrides.functionsInvocations.dailyLimit",
         "usageLimitOverrides.functionsInvocations.enabled",
         "usageLimitOverrides.functionsInvocations.enforcementMode",
@@ -7867,7 +8232,12 @@
         "usageLimitOverrides.k1.hardThresholdPercent",
         "usageLimitOverrides.k1.monthlyLimit",
         "usageLimitOverrides.k1.warningThresholdPercent",
-        "usageLimitOverrides.k1.weeklyLimit"
+        "usageLimitOverrides.k1.weeklyLimit",
+        "usageLimitOverrides.locationPings.dailyLimit",
+        "usageLimitOverrides.locationPings.enabled",
+        "usageLimitOverrides.locationPings.enforcementMode",
+        "usageLimitOverrides.locationPings.hardThresholdPercent",
+        "usageLimitOverrides.locationPings.warningThresholdPercent"
       ]
     },
     {
@@ -7876,7 +8246,7 @@
       "displayName": "Outflow",
       "callablePrefix": "outflows",
       "collection": "outflows",
-      "documentsObserved": 7,
+      "documentsObserved": 38,
       "fields": [
         {
           "path": "organizationId",
@@ -7992,7 +8362,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "number | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Paid amount asked for in the approval request."
         },
         {
@@ -8001,7 +8371,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "PaymentMethod | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Payment method asked for in the approval request."
         },
         {
@@ -8091,7 +8461,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "recurringExpenses/{templateId} that generated this expense"
         },
         {
@@ -8244,7 +8614,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "number | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Quantity already returned from this line."
         },
         {
@@ -8613,7 +8983,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was rejected (ISO-8601)."
         },
         {
@@ -8622,7 +8992,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the user who rejected it."
         },
         {
@@ -8631,7 +9001,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | null | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Reason the approver gave."
         },
         {
@@ -8712,7 +9082,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the document was voided (ISO-8601)."
         },
         {
@@ -8721,7 +9091,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the user who voided the document."
         },
         {
@@ -8730,7 +9100,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Reason the document was voided."
         }
       ],
@@ -8742,7 +9112,7 @@
       "displayName": "Payment Processing Fee",
       "callablePrefix": "payments",
       "collection": "paymentProcessingFees",
-      "documentsObserved": 1,
+      "documentsObserved": 2,
       "fields": [
         {
           "path": "organizationId",
@@ -9050,7 +9420,7 @@
       "displayName": "Payment",
       "callablePrefix": "payments",
       "collection": "payments",
-      "documentsObserved": 18,
+      "documentsObserved": 60,
       "fields": [
         {
           "path": "organizationId",
@@ -9148,7 +9518,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Only for a standalone payment with no partyId and no referenceId (owned free text)"
         },
         {
@@ -9274,7 +9644,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was last changed (ISO-8601)."
         },
         {
@@ -9283,7 +9653,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the user who last changed the record."
         },
         {
@@ -9463,7 +9833,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the document was voided (ISO-8601)."
         },
         {
@@ -9472,7 +9842,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the user who voided the document."
         },
         {
@@ -9481,7 +9851,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Reason the document was voided."
         }
       ],
@@ -9493,7 +9863,7 @@
       "displayName": "Permission Catalog",
       "callablePrefix": "permission",
       "collection": "permissionCatalog",
-      "documentsObserved": 145,
+      "documentsObserved": 149,
       "fields": [
         {
           "path": "code",
@@ -9548,7 +9918,7 @@
       "entity": "platformSettings",
       "docName": null,
       "displayName": "platform Settings",
-      "callablePrefix": null,
+      "callablePrefix": "requests",
       "collection": "platformSettings",
       "documentsObserved": 1,
       "fields": [],
@@ -9560,17 +9930,7 @@
         "needsInfoAutoCancelDays",
         "needsInfoReminderDays",
         "reopenWindowDays",
-        "requestsEnabled",
-        "sla.high.firstResponseHours",
-        "sla.high.resolutionHours",
-        "sla.low.firstResponseHours",
-        "sla.low.resolutionHours",
-        "sla.normal.firstResponseHours",
-        "sla.normal.resolutionHours",
-        "sla.urgent.firstResponseHours",
-        "sla.urgent.resolutionHours",
-        "updatedAt",
-        "updatedBy"
+        "requestsEnabled"
       ]
     },
     {
@@ -9579,7 +9939,7 @@
       "displayName": "Product",
       "callablePrefix": "products",
       "collection": "products",
-      "documentsObserved": 21,
+      "documentsObserved": 70,
       "fields": [
         {
           "path": "organizationId",
@@ -10195,8 +10555,11 @@
         }
       ],
       "untypedStoredPaths": [
+        "variantAttributes.colour",
         "variantAttributes.frame",
         "variantAttributes.k1",
+        "variantAttributes.size",
+        "variantAttributes.storage",
         "variantAttributes.wheels"
       ]
     },
@@ -10206,7 +10569,7 @@
       "displayName": "Recurring Expense",
       "callablePrefix": "recurring",
       "collection": "recurringExpenses",
-      "documentsObserved": 1,
+      "documentsObserved": 3,
       "fields": [
         {
           "path": "organizationId",
@@ -10250,7 +10613,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "YYYY-MM (monthly) or YYYY-MM-DD (weekly)"
         },
         {
@@ -10532,17 +10895,8 @@
       "displayName": "Request",
       "callablePrefix": "requests",
       "collection": "requests",
-      "documentsObserved": 8,
+      "documentsObserved": 23,
       "fields": [
-        {
-          "path": "requestId",
-          "type": "string",
-          "requiredOnCreate": true,
-          "sensitivity": "public",
-          "validator": "string",
-          "verdict": "PRESENT",
-          "description": "Id of the approval request or client request this entry belongs to."
-        },
         {
           "path": "requestNumber",
           "type": "string",
@@ -10976,15 +11330,6 @@
           "description": ""
         },
         {
-          "path": "organizationName",
-          "type": "string",
-          "requiredOnCreate": true,
-          "sensitivity": "public",
-          "validator": "string",
-          "verdict": "PRESENT",
-          "description": "Name of the organization."
-        },
-        {
           "path": "requesterName",
           "type": "string",
           "requiredOnCreate": true,
@@ -11019,6 +11364,10 @@
         "applyResult.metric",
         "applyResult.moduleKey",
         "applyResult.newPlanId",
+        "applyResult.overriddenBlockers[].allowed",
+        "applyResult.overriddenBlockers[].code",
+        "applyResult.overriddenBlockers[].current",
+        "applyResult.overriddenBlockers[].message",
         "applyResult.period",
         "applyResult.previousPlanId",
         "assignee",
@@ -11028,22 +11377,28 @@
         "details.area",
         "details.billingPeriod",
         "details.description",
+        "details.detailsText",
         "details.diagnostics.appVersion",
         "details.diagnostics.platform",
         "details.diagnostics.route",
         "details.diagnosticsOptIn",
         "details.expected",
+        "details.field",
         "details.metric",
         "details.moduleKey",
         "details.period",
         "details.permissionKeys[]",
+        "details.proposedValue",
+        "details.question",
         "details.reason",
         "details.requestedLimit",
         "details.requestedPlanId",
         "details.severity",
         "details.stepsToReproduce",
         "details.suspectedImpact",
+        "details.topic",
         "relatedEntity",
+        "requestId",
         "requester.email",
         "requester.role"
       ]
@@ -11054,7 +11409,7 @@
       "displayName": "Return",
       "callablePrefix": "outflows",
       "collection": "returns",
-      "documentsObserved": 2,
+      "documentsObserved": 10,
       "fields": [
         {
           "path": "organizationId",
@@ -11296,7 +11651,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Free-text notes."
         },
         {
@@ -11404,7 +11759,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was approved (ISO-8601)."
         },
         {
@@ -11413,7 +11768,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the approver."
         },
         {
@@ -11440,7 +11795,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | null | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Reason the approver gave."
         },
         {
@@ -11551,7 +11906,7 @@
       "displayName": "Role",
       "callablePrefix": "employees",
       "collection": "roles",
-      "documentsObserved": 9,
+      "documentsObserved": 10,
       "fields": [
         {
           "path": "organizationId",
@@ -11644,7 +11999,9 @@
           "description": "Firebase Auth uid of the user who last changed the record."
         }
       ],
-      "untypedStoredPaths": []
+      "untypedStoredPaths": [
+        "migration"
+      ]
     },
     {
       "entity": "serial",
@@ -11652,7 +12009,7 @@
       "displayName": "Serial",
       "callablePrefix": null,
       "collection": "serials",
-      "documentsObserved": 28,
+      "documentsObserved": 35,
       "fields": [
         {
           "path": "organizationId",
@@ -11798,7 +12155,7 @@
       "displayName": "Stock Adjustment Request",
       "callablePrefix": null,
       "collection": "stockAdjustmentRequests",
-      "documentsObserved": 0,
+      "documentsObserved": 2,
       "fields": [
         {
           "path": "organizationId",
@@ -11806,7 +12163,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Id of the organization (tenant) the record belongs to."
         },
         {
@@ -11815,7 +12172,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Id of the branch the record belongs to or applies to."
         },
         {
@@ -11824,7 +12181,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Id of the product."
         },
         {
@@ -11833,7 +12190,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "number",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "signed, base unit"
         },
         {
@@ -11842,7 +12199,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Reason code or text explaining the outcome."
         },
         {
@@ -11851,7 +12208,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "StockAdjustmentReason | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": ""
         },
         {
@@ -11869,7 +12226,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "\"pending_approval\" | \"rejected\" | \"approved\"",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Lifecycle status of the record (values: the field's enum)."
         },
         {
@@ -11878,7 +12235,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | null | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Note recorded with the approval decision."
         },
         {
@@ -11887,7 +12244,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": ""
         },
         {
@@ -11896,7 +12253,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was created (ISO-8601)."
         },
         {
@@ -11905,7 +12262,7 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "string",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the user who created the record."
         },
         {
@@ -11914,7 +12271,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | null | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Membership id of the member who created the record."
         },
         {
@@ -11923,7 +12280,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was last changed (ISO-8601)."
         },
         {
@@ -11932,7 +12289,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the user who last changed the record."
         },
         {
@@ -11995,7 +12352,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was approved (ISO-8601)."
         },
         {
@@ -12004,7 +12361,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the approver."
         },
         {
@@ -12013,7 +12370,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Time the record was rejected (ISO-8601)."
         },
         {
@@ -12022,7 +12379,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the user who rejected it."
         },
         {
@@ -12031,7 +12388,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | null | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Reason the approver gave."
         },
         {
@@ -12142,7 +12499,7 @@
       "displayName": "Stock Balance",
       "callablePrefix": "bills",
       "collection": "stockBalances",
-      "documentsObserved": 30,
+      "documentsObserved": 63,
       "fields": [
         {
           "path": "organizationId",
@@ -12186,7 +12543,7 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "number | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "R3 cache of open sales-order reservations (available = current - allocated, computed)"
         },
         {
@@ -12225,7 +12582,7 @@
       "displayName": "Stock Movement",
       "callablePrefix": "stock",
       "collection": "stockMovements",
-      "documentsObserved": 69,
+      "documentsObserved": 159,
       "fields": [
         {
           "path": "organizationId",
@@ -12371,7 +12728,7 @@
       "displayName": "Stock Transfer",
       "callablePrefix": "stock",
       "collection": "stockTransfers",
-      "documentsObserved": 4,
+      "documentsObserved": 6,
       "fields": [
         {
           "path": "organizationId",
@@ -12859,7 +13216,7 @@
       "displayName": "Storage Location",
       "callablePrefix": "storage",
       "collection": "storageLocations",
-      "documentsObserved": 7,
+      "documentsObserved": 8,
       "fields": [
         {
           "path": "organizationId",
@@ -13113,7 +13470,7 @@
       "displayName": "Subscription Plan",
       "callablePrefix": "plans",
       "collection": "subscriptionPlans",
-      "documentsObserved": 9,
+      "documentsObserved": 13,
       "fields": [
         {
           "path": "name",
@@ -13274,11 +13631,12 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the user who last changed the record."
         }
       ],
       "untypedStoredPaths": [
+        "moduleFlags.analytics",
         "moduleFlags.billing",
         "moduleFlags.customers",
         "moduleFlags.deliveries",
@@ -13287,6 +13645,7 @@
         "moduleFlags.expenses",
         "moduleFlags.inventory",
         "moduleFlags.k1",
+        "moduleFlags.liveLocation",
         "moduleFlags.purchases",
         "moduleFlags.reports",
         "moduleFlags.returns",
@@ -13301,7 +13660,7 @@
       "displayName": "Task",
       "callablePrefix": "tasks",
       "collection": "tasks",
-      "documentsObserved": 1,
+      "documentsObserved": 2,
       "fields": [
         {
           "path": "organizationId",
@@ -13620,7 +13979,7 @@
       "displayName": "Team",
       "callablePrefix": "teams",
       "collection": "teams",
-      "documentsObserved": 2,
+      "documentsObserved": 6,
       "fields": [
         {
           "path": "organizationId",
@@ -13712,7 +14071,7 @@
       "displayName": "Unique Key",
       "callablePrefix": null,
       "collection": "uniqueKeys",
-      "documentsObserved": 85,
+      "documentsObserved": 207,
       "fields": [
         {
           "path": "organizationId",
@@ -13768,7 +14127,7 @@
       "displayName": "Unit",
       "callablePrefix": "units",
       "collection": "units",
-      "documentsObserved": 8,
+      "documentsObserved": 11,
       "fields": [
         {
           "path": "organizationId",
@@ -13887,7 +14246,7 @@
       "displayName": "Usage Counter Shard",
       "callablePrefix": null,
       "collection": "usageCounterShards",
-      "documentsObserved": 81,
+      "documentsObserved": 325,
       "fields": [
         {
           "path": "organizationId",
@@ -13945,31 +14304,49 @@
         }
       ],
       "untypedStoredPaths": [
-        "branches.05twk9jfVna7Qyp79oIH.2026-11-18.firestoreWrites",
-        "branches.05twk9jfVna7Qyp79oIH.2026-11-18.functionsInvocations",
-        "branches.branch_abu_dhabi.2026-11-18.firestoreWrites",
-        "branches.branch_abu_dhabi.2026-11-18.functionsInvocations",
-        "branches.branch_riffa.2026-11-18.firestoreWrites",
-        "branches.branch_riffa.2026-11-18.functionsInvocations",
-        "branches.branch_sec_1794988681537_5395.2026-11-18.firestoreWrites",
-        "branches.branch_sec_1794988681537_5395.2026-11-18.functionsInvocations",
-        "branches.branchid-pr.2026-11-18.firestoreWrites",
-        "branches.branchid-pr.2026-11-18.functionsInvocations",
-        "branches.dUXtAyoArohLHwSIcX8U.2026-11-18.firestoreReads",
-        "branches.dUXtAyoArohLHwSIcX8U.2026-11-18.firestoreWrites",
-        "branches.dUXtAyoArohLHwSIcX8U.2026-11-18.functionsInvocations",
-        "branches.dUXtAyoArohLHwSIcX8U.2026-11-18.locationPings",
-        "branches.main-branch.2026-11-18.firestoreReads",
-        "branches.main-branch.2026-11-18.firestoreWrites",
-        "branches.main-branch.2026-11-18.functionsInvocations",
-        "branches.main-branch.2026-11-18.locationPings",
-        "branches.sourcebranchid-pr.2026-11-18.firestoreWrites",
-        "branches.sourcebranchid-pr.2026-11-18.functionsInvocations",
-        "days.2026-11-18.firestoreReads",
-        "days.2026-11-18.firestoreWrites",
-        "days.2026-11-18.functionsInvocations",
-        "days.2026-11-18.locationPings",
-        "days.2026-11-18.storageUploadBytes"
+        "branches.NGgZpvEaQrNTdrh87wQB.2026-11-19.firestoreReads",
+        "branches.NGgZpvEaQrNTdrh87wQB.2026-11-19.functionsInvocations",
+        "branches.U12ZQ3L6VvPAmrlhLv0U.2026-11-19.firestoreWrites",
+        "branches.U12ZQ3L6VvPAmrlhLv0U.2026-11-19.functionsInvocations",
+        "branches.UzTG5uaJeQ1C4YH5zN7S.2026-11-19.firestoreWrites",
+        "branches.UzTG5uaJeQ1C4YH5zN7S.2026-11-19.functionsInvocations",
+        "branches.aiy6h5Ale5oDGl0PLB8V.2026-11-19.firestoreReads",
+        "branches.aiy6h5Ale5oDGl0PLB8V.2026-11-19.firestoreWrites",
+        "branches.aiy6h5Ale5oDGl0PLB8V.2026-11-19.functionsInvocations",
+        "branches.bI9htiWOIMz2GzDblddi.2026-11-19.firestoreWrites",
+        "branches.bI9htiWOIMz2GzDblddi.2026-11-19.functionsInvocations",
+        "branches.branch_abu_dhabi.2026-11-19.firestoreWrites",
+        "branches.branch_abu_dhabi.2026-11-19.functionsInvocations",
+        "branches.branch_riffa.2026-11-19.firestoreWrites",
+        "branches.branch_riffa.2026-11-19.functionsInvocations",
+        "branches.branch_sec_1795070339770_94892.2026-11-19.firestoreWrites",
+        "branches.branch_sec_1795070339770_94892.2026-11-19.functionsInvocations",
+        "branches.branch_sec_1795070570648_78025.2026-11-19.firestoreWrites",
+        "branches.branch_sec_1795070570648_78025.2026-11-19.functionsInvocations",
+        "branches.branchid-pr.2026-11-19.firestoreWrites",
+        "branches.branchid-pr.2026-11-19.functionsInvocations",
+        "branches.fCCSsm84wlPMoLKw1htL.2026-11-19.firestoreReads",
+        "branches.fCCSsm84wlPMoLKw1htL.2026-11-19.firestoreWrites",
+        "branches.fCCSsm84wlPMoLKw1htL.2026-11-19.functionsInvocations",
+        "branches.main-branch.2026-11-19.firestoreReads",
+        "branches.main-branch.2026-11-19.firestoreWrites",
+        "branches.main-branch.2026-11-19.functionsInvocations",
+        "branches.main-branch.2026-11-19.locationPings",
+        "branches.nkZI7wKkHZpft9Qw7coN.2026-11-19.firestoreWrites",
+        "branches.nkZI7wKkHZpft9Qw7coN.2026-11-19.functionsInvocations",
+        "branches.nope-branch.2026-11-19.firestoreWrites",
+        "branches.nope-branch.2026-11-19.functionsInvocations",
+        "branches.rFNZK2gN7JU5byfvtDyy.2026-11-19.firestoreReads",
+        "branches.rFNZK2gN7JU5byfvtDyy.2026-11-19.firestoreWrites",
+        "branches.rFNZK2gN7JU5byfvtDyy.2026-11-19.functionsInvocations",
+        "branches.rFNZK2gN7JU5byfvtDyy.2026-11-19.locationPings",
+        "branches.sourcebranchid-pr.2026-11-19.firestoreWrites",
+        "branches.sourcebranchid-pr.2026-11-19.functionsInvocations",
+        "days.2026-11-19.firestoreReads",
+        "days.2026-11-19.firestoreWrites",
+        "days.2026-11-19.functionsInvocations",
+        "days.2026-11-19.locationPings",
+        "days.2026-11-19.storageUploadBytes"
       ]
     },
     {
@@ -14187,7 +14564,7 @@
       "displayName": "User",
       "callablePrefix": "users",
       "collection": "users",
-      "documentsObserved": 48,
+      "documentsObserved": 148,
       "fields": [
         {
           "path": "name",
@@ -14366,11 +14743,13 @@
           "requiredOnCreate": false,
           "sensitivity": "public",
           "validator": "string | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
+          "verdict": "PRESENT",
           "description": "Firebase Auth uid of the user who last changed the record."
         }
       ],
-      "untypedStoredPaths": []
+      "untypedStoredPaths": [
+        "image"
+      ]
     },
     {
       "entity": "vendor",
@@ -14378,7 +14757,7 @@
       "displayName": "Vendor",
       "callablePrefix": "vendors",
       "collection": "vendors",
-      "documentsObserved": 6,
+      "documentsObserved": 17,
       "fields": [
         {
           "path": "organizationId",

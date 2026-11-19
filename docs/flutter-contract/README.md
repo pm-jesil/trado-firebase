@@ -6,9 +6,9 @@ Freshness and integrity enforced by `scripts/check-flutter-contract.js`.
 
 ## Contents
 - [SUMMARY.md](./SUMMARY.md) — Compact cheatsheet (≤ 250 lines) + contract changelog for Flutter.
-- [callables/INDEX.md](./callables/INDEX.md) & [callables.json](./callables.json) — Authoritative reference for all 188 callables (input, response shape, permissions, gate, errors).
+- [callables/INDEX.md](./callables/INDEX.md) & [callables.json](./callables.json) — Authoritative reference for all 189 callables (input, response shape, permissions, gate, errors).
 - `forms/` — 35 entity/action forms + 15 request-detail schemas.
-- [permissions.md](./permissions.md) & [permissions.json](./permissions.json) — 147 concrete permission keys with descriptions, default roles, and scope notes.
+- [permissions.md](./permissions.md) & [permissions.json](./permissions.json) — 149 concrete permission keys with descriptions, default roles, and scope notes.
 - [auth.md](./auth.md) — `authMe` / `authLogin` session bootstrap contract (`primaryOrganization.timezone`, `organization_selection_required`).
 - [images.md](./images.md) — `ImageRef` (`path`, `uploadId`) pipeline, limits, and entity shapes.
 - [errors.md](./errors.md) — All 69 stable error reason codes.

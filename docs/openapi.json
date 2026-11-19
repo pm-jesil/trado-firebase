@@ -3,7 +3,7 @@
   "info": {
     "title": "Trado Firebase Backend — Local Emulator API",
     "version": "1.0.0",
-    "description": "Authoritative OpenAPI 3.0.3 contract for the Trado Firebase backend.\n\n**188 HTTPS Callable functions** across 40 domains.\n**8 Firestore Triggers** (internal event-driven background automation).\n\n⚠️ **LOCAL EMULATOR ONLY** — Targets loopback Firebase Emulator Suite (`127.0.0.1:5001`).\nDo NOT use this contract against production cloud endpoints.\n\nGenerated from canonical source exports and validation schemas (196 total exports).\nInput schemas derived from 213 Zod schemas via z.toJSONSchema()."
+    "description": "Authoritative OpenAPI 3.0.3 contract for the Trado Firebase backend.\n\n**189 HTTPS Callable functions** across 40 domains.\n**8 Firestore Triggers** (internal event-driven background automation).\n\n⚠️ **LOCAL EMULATOR ONLY** — Targets loopback Firebase Emulator Suite (`127.0.0.1:5001`).\nDo NOT use this contract against production cloud endpoints.\n\nGenerated from canonical source exports and validation schemas (197 total exports).\nInput schemas derived from 214 Zod schemas via z.toJSONSchema()."
   },
   "servers": [
     {
@@ -10369,6 +10369,90 @@
         ]
       }
     },
+    "/api/callables/organizationsRevealBankAccount": {
+      "post": {
+        "operationId": "organizationsRevealBankAccount",
+        "summary": "[ACTION] Organizations Reveal Bank Account",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `organizations.revealBankAccount`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `org:manage_bank_details`\n\n**Super Admin bypass:** Yes\n\n**Input schema:** `RevealBankAccountSchema`\n\n**Reads:** organizations\n\n**Side effects:** audit_log\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Organizations"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/RevealBankAccountSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (OrganizationsRevealBankAccountResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrganizationsRevealBankAccountResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
     "/api/callables/employeesGet": {
       "post": {
         "operationId": "employeesGet",
@@ -16422,7 +16506,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "default": "bank_xoww3f3",
+            "default": "bank_1f5rpx3",
             "type": "string",
             "minLength": 1
           },
@@ -16503,7 +16587,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "default": "bank_8f14glq",
+              "default": "bank_b6ci9o3",
               "type": "string",
               "minLength": 1
             },
@@ -17155,6 +17239,28 @@
         },
         "required": [
           "organizationId"
+        ],
+        "additionalProperties": false
+      },
+      "RevealBankAccountSchema": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string"
+          },
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "bankAccountId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "organizationId",
+          "bankAccountId"
         ],
         "additionalProperties": false
       },
@@ -29782,6 +29888,94 @@
                 "items": {
                   "type": "object",
                   "properties": {
+                    "bankAccounts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Id of this item, unique within its list.",
+                            "x-ts-type": "string"
+                          },
+                          "accountHolderName": {
+                            "type": "string",
+                            "description": "Name on the bank account.",
+                            "x-ts-type": "string"
+                          },
+                          "bankName": {
+                            "type": "string",
+                            "description": "Name of the bank.",
+                            "x-ts-type": "string"
+                          },
+                          "accountNumber": {
+                            "type": "string",
+                            "description": "Bank account number.",
+                            "x-ts-type": "string"
+                          },
+                          "label": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Label of the bank account.",
+                            "x-ts-type": "string | undefined"
+                          },
+                          "routingType": {
+                            "type": "string",
+                            "enum": [
+                              "ifsc",
+                              "iban",
+                              "swift",
+                              "us_routing",
+                              "sg_code",
+                              "other"
+                            ],
+                            "nullable": true,
+                            "description": "Kind of routing code (IFSC, IBAN, SWIFT, US routing, other).",
+                            "x-ts-type": "\"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined"
+                          },
+                          "routingCode": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Routing code of the bank branch, of the kind given by routingType.",
+                            "x-ts-type": "string | undefined"
+                          },
+                          "upiId": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "UPI id for payments to this account.",
+                            "x-ts-type": "string | undefined"
+                          },
+                          "currency": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "ISO 4217 currency of the account.",
+                            "x-ts-type": "string | undefined"
+                          },
+                          "isDefault": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "description": "Whether this is the default entry of its list.",
+                            "x-ts-type": "boolean | undefined"
+                          },
+                          "showOnInvoice": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "description": "Whether the account is printed on invoices.",
+                            "x-ts-type": "boolean | undefined"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "active",
+                              "archived"
+                            ],
+                            "nullable": true,
+                            "description": "Whether the account is active or archived.",
+                            "x-ts-type": "\"active\" | \"archived\" | undefined"
+                          }
+                        }
+                      }
+                    },
                     "subscriptionStatus": {
                       "type": "string",
                       "description": "State of the organization's subscription.",
@@ -30075,6 +30269,12 @@
                       "nullable": true,
                       "description": "D-25: tenants see the cost estimate (labelled) only when the Super Admin enables it",
                       "x-ts-type": "boolean | undefined"
+                    },
+                    "supportAccessExpiresAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "BC3 / MG-40: Tenant-granted expiring support access grant for Super Admin",
+                      "x-ts-type": "string | null | undefined"
                     },
                     "subscriptionStartsAt": {
                       "type": "string",
@@ -30440,94 +30640,6 @@
                             "nullable": true,
                             "description": "Whether this address is used for shipping by default.",
                             "x-ts-type": "boolean | undefined"
-                          }
-                        }
-                      }
-                    },
-                    "bankAccounts": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "description": "Id of this item, unique within its list.",
-                            "x-ts-type": "string"
-                          },
-                          "accountHolderName": {
-                            "type": "string",
-                            "description": "Name on the bank account.",
-                            "x-ts-type": "string"
-                          },
-                          "bankName": {
-                            "type": "string",
-                            "description": "Name of the bank.",
-                            "x-ts-type": "string"
-                          },
-                          "accountNumber": {
-                            "type": "string",
-                            "description": "Bank account number.",
-                            "x-ts-type": "string"
-                          },
-                          "label": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Label of the bank account.",
-                            "x-ts-type": "string | undefined"
-                          },
-                          "routingType": {
-                            "type": "string",
-                            "enum": [
-                              "ifsc",
-                              "iban",
-                              "swift",
-                              "us_routing",
-                              "sg_code",
-                              "other"
-                            ],
-                            "nullable": true,
-                            "description": "Kind of routing code (IFSC, IBAN, SWIFT, US routing, other).",
-                            "x-ts-type": "\"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined"
-                          },
-                          "routingCode": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Routing code of the bank branch, of the kind given by routingType.",
-                            "x-ts-type": "string | undefined"
-                          },
-                          "upiId": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "UPI id for payments to this account.",
-                            "x-ts-type": "string | undefined"
-                          },
-                          "currency": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "ISO 4217 currency of the account.",
-                            "x-ts-type": "string | undefined"
-                          },
-                          "isDefault": {
-                            "type": "boolean",
-                            "nullable": true,
-                            "description": "Whether this is the default entry of its list.",
-                            "x-ts-type": "boolean | undefined"
-                          },
-                          "showOnInvoice": {
-                            "type": "boolean",
-                            "nullable": true,
-                            "description": "Whether the account is printed on invoices.",
-                            "x-ts-type": "boolean | undefined"
-                          },
-                          "status": {
-                            "type": "string",
-                            "enum": [
-                              "active",
-                              "archived"
-                            ],
-                            "nullable": true,
-                            "description": "Whether the account is active or archived.",
-                            "x-ts-type": "\"active\" | \"archived\" | undefined"
                           }
                         }
                       }
@@ -30614,6 +30726,94 @@
                 "items": {
                   "type": "object",
                   "properties": {
+                    "bankAccounts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Id of this item, unique within its list.",
+                            "x-ts-type": "string"
+                          },
+                          "accountHolderName": {
+                            "type": "string",
+                            "description": "Name on the bank account.",
+                            "x-ts-type": "string"
+                          },
+                          "bankName": {
+                            "type": "string",
+                            "description": "Name of the bank.",
+                            "x-ts-type": "string"
+                          },
+                          "accountNumber": {
+                            "type": "string",
+                            "description": "Bank account number.",
+                            "x-ts-type": "string"
+                          },
+                          "label": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Label of the bank account.",
+                            "x-ts-type": "string | undefined"
+                          },
+                          "routingType": {
+                            "type": "string",
+                            "enum": [
+                              "ifsc",
+                              "iban",
+                              "swift",
+                              "us_routing",
+                              "sg_code",
+                              "other"
+                            ],
+                            "nullable": true,
+                            "description": "Kind of routing code (IFSC, IBAN, SWIFT, US routing, other).",
+                            "x-ts-type": "\"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined"
+                          },
+                          "routingCode": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Routing code of the bank branch, of the kind given by routingType.",
+                            "x-ts-type": "string | undefined"
+                          },
+                          "upiId": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "UPI id for payments to this account.",
+                            "x-ts-type": "string | undefined"
+                          },
+                          "currency": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "ISO 4217 currency of the account.",
+                            "x-ts-type": "string | undefined"
+                          },
+                          "isDefault": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "description": "Whether this is the default entry of its list.",
+                            "x-ts-type": "boolean | undefined"
+                          },
+                          "showOnInvoice": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "description": "Whether the account is printed on invoices.",
+                            "x-ts-type": "boolean | undefined"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "active",
+                              "archived"
+                            ],
+                            "nullable": true,
+                            "description": "Whether the account is active or archived.",
+                            "x-ts-type": "\"active\" | \"archived\" | undefined"
+                          }
+                        }
+                      }
+                    },
                     "subscriptionStatus": {
                       "type": "string",
                       "description": "State of the organization's subscription.",
@@ -30907,6 +31107,12 @@
                       "nullable": true,
                       "description": "D-25: tenants see the cost estimate (labelled) only when the Super Admin enables it",
                       "x-ts-type": "boolean | undefined"
+                    },
+                    "supportAccessExpiresAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "BC3 / MG-40: Tenant-granted expiring support access grant for Super Admin",
+                      "x-ts-type": "string | null | undefined"
                     },
                     "subscriptionStartsAt": {
                       "type": "string",
@@ -31272,94 +31478,6 @@
                             "nullable": true,
                             "description": "Whether this address is used for shipping by default.",
                             "x-ts-type": "boolean | undefined"
-                          }
-                        }
-                      }
-                    },
-                    "bankAccounts": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "description": "Id of this item, unique within its list.",
-                            "x-ts-type": "string"
-                          },
-                          "accountHolderName": {
-                            "type": "string",
-                            "description": "Name on the bank account.",
-                            "x-ts-type": "string"
-                          },
-                          "bankName": {
-                            "type": "string",
-                            "description": "Name of the bank.",
-                            "x-ts-type": "string"
-                          },
-                          "accountNumber": {
-                            "type": "string",
-                            "description": "Bank account number.",
-                            "x-ts-type": "string"
-                          },
-                          "label": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Label of the bank account.",
-                            "x-ts-type": "string | undefined"
-                          },
-                          "routingType": {
-                            "type": "string",
-                            "enum": [
-                              "ifsc",
-                              "iban",
-                              "swift",
-                              "us_routing",
-                              "sg_code",
-                              "other"
-                            ],
-                            "nullable": true,
-                            "description": "Kind of routing code (IFSC, IBAN, SWIFT, US routing, other).",
-                            "x-ts-type": "\"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined"
-                          },
-                          "routingCode": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "Routing code of the bank branch, of the kind given by routingType.",
-                            "x-ts-type": "string | undefined"
-                          },
-                          "upiId": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "UPI id for payments to this account.",
-                            "x-ts-type": "string | undefined"
-                          },
-                          "currency": {
-                            "type": "string",
-                            "nullable": true,
-                            "description": "ISO 4217 currency of the account.",
-                            "x-ts-type": "string | undefined"
-                          },
-                          "isDefault": {
-                            "type": "boolean",
-                            "nullable": true,
-                            "description": "Whether this is the default entry of its list.",
-                            "x-ts-type": "boolean | undefined"
-                          },
-                          "showOnInvoice": {
-                            "type": "boolean",
-                            "nullable": true,
-                            "description": "Whether the account is printed on invoices.",
-                            "x-ts-type": "boolean | undefined"
-                          },
-                          "status": {
-                            "type": "string",
-                            "enum": [
-                              "active",
-                              "archived"
-                            ],
-                            "nullable": true,
-                            "description": "Whether the account is active or archived.",
-                            "x-ts-type": "\"active\" | \"archived\" | undefined"
                           }
                         }
                       }
@@ -31465,7 +31583,7 @@
             }
           }
         },
-        "x-ts-type": "{ items: { subscriptionStatus: string; subscriptionExpiresAt: string | null; seatsUsed: number; branchesUsed: number; name: string; code?: string | undefined; legalName?: string | undefined; ... 42 more ...; organizationId: string; }[]; ... 4 more ...; hasMore: boolean; }"
+        "x-ts-type": "{ items: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 5 more ...; status?: \"active\" | ... 1 more ... | undefined; }[]; ... 49 more ...; organi..."
       },
       "EmployeesCreateResponse": {
         "type": "object",
@@ -37417,11 +37535,280 @@
                 "type": "string",
                 "description": "Human-readable message.",
                 "x-ts-type": "string"
+              },
+              "printSnapshot": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "number",
+                    "x-ts-type": "1"
+                  },
+                  "invoiceTitle": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "organization": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Human-readable name of this record.",
+                        "x-ts-type": "string"
+                      },
+                      "legalName": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Registered legal name.",
+                        "x-ts-type": "string | null"
+                      },
+                      "taxId": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Tax registration number (GSTIN, VAT number, …).",
+                        "x-ts-type": "string | null"
+                      },
+                      "address": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "x-ts-type": "unknown"
+                        },
+                        "x-ts-type": "Record<string, unknown>"
+                      },
+                      "contactPhone": {
+                        "type": "string",
+                        "nullable": true,
+                        "x-ts-type": "string | null"
+                      },
+                      "contactEmail": {
+                        "type": "string",
+                        "nullable": true,
+                        "x-ts-type": "string | null"
+                      },
+                      "bankAccounts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Id of this item, unique within its list.",
+                              "x-ts-type": "string | undefined"
+                            },
+                            "bankName": {
+                              "type": "string",
+                              "description": "Name of the bank.",
+                              "x-ts-type": "string"
+                            },
+                            "accountNumber": {
+                              "type": "string",
+                              "description": "masked (****1234)",
+                              "x-ts-type": "string"
+                            },
+                            "routingType": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Kind of routing code (IFSC, IBAN, SWIFT, US routing, other).",
+                              "x-ts-type": "string | undefined"
+                            },
+                            "routingCode": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Routing code of the bank branch, of the kind given by routingType.",
+                              "x-ts-type": "string | null | undefined"
+                            },
+                            "accountHolderName": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Name on the bank account.",
+                              "x-ts-type": "string | undefined"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "customer": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Human-readable name of this record.",
+                        "x-ts-type": "string"
+                      },
+                      "phone": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Phone number in E.164 format.",
+                        "x-ts-type": "string | undefined"
+                      },
+                      "taxId": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Tax registration number (GSTIN, VAT number, …).",
+                        "x-ts-type": "string | undefined"
+                      },
+                      "billingAddress": {
+                        "type": "string",
+                        "nullable": true,
+                        "x-ts-type": "string | undefined"
+                      }
+                    }
+                  },
+                  "billNumber": {
+                    "type": "string",
+                    "description": "Sequential bill number, unique per organization and document type.",
+                    "x-ts-type": "string"
+                  },
+                  "issueDate": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "salesMode": {
+                    "type": "string",
+                    "description": "How sales are made by default (POS, invoice, …).",
+                    "x-ts-type": "string"
+                  },
+                  "documentType": {
+                    "type": "string",
+                    "description": "Kind of document (values: the field's enum).",
+                    "x-ts-type": "string"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "lineId": {
+                          "type": "string",
+                          "description": "Id of a line within its document.",
+                          "x-ts-type": "string"
+                        },
+                        "productId": {
+                          "type": "string",
+                          "description": "Id of the product.",
+                          "x-ts-type": "string"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Human-readable name of this record.",
+                          "x-ts-type": "string"
+                        },
+                        "sku": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Stock-keeping unit code.",
+                          "x-ts-type": "string | null"
+                        },
+                        "quantity": {
+                          "type": "number",
+                          "description": "Quantity in the line's unit.",
+                          "x-ts-type": "number"
+                        },
+                        "unit": {
+                          "type": "string",
+                          "description": "Unit of measure (piece, box, kg, …).",
+                          "x-ts-type": "string"
+                        },
+                        "unitPrice": {
+                          "type": "number",
+                          "description": "Price per unit.",
+                          "x-ts-type": "number"
+                        },
+                        "discountAmount": {
+                          "type": "number",
+                          "description": "Discount amount on the line.",
+                          "x-ts-type": "number"
+                        },
+                        "taxAmount": {
+                          "type": "number",
+                          "description": "Tax amount.",
+                          "x-ts-type": "number"
+                        },
+                        "taxRatePercent": {
+                          "type": "number",
+                          "nullable": true,
+                          "x-ts-type": "number | undefined"
+                        },
+                        "totalAmount": {
+                          "type": "number",
+                          "description": "Total of the document in the currency's major unit.",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "totals": {
+                    "type": "object",
+                    "properties": {
+                      "subTotal": {
+                        "type": "number",
+                        "description": "Total of the lines before document-level discount and tax.",
+                        "x-ts-type": "number"
+                      },
+                      "discountTotal": {
+                        "type": "number",
+                        "description": "Total discount of the document.",
+                        "x-ts-type": "number"
+                      },
+                      "taxTotal": {
+                        "type": "number",
+                        "description": "Total tax of the document.",
+                        "x-ts-type": "number"
+                      },
+                      "roundOff": {
+                        "type": "number",
+                        "x-ts-type": "number"
+                      },
+                      "totalAmount": {
+                        "type": "number",
+                        "description": "Total of the document in the currency's major unit.",
+                        "x-ts-type": "number"
+                      },
+                      "paidAmount": {
+                        "type": "number",
+                        "description": "Amount paid so far.",
+                        "x-ts-type": "number"
+                      },
+                      "balanceAmount": {
+                        "type": "number",
+                        "description": "Amount still to be paid.",
+                        "x-ts-type": "number"
+                      }
+                    }
+                  },
+                  "taxBreakdown": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Human-readable name of this record.",
+                          "x-ts-type": "string"
+                        },
+                        "ratePercent": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "taxableAmount": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "taxAmount": {
+                          "type": "number",
+                          "description": "Tax amount.",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           }
         },
-        "x-ts-type": "Record<string, unknown> | { billId: string; status: string; billNumber: string; originalQuotationNumber: string; totalAmount: number; paidAmount: number; balanceAmount: number; paymentId: string | null; message: string; } | undefined"
+        "x-ts-type": "Record<string, unknown> | { billId: string; status: string; billNumber: string; originalQuotationNumber: string; totalAmount: number; paidAmount: number; balanceAmount: number; paymentId: string | null; message: string; printSnapshot: BillPrintSnapshot; } | undefined"
       },
       "BillsListResponse": {
         "type": "object",
@@ -37520,11 +37907,280 @@
               },
               "included": {
                 "x-ts-type": "Partial<Record<IncludedKind, Record<string, Record<string, unknown>>>>"
+              },
+              "printSnapshot": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "number",
+                    "x-ts-type": "1"
+                  },
+                  "invoiceTitle": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "organization": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Human-readable name of this record.",
+                        "x-ts-type": "string"
+                      },
+                      "legalName": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Registered legal name.",
+                        "x-ts-type": "string | null"
+                      },
+                      "taxId": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Tax registration number (GSTIN, VAT number, …).",
+                        "x-ts-type": "string | null"
+                      },
+                      "address": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "x-ts-type": "unknown"
+                        },
+                        "x-ts-type": "Record<string, unknown>"
+                      },
+                      "contactPhone": {
+                        "type": "string",
+                        "nullable": true,
+                        "x-ts-type": "string | null"
+                      },
+                      "contactEmail": {
+                        "type": "string",
+                        "nullable": true,
+                        "x-ts-type": "string | null"
+                      },
+                      "bankAccounts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Id of this item, unique within its list.",
+                              "x-ts-type": "string | undefined"
+                            },
+                            "bankName": {
+                              "type": "string",
+                              "description": "Name of the bank.",
+                              "x-ts-type": "string"
+                            },
+                            "accountNumber": {
+                              "type": "string",
+                              "description": "masked (****1234)",
+                              "x-ts-type": "string"
+                            },
+                            "routingType": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Kind of routing code (IFSC, IBAN, SWIFT, US routing, other).",
+                              "x-ts-type": "string | undefined"
+                            },
+                            "routingCode": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Routing code of the bank branch, of the kind given by routingType.",
+                              "x-ts-type": "string | null | undefined"
+                            },
+                            "accountHolderName": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Name on the bank account.",
+                              "x-ts-type": "string | undefined"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "customer": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Human-readable name of this record.",
+                        "x-ts-type": "string"
+                      },
+                      "phone": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Phone number in E.164 format.",
+                        "x-ts-type": "string | undefined"
+                      },
+                      "taxId": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Tax registration number (GSTIN, VAT number, …).",
+                        "x-ts-type": "string | undefined"
+                      },
+                      "billingAddress": {
+                        "type": "string",
+                        "nullable": true,
+                        "x-ts-type": "string | undefined"
+                      }
+                    }
+                  },
+                  "billNumber": {
+                    "type": "string",
+                    "description": "Sequential bill number, unique per organization and document type.",
+                    "x-ts-type": "string"
+                  },
+                  "issueDate": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "salesMode": {
+                    "type": "string",
+                    "description": "How sales are made by default (POS, invoice, …).",
+                    "x-ts-type": "string"
+                  },
+                  "documentType": {
+                    "type": "string",
+                    "description": "Kind of document (values: the field's enum).",
+                    "x-ts-type": "string"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "lineId": {
+                          "type": "string",
+                          "description": "Id of a line within its document.",
+                          "x-ts-type": "string"
+                        },
+                        "productId": {
+                          "type": "string",
+                          "description": "Id of the product.",
+                          "x-ts-type": "string"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Human-readable name of this record.",
+                          "x-ts-type": "string"
+                        },
+                        "sku": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Stock-keeping unit code.",
+                          "x-ts-type": "string | null"
+                        },
+                        "quantity": {
+                          "type": "number",
+                          "description": "Quantity in the line's unit.",
+                          "x-ts-type": "number"
+                        },
+                        "unit": {
+                          "type": "string",
+                          "description": "Unit of measure (piece, box, kg, …).",
+                          "x-ts-type": "string"
+                        },
+                        "unitPrice": {
+                          "type": "number",
+                          "description": "Price per unit.",
+                          "x-ts-type": "number"
+                        },
+                        "discountAmount": {
+                          "type": "number",
+                          "description": "Discount amount on the line.",
+                          "x-ts-type": "number"
+                        },
+                        "taxAmount": {
+                          "type": "number",
+                          "description": "Tax amount.",
+                          "x-ts-type": "number"
+                        },
+                        "taxRatePercent": {
+                          "type": "number",
+                          "nullable": true,
+                          "x-ts-type": "number | undefined"
+                        },
+                        "totalAmount": {
+                          "type": "number",
+                          "description": "Total of the document in the currency's major unit.",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "totals": {
+                    "type": "object",
+                    "properties": {
+                      "subTotal": {
+                        "type": "number",
+                        "description": "Total of the lines before document-level discount and tax.",
+                        "x-ts-type": "number"
+                      },
+                      "discountTotal": {
+                        "type": "number",
+                        "description": "Total discount of the document.",
+                        "x-ts-type": "number"
+                      },
+                      "taxTotal": {
+                        "type": "number",
+                        "description": "Total tax of the document.",
+                        "x-ts-type": "number"
+                      },
+                      "roundOff": {
+                        "type": "number",
+                        "x-ts-type": "number"
+                      },
+                      "totalAmount": {
+                        "type": "number",
+                        "description": "Total of the document in the currency's major unit.",
+                        "x-ts-type": "number"
+                      },
+                      "paidAmount": {
+                        "type": "number",
+                        "description": "Amount paid so far.",
+                        "x-ts-type": "number"
+                      },
+                      "balanceAmount": {
+                        "type": "number",
+                        "description": "Amount still to be paid.",
+                        "x-ts-type": "number"
+                      }
+                    }
+                  },
+                  "taxBreakdown": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Human-readable name of this record.",
+                          "x-ts-type": "string"
+                        },
+                        "ratePercent": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "taxableAmount": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "taxAmount": {
+                          "type": "number",
+                          "description": "Tax amount.",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           }
         },
-        "x-ts-type": "{ serialsByLine: Record<string, string[]>; delivery: { complete: boolean; lines: { lineId: string; ordered: number; delivered: number; onTheWay: number; remaining: number; }[]; } | null; included: Partial<...>; }"
+        "x-ts-type": "{ serialsByLine: Record<string, string[]>; delivery: { complete: boolean; lines: { lineId: string; ordered: number; delivered: number; onTheWay: number; remaining: number; }[]; } | null; included: Partial<...>; printSnapshot: BillPrintSnapshot; }"
       },
       "DeliveriesCreateResponse": {
         "type": "object",
@@ -41289,6 +41945,10 @@
                       "type": "string",
                       "description": "Time the record was last changed (ISO-8601).",
                       "x-ts-type": "string"
+                    },
+                    "expiresAt": {
+                      "description": "BC3: Firestore Timestamp TTL for pruning inactive latestLocations",
+                      "x-ts-type": "any"
                     }
                   }
                 }
@@ -44438,6 +45098,12 @@
                     "description": "D-25: tenants see the cost estimate (labelled) only when the Super Admin enables it",
                     "x-ts-type": "boolean | undefined"
                   },
+                  "supportAccessExpiresAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "BC3 / MG-40: Tenant-granted expiring support access grant for Super Admin",
+                    "x-ts-type": "string | null | undefined"
+                  },
                   "subscriptionStatus": {
                     "nullable": true,
                     "description": "State of the organization's subscription.",
@@ -44947,7 +45613,58 @@
             }
           }
         },
-        "x-ts-type": "{ organization: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 5 more ...; status?: \"active\" | ... 1 more ... | undefined; }[]; ... 48 more ...;..."
+        "x-ts-type": "{ organization: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 5 more ...; status?: \"active\" | ... 1 more ... | undefined; }[]; ... 49 more ...;..."
+      },
+      "OrganizationsRevealBankAccountResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "organizationId": {
+                "type": "string",
+                "description": "Id of the organization (tenant) the record belongs to.",
+                "x-ts-type": "string"
+              },
+              "bankAccountId": {
+                "x-ts-type": "any"
+              },
+              "bankName": {
+                "type": "string",
+                "description": "Name of the bank.",
+                "x-ts-type": "string"
+              },
+              "accountHolderName": {
+                "description": "Name on the bank account.",
+                "x-ts-type": "any"
+              },
+              "accountNumber": {
+                "type": "string",
+                "description": "Bank account number.",
+                "x-ts-type": "string"
+              },
+              "routingType": {
+                "description": "Kind of routing code (IFSC, IBAN, SWIFT, US routing, other).",
+                "x-ts-type": "any"
+              },
+              "routingCode": {
+                "description": "Routing code of the bank branch, of the kind given by routingType.",
+                "x-ts-type": "any"
+              },
+              "upiId": {
+                "description": "UPI id for payments to this account.",
+                "x-ts-type": "any"
+              },
+              "iban": {
+                "x-ts-type": "any"
+              }
+            }
+          }
+        },
+        "x-ts-type": "{ organizationId: string; bankAccountId: any; bankName: string; accountHolderName: any; accountNumber: string; routingType: any; routingCode: any; upiId: any; iban: any; }"
       },
       "EmployeesGetResponse": {
         "type": "object",
@@ -45679,11 +46396,280 @@
                     }
                   }
                 }
+              },
+              "printSnapshot": {
+                "type": "object",
+                "properties": {
+                  "version": {
+                    "type": "number",
+                    "x-ts-type": "1"
+                  },
+                  "invoiceTitle": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "organization": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Human-readable name of this record.",
+                        "x-ts-type": "string"
+                      },
+                      "legalName": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Registered legal name.",
+                        "x-ts-type": "string | null"
+                      },
+                      "taxId": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Tax registration number (GSTIN, VAT number, …).",
+                        "x-ts-type": "string | null"
+                      },
+                      "address": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "x-ts-type": "unknown"
+                        },
+                        "x-ts-type": "Record<string, unknown>"
+                      },
+                      "contactPhone": {
+                        "type": "string",
+                        "nullable": true,
+                        "x-ts-type": "string | null"
+                      },
+                      "contactEmail": {
+                        "type": "string",
+                        "nullable": true,
+                        "x-ts-type": "string | null"
+                      },
+                      "bankAccounts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Id of this item, unique within its list.",
+                              "x-ts-type": "string | undefined"
+                            },
+                            "bankName": {
+                              "type": "string",
+                              "description": "Name of the bank.",
+                              "x-ts-type": "string"
+                            },
+                            "accountNumber": {
+                              "type": "string",
+                              "description": "masked (****1234)",
+                              "x-ts-type": "string"
+                            },
+                            "routingType": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Kind of routing code (IFSC, IBAN, SWIFT, US routing, other).",
+                              "x-ts-type": "string | undefined"
+                            },
+                            "routingCode": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Routing code of the bank branch, of the kind given by routingType.",
+                              "x-ts-type": "string | null | undefined"
+                            },
+                            "accountHolderName": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Name on the bank account.",
+                              "x-ts-type": "string | undefined"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "customer": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "description": "Human-readable name of this record.",
+                        "x-ts-type": "string"
+                      },
+                      "phone": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Phone number in E.164 format.",
+                        "x-ts-type": "string | undefined"
+                      },
+                      "taxId": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Tax registration number (GSTIN, VAT number, …).",
+                        "x-ts-type": "string | undefined"
+                      },
+                      "billingAddress": {
+                        "type": "string",
+                        "nullable": true,
+                        "x-ts-type": "string | undefined"
+                      }
+                    }
+                  },
+                  "billNumber": {
+                    "type": "string",
+                    "description": "Sequential bill number, unique per organization and document type.",
+                    "x-ts-type": "string"
+                  },
+                  "issueDate": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "salesMode": {
+                    "type": "string",
+                    "description": "How sales are made by default (POS, invoice, …).",
+                    "x-ts-type": "string"
+                  },
+                  "documentType": {
+                    "type": "string",
+                    "description": "Kind of document (values: the field's enum).",
+                    "x-ts-type": "string"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "lineId": {
+                          "type": "string",
+                          "description": "Id of a line within its document.",
+                          "x-ts-type": "string"
+                        },
+                        "productId": {
+                          "type": "string",
+                          "description": "Id of the product.",
+                          "x-ts-type": "string"
+                        },
+                        "name": {
+                          "type": "string",
+                          "description": "Human-readable name of this record.",
+                          "x-ts-type": "string"
+                        },
+                        "sku": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Stock-keeping unit code.",
+                          "x-ts-type": "string | null"
+                        },
+                        "quantity": {
+                          "type": "number",
+                          "description": "Quantity in the line's unit.",
+                          "x-ts-type": "number"
+                        },
+                        "unit": {
+                          "type": "string",
+                          "description": "Unit of measure (piece, box, kg, …).",
+                          "x-ts-type": "string"
+                        },
+                        "unitPrice": {
+                          "type": "number",
+                          "description": "Price per unit.",
+                          "x-ts-type": "number"
+                        },
+                        "discountAmount": {
+                          "type": "number",
+                          "description": "Discount amount on the line.",
+                          "x-ts-type": "number"
+                        },
+                        "taxAmount": {
+                          "type": "number",
+                          "description": "Tax amount.",
+                          "x-ts-type": "number"
+                        },
+                        "taxRatePercent": {
+                          "type": "number",
+                          "nullable": true,
+                          "x-ts-type": "number | undefined"
+                        },
+                        "totalAmount": {
+                          "type": "number",
+                          "description": "Total of the document in the currency's major unit.",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    }
+                  },
+                  "totals": {
+                    "type": "object",
+                    "properties": {
+                      "subTotal": {
+                        "type": "number",
+                        "description": "Total of the lines before document-level discount and tax.",
+                        "x-ts-type": "number"
+                      },
+                      "discountTotal": {
+                        "type": "number",
+                        "description": "Total discount of the document.",
+                        "x-ts-type": "number"
+                      },
+                      "taxTotal": {
+                        "type": "number",
+                        "description": "Total tax of the document.",
+                        "x-ts-type": "number"
+                      },
+                      "roundOff": {
+                        "type": "number",
+                        "x-ts-type": "number"
+                      },
+                      "totalAmount": {
+                        "type": "number",
+                        "description": "Total of the document in the currency's major unit.",
+                        "x-ts-type": "number"
+                      },
+                      "paidAmount": {
+                        "type": "number",
+                        "description": "Amount paid so far.",
+                        "x-ts-type": "number"
+                      },
+                      "balanceAmount": {
+                        "type": "number",
+                        "description": "Amount still to be paid.",
+                        "x-ts-type": "number"
+                      }
+                    }
+                  },
+                  "taxBreakdown": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Human-readable name of this record.",
+                          "x-ts-type": "string"
+                        },
+                        "ratePercent": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "taxableAmount": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "taxAmount": {
+                          "type": "number",
+                          "description": "Tax amount.",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           }
         },
-        "x-ts-type": "{ items: BillItem[]; subTotal: number; taxTotal: number; discountTotal: number; totalAmount: number; roundOff: number; taxSnapshot: TaxSnapshot; currency: string; warnings: { ...; }[]; }"
+        "x-ts-type": "{ items: BillItem[]; subTotal: number; taxTotal: number; discountTotal: number; totalAmount: number; roundOff: number; taxSnapshot: TaxSnapshot; currency: string; warnings: { ...; }[]; printSnapshot: BillPrintSnapshot; }"
       },
       "OrganizationsReactivateResponse": {
         "type": "object",
@@ -50217,11 +51203,6 @@
               "request": {
                 "type": "object",
                 "properties": {
-                  "requestId": {
-                    "type": "string",
-                    "description": "Id of the approval request or client request this entry belongs to.",
-                    "x-ts-type": "string"
-                  },
                   "requestNumber": {
                     "type": "string",
                     "description": "REQ-YYYY-000123",
@@ -50843,7 +51824,7 @@
             }
           }
         },
-        "x-ts-type": "{ request: RequestDoc; included: { blockers: unknown[]; }; }"
+        "x-ts-type": "{ request: { requestId: string; requestNumber: string; audience: \"platform\" | \"organization\" | RequestAudience; category: RequestCategory; kind: RequestKind | ... 1 more ... | \"work\"; ... 35 more ...; requestedPlanName?: string | ... 1 more ... | undefined; }; included: { ...; }; }"
       },
       "RequestsListResponse": {
         "type": "object",
@@ -50857,281 +51838,7 @@
               "items": {
                 "type": "array",
                 "items": {
-                  "type": "object",
-                  "properties": {
-                    "requestId": {
-                      "type": "string",
-                      "description": "Id of the approval request or client request this entry belongs to.",
-                      "x-ts-type": "string"
-                    },
-                    "requestNumber": {
-                      "type": "string",
-                      "description": "REQ-YYYY-000123",
-                      "x-ts-type": "string"
-                    },
-                    "audience": {
-                      "x-ts-type": "\"platform\" | \"organization\" | RequestAudience"
-                    },
-                    "category": {
-                      "x-ts-type": "RequestCategory"
-                    },
-                    "kind": {
-                      "description": "Kind of record (values: the field's enum).",
-                      "x-ts-type": "RequestKind | \"approval\" | \"work\""
-                    },
-                    "title": {
-                      "type": "string",
-                      "description": "Short title.",
-                      "x-ts-type": "string"
-                    },
-                    "description": {
-                      "type": "string",
-                      "description": "Free-text description.",
-                      "x-ts-type": "string"
-                    },
-                    "details": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "description": "Structured details of the event.",
-                        "x-ts-type": "unknown"
-                      },
-                      "description": "Structured details of the event.",
-                      "x-ts-type": "Record<string, unknown>"
-                    },
-                    "priority": {
-                      "description": "Task priority.",
-                      "x-ts-type": "\"low\" | \"high\" | \"urgent\" | RequestPriority | \"normal\""
-                    },
-                    "severity": {
-                      "nullable": true,
-                      "x-ts-type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined"
-                    },
-                    "status": {
-                      "description": "Lifecycle status of the record (values: the field's enum).",
-                      "x-ts-type": "RequestStatus"
-                    },
-                    "statusReason": {
-                      "type": "string",
-                      "nullable": true,
-                      "x-ts-type": "string | null | undefined"
-                    },
-                    "statusChangedAt": {
-                      "type": "string",
-                      "x-ts-type": "string"
-                    },
-                    "requester": {
-                      "type": "object",
-                      "properties": {
-                        "uid": {
-                          "type": "string",
-                          "description": "Firebase Auth uid.",
-                          "x-ts-type": "string"
-                        },
-                        "name": {
-                          "type": "string",
-                          "description": "Human-readable name of this record.",
-                          "x-ts-type": "string"
-                        },
-                        "roleLabel": {
-                          "type": "string",
-                          "x-ts-type": "string"
-                        }
-                      }
-                    },
-                    "organizationId": {
-                      "type": "string",
-                      "description": "Id of the organization (tenant) the record belongs to.",
-                      "x-ts-type": "string"
-                    },
-                    "branchId": {
-                      "type": "string",
-                      "nullable": true,
-                      "description": "Id of the branch the record belongs to or applies to.",
-                      "x-ts-type": "string | null | undefined"
-                    },
-                    "relatedEntity": {
-                      "type": "object",
-                      "properties": {
-                        "type": {
-                          "type": "string",
-                          "x-ts-type": "string"
-                        },
-                        "id": {
-                          "type": "string",
-                          "description": "Id of this item, unique within its list.",
-                          "x-ts-type": "string"
-                        },
-                        "label": {
-                          "type": "string",
-                          "x-ts-type": "string"
-                        }
-                      }
-                    },
-                    "assignee": {
-                      "type": "object",
-                      "properties": {
-                        "uid": {
-                          "type": "string",
-                          "description": "Firebase Auth uid.",
-                          "x-ts-type": "string"
-                        },
-                        "name": {
-                          "type": "string",
-                          "description": "Human-readable name of this record.",
-                          "x-ts-type": "string"
-                        }
-                      }
-                    },
-                    "attachments": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "storagePath": {
-                            "type": "string",
-                            "x-ts-type": "string"
-                          },
-                          "filename": {
-                            "type": "string",
-                            "x-ts-type": "string"
-                          },
-                          "mimeType": {
-                            "type": "string",
-                            "x-ts-type": "string"
-                          },
-                          "sizeBytes": {
-                            "type": "number",
-                            "x-ts-type": "number"
-                          },
-                          "uploadedAt": {
-                            "type": "string",
-                            "nullable": true,
-                            "x-ts-type": "string | undefined"
-                          }
-                        }
-                      }
-                    },
-                    "labels": {
-                      "type": "array",
-                      "items": {
-                        "type": "string",
-                        "x-ts-type": "string"
-                      }
-                    },
-                    "idempotencyKey": {
-                      "type": "string",
-                      "nullable": true,
-                      "x-ts-type": "string | null | undefined"
-                    },
-                    "version": {
-                      "type": "number",
-                      "x-ts-type": "number"
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "description": "Time the record was created (ISO-8601).",
-                      "x-ts-type": "string"
-                    },
-                    "updatedAt": {
-                      "type": "string",
-                      "description": "Time the record was last changed (ISO-8601).",
-                      "x-ts-type": "string"
-                    },
-                    "lastActivityAt": {
-                      "type": "string",
-                      "x-ts-type": "string"
-                    },
-                    "lastActivityBy": {
-                      "type": "object",
-                      "properties": {
-                        "uid": {
-                          "type": "string",
-                          "description": "Firebase Auth uid.",
-                          "x-ts-type": "string"
-                        },
-                        "name": {
-                          "type": "string",
-                          "description": "Human-readable name of this record.",
-                          "x-ts-type": "string"
-                        },
-                        "isPlatform": {
-                          "type": "boolean",
-                          "x-ts-type": "boolean"
-                        }
-                      }
-                    },
-                    "firstResponseDueAt": {
-                      "type": "string",
-                      "x-ts-type": "string"
-                    },
-                    "resolutionDueAt": {
-                      "type": "string",
-                      "x-ts-type": "string"
-                    },
-                    "firstResponseAt": {
-                      "type": "string",
-                      "nullable": true,
-                      "x-ts-type": "string | null | undefined"
-                    },
-                    "slaState": {
-                      "x-ts-type": "SlaState | \"on_track\" | \"at_risk\" | \"breached\" | \"paused\""
-                    },
-                    "slaPausedAt": {
-                      "type": "string",
-                      "nullable": true,
-                      "x-ts-type": "string | null | undefined"
-                    },
-                    "slaTotalPausedMs": {
-                      "type": "number",
-                      "x-ts-type": "number"
-                    },
-                    "resolvedAt": {
-                      "type": "string",
-                      "nullable": true,
-                      "x-ts-type": "string | null | undefined"
-                    },
-                    "closedAt": {
-                      "type": "string",
-                      "nullable": true,
-                      "x-ts-type": "string | null | undefined"
-                    },
-                    "resumeOn": {
-                      "type": "string",
-                      "nullable": true,
-                      "x-ts-type": "string | null | undefined"
-                    },
-                    "appliedAt": {
-                      "type": "string",
-                      "nullable": true,
-                      "x-ts-type": "string | null | undefined"
-                    },
-                    "appliedBy": {
-                      "type": "string",
-                      "nullable": true,
-                      "x-ts-type": "string | null | undefined"
-                    },
-                    "applyResult": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "x-ts-type": "unknown"
-                      },
-                      "x-ts-type": "Record<string, unknown>"
-                    },
-                    "requesterName": {
-                      "type": "string",
-                      "x-ts-type": "string"
-                    },
-                    "currentPlanName": {
-                      "type": "string",
-                      "nullable": true,
-                      "x-ts-type": "string | null | undefined"
-                    },
-                    "requestedPlanName": {
-                      "type": "string",
-                      "nullable": true,
-                      "x-ts-type": "string | null | undefined"
-                    }
-                  }
+                  "x-ts-type": "RequestDoc & { requestId: string; }"
                 }
               },
               "count": {
@@ -51153,7 +51860,7 @@
             }
           }
         },
-        "x-ts-type": "{ items: RequestDoc[]; count: number; totalCount: number; nextCursor: string | null; }"
+        "x-ts-type": "{ items: (RequestDoc & { requestId: string; })[]; count: number; totalCount: number; nextCursor: string | null; }"
       },
       "RequestsActivityListResponse": {
         "type": "object",
@@ -51169,10 +51876,6 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "activityId": {
-                      "type": "string",
-                      "x-ts-type": "string"
-                    },
                     "requestId": {
                       "type": "string",
                       "description": "Id of the approval request or client request this entry belongs to.",
@@ -51619,7 +52322,7 @@
             }
           }
         },
-        "x-ts-type": "{ success: boolean; requestId: string; previousStatus: RequestStatus; status: RequestStatus; request: RequestDoc; }"
+        "x-ts-type": "{ success: boolean; requestId: string; previousStatus: RequestStatus; status: RequestStatus; request: { requestId: string; requestNumber: string; audience: \"platform\" | ... 1 more ... | RequestAudience; ... 37 more ...; requestedPlanName?: string | ... 1 more ... | undefined; }; }"
       },
       "RequestsInboxListResponse": {
         "type": "object",
@@ -51635,11 +52338,6 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "requestId": {
-                      "type": "string",
-                      "description": "Id of the approval request or client request this entry belongs to.",
-                      "x-ts-type": "string"
-                    },
                     "requestNumber": {
                       "type": "string",
                       "description": "REQ-YYYY-000123",
@@ -51906,6 +52604,11 @@
                       "type": "string",
                       "nullable": true,
                       "x-ts-type": "string | null | undefined"
+                    },
+                    "requestId": {
+                      "type": "string",
+                      "description": "Id of the approval request or client request this entry belongs to.",
+                      "x-ts-type": "string"
                     }
                   }
                 }
@@ -51929,7 +52632,7 @@
             }
           }
         },
-        "x-ts-type": "{ items: RequestDoc[]; count: number; totalCount: number; nextCursor: string | null; }"
+        "x-ts-type": "{ items: { requestNumber: string; audience: \"platform\" | \"organization\" | RequestAudience; category: RequestCategory; kind: RequestKind | \"approval\" | \"work\"; ... 36 more ...; requestId: string; }[]; count: number; totalCount: number; nextCursor: string | null; }"
       },
       "RequestsInboxCountsResponse": {
         "type": "object",
@@ -52082,11 +52785,6 @@
               "request": {
                 "type": "object",
                 "properties": {
-                  "requestId": {
-                    "type": "string",
-                    "description": "Id of the approval request or client request this entry belongs to.",
-                    "x-ts-type": "string"
-                  },
                   "requestNumber": {
                     "type": "string",
                     "description": "REQ-YYYY-000123",
@@ -52353,6 +53051,11 @@
                     "type": "string",
                     "nullable": true,
                     "x-ts-type": "string | null | undefined | string | null | undefined"
+                  },
+                  "requestId": {
+                    "type": "string",
+                    "description": "Id of the approval request or client request this entry belongs to.",
+                    "x-ts-type": "string"
                   }
                 }
               },
@@ -54357,11 +55060,11 @@
   "x-meta": {
     "projectId": "trado-x",
     "region": "asia-south1",
-    "callableCount": 188,
+    "callableCount": 189,
     "triggerCount": 8,
-    "totalExports": 196,
+    "totalExports": 197,
     "zodSchemasResolved": true,
-    "resolvedSchemaCount": 213,
+    "resolvedSchemaCount": 214,
     "operationsWithExamples": 121
   }
 }

@@ -56,8 +56,8 @@ Gate order for `tenant-gate`: authenticated → user active → membership activ
 | `jobRolesList` | jobRoles.ts | NONE | — | — | reference list visible to members |
 | `jobRolesUpdate` | jobRoles.ts | catalog-gate | `job_role:manage` | staff |  |
 | `ledgerVerify` | ledgerVerify.ts | tenant-gate | `accounts:view` | billing |  |
-| `locationsGetHistory` | locations.ts | tenant-gate | `location:view_own`, `location:view_all` | employee_tracking |  |
-| `locationsGetLatest` | locations.ts | tenant-gate | `location:view_own`, `location:view_all` | employee_tracking |  |
+| `locationsGetHistory` | locations.ts | tenant-gate | `location:view_own`, `locations:view_team`, `location:view_all` | employee_tracking, system |  |
+| `locationsGetLatest` | locations.ts | tenant-gate | `location:view_own`, `locations:view_team`, `location:view_all` | employee_tracking, system |  |
 | `locationsRecordPing` | locations.ts | tenant-gate | `location:ping` | employee_tracking |  |
 | `modulesList` | catalogs.ts | NONE | — | — | platform reference catalog |
 | `notificationsList` | notifications.ts | NONE | — | — | caller reads own notifications (userId == caller) |
@@ -71,6 +71,7 @@ Gate order for `tenant-gate`: authenticated → user active → membership activ
 | `organizationsPreviewDeactivationImpact` | organizations.ts | platform-only | — | — |  |
 | `organizationsProvisionUser` | organizations.ts | platform-only | — | — |  |
 | `organizationsReactivate` | organizations.ts | platform-only | — | — |  |
+| `organizationsRevealBankAccount` | organizations.ts | tenant-gate | `org:manage_bank_details` | staff |  |
 | `organizationsSetSubscription` | organizations.ts | platform-only | — | — |  |
 | `organizationsTransferOwnership` | organizations.ts | NONE | — | — | Super Admin or current Owner transfers ownership (dual tier) |
 | `organizationsUpdate` | organizations.ts | NONE | — | — | field-policy matrix (ORGANIZATION_FIELD_POLICY) + subscription check, hand-rolled tiers |

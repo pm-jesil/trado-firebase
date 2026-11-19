@@ -102,7 +102,7 @@ Back to [Master Index](./INDEX.md).
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 | `clientRequestId` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "request" (52 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "request" (51 typed leaf paths).
 **Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `REQUEST_ATTACHMENT_INVALID`, `REQUEST_CATEGORY_FORBIDDEN`, `REQUEST_DETAILS_INVALID`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -123,7 +123,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsUpdate`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/tenantRequests.ts:364`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/tenantRequests.ts:362`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.update` (`mutation`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -165,7 +165,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsAddComment`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/tenantRequests.ts:437`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/tenantRequests.ts:434`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.add_comment` (`mutation`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -253,7 +253,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsGet`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/requests/tenantRequests.ts:495`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/requests/tenantRequests.ts:491`
 - **Permission(s):** `platform:requests_read`, `requests:read_org` · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.get` (`none`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -285,7 +285,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsList`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/requests/tenantRequests.ts:553`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/requests/tenantRequests.ts:549`
 - **Permission(s):** `requests:read_org` · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.list` (`none`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -305,7 +305,7 @@ Back to [Master Index](./INDEX.md).
 | `cursor` | `string` | No | — | `Sample cursor` |
 | `clientRequestId` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "items", "nextCursor", "totalCount" (55 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "items", "nextCursor", "totalCount" (4 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -326,7 +326,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsActivityList`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/requests/tenantRequests.ts:599`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/requests/tenantRequests.ts:595`
 - **Permission(s):** `platform:requests_internal_notes`, `platform:requests_read` · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.activity_list` (`none`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -341,7 +341,7 @@ Back to [Master Index](./INDEX.md).
 | `cursor` | `string` | No | — | `Sample cursor` |
 | `clientRequestId` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "items", "totalCount" (18 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "items", "totalCount" (17 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `REQUEST_NOT_FOUND`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -363,7 +363,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsCounts`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/requests/tenantRequests.ts:637`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/requests/tenantRequests.ts:633`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.counts` (`mutation`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -394,7 +394,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsInboxList`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/requests/platformRequests.ts:196`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/requests/platformRequests.ts:195`
 - **Permission(s):** `platform:requests_read` · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.inbox_list` (`none`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -438,7 +438,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsInboxCounts`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/requests/platformRequests.ts:245`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/requests/platformRequests.ts:244`
 - **Permission(s):** `platform:requests_read` · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.inbox_counts` (`mutation`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -472,7 +472,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsAssign`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/platformRequests.ts:294`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/platformRequests.ts:293`
 - **Permission(s):** `platform:requests_manage` · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.assign` (`mutation`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -510,7 +510,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsSetPriority`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/platformRequests.ts:364`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/platformRequests.ts:362`
 - **Permission(s):** `platform:requests_manage` · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.set_priority` (`mutation`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -546,7 +546,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsAddInternalNote`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/platformRequests.ts:419`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/platformRequests.ts:416`
 - **Permission(s):** `platform:requests_internal_notes` · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.add_internal_note` (`mutation`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -584,7 +584,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsApply`
-- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/platformRequests.ts:472`
+- **Domain:** `requests` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/requests/platformRequests.ts:467`
 - **Permission(s):** `platform:requests_apply`, `platform:requests_override_blockers` · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.apply` (`mutation`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -626,7 +626,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsSettingsGet`
-- **Domain:** `requests` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/requests/platformRequests.ts:641`
+- **Domain:** `requests` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/requests/platformRequests.ts:635`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.settings_get` (`admin`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 
@@ -646,7 +646,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `requestsSettingsUpdate`
-- **Domain:** `requests` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/requests/platformRequests.ts:669`
+- **Domain:** `requests` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/requests/platformRequests.ts:663`
 - **Permission(s):** `platform:requests_configure` · **Module:** — · **Feature Flag:** `platformSettings/requests.requestsEnabled`
 - **Idempotency:** No · **Audit:** `request.settings_update` (`admin`) · **State Machine:** [request-approval / request-work](../state-machines.md)
 

@@ -1,6 +1,6 @@
 {
- "runId": "sweep-mwlwkvnc",
- "generatedAt": "2026-11-18T09:12:36.408Z",
+ "runId": "sweep-mwn6ievp",
+ "generatedAt": "2026-11-19T06:38:23.701Z",
  "items": [
   {
    "id": "healthCheck:organizationId:min",
@@ -2271,6 +2271,14 @@
    "pass": true
   },
   {
+   "id": "organizationsUpdate:settings.approvals.thresholds.*:min",
+   "pass": true
+  },
+  {
+   "id": "organizationsUpdate:settings.approvals.thresholds.*:min-1",
+   "pass": true
+  },
+  {
    "id": "organizationsUpdate:settings.businessConfig.defaultUnits[]:max",
    "pass": true
   },
@@ -2876,6 +2884,30 @@
   },
   {
    "id": "organizationsTransferOwnership:clientRequestId:min-1",
+   "pass": true
+  },
+  {
+   "id": "organizationsRevealBankAccount:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "organizationsRevealBankAccount:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "organizationsRevealBankAccount:bankAccountId:max",
+   "pass": true
+  },
+  {
+   "id": "organizationsRevealBankAccount:bankAccountId:max+1",
+   "pass": true
+  },
+  {
+   "id": "organizationsRevealBankAccount:bankAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "organizationsRevealBankAccount:bankAccountId:min-1",
    "pass": true
   },
   {
@@ -5663,6 +5695,14 @@
    "pass": true
   },
   {
+   "id": "productsList:ids[]:min",
+   "pass": true
+  },
+  {
+   "id": "productsList:ids[]:min-1",
+   "pass": true
+  },
+  {
    "id": "productsList:limit:max",
    "pass": true
   },
@@ -5676,6 +5716,18 @@
   },
   {
    "id": "productsList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "productsList:ids[length]:max+1",
+   "pass": true
+  },
+  {
+   "id": "productsList:ids[length]:min",
+   "pass": true
+  },
+  {
+   "id": "productsList:ids[length]:min-1",
    "pass": true
   },
   {
@@ -16387,6 +16439,262 @@
    "pass": true
   },
   {
+   "id": "requestsSettingsUpdate:sla.urgent.firstResponseHours:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.urgent.firstResponseHours:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.urgent.firstResponseHours:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.urgent.firstResponseHours:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.urgent.resolutionHours:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.urgent.resolutionHours:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.urgent.resolutionHours:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.urgent.resolutionHours:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.high.firstResponseHours:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.high.firstResponseHours:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.high.firstResponseHours:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.high.firstResponseHours:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.high.resolutionHours:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.high.resolutionHours:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.high.resolutionHours:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.high.resolutionHours:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.normal.firstResponseHours:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.normal.firstResponseHours:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.normal.firstResponseHours:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.normal.firstResponseHours:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.normal.resolutionHours:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.normal.resolutionHours:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.normal.resolutionHours:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.normal.resolutionHours:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.low.firstResponseHours:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.low.firstResponseHours:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.low.firstResponseHours:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.low.firstResponseHours:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.low.resolutionHours:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.low.resolutionHours:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.low.resolutionHours:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:sla.low.resolutionHours:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxOpenPerUser:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxOpenPerUser:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxOpenPerUser:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxOpenPerUser:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxOpenPerOrg:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxOpenPerOrg:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxOpenPerOrg:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxOpenPerOrg:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxCreationsPerHourPerUser:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxCreationsPerHourPerUser:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxCreationsPerHourPerUser:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:limits.maxCreationsPerHourPerUser:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:autoCloseDays:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:autoCloseDays:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:autoCloseDays:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:autoCloseDays:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:reopenWindowDays:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:reopenWindowDays:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:reopenWindowDays:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:reopenWindowDays:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:needsInfoReminderDays:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:needsInfoReminderDays:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:needsInfoReminderDays:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:needsInfoReminderDays:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:needsInfoAutoCancelDays:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:needsInfoAutoCancelDays:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:needsInfoAutoCancelDays:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:needsInfoAutoCancelDays:min-1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:reason:max",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:reason:max+1",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:reason:min",
+   "pass": true
+  },
+  {
+   "id": "requestsSettingsUpdate:reason:min-1",
+   "pass": true
+  },
+  {
    "id": "usageGetPlatformSummary:organizationId:min",
    "pass": true
   },
@@ -16575,5 +16883,10 @@
    "pass": true
   }
  ],
- "untestable": []
+ "untestable": [
+  {
+   "id": "productsList:ids[length]:max",
+   "reason": "value trips another rule: ids: custom Duplicate product IDs are not allowed in ids filter."
+  }
+ ]
 }

@@ -10,7 +10,7 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `auth` | 2 |
 | `export` | 3 |
 | `file` | 3 |
-| `mutation` | 87 |
+| `mutation` | 88 |
 | `none` | 71 |
 | `read_sensitive` | 1 |
 | `system` | 8 |
@@ -95,6 +95,7 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `organizationsPreviewDeactivationImpact` | `organization.preview_deactivation_impact` | `organization` | `preview_deactivation_impact` | `audit.action.organization.preview_deactivation_impact` | No | No | admin | `organizations` | — |
 | `organizationsProvisionUser` | `organization.provision_user` | `organization` | `provision_user` | `audit.action.organization.provision_user` | No | No | admin | `organizations` | `reason` |
 | `organizationsReactivate` | `organization.reactivate` | `organization` | `reactivate` | `audit.action.organization.reactivate` | No | No | admin | `organizations` | `reason` |
+| `organizationsRevealBankAccount` | `organization.reveal_bank_account` | `organization` | `reveal_bank_account` | `audit.action.organization.reveal_bank_account` | No | Yes | mutation | `organizations` | — |
 | `organizationsSetSubscription` | `organization.set_subscription` | `organization` | `set_subscription` | `audit.action.organization.set_subscription` | No | No | admin | `organizations` | `action`, `planId`, `reason` |
 | `organizationsTransferOwnership` | `organization.transfer_ownership` | `organization` | `transfer_ownership` | `audit.action.organization.transfer_ownership` | No | Yes | mutation | `organizations` | `reason` |
 | `organizationsUpdate` | `organization.update` | `organization` | `update` | `audit.action.organization.update` | No | Yes | mutation | `organizations` | — |

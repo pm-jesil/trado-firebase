@@ -1,6 +1,6 @@
 {
- "runId": "roundtrip-mwlxcpoh",
- "generatedAt": "2026-11-18T09:34:15.041Z",
+ "runId": "roundtrip-mwn6hq7h",
+ "generatedAt": "2026-11-19T06:37:51.726Z",
  "callables": {
   "usersUpdateMe": {
    "calls": 1,
@@ -18,7 +18,7 @@
    ],
    "transformed": [],
    "documents": [
-    "imageUploadSessions/up_3ea476cd562644c63828090433170762"
+    "imageUploadSessions/up_60ac56cf2d166cd962202154ba28e784"
    ]
   },
   "imagesAttach": {
@@ -94,12 +94,12 @@
     "minorUnitNamePlural"
    ],
    "documents": [
-    "organizations/k0uR85HEnGYdFA3raSZE",
-    "organizations/XZAZv2S99T2EllZ9L1CQ"
+    "organizations/QpRe7nfd1tAqLwXzdq41",
+    "organizations/hPVL5uUvU3HmqDvDcCuQ"
    ]
   },
   "organizationsUpdate": {
-   "calls": 3,
+   "calls": 2,
    "proven": [
     "addresses[].area",
     "addresses[].city",
@@ -148,13 +148,16 @@
     "contacts[].updatedBy",
     "displayName",
     "legalName",
+    "settings.approvals.allowSelfApproval",
     "settings.approvals.amountThreshold",
     "settings.approvals.enabled",
+    "settings.approvals.modules.account_transfer",
     "settings.approvals.modules.expense",
     "settings.approvals.modules.purchase",
     "settings.approvals.modules.return",
     "settings.approvals.modules.sale",
     "settings.approvals.modules.stock_adjustment",
+    "settings.approvals.modules.stock_transfer",
     "settings.businessConfig.defaultUnits[]",
     "settings.businessConfig.salesMode",
     "taxId",
@@ -162,8 +165,8 @@
    ],
    "transformed": [],
    "documents": [
-    "organizations/k0uR85HEnGYdFA3raSZE",
-    "organizations/qCu4shtauk2soAPm4zAT"
+    "organizations/QpRe7nfd1tAqLwXzdq41",
+    "organizations/Dsax2nGz6FfTOFB3Hzc6"
    ]
   },
   "organizationsReactivate": {
@@ -171,7 +174,7 @@
    "proven": [],
    "transformed": [],
    "documents": [
-    "organizations/qCu4shtauk2soAPm4zAT"
+    "organizations/Dsax2nGz6FfTOFB3Hzc6"
    ]
   },
   "organizationsSetSubscription": {
@@ -184,7 +187,7 @@
     "status"
    ],
    "documents": [
-    "organizations/qCu4shtauk2soAPm4zAT"
+    "organizations/Dsax2nGz6FfTOFB3Hzc6"
    ]
   },
   "organizationsProvisionUser": {
@@ -206,7 +209,7 @@
     "name"
    ],
    "documents": [
-    "organizations/qCu4shtauk2soAPm4zAT"
+    "organizations/Dsax2nGz6FfTOFB3Hzc6"
    ]
   },
   "branchesUpdate": {
@@ -219,7 +222,7 @@
     "name"
    ],
    "documents": [
-    "organizations/qCu4shtauk2soAPm4zAT"
+    "organizations/Dsax2nGz6FfTOFB3Hzc6"
    ]
   },
   "branchContextSwitch": {
@@ -227,7 +230,7 @@
    "proven": [],
    "transformed": [],
    "documents": [
-    "organizations/qCu4shtauk2soAPm4zAT"
+    "organizations/Dsax2nGz6FfTOFB3Hzc6"
    ]
   },
   "sharingPoliciesUpdate": {
@@ -235,7 +238,7 @@
    "proven": [],
    "transformed": [],
    "documents": [
-    "organizations/qCu4shtauk2soAPm4zAT"
+    "organizations/Dsax2nGz6FfTOFB3Hzc6"
    ]
   },
   "employeesCreate": {
@@ -247,7 +250,7 @@
    ],
    "transformed": [],
    "documents": [
-    "users/Coonl73WlrL5v9NwlPXtTP9DukCj"
+    "users/em8cEgvX4mUOIprwLBhsED706g3X"
    ]
   },
   "employeesUpdate": {
@@ -262,7 +265,7 @@
    ],
    "transformed": [],
    "documents": [
-    "memberships/Coonl73WlrL5v9NwlPXtTP9DukCj_qCu4shtauk2soAPm4zAT"
+    "memberships/em8cEgvX4mUOIprwLBhsED706g3X_Dsax2nGz6FfTOFB3Hzc6"
    ]
   },
   "rolesCreate": {
@@ -275,7 +278,7 @@
    ],
    "transformed": [],
    "documents": [
-    "roles/AJAiqUWpqBnTTxgmfVjr"
+    "roles/nlMCEVTRXVnX9Vpe6WDj"
    ]
   },
   "rolesUpdate": {
@@ -287,7 +290,7 @@
    ],
    "transformed": [],
    "documents": [
-    "roles/AJAiqUWpqBnTTxgmfVjr"
+    "roles/nlMCEVTRXVnX9Vpe6WDj"
    ]
   },
   "departmentsCreate": {
@@ -298,7 +301,7 @@
    ],
    "transformed": [],
    "documents": [
-    "departments/uED8N22KKqoEpq7Zo7IL"
+    "departments/nwbZKqgy47DCnWUGacYY"
    ]
   },
   "departmentsUpdate": {
@@ -309,7 +312,7 @@
    ],
    "transformed": [],
    "documents": [
-    "departments/uED8N22KKqoEpq7Zo7IL"
+    "departments/nwbZKqgy47DCnWUGacYY"
    ]
   },
   "jobRolesCreate": {
@@ -320,7 +323,7 @@
    ],
    "transformed": [],
    "documents": [
-    "jobRoles/Vxrn8rpaRVHwl0DGd4SA"
+    "jobRoles/lB23OJFOsXcIjy8YfmxW"
    ]
   },
   "jobRolesUpdate": {
@@ -330,7 +333,7 @@
    ],
    "transformed": [],
    "documents": [
-    "jobRoles/Vxrn8rpaRVHwl0DGd4SA"
+    "jobRoles/lB23OJFOsXcIjy8YfmxW"
    ]
   },
   "teamsCreate": {
@@ -342,7 +345,7 @@
    ],
    "transformed": [],
    "documents": [
-    "teams/RKmWxPoU1pvfc5BbHCiX"
+    "teams/CXtbY8IZomfyQJlKX6O8"
    ]
   },
   "teamsUpdate": {
@@ -355,7 +358,7 @@
    ],
    "transformed": [],
    "documents": [
-    "teams/RKmWxPoU1pvfc5BbHCiX"
+    "teams/CXtbY8IZomfyQJlKX6O8"
    ]
   },
   "teamsAssignMember": {
@@ -365,7 +368,7 @@
    ],
    "transformed": [],
    "documents": [
-    "memberships/Coonl73WlrL5v9NwlPXtTP9DukCj_qCu4shtauk2soAPm4zAT"
+    "memberships/em8cEgvX4mUOIprwLBhsED706g3X_Dsax2nGz6FfTOFB3Hzc6"
    ]
   },
   "plansCreate": {
@@ -383,8 +386,8 @@
    ],
    "transformed": [],
    "documents": [
-    "subscriptionPlans/TJLcwfjrgHLVidY0DT8o",
-    "subscriptionPlans/p0Ddlp9kI3H7NlqmbITe"
+    "subscriptionPlans/HBqK7PFPvsxlxgSn5UFI",
+    "subscriptionPlans/OzlqEX2VdDh4nYo2uyGH"
    ]
   },
   "plansUpdate": {
@@ -397,7 +400,7 @@
    ],
    "transformed": [],
    "documents": [
-    "subscriptionPlans/p0Ddlp9kI3H7NlqmbITe"
+    "subscriptionPlans/OzlqEX2VdDh4nYo2uyGH"
    ]
   },
   "notificationsRegisterFcmToken": {
@@ -469,8 +472,8 @@
    ],
    "transformed": [],
    "documents": [
-    "products/XT8xzwp0bTlZpIpsw5RO",
-    "products/sslY7yRCmeQtVAAhhJQ4"
+    "products/JtrP5W4Vbtcivq56ymQ2",
+    "products/xG4RC3AoI1vN73RV6wvB"
    ]
   },
   "productsUpdate": {
@@ -533,8 +536,8 @@
    ],
    "transformed": [],
    "documents": [
-    "products/XT8xzwp0bTlZpIpsw5RO",
-    "products/sslY7yRCmeQtVAAhhJQ4"
+    "products/JtrP5W4Vbtcivq56ymQ2",
+    "products/xG4RC3AoI1vN73RV6wvB"
    ]
   },
   "categoriesCreate": {
@@ -546,7 +549,7 @@
    ],
    "transformed": [],
    "documents": [
-    "categories/PlmMUavEiSGdpP6FzkR5"
+    "categories/WlW5ed77kvXNXuRBRmua"
    ]
   },
   "categoriesUpdate": {
@@ -559,7 +562,7 @@
    ],
    "transformed": [],
    "documents": [
-    "categories/PlmMUavEiSGdpP6FzkR5"
+    "categories/WlW5ed77kvXNXuRBRmua"
    ]
   },
   "unitsCreate": {
@@ -574,7 +577,7 @@
    ],
    "transformed": [],
    "documents": [
-    "units/QGwXgltYtpynyNUUQQwH"
+    "units/UNFTWBV55vNiLhxSfitJ"
    ]
   },
   "unitsUpdate": {
@@ -586,7 +589,7 @@
    ],
    "transformed": [],
    "documents": [
-    "units/QGwXgltYtpynyNUUQQwH"
+    "units/UNFTWBV55vNiLhxSfitJ"
    ]
   },
   "customersCreate": {
@@ -643,8 +646,8 @@
     "creditPeriodDays"
    ],
    "documents": [
-    "customers/jOTPW6jw0GkiZH1j7AAe",
-    "customers/S5S9CKFawLQ7eAHpJBvp"
+    "customers/77GINx4VuyzkcIHoSyR9",
+    "customers/A6ul9MQxP8F3RcScw6f2"
    ]
   },
   "customersUpdate": {
@@ -698,8 +701,8 @@
    ],
    "transformed": [],
    "documents": [
-    "customers/jOTPW6jw0GkiZH1j7AAe",
-    "customers/S5S9CKFawLQ7eAHpJBvp"
+    "customers/77GINx4VuyzkcIHoSyR9",
+    "customers/A6ul9MQxP8F3RcScw6f2"
    ]
   },
   "vendorsCreate": {
@@ -753,8 +756,8 @@
    ],
    "transformed": [],
    "documents": [
-    "vendors/WBuf6zJsCKzaLwuc7KWX",
-    "vendors/dCMq0wEHYZl5IQImPLnK"
+    "vendors/pHdjpi0FkAGekwbhVsO0",
+    "vendors/qiec8zX8wRGkO4zruFh1"
    ]
   },
   "vendorsUpdate": {
@@ -807,8 +810,8 @@
    ],
    "transformed": [],
    "documents": [
-    "vendors/WBuf6zJsCKzaLwuc7KWX",
-    "vendors/dCMq0wEHYZl5IQImPLnK"
+    "vendors/pHdjpi0FkAGekwbhVsO0",
+    "vendors/qiec8zX8wRGkO4zruFh1"
    ]
   },
   "outflowsCreate": {
@@ -825,7 +828,7 @@
    ],
    "transformed": [],
    "documents": [
-    "outflows/bQOjUeQTWdN6v0buVyYs"
+    "outflows/nzgmbVnaIgqXiNFcBkX3"
    ]
   },
   "billsCreate": {
@@ -841,7 +844,7 @@
    ],
    "transformed": [],
    "documents": [
-    "bills/GDlXObPalRayPjeXl0Fk"
+    "bills/l9ujFa87PVYltXDUfIgw"
    ]
   },
   "billsUpdateDraft": {
@@ -879,7 +882,7 @@
    ],
    "transformed": [],
    "documents": [
-    "recurringExpenses/DINgCnQUJqZgiPCcvXaG"
+    "recurringExpenses/ur8t8nUoFnlMCCkY26o0"
    ]
   },
   "recurringExpensesUpdate": {
@@ -904,7 +907,7 @@
    ],
    "transformed": [],
    "documents": [
-    "recurringExpenses/DINgCnQUJqZgiPCcvXaG"
+    "recurringExpenses/ur8t8nUoFnlMCCkY26o0"
    ]
   },
   "financialAccountsCreate": {
@@ -973,7 +976,7 @@
    ],
    "transformed": [],
    "documents": [
-    "deliveries/litFHETPrImsqydWQAFK"
+    "deliveries/8V7zQ5eMhSRyBs29OkXk"
    ]
   },
   "deliveriesUpdateStatus": {
@@ -985,7 +988,7 @@
    ],
    "transformed": [],
    "documents": [
-    "deliveries/litFHETPrImsqydWQAFK"
+    "deliveries/8V7zQ5eMhSRyBs29OkXk"
    ]
   },
   "returnsCreate": {
@@ -1001,7 +1004,7 @@
    ],
    "transformed": [],
    "documents": [
-    "returns/q86GOYfnKsOnqxNykVwq"
+    "returns/mwEriVRW0bhWEiPYpwy3"
    ]
   },
   "paymentsCreate": {
@@ -1018,7 +1021,7 @@
    ],
    "transformed": [],
    "documents": [
-    "payments/hqs217dE5JlycMNoXzDS"
+    "payments/L7vMnzAHCnkCRGgWz2NW"
    ]
   },
   "stockAdjust": {
@@ -1026,8 +1029,8 @@
    "proven": [],
    "transformed": [],
    "documents": [
-    "products/XT8xzwp0bTlZpIpsw5RO",
-    "products/sslY7yRCmeQtVAAhhJQ4"
+    "products/JtrP5W4Vbtcivq56ymQ2",
+    "products/xG4RC3AoI1vN73RV6wvB"
    ]
   },
   "tasksCreate": {
@@ -1043,7 +1046,7 @@
    ],
    "transformed": [],
    "documents": [
-    "tasks/XomsVYaa18CIdPRae1Q6"
+    "tasks/rmWzbPLP0wApiPdWQjus"
    ]
   },
   "tasksUpdate": {
@@ -1058,7 +1061,7 @@
    ],
    "transformed": [],
    "documents": [
-    "tasks/XomsVYaa18CIdPRae1Q6"
+    "tasks/rmWzbPLP0wApiPdWQjus"
    ]
   },
   "tasksAssign": {
@@ -1068,7 +1071,7 @@
    ],
    "transformed": [],
    "documents": [
-    "tasks/XomsVYaa18CIdPRae1Q6"
+    "tasks/rmWzbPLP0wApiPdWQjus"
    ]
   },
   "tasksUpdateStatus": {
@@ -1078,7 +1081,7 @@
    ],
    "transformed": [],
    "documents": [
-    "tasks/XomsVYaa18CIdPRae1Q6"
+    "tasks/rmWzbPLP0wApiPdWQjus"
    ]
   },
   "locationsRecordPing": {
@@ -1135,12 +1138,18 @@
    "transformed": [],
    "documents": []
   },
+  "requestsSettingsUpdate": {
+   "calls": 1,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
   "usageCalculateDryRunStatement": {
    "calls": 1,
    "proven": [],
    "transformed": [],
    "documents": [
-    "organizations/qCu4shtauk2soAPm4zAT"
+    "organizations/Dsax2nGz6FfTOFB3Hzc6"
    ]
   },
   "usageRecordClientMetric": {

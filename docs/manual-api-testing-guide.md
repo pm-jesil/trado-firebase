@@ -79,7 +79,7 @@ node scripts/generate-openapi.js
 You should see output like:
 ```
 [OK] Generated docs/openapi.json
-     188 callable operations, 8 triggers documented
+     189 callable operations, 8 triggers documented
      100% typed response schemas
 ```
 
@@ -96,7 +96,7 @@ Open your browser to: **[http://127.0.0.1:3939](http://127.0.0.1:3939)**
 You'll see:
 1. A red **"LOCAL FIREBASE EMULATOR — trado-x — NOT PRODUCTION"** banner
 2. A **persona login** panel with one-click buttons for Super Admin, Retail, and Wholesale personas
-3. The **Swagger UI** listing all 188 callable functions grouped by domain
+3. The **Swagger UI** listing all 189 callable functions grouped by domain
 
 ---
 
@@ -297,7 +297,7 @@ No data transformation, no caching, no middleware.
 
 - 📱 [Flutter Web Client Integration Guide](flutter-client-integration.md)
 - 🌱 [Local Development & Safe Emulator Seed Guide](local-development-seed-guide.md)
-- 📜 [API Reference (All 188 Callables & 8 Triggers)](api-reference.md)
+- 📜 [API Reference (All 189 Callables & 8 Triggers)](api-reference.md)
 - 🧪 [Testing Architecture & Pipelines](testing-guide.md)
 
 

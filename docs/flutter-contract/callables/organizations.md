@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `organizationsCreate`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `create` · **Source:** `functions/src/callables/organizations.ts:179`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `create` · **Source:** `functions/src/callables/organizations.ts:183`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `organization.create` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -78,8 +78,8 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsUpdate`
-- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:411`
-- **Permission(s):** `org:manage_bank_details`, `org:manage_legal_profile`, `org:update` · **Module:** — · **Feature Flag:** —
+- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:415`
+- **Permission(s):** `org:manage_approval_policy`, `org:manage_bank_details`, `org:manage_legal_profile`, `org:update` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.update` (`mutation`) · **State Machine:** [organization](../state-machines.md)
 
 **Input (`UpdateOrganizationSchema` — strict, unknown fields rejected):**
@@ -121,7 +121,7 @@ Back to [Master Index](./INDEX.md).
 | `contacts[].email` | `string` | No | {"format":"email"} | `owner@example.com` |
 | `contacts[].type` | `enum` | No | Enum: `primary`, `billing`, `technical`, `operations`, `other` | `primary` |
 | `contacts[].isPrimary` | `boolean` | No | — | `true` |
-| *...* | *+43 nested fields* | | | *See `callables.json`* |
+| *...* | *+48 nested fields* | | | *See `callables.json`* |
 
 **Response:** Envelope `ACTION` · Top-level keys: "message", "success" (2 typed leaf paths).
 **Declared Errors:** `FIELD_NOT_EDITABLE`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
@@ -146,7 +146,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsDeactivate`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `delete` · **Source:** `functions/src/callables/organizations.ts:511`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `delete` · **Source:** `functions/src/callables/organizations.ts:516`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.deactivate` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -176,7 +176,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsReactivate`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:581`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:587`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.reactivate` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -205,7 +205,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsList`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `list` · **Source:** `functions/src/callables/organizations.ts:534`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `list` · **Source:** `functions/src/callables/organizations.ts:539`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.list` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -220,7 +220,7 @@ Back to [Master Index](./INDEX.md).
 | `status` | `enum` | No | Enum: `active`, `inactive`, `suspended` | `active` |
 | `planId` | `string` | No | — | `plan_001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "organizations", "totalCount" (250 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "organizations", "totalCount" (252 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -242,7 +242,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsSetSubscription`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:687`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:693`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.set_subscription` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -291,7 +291,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsGet`
-- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:775`
+- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:781`
 - **Permission(s):** `org:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.get` (`none`) · **State Machine:** [organization](../state-machines.md)
 
@@ -301,7 +301,7 @@ Back to [Master Index](./INDEX.md).
 |---|---|---|---|---|
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "evaluation", "organization" (130 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "evaluation", "organization" (131 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -317,7 +317,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsPreviewDeactivationImpact`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:598`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:604`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.preview_deactivation_impact` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -349,7 +349,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsGetSubscriptionHistory`
-- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:643`
+- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:649`
 - **Permission(s):** `org:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.get_subscription_history` (`none`) · **State Machine:** [organization](../state-machines.md)
 
@@ -378,7 +378,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsProvisionUser`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:875`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:881`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.provision_user` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -427,7 +427,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsTransferOwnership`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:938`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:944`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.transfer_ownership` (`mutation`) · **State Machine:** [organization](../state-machines.md)
 
@@ -460,6 +460,42 @@ Back to [Master Index](./INDEX.md).
     "previousOwnerAction": "...",
     "previousOwnerUserId": "previousOwnerUserId_001",
     "success": true
+  }
+}
+```
+
+## `organizationsRevealBankAccount`
+- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/organizations.ts:1044`
+- **Permission(s):** `org:manage_bank_details` · **Module:** — · **Feature Flag:** —
+- **Idempotency:** No · **Audit:** `org.reveal_bank_account` (`read_sensitive`) · **State Machine:** [organization](../state-machines.md)
+
+**Input (`RevealBankAccountSchema` — strict, unknown fields rejected):**
+
+| Field | Type | Required | Bounds / Enum | Example |
+|---|---|---|---|---|
+| `branchId` | `string` | No | — | `branch_001` |
+| `organizationId` | `string` | **Yes** | {"minLength":2} | `organization_001` |
+| `bankAccountId` | `string` | **Yes** | {"minLength":1,"maxLength":128} | `bankAccount_001` |
+
+**Response:** Envelope `ACTION` · Top-level keys: "accountHolderName", "accountNumber", "bankAccountId", "bankName", "iban", "organizationId", "routingCode", "routingType", "upiId" (9 typed leaf paths).
+**Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
+
+```json
+{
+  "request": {
+    "branchId": "branch_001",
+    "organizationId": "organization_001",
+    "bankAccountId": "bankAccount_001"
+  },
+  "response": {
+    "accountHolderName": "...",
+    "accountNumber": "...",
+    "bankAccountId": "bankAccountId_001",
+    "bankName": "...",
+    "iban": "...",
+    "organizationId": "organizationId_001",
+    "routingCode": "...",
+    "routingType": "..."
   }
 }
 ```

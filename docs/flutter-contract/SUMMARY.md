@@ -3,12 +3,12 @@
 <!-- ATTACH THIS FILE TO CLAUDE FOR FLUTTER CODE GENERATION -->
 
 ## 1. Conventions & Authoritative References
-- **Callable Reference (188/188):** [callables/INDEX.md](./callables/INDEX.md) & [callables.json](./callables.json)
+- **Callable Reference (189/189):** [callables/INDEX.md](./callables/INDEX.md) & [callables.json](./callables.json)
 - **Single Entity / List (D-18):** `{ "<entity>": { ... } }` | `{ "items": [...], "count": N, "nextCursor": "...", "included": { ... } }`
 - **Money:** Integer minor units per org `currencyDecimals` (2 for INR/AED/USD, 3 for BHD/OMR/KWD).
 - **Timestamps:** ISO 8601 UTC strings; local dates `YYYY-MM-DD`; org timezone from `authMe` → `context.primaryOrganization.timezone` ([auth.md](./auth.md)).
 - **Images:** Upload to `uploadPath` via `imagesCreateUploadSession`, pass `uploadId`; stored as `ImageRef { path, contentType, width, height, sizeBytes, updatedAt, thumbnailPath? }`; read as hydrated `imageUrl` ([images.md](./images.md)).
-- **Permissions (147 concrete):** [permissions.json](./permissions.json) · **Errors (69 codes):** [errors.md](./errors.md) · **State Machines (13):** [state-machines.md](./state-machines.md)
+- **Permissions (149 concrete):** [permissions.json](./permissions.json) · **Errors (69 codes):** [errors.md](./errors.md) · **State Machines (13):** [state-machines.md](./state-machines.md)
 
 ## 2. Contract Changes Since Last Pack (Read First for Flutter Prompt 80)
 - `forms/*.json` `callables` shape changed from `{ create, update }` to `{ create?, get?, list?, update?, delete?, void?, actions: [{ name, kind }] }` (MG-06).

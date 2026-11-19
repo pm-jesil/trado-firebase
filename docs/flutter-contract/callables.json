@@ -1,8 +1,8 @@
 {
   "version": "2.0.0",
-  "totalCallables": 188,
-  "responseDocumented": 188,
-  "errorsDeclared": 188,
+  "totalCallables": 189,
+  "responseDocumented": 189,
+  "errorsDeclared": 189,
   "callables": [
     {
       "name": "healthCheck",
@@ -1400,7 +1400,7 @@
       "name": "organizationsCreate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 179,
+      "line": 183,
       "gate": "platform",
       "kind": "create",
       "permissions": [],
@@ -2610,10 +2610,11 @@
       "name": "organizationsUpdate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 411,
+      "line": 415,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
+        "org:manage_approval_policy",
         "org:manage_bank_details",
         "org:manage_legal_profile",
         "org:update"
@@ -3567,6 +3568,26 @@
           "example": true
         },
         {
+          "path": "settings.approvals.modules.account_transfer",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
+          "path": "settings.approvals.modules.stock_transfer",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
           "path": "settings.approvals.amountThreshold",
           "type": "number",
           "required": false,
@@ -3578,6 +3599,39 @@
           "enumValues": [],
           "uiHint": "money_paise",
           "example": 2500
+        },
+        {
+          "path": "settings.approvals.allowSelfApproval",
+          "type": "boolean",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "switch",
+          "example": true
+        },
+        {
+          "path": "settings.approvals.thresholds.*",
+          "type": "number",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "min": 0,
+            "minInclusive": true
+          },
+          "enumValues": [],
+          "uiHint": "numeric",
+          "example": 1
+        },
+        {
+          "path": "settings.numbering.*",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "Sample *"
         },
         {
           "path": "settings.businessConfig.defaultUnits[]",
@@ -3655,7 +3709,7 @@
       "name": "organizationsDeactivate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 511,
+      "line": 516,
       "gate": "platform",
       "kind": "delete",
       "permissions": [],
@@ -3744,7 +3798,7 @@
       "name": "organizationsReactivate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 581,
+      "line": 587,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -3829,7 +3883,7 @@
       "name": "organizationsList",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 534,
+      "line": 539,
       "gate": "platform",
       "kind": "list",
       "permissions": [],
@@ -3920,7 +3974,7 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: { subscriptionStatus: string; subscriptionExpiresAt: string | null; seatsUsed: number; branchesUsed: number; name: string; code?: string | undefined; legalName?: string | undefined; ... 42 more ...; organizationId: string; }[]; ...",
+        "tsType": "{ items: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 5 more ...;",
         "topLevelKeys": [
           "count",
           "hasMore",
@@ -3936,8 +3990,68 @@
           "organizations",
           "totalCount"
         ],
-        "leafCount": 250,
+        "leafCount": 252,
         "sampleLeaves": [
+          {
+            "path": "items[].bankAccounts[].id",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "items[].bankAccounts[].accountHolderName",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "items[].bankAccounts[].bankName",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "items[].bankAccounts[].accountNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "items[].bankAccounts[].label",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].bankAccounts[].routingType",
+            "type": "\"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].bankAccounts[].routingCode",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].bankAccounts[].upiId",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].bankAccounts[].currency",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].bankAccounts[].isDefault",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].bankAccounts[].showOnInvoice",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].bankAccounts[].status",
+            "type": "\"active\" | \"archived\" | undefined",
+            "optional": true
+          },
           {
             "path": "items[].subscriptionStatus",
             "type": "string",
@@ -4077,66 +4191,6 @@
             "path": "items[].ownerStatus",
             "type": "\"pending\" | \"active\" | undefined",
             "optional": true
-          },
-          {
-            "path": "items[].ownerUserId",
-            "type": "string | null | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].financialYearStartMonth",
-            "type": "number | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].defaultBranchId",
-            "type": "string | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].branchCount",
-            "type": "number | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].sharingPolicies.products",
-            "type": "\"organization_shared\" | \"branch_scoped\" | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].sharingPolicies.categories",
-            "type": "\"organization_shared\" | \"branch_scoped\" | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].sharingPolicies.customers",
-            "type": "\"organization_shared\" | \"branch_scoped\" | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].sharingPolicies.vendors",
-            "type": "\"organization_shared\" | \"branch_scoped\" | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].sharingPolicies.sales",
-            "type": "\"organization_shared\" | \"branch_scoped\" | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].sharingPolicies.purchases",
-            "type": "\"organization_shared\" | \"branch_scoped\" | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].sharingPolicies.expenses",
-            "type": "\"organization_shared\" | \"branch_scoped\" | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].sharingPolicies.stock",
-            "type": "\"branch_scoped\" | undefined",
-            "optional": true
           }
         ]
       },
@@ -4152,7 +4206,7 @@
       "name": "organizationsSetSubscription",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 687,
+      "line": 693,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -4425,7 +4479,7 @@
       "name": "organizationsGet",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 775,
+      "line": 781,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -4467,7 +4521,7 @@
           "evaluation",
           "organization"
         ],
-        "leafCount": 130,
+        "leafCount": 131,
         "sampleLeaves": [
           {
             "path": "organization.bankAccounts[].id",
@@ -4683,7 +4737,7 @@
       "name": "organizationsPreviewDeactivationImpact",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 598,
+      "line": 604,
       "gate": "platform",
       "kind": "read",
       "permissions": [],
@@ -4832,7 +4886,7 @@
       "name": "organizationsGetSubscriptionHistory",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 643,
+      "line": 649,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -4993,7 +5047,7 @@
       "name": "organizationsProvisionUser",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 875,
+      "line": 881,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -5317,7 +5371,7 @@
       "name": "organizationsTransferOwnership",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 938,
+      "line": 944,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -5445,6 +5499,146 @@
           {
             "path": "message",
             "type": "string",
+            "optional": false
+          }
+        ]
+      },
+      "errors": [
+        "INVALID_ARGUMENT",
+        "PERMISSION_DENIED",
+        "UNAUTHENTICATED",
+        "UNKNOWN_FIELD"
+      ],
+      "stateMachine": "organization"
+    },
+    {
+      "name": "organizationsRevealBankAccount",
+      "domain": "organizations",
+      "file": "functions/src/callables/organizations.ts",
+      "line": 1044,
+      "gate": "tenant",
+      "kind": "action",
+      "permissions": [
+        "org:manage_bank_details"
+      ],
+      "moduleGate": null,
+      "featureFlag": null,
+      "idempotent": false,
+      "idempotencyField": null,
+      "audit": {
+        "action": "org.reveal_bank_account",
+        "category": "read_sensitive",
+        "collection": "organizations"
+      },
+      "purpose": "ACTION endpoint in organizations domain (org.reveal_bank_account).",
+      "inputSchema": "RevealBankAccountSchema",
+      "inputFields": [
+        {
+          "path": "branchId",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "branch_001"
+        },
+        {
+          "path": "organizationId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 2
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "organization_001"
+        },
+        {
+          "path": "bankAccountId",
+          "type": "string",
+          "required": true,
+          "nullable": false,
+          "bounds": {
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "bankAccount_001"
+        }
+      ],
+      "response": {
+        "envelope": "ACTION",
+        "tsType": "{ organizationId: string; bankAccountId: any; bankName: string; accountHolderName: any; accountNumber: string; routingType: any; routingCode: any; upiId: any; iban: any; }",
+        "topLevelKeys": [
+          "accountHolderName",
+          "accountNumber",
+          "bankAccountId",
+          "bankName",
+          "iban",
+          "organizationId",
+          "routingCode",
+          "routingType",
+          "upiId"
+        ],
+        "requiredTopKeys": [
+          "accountHolderName",
+          "accountNumber",
+          "bankAccountId",
+          "bankName",
+          "iban",
+          "organizationId",
+          "routingCode",
+          "routingType",
+          "upiId"
+        ],
+        "leafCount": 9,
+        "sampleLeaves": [
+          {
+            "path": "organizationId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "bankAccountId",
+            "type": "any",
+            "optional": false
+          },
+          {
+            "path": "bankName",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "accountHolderName",
+            "type": "any",
+            "optional": false
+          },
+          {
+            "path": "accountNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "routingType",
+            "type": "any",
+            "optional": false
+          },
+          {
+            "path": "routingCode",
+            "type": "any",
+            "optional": false
+          },
+          {
+            "path": "upiId",
+            "type": "any",
+            "optional": false
+          },
+          {
+            "path": "iban",
+            "type": "any",
             "optional": false
           }
         ]
@@ -21308,7 +21502,7 @@
       "name": "billsCreate",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsMutations.ts",
-      "line": 83,
+      "line": 84,
       "gate": "tenant",
       "kind": "create",
       "permissions": [
@@ -21782,7 +21976,7 @@
       "name": "billsFinalize",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsMutations.ts",
-      "line": 347,
+      "line": 348,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -21852,7 +22046,7 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "Record<string, unknown> | { billId: string; status: string; billNumber: string; originalQuotationNumber: string; totalAmount: number; paidAmount: number; balanceAmount: number; paymentId: string | null; message: string; } | undefined",
+        "tsType": "Record<string, unknown> | { billId: string; status: string; billNumber: string; originalQuotationNumber: string; totalAmount: number; paidAmount: number; balanceAmount: number; paymentId: string | null; message: string; printSnapshot: BillP",
         "topLevelKeys": [
           "balanceAmount",
           "billId",
@@ -21861,6 +22055,7 @@
           "originalQuotationNumber",
           "paidAmount",
           "paymentId",
+          "printSnapshot",
           "status",
           "totalAmount"
         ],
@@ -21871,10 +22066,11 @@
           "message",
           "originalQuotationNumber",
           "paidAmount",
+          "printSnapshot",
           "status",
           "totalAmount"
         ],
-        "leafCount": 9,
+        "leafCount": 53,
         "sampleLeaves": [
           {
             "path": "billId",
@@ -21919,6 +22115,161 @@
           {
             "path": "message",
             "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.version",
+            "type": "1",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.invoiceTitle",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.organization.name",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.organization.legalName",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.taxId",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.address",
+            "type": "Record<string, unknown>",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.contactPhone",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.contactEmail",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].id",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].bankName",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].accountNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].routingType",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].routingCode",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].accountHolderName",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.customer.name",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.customer.phone",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.customer.taxId",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.customer.billingAddress",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.billNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.issueDate",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.salesMode",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.documentType",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].lineId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].productId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].name",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].sku",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.items[].quantity",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].unit",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].unitPrice",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].discountAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].taxAmount",
+            "type": "number",
             "optional": false
           }
         ]
@@ -22215,18 +22566,20 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "{ serialsByLine: Record<string, string[]>; delivery: { complete: boolean; lines: { lineId: string; ordered: number; delivered: number; onTheWay: number; remaining: number; }[]; } | null; included: Partial<...>; }",
+        "tsType": "{ serialsByLine: Record<string, string[]>; delivery: { complete: boolean; lines: { lineId: string; ordered: number; delivered: number; onTheWay: number; remaining: number; }[]; } | null; included: Partial<...>; printSnapshot: BillPrintSnaps",
         "topLevelKeys": [
           "delivery",
           "included",
+          "printSnapshot",
           "serialsByLine"
         ],
         "requiredTopKeys": [
           "delivery",
           "included",
+          "printSnapshot",
           "serialsByLine"
         ],
-        "leafCount": 8,
+        "leafCount": 52,
         "sampleLeaves": [
           {
             "path": "serialsByLine",
@@ -22267,6 +22620,166 @@
             "path": "included",
             "type": "Partial<Record<IncludedKind, Record<string, Record<string, unknown>>>>",
             "optional": false
+          },
+          {
+            "path": "printSnapshot.version",
+            "type": "1",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.invoiceTitle",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.organization.name",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.organization.legalName",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.taxId",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.address",
+            "type": "Record<string, unknown>",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.contactPhone",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.contactEmail",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].id",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].bankName",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].accountNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].routingType",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].routingCode",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.organization.bankAccounts[].accountHolderName",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.customer.name",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.customer.phone",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.customer.taxId",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.customer.billingAddress",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.billNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.issueDate",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.salesMode",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.documentType",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].lineId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].productId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].name",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].sku",
+            "type": "string | null",
+            "optional": true
+          },
+          {
+            "path": "printSnapshot.items[].quantity",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].unit",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].unitPrice",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].discountAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].taxAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "printSnapshot.items[].taxRatePercent",
+            "type": "number | undefined",
+            "optional": true
           }
         ]
       },
@@ -22282,7 +22795,7 @@
       "name": "billsUpdateDraft",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsMutations.ts",
-      "line": 309,
+      "line": 310,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -22546,7 +23059,7 @@
       "name": "billsVoid",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsMutations.ts",
-      "line": 569,
+      "line": 580,
       "gate": "tenant",
       "kind": "delete",
       "permissions": [
@@ -22675,7 +23188,7 @@
       "name": "billsPreview",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsQueries.ts",
-      "line": 109,
+      "line": 110,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -23020,11 +23533,12 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: BillItem[]; subTotal: number; taxTotal: number; discountTotal: number; totalAmount: number; roundOff: number; taxSnapshot: TaxSnapshot; currency: string; warnings: { ...; }[]; }",
+        "tsType": "{ items: BillItem[]; subTotal: number; taxTotal: number; discountTotal: number; totalAmount: number; roundOff: number; taxSnapshot: TaxSnapshot; currency: string; warnings: { ...; }[]; printSnapshot: BillPrintSnapshot; }",
         "topLevelKeys": [
           "currency",
           "discountTotal",
           "items",
+          "printSnapshot",
           "roundOff",
           "subTotal",
           "taxSnapshot",
@@ -23036,6 +23550,7 @@
           "currency",
           "discountTotal",
           "items",
+          "printSnapshot",
           "roundOff",
           "subTotal",
           "taxSnapshot",
@@ -23043,7 +23558,7 @@
           "totalAmount",
           "warnings"
         ],
-        "leafCount": 41,
+        "leafCount": 85,
         "sampleLeaves": [
           {
             "path": "items[].lineId",
@@ -40158,12 +40673,13 @@
       "name": "locationsGetLatest",
       "domain": "locations",
       "file": "functions/src/callables/locations.ts",
-      "line": 155,
+      "line": 156,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
         "location:view_all",
-        "location:view_own"
+        "location:view_own",
+        "locations:view_team"
       ],
       "moduleGate": null,
       "featureFlag": null,
@@ -40219,7 +40735,7 @@
           "locations",
           "organizationId"
         ],
-        "leafCount": 12,
+        "leafCount": 13,
         "sampleLeaves": [
           {
             "path": "organizationId",
@@ -40280,6 +40796,11 @@
             "path": "locations[].updatedAt",
             "type": "string",
             "optional": false
+          },
+          {
+            "path": "locations[].expiresAt",
+            "type": "any",
+            "optional": true
           }
         ]
       },
@@ -40295,12 +40816,13 @@
       "name": "locationsGetHistory",
       "domain": "locations",
       "file": "functions/src/callables/locations.ts",
-      "line": 202,
+      "line": 222,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
         "location:view_all",
-        "location:view_own"
+        "location:view_own",
+        "locations:view_team"
       ],
       "moduleGate": null,
       "featureFlag": null,
@@ -41479,13 +42001,8 @@
         "requiredTopKeys": [
           "request"
         ],
-        "leafCount": 52,
+        "leafCount": 51,
         "sampleLeaves": [
-          {
-            "path": "request.requestId",
-            "type": "string",
-            "optional": false
-          },
           {
             "path": "request.requestNumber",
             "type": "string",
@@ -41680,6 +42197,11 @@
             "path": "request.firstResponseAt",
             "type": "string | null | undefined",
             "optional": true
+          },
+          {
+            "path": "request.slaState",
+            "type": "SlaState | \"on_track\" | \"at_risk\" | \"breached\" | \"paused\"",
+            "optional": false
           }
         ]
       },
@@ -41699,7 +42221,7 @@
       "name": "requestsUpdate",
       "domain": "requests",
       "file": "functions/src/callables/requests/tenantRequests.ts",
-      "line": 364,
+      "line": 362,
       "gate": "tenant",
       "kind": "update",
       "permissions": [],
@@ -41922,7 +42444,7 @@
       "name": "requestsAddComment",
       "domain": "requests",
       "file": "functions/src/callables/requests/tenantRequests.ts",
-      "line": 437,
+      "line": 434,
       "gate": "tenant",
       "kind": "update",
       "permissions": [],
@@ -42333,7 +42855,7 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "{ success: boolean; requestId: string; previousStatus: RequestStatus; status: RequestStatus; request: RequestDoc; }",
+        "tsType": "{ success: boolean; requestId: string; previousStatus: RequestStatus; status: RequestStatus; request: { requestId: string; requestNumber: string; audience: \"platform\" | ... 1 more ... | RequestAudience; ... 37 more ...; requestedPlanName?: ",
         "topLevelKeys": [
           "previousStatus",
           "request",
@@ -42566,7 +43088,7 @@
       "name": "requestsGet",
       "domain": "requests",
       "file": "functions/src/callables/requests/tenantRequests.ts",
-      "line": 495,
+      "line": 491,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -42635,7 +43157,7 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "{ request: RequestDoc; included: { blockers: unknown[]; }; }",
+        "tsType": "{ request: { requestId: string; requestNumber: string; audience: \"platform\" | \"organization\" | RequestAudience; category: RequestCategory; kind: RequestKind | ... 1 more ... | \"work\"; ... 35 more ...; requestedPlanName?: string | ... 1 more",
         "topLevelKeys": [
           "included",
           "request"
@@ -42861,7 +43383,7 @@
       "name": "requestsList",
       "domain": "requests",
       "file": "functions/src/callables/requests/tenantRequests.ts",
-      "line": 553,
+      "line": 549,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -43045,7 +43567,7 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: RequestDoc[]; count: number; totalCount: number; nextCursor: string | null; }",
+        "tsType": "{ items: (RequestDoc & { requestId: string; })[]; count: number; totalCount: number; nextCursor: string | null; }",
         "topLevelKeys": [
           "count",
           "items",
@@ -43057,206 +43579,26 @@
           "items",
           "totalCount"
         ],
-        "leafCount": 55,
+        "leafCount": 4,
         "sampleLeaves": [
           {
-            "path": "items[].requestId",
-            "type": "string",
+            "path": "items[]",
+            "type": "RequestDoc & { requestId: string; }",
             "optional": false
           },
           {
-            "path": "items[].requestNumber",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].audience",
-            "type": "\"platform\" | \"organization\" | RequestAudience",
-            "optional": false
-          },
-          {
-            "path": "items[].category",
-            "type": "RequestCategory",
-            "optional": false
-          },
-          {
-            "path": "items[].kind",
-            "type": "RequestKind | \"approval\" | \"work\"",
-            "optional": false
-          },
-          {
-            "path": "items[].title",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].description",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].details",
-            "type": "Record<string, unknown>",
-            "optional": false
-          },
-          {
-            "path": "items[].priority",
-            "type": "\"low\" | \"high\" | \"urgent\" | RequestPriority | \"normal\"",
-            "optional": false
-          },
-          {
-            "path": "items[].severity",
-            "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].status",
-            "type": "RequestStatus",
-            "optional": false
-          },
-          {
-            "path": "items[].statusReason",
-            "type": "string | null | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].statusChangedAt",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].requester.uid",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].requester.name",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].requester.roleLabel",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].organizationId",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].branchId",
-            "type": "string | null | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].relatedEntity.type",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].relatedEntity.id",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].relatedEntity.label",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].assignee.uid",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].assignee.name",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].attachments[].storagePath",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].attachments[].filename",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].attachments[].mimeType",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].attachments[].sizeBytes",
+            "path": "count",
             "type": "number",
             "optional": false
           },
           {
-            "path": "items[].attachments[].uploadedAt",
-            "type": "string | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].labels[]",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].idempotencyKey",
-            "type": "string | null | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].version",
+            "path": "totalCount",
             "type": "number",
             "optional": false
           },
           {
-            "path": "items[].createdAt",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].updatedAt",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].lastActivityAt",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].lastActivityBy.uid",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].lastActivityBy.name",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].lastActivityBy.isPlatform",
-            "type": "boolean",
-            "optional": false
-          },
-          {
-            "path": "items[].firstResponseDueAt",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].resolutionDueAt",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "items[].firstResponseAt",
-            "type": "string | null | undefined",
+            "path": "nextCursor",
+            "type": "string | null",
             "optional": true
           }
         ]
@@ -43273,7 +43615,7 @@
       "name": "requestsActivityList",
       "domain": "requests",
       "file": "functions/src/callables/requests/tenantRequests.ts",
-      "line": 599,
+      "line": 595,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -43379,13 +43721,8 @@
           "items",
           "totalCount"
         ],
-        "leafCount": 18,
+        "leafCount": 17,
         "sampleLeaves": [
-          {
-            "path": "items[].activityId",
-            "type": "string",
-            "optional": false
-          },
           {
             "path": "items[].requestId",
             "type": "string",
@@ -43486,7 +43823,7 @@
       "name": "requestsCounts",
       "domain": "requests",
       "file": "functions/src/callables/requests/tenantRequests.ts",
-      "line": 637,
+      "line": 633,
       "gate": "tenant",
       "kind": "action",
       "permissions": [],
@@ -43582,7 +43919,7 @@
       "name": "requestsInboxList",
       "domain": "requests",
       "file": "functions/src/callables/requests/platformRequests.ts",
-      "line": 196,
+      "line": 195,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -43805,7 +44142,7 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: RequestDoc[]; count: number; totalCount: number; nextCursor: string | null; }",
+        "tsType": "{ items: { requestNumber: string; audience: \"platform\" | \"organization\" | RequestAudience; category: RequestCategory; kind: RequestKind | \"approval\" | \"work\"; ... 36 more ...; requestId: string; }[]; count: number; totalCount: number; nextC",
         "topLevelKeys": [
           "count",
           "items",
@@ -43819,11 +44156,6 @@
         ],
         "leafCount": 55,
         "sampleLeaves": [
-          {
-            "path": "items[].requestId",
-            "type": "string",
-            "optional": false
-          },
           {
             "path": "items[].requestNumber",
             "type": "string",
@@ -44018,6 +44350,11 @@
             "path": "items[].firstResponseAt",
             "type": "string | null | undefined",
             "optional": true
+          },
+          {
+            "path": "items[].slaState",
+            "type": "SlaState | \"on_track\" | \"at_risk\" | \"breached\" | \"paused\"",
+            "optional": false
           }
         ]
       },
@@ -44033,7 +44370,7 @@
       "name": "requestsInboxCounts",
       "domain": "requests",
       "file": "functions/src/callables/requests/platformRequests.ts",
-      "line": 245,
+      "line": 244,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -44152,7 +44489,7 @@
       "name": "requestsAssign",
       "domain": "requests",
       "file": "functions/src/callables/requests/platformRequests.ts",
-      "line": 294,
+      "line": 293,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -44295,7 +44632,7 @@
       "name": "requestsSetPriority",
       "domain": "requests",
       "file": "functions/src/callables/requests/platformRequests.ts",
-      "line": 364,
+      "line": 362,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -44428,7 +44765,7 @@
       "name": "requestsAddInternalNote",
       "domain": "requests",
       "file": "functions/src/callables/requests/platformRequests.ts",
-      "line": 419,
+      "line": 416,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -44614,7 +44951,7 @@
       "name": "requestsApply",
       "domain": "requests",
       "file": "functions/src/callables/requests/platformRequests.ts",
-      "line": 472,
+      "line": 467,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -44750,11 +45087,6 @@
             "path": "applyResult",
             "type": "Record<string, unknown>",
             "optional": true
-          },
-          {
-            "path": "request.requestId",
-            "type": "string",
-            "optional": false
           },
           {
             "path": "request.requestNumber",
@@ -44935,6 +45267,11 @@
             "path": "request.lastActivityBy.isPlatform",
             "type": "boolean",
             "optional": false
+          },
+          {
+            "path": "request.firstResponseDueAt",
+            "type": "string",
+            "optional": false
           }
         ]
       },
@@ -44954,7 +45291,7 @@
       "name": "requestsSettingsGet",
       "domain": "requests",
       "file": "functions/src/callables/requests/platformRequests.ts",
-      "line": 641,
+      "line": 635,
       "gate": "platform",
       "kind": "read",
       "permissions": [],
@@ -45097,7 +45434,7 @@
       "name": "requestsSettingsUpdate",
       "domain": "requests",
       "file": "functions/src/callables/requests/platformRequests.ts",
-      "line": 669,
+      "line": 663,
       "gate": "platform",
       "kind": "update",
       "permissions": [

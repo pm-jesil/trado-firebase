@@ -853,7 +853,6 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 |---|---|---|---|---|---|---|
 | DUP-085 | BOUNDED_ARRAY | `accountReconciliations` | `reconciledTransactionIds` | Array of reconciled ledger transaction IDs bounded per statement period. | — | cap 500 |
 | DUP-083 | R4 | `accountTransactions` | `balanceAfter` | Running account balance snapshot at the exact time of the transaction for point-in-time statements and audit. | — | — |
-| DUP-081 | R4 | `activity` | `activityId` | Document self ID stored on timeline entry record for client reference and deduplication. | — | — |
 | DUP-080 | BOUNDED_ARRAY | `activity` | `attachments` | Activity comment attachments array capped at 5 in RequestAttachmentSchema. | — | cap 5 |
 | DUP-079 | OWNED | `activity` | `author.roleLabel` | Snapshot of author role label at activity creation time for timeline rendering without role hydration. | — | — |
 | DUP-020 | R3 | `auditLogs` | `changedFields` | Top-level field names of the event's changes, stored for array-contains queries. Bounded by the entity's field count; written only by the audit recorder. | `recordCommitEvent` | reconcile:auditChangedFields |
@@ -920,7 +919,6 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 | DUP-075 | BOUNDED_ARRAY | `requests` | `attachments` | Request attachments array capped at 5 in RequestAttachmentSchema, keeping ticket document small. | — | cap 5 |
 | DUP-076 | BOUNDED_ARRAY | `requests` | `labels` | Request categorization labels array capped at 10 in CreateRequestSchema. | — | cap 10 |
 | DUP-074 | OWNED | `requests` | `requester.roleLabel` | Snapshot of requester role label at creation time for display in ticket header without role hydration. | — | — |
-| DUP-078 | R4 | `requests` | `requestId` | Document self ID stored on ticket record for query filtering and client reference. | — | — |
 | DUP-057 | BOUNDED_ARRAY | `returns` | `items` | Owned list capped at 200 by the Zod input, keeping the document far below the 1 MiB limit. | — | cap 200 |
 | DUP-015 | R2 | `returns` | `items.baseQuantity` | Returned quantity × the source line's frozen conversionFactor; the stock movement uses it. | — | — |
 | DUP-061 | BOUNDED_ARRAY | `returns` | `requestedItems` | Pending return request lines bounded by the 200-item create limit, written only by returnsCreate. | `returnsCreate` | cap 200 |

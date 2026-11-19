@@ -24,7 +24,7 @@
       "path": "docs/api-reference.md",
       "title": "Trado API Reference",
       "classification": "KEEP+UPDATE",
-      "lineCount": 1259
+      "lineCount": 1267
     },
     {
       "path": "docs/architecture.md",
@@ -156,7 +156,7 @@
       "path": "docs/audit/handoff.md",
       "title": "Trado Engineering Handoff (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 78
+      "lineCount": 87
     },
     {
       "path": "docs/audit/implementation-status.md",
@@ -222,7 +222,7 @@
       "path": "docs/audit/run-ledger.md",
       "title": "Trado Engineering Run Ledger (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 35
+      "lineCount": 36
     },
     {
       "path": "docs/audit/test-coverage-matrix.md",
@@ -276,7 +276,7 @@
       "path": "docs/data-model.md",
       "title": "Trado Data Model & Schema Specification",
       "classification": "KEEP+UPDATE",
-      "lineCount": 948
+      "lineCount": 946
     },
     {
       "path": "docs/decisions/decision-register.md",
@@ -318,7 +318,7 @@
       "path": "docs/features/employee-location-and-privacy.md",
       "title": "Feature Guide: Employee Live Location Tracking & Privacy",
       "classification": "KEEP+UPDATE",
-      "lineCount": 83
+      "lineCount": 87
     },
     {
       "path": "docs/features/inventory-stock-and-costing.md",

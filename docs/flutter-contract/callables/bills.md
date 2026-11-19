@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `billsCreate`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/bills/billsMutations.ts:83`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/bills/billsMutations.ts:84`
 - **Permission(s):** `sale:create` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `bill.create` (`mutation`) · **State Machine:** [bill](../state-machines.md)
 
@@ -68,7 +68,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `billsFinalize`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/bills/billsMutations.ts:347`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/bills/billsMutations.ts:348`
 - **Permission(s):** `bill:create`, `bill:update`, `delivery:update` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `bill.finalize` (`mutation`) · **State Machine:** [bill](../state-machines.md)
 
@@ -81,7 +81,7 @@ Back to [Master Index](./INDEX.md).
 | `billId` | `string` | **Yes** | {"minLength":2} | `bill_001` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "balanceAmount", "billId", "billNumber", "message", "originalQuotationNumber", "paidAmount", "paymentId", "status", "totalAmount" (9 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "balanceAmount", "billId", "billNumber", "message", "originalQuotationNumber", "paidAmount", "paymentId", "printSnapshot", "status", "totalAmount" (53 typed leaf paths).
 **Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -100,7 +100,7 @@ Back to [Master Index](./INDEX.md).
     "originalQuotationNumber": "...",
     "paidAmount": "...",
     "paymentId": "paymentId_001",
-    "status": "..."
+    "printSnapshot": "..."
   }
 }
 ```
@@ -164,7 +164,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `billId` | `string` | **Yes** | {"minLength":2} | `bill_001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "delivery", "included", "serialsByLine" (8 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "delivery", "included", "printSnapshot", "serialsByLine" (52 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -177,13 +177,14 @@ Back to [Master Index](./INDEX.md).
   "response": {
     "delivery": "...",
     "included": "...",
+    "printSnapshot": "...",
     "serialsByLine": "..."
   }
 }
 ```
 
 ## `billsUpdateDraft`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/bills/billsMutations.ts:309`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/bills/billsMutations.ts:310`
 - **Permission(s):** `bill:view_all` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `bill.update_draft` (`mutation`) · **State Machine:** [bill](../state-machines.md)
 
@@ -229,7 +230,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `billsVoid`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/bills/billsMutations.ts:569`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/bills/billsMutations.ts:580`
 - **Permission(s):** `bill:void` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `bill.void` (`mutation`) · **State Machine:** [bill](../state-machines.md)
 
@@ -265,7 +266,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `billsPreview`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/bills/billsQueries.ts:109`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/bills/billsQueries.ts:110`
 - **Permission(s):** `bill:create`, `bill:view`, `bill:view_all`, `sale:create`, `sale:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `bill.preview` (`none`) · **State Machine:** [bill](../state-machines.md)
 
@@ -299,7 +300,7 @@ Back to [Master Index](./INDEX.md).
 | `splitPayments[].notes` | `string` | No | {"maxLength":300} | `Sample notes` |
 | `notes` | `string` | No | {"maxLength":1000} | `Sample notes` |
 
-**Response:** Envelope `LIST` · Top-level keys: "currency", "discountTotal", "items", "roundOff", "subTotal", "taxSnapshot", "taxTotal", "totalAmount", "warnings" (41 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "currency", "discountTotal", "items", "printSnapshot", "roundOff", "subTotal", "taxSnapshot", "taxTotal", "totalAmount", "warnings" (85 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
