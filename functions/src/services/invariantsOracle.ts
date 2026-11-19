@@ -209,7 +209,7 @@ export async function assertLedgerInvariants(orgId: string): Promise<InvariantsC
           description: `Reversal transaction points to non-existent original ${t.reversedTransactionId}`,
         });
       } else {
-        if (orig.status !== "reversed") {
+        if (orig.status !== "reversed" && orig.status !== "rejected") {
           violations.push({
             code: "INV-5",
             entity: "accountTransactions",

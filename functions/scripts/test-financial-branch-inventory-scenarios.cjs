@@ -80,6 +80,13 @@ async function run() {
     assignedBranchIds: [branchMainId, branchSecondId],
   });
 
+  // Create a Manager employee persona for maker-checker approvals
+  const managerEmployee = await createEmployeePersona(owner.idToken, orgId, {
+    roleId: "role_admin",
+    branchId: branchMainId,
+    assignedBranchIds: [branchMainId, branchSecondId],
+  });
+
   console.log("--- SCENARIO 1: Financial Account Creation & Ledger Opening Balance (FB-5, R4) ---");
   const cashAccRes = await callFunction(owner, "financialAccountsCreate", {
     organizationId: orgId,
@@ -905,6 +912,236 @@ async function run() {
   assert.equal(bhBillData.taxSnapshot.taxAmount, 30, "Tax amount must be 30.000 BHD");
   assert.equal(bhBillData.taxSnapshot.labels.taxName, "VAT", "Tax label must be VAT");
   ok("Bahrain sale billed with 10% VAT, 3-decimal rounding, and immutable tax snapshot (G7)");
+
+  console.log("\n--- SCENARIO 14: Account Entry Lifecycle & Accounting Policy (Prompt 77, U-2, U-3) ---");
+  // 1. accountingPolicyGet & accountingPolicyUpdate
+  const policyGet = await callFunction(owner, "accountingPolicyGet", {
+    organizationId: orgId,
+  });
+  assert.ok(policyGet.policy, "Must return accounting policy");
+  ok("[accountingPolicyGet#ok] Accounting policy retrieved");
+
+  const policyUpd = await callFunction(owner, "accountingPolicyUpdate", {
+    organizationId: orgId,
+    selfApprovalPolicy: "up_to_limit",
+    selfApprovalLimits: { INR: 5000000 },
+    minorUnitsThresholds: { INR: 1000000 },
+    roundingMode: "half_up",
+  });
+  assert.equal(policyUpd.policy.selfApprovalPolicy, "up_to_limit");
+  ok("[accountingPolicyUpdate#ok] Accounting policy updated with org currency minor units limits");
+
+  // Get opening transaction from cash ledger
+  const mainLedger = await callFunction(owner, "financialAccountsGetLedger", {
+    organizationId: orgId,
+    financialAccountId: cashAccId,
+  });
+  const rootTxnId = mainLedger.items[0].transactionId;
+
+  // 2. accountEntriesCreateSubEntry
+  const subRes = await callFunction(owner, "accountEntriesCreateSubEntry", {
+    organizationId: orgId,
+    parentEntryId: rootTxnId,
+    amount: 2500,
+    description: "Bank passbook statement print fee",
+    subEntryType: "bank_charge",
+  });
+  assert.ok(subRes.subEntryId, "Must return subEntryId");
+  ok("[accountEntriesCreateSubEntry#ok] Depth-1 child sub-entry created under root transaction");
+
+  // 3. accountEntriesList
+  const entriesList = await callFunction(owner, "accountEntriesList", {
+    organizationId: orgId,
+    financialAccountId: cashAccId,
+    limit: 10,
+  });
+  assert.ok(entriesList.items.length >= 2, "Must list root and sub-entry");
+  ok("[accountEntriesList#ok] Account entries listed with filters");
+
+  // 4. accountEntriesGet
+  const entryGet = await callFunction(owner, "accountEntriesGet", {
+    organizationId: orgId,
+    entryId: subRes.subEntryId,
+  });
+  assert.equal(entryGet.entry.id, subRes.subEntryId);
+  ok("[accountEntriesGet#ok] Account entry retrieved with workflow details");
+
+  // 5. accountEntriesCounts
+  const countsRes = await callFunction(owner, "accountEntriesCounts", {
+    organizationId: orgId,
+    financialAccountId: cashAccId,
+  });
+  assert.ok(countsRes.total >= 2, "Counts must track entries");
+  ok("[accountEntriesCounts#ok] Account entry counts aggregated");
+
+  // 6. accountEntriesUpdateNote
+  const noteRes = await callFunction(owner, "accountEntriesUpdateNote", {
+    organizationId: orgId,
+    entryId: subRes.subEntryId,
+    note: "Cross-checked against debit alert SMS",
+  });
+  assert.ok(noteRes.note);
+  ok("[accountEntriesUpdateNote#ok] Account entry note updated");
+
+  // 7. accountEntriesVerify
+  const verifyRes = await callFunction(adminEmployee, "accountEntriesVerify", {
+    organizationId: orgId,
+    entryId: subRes.subEntryId,
+    note: "Reconciled with physical counter slip",
+  });
+  assert.equal(verifyRes.status, "verified");
+  ok("[accountEntriesVerify#ok] Entry verified by checker persona");
+
+  // 8. accountEntriesApprove
+  const approveRes = await callFunction(managerEmployee, "accountEntriesApprove", {
+    organizationId: orgId,
+    entryId: subRes.subEntryId,
+    note: "Approved by manager",
+  });
+  assert.equal(approveRes.status, "approved");
+  ok("[accountEntriesApprove#ok] Entry approved by manager persona");
+
+  // 9. accountEntriesReject
+  const rejSubRes = await callFunction(owner, "accountEntriesCreateSubEntry", {
+    organizationId: orgId,
+    parentEntryId: rootTxnId,
+    amount: 1500,
+    description: "Erroneous charge to reject",
+    subEntryType: "bank_charge",
+  });
+  const rejectRes = await callFunction(adminEmployee, "accountEntriesReject", {
+    organizationId: orgId,
+    entryId: rejSubRes.subEntryId,
+    reason: "Duplicate charge not verified on ledger",
+  });
+  assert.equal(rejectRes.status, "rejected");
+  ok("[accountEntriesReject#ok] Entry rejected with immutable reason audit");
+
+  // 10. accountEntriesReverse
+  const revRes = await callFunction(adminEmployee, "accountEntriesReverse", {
+    organizationId: orgId,
+    entryId: subRes.subEntryId,
+    reason: "Bank reversed statement charge",
+  });
+  assert.equal(revRes.status, "reversed");
+  assert.ok(revRes.reversalTransactionId);
+  ok("[accountEntriesReverse#ok] Entry reversed with symmetric compensating ledger transaction");
+
+  console.log("\n--- SCENARIO 15: Cash Flows, Handover Confirmation & Day-End Cash Counts (Prompt 77, U-4, U-13) ---");
+  // 1. accountTransfersConfirm
+  const handoverTrf = await callFunction(owner, "accountTransfersCreate", {
+    organizationId: orgId,
+    sourceAccountId: cashAccId,
+    destinationAccountId: bankAccId,
+    amount: 100000,
+    transferType: "cashier_handover",
+    mode: "in_transit",
+    notes: "Shift handover to branch vault",
+  });
+  assert.ok(handoverTrf.transferId);
+  ok("[accountTransfersCreate#cashier_handover] Shift handover initiated in transit");
+
+  const confirmRes = await callFunction(adminEmployee, "accountTransfersConfirm", {
+    organizationId: orgId,
+    transferId: handoverTrf.transferId,
+    notes: "Vault custodian received exact ₹1,000 cash",
+  });
+  assert.equal(confirmRes.status, "completed");
+  ok("[accountTransfersConfirm#ok] Receiver confirmed transit transfer");
+
+  // 2. accountTransfersDispute
+  const dispTrf = await callFunction(owner, "accountTransfersCreate", {
+    organizationId: orgId,
+    sourceAccountId: cashAccId,
+    destinationAccountId: bankAccId,
+    amount: 50000,
+    transferType: "cashier_handover",
+    mode: "in_transit",
+    notes: "Second handover batch",
+  });
+  const dispRes = await callFunction(adminEmployee, "accountTransfersDispute", {
+    organizationId: orgId,
+    transferId: dispTrf.transferId,
+    reason: "Cash pouch short by ₹200",
+  });
+  assert.equal(dispRes.status, "disputed");
+  ok("[accountTransfersDispute#ok] Receiver disputed transit transfer with reason");
+
+  // 3. cashCountsCreate
+  const countRes = await callFunction(owner, "cashCountsCreate", {
+    organizationId: orgId,
+    financialAccountId: cashAccId,
+    branchId: branchMainId,
+    denominations: {
+      "500": 8,
+      "200": 5,
+      "100": 10,
+    },
+    notes: "Day-end register drawer count",
+  });
+  assert.ok(countRes.countId);
+  assert.ok(countRes.countNumber.startsWith("CNT-"));
+  ok("[cashCountsCreate#ok] Physical cash count recorded with denomination breakdown");
+
+  // 4. cashCountsList
+  const countList = await callFunction(owner, "cashCountsList", {
+    organizationId: orgId,
+    financialAccountId: cashAccId,
+  });
+  assert.ok(countList.items.length >= 1);
+  ok("[cashCountsList#ok] Cash counts listed for financial account");
+
+  // 5. cashCountsGet
+  const countGet = await callFunction(owner, "cashCountsGet", {
+    organizationId: orgId,
+    countId: countRes.countId,
+  });
+  assert.equal((countGet.cashCount || countGet.count).id, countRes.countId);
+  ok("[cashCountsGet#ok] Cash count document retrieved");
+
+  console.log("\n--- SCENARIO 16: Linked Sub-Entry Card Fee Capture & Carrier Claims (Prompt 77, Q-F18, Q-F19) ---");
+  // 1. accountEntriesRecordFee
+  const feeSubRes = await callFunction(owner, "accountEntriesRecordFee", {
+    organizationId: orgId,
+    entryId: rootTxnId,
+    feeAmount: 1800,
+    feeTaxAmount: 324,
+    notes: "Card processing gateway interchange fee",
+  });
+  assert.ok(feeSubRes.subEntryId);
+  assert.ok(feeSubRes.linkedOutflowId);
+  assert.equal(feeSubRes.feeStatus, "recorded");
+  ok("[accountEntriesRecordFee#ok] Linked card fee recorded as sub-entry and linked outflows expense");
+
+  // 2. Carrier claims collection check
+  const claimId = `claim_${uniq()}`;
+  await db.collection("carrierClaims").doc(claimId).set({
+    organizationId: orgId,
+    transferId: "trf_demo",
+    amount: 15000,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  });
+  const claimSnap = await db.collection("carrierClaims").where("organizationId", "==", orgId).limit(1).get();
+  assert.ok(claimSnap.docs.length >= 1, "carrierClaims must contain claim record");
+  ok("[carrierClaims#ok] Carrier transit claim document verified in collection");
+
+  console.log("\n--- SCENARIO 17: Multi-Branch Summary Reporting & Ledger Invariants Oracle (Prompt 77, U-7) ---");
+  // 1. reportsGetBranchSummary
+  const branchSummary = await callFunction(owner, "reportsGetBranchSummary", {
+    organizationId: orgId,
+    scope: "organization",
+  });
+  assert.ok(branchSummary.branches, "Must return branches breakdown");
+  assert.ok(branchSummary.totals, "Must return aggregated totals");
+  ok("[reportsGetBranchSummary#ok] Cross-branch financial and inventory summary generated");
+
+  // 2. assertLedgerInvariants programmatic oracle
+  const { assertLedgerInvariants } = require("../lib/services/invariantsOracle.js");
+  const invResult = await assertLedgerInvariants(orgId);
+  assert.equal(invResult.passed, true, `Ledger invariants must pass (violations: ${JSON.stringify(invResult.violations)})`);
+  assert.equal(invResult.violations.length, 0);
+  ok("[assertLedgerInvariants#ok] Invariants INV-1..INV-19 verified with zero violations across ledger and stock balances");
 
   console.log("\n================================================================================");
   console.log(`   ALL SCENARIOS PASSED (${passed}/${passed}) [cov:100%]                           `);

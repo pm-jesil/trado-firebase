@@ -10,14 +10,28 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `auth` | 2 |
 | `export` | 3 |
 | `file` | 3 |
-| `mutation` | 88 |
-| `none` | 71 |
+| `mutation` | 100 |
+| `none` | 77 |
 | `read_sensitive` | 1 |
 | `system` | 8 |
 
 | Code | Action | Entity Type | Verb | Display Key | Status Tracked | Audit Before | Category | Primary Collection | Reason Fields |
 |---|---|---|---|---|---|---|---|---|---|
+| `accountEntriesApprove` | `account.entries_approve` | `account` | `entries_approve` | `audit.action.account.entries_approve` | Yes | Yes | mutation | — | `note` |
+| `accountEntriesCounts` | `account.entries_counts` | `account` | `entries_counts` | `audit.action.account.entries_counts` | No | Yes | mutation | — | — |
+| `accountEntriesCreateSubEntry` | `account.entries_create_sub_entry` | `account` | `entries_create_sub_entry` | `audit.action.account.entries_create_sub_entry` | No | Yes | mutation | — | `notes` |
+| `accountEntriesGet` | `account.entries_get` | `account` | `entries_get` | `audit.action.account.entries_get` | No | No | none | — | — |
+| `accountEntriesList` | `account.entries_list` | `account` | `entries_list` | `audit.action.account.entries_list` | No | No | none | — | — |
+| `accountEntriesRecordFee` | `account.entries_record_fee` | `account` | `entries_record_fee` | `audit.action.account.entries_record_fee` | No | Yes | mutation | — | `notes` |
+| `accountEntriesReject` | `account.entries_reject` | `account` | `entries_reject` | `audit.action.account.entries_reject` | Yes | Yes | mutation | — | `reason` |
+| `accountEntriesReverse` | `account.entries_reverse` | `account` | `entries_reverse` | `audit.action.account.entries_reverse` | No | Yes | mutation | — | `reason` |
+| `accountEntriesUpdateNote` | `account.entries_update_note` | `account` | `entries_update_note` | `audit.action.account.entries_update_note` | No | Yes | mutation | — | `note` |
+| `accountEntriesVerify` | `account.entries_verify` | `account` | `entries_verify` | `audit.action.account.entries_verify` | No | Yes | mutation | — | `note` |
+| `accountingPolicyGet` | `accounting.policy_get` | `accounting` | `policy_get` | `audit.action.accounting.policy_get` | No | No | none | — | — |
+| `accountingPolicyUpdate` | `accounting.policy_update` | `accounting` | `policy_update` | `audit.action.accounting.policy_update` | No | Yes | mutation | — | — |
+| `accountTransfersConfirm` | `account_transfer.confirm` | `account_transfer` | `confirm` | `audit.action.account_transfer.confirm` | No | Yes | mutation | `accountTransfers` | `notes` |
 | `accountTransfersCreate` | `account_transfer.create` | `account_transfer` | `create` | `audit.action.account_transfer.create` | No | Yes | mutation | `accountTransfers` | `notes` |
+| `accountTransfersDispute` | `account_transfer.dispute` | `account_transfer` | `dispute` | `audit.action.account_transfer.dispute` | No | Yes | mutation | `accountTransfers` | `reason` |
 | `accountTransfersGet` | `account_transfer.get` | `account_transfer` | `get` | `audit.action.account_transfer.get` | No | No | none | `accountTransfers` | — |
 | `accountTransfersList` | `account_transfer.list` | `account_transfer` | `list` | `audit.action.account_transfer.list` | No | No | none | `accountTransfers` | — |
 | `approvalsCounts` | `approval.counts` | `approval` | `counts` | `audit.action.approval.counts` | No | Yes | mutation | — | — |
@@ -41,6 +55,9 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `branchesUpdate` | `branch.update` | `branch` | `update` | `audit.action.branch.update` | No | Yes | mutation | `branches` | — |
 | `capitalTransactionsCreate` | `capital_transaction.create` | `capital_transaction` | `create` | `audit.action.capital_transaction.create` | No | Yes | mutation | `capitalTransactions` | — |
 | `capitalTransactionsList` | `capital_transaction.list` | `capital_transaction` | `list` | `audit.action.capital_transaction.list` | No | No | none | `capitalTransactions` | — |
+| `cashCountsCreate` | `cash_count.create` | `cash_count` | `create` | `audit.action.cash_count.create` | No | Yes | mutation | `cashCounts` | `notes` |
+| `cashCountsGet` | `cash_count.get` | `cash_count` | `get` | `audit.action.cash_count.get` | No | No | none | `cashCounts` | — |
+| `cashCountsList` | `cash_count.list` | `cash_count` | `list` | `audit.action.cash_count.list` | No | No | none | `cashCounts` | — |
 | `categoriesCreate` | `category.create` | `category` | `create` | `audit.action.category.create` | No | Yes | mutation | `categories` | — |
 | `categoriesList` | `category.list` | `category` | `list` | `audit.action.category.list` | No | No | none | `categories` | — |
 | `categoriesUpdate` | `category.update` | `category` | `update` | `audit.action.category.update` | No | Yes | mutation | `categories` | — |
@@ -135,6 +152,7 @@ Every callable and trigger has exactly one action. Events are written by the cou
 | `recurringExpensesList` | `recurring_expense.list` | `recurring_expense` | `list` | `audit.action.recurring_expense.list` | No | No | none | `recurringExpenses` | — |
 | `recurringExpensesUpdate` | `recurring_expense.update` | `recurring_expense` | `update` | `audit.action.recurring_expense.update` | No | Yes | mutation | `recurringExpenses` | — |
 | `reportsExportCsv` | `report.export_csv` | `report` | `export_csv` | `audit.action.report.export_csv` | No | No | export | — | — |
+| `reportsGetBranchSummary` | `report.get_branch_summary` | `report` | `get_branch_summary` | `audit.action.report.get_branch_summary` | No | No | none | — | — |
 | `reportsGetCashBankSummary` | `report.get_cash_bank_summary` | `report` | `get_cash_bank_summary` | `audit.action.report.get_cash_bank_summary` | No | No | none | — | — |
 | `reportsGetOutflowSummary` | `report.get_outflow_summary` | `report` | `get_outflow_summary` | `audit.action.report.get_outflow_summary` | No | No | read_sensitive | — | — |
 | `reportsGetPartyStatement` | `report.get_party_statement` | `report` | `get_party_statement` | `audit.action.report.get_party_statement` | No | No | export | — | — |

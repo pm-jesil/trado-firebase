@@ -214,8 +214,19 @@ export interface OrganizationContact {
 }
 
 
+export interface AccountingPolicy {
+  minorUnitsThresholds?: Record<string, number>;
+  selfApprovalPolicy?: "off" | "up_to_limit" | "on";
+  selfApprovalLimits?: Record<string, number>;
+  roundingMode?: "half_up" | "half_even";
+  roundToNearestRupee?: boolean;
+  cashRoundingFils?: boolean;
+  cashCountVarianceThresholdMinor?: number;
+}
+
 export interface OrganizationSettings {
   approvals?: ApprovalPolicy;
+  accountingPolicy?: AccountingPolicy;
   /** Overrides of the business-type defaults (constants/businessDefaults.ts); absent = default. */
   businessConfig?: {
     defaultUnits?: string[];
@@ -1730,6 +1741,7 @@ export interface AccountWorkflowHistory {
   approvedBy?: Array<{ uid: string; approvedAt: string; note?: string }>;
   rejectedBy?: { uid: string; rejectedAt: string; reason: string };
   reversedBy?: { uid: string; reversedAt: string; reason: string };
+  selfApproved?: boolean;
   notes?: string;
 }
 
@@ -1772,6 +1784,7 @@ export interface AccountTransactionDoc {
   reviewReasons?: string[];
   reversedTransactionId?: string | null;
   reversalTransactionId?: string | null;
+  selfApproved?: boolean;
   workflow?: AccountWorkflowHistory;
   reconciled?: boolean;
   reconciledAt?: string | null;

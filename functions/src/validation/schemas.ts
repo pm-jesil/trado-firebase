@@ -2135,7 +2135,9 @@ export const CreateAccountTransferSchema = z.strictObject({
   sourceAccountId: z.string().trim().min(2),
   destinationAccountId: z.string().trim().min(2),
   amount: z.number().positive(),
-  transferType: z.enum(["transfer", "cash_deposit", "cash_withdrawal", "inter_bank", "petty_cash", "cashier_handover"]).default("transfer").optional(),
+  transferType: z.enum(["transfer", "cash_deposit", "cash_withdrawal", "inter_bank", "petty_cash", "cashier_handover", "settlement"]).default("transfer").optional(),
+  mode: z.enum(["instant", "in_transit"]).default("instant").optional(),
+  reference: z.string().trim().max(120).optional(),
   notes: z.string().trim().max(500).optional(),
   idempotencyKey: z.string().min(8).max(128).optional(),
 }).refine((data) => data.sourceAccountId !== data.destinationAccountId, {
@@ -2469,12 +2471,7 @@ export const VerifyAccountEntrySchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
 });
 
-export const ApproveAccountEntrySchema = z.strictObject({
-  ...ContextFields,
-  entryId: z.string().trim().min(2),
-  note: z.string().trim().max(500).optional(),
-  idempotencyKey: z.string().min(8).max(128).optional(),
-});
+export const ApproveAccountEntrySchema = VerifyAccountEntrySchema;
 
 export const RejectAccountEntrySchema = z.strictObject({
   ...ContextFields,
@@ -2483,12 +2480,7 @@ export const RejectAccountEntrySchema = z.strictObject({
   idempotencyKey: z.string().min(8).max(128).optional(),
 });
 
-export const ReverseAccountEntrySchema = z.strictObject({
-  ...ContextFields,
-  entryId: z.string().trim().min(2),
-  reason: z.string().trim().min(3).max(500),
-  idempotencyKey: z.string().min(8).max(128).optional(),
-});
+export const ReverseAccountEntrySchema = RejectAccountEntrySchema;
 
 export const UpdateAccountEntryNoteSchema = z.strictObject({
   ...ContextFields,
@@ -2504,6 +2496,7 @@ export const CreateSubEntrySchema = z.strictObject({
   financialAccountId: z.string().trim().optional(),
   direction: z.enum(["in", "out"]).optional(),
   notes: z.string().trim().max(500).optional(),
+  description: z.string().trim().max(500).optional(),
   idempotencyKey: z.string().min(8).max(128).optional(),
 });
 

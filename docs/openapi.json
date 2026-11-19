@@ -3,7 +3,7 @@
   "info": {
     "title": "Trado Firebase Backend — Local Emulator API",
     "version": "1.0.0",
-    "description": "Authoritative OpenAPI 3.0.3 contract for the Trado Firebase backend.\n\n**189 HTTPS Callable functions** across 40 domains.\n**8 Firestore Triggers** (internal event-driven background automation).\n\n⚠️ **LOCAL EMULATOR ONLY** — Targets loopback Firebase Emulator Suite (`127.0.0.1:5001`).\nDo NOT use this contract against production cloud endpoints.\n\nGenerated from canonical source exports and validation schemas (197 total exports).\nInput schemas derived from 214 Zod schemas via z.toJSONSchema()."
+    "description": "Authoritative OpenAPI 3.0.3 contract for the Trado Firebase backend.\n\n**207 HTTPS Callable functions** across 40 domains.\n**8 Firestore Triggers** (internal event-driven background automation).\n\n⚠️ **LOCAL EMULATOR ONLY** — Targets loopback Firebase Emulator Suite (`127.0.0.1:5001`).\nDo NOT use this contract against production cloud endpoints.\n\nGenerated from canonical source exports and validation schemas (215 total exports).\nInput schemas derived from 232 Zod schemas via z.toJSONSchema()."
   },
   "servers": [
     {
@@ -16490,6 +16490,1510 @@
           "None — safe to execute repeatedly"
         ]
       }
+    },
+    "/api/callables/accountEntriesList": {
+      "post": {
+        "operationId": "accountEntriesList",
+        "summary": "[READ] Account Entries List",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `accountEntries.list`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `ledger:view`, `accounts:view`\n\n**Input schema:** `ListAccountEntriesSchema`\n\n**Reads:** accountTransactions\n\n**Side effects:** READ_PAGE\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/ListAccountEntriesSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountEntriesListResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountEntriesListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "READ",
+        "x-trado-persona": "Retail Owner / Cashier / Staff",
+        "x-trado-repeatable": true,
+        "x-trado-prerequisites": [
+          "None — safe to execute repeatedly"
+        ]
+      }
+    },
+    "/api/callables/accountEntriesGet": {
+      "post": {
+        "operationId": "accountEntriesGet",
+        "summary": "[READ] Account Entries Get",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `accountEntries.get`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `ledger:view`, `accounts:view`\n\n**Input schema:** `GetAccountEntrySchema`\n\n**Reads:** accountTransactions\n\n**Side effects:** READ_ENTRY\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/GetAccountEntrySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountEntriesGetResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountEntriesGetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "READ",
+        "x-trado-persona": "Retail Owner / Cashier / Staff",
+        "x-trado-repeatable": true,
+        "x-trado-prerequisites": [
+          "None — safe to execute repeatedly"
+        ]
+      }
+    },
+    "/api/callables/accountEntriesCounts": {
+      "post": {
+        "operationId": "accountEntriesCounts",
+        "summary": "[ACTION] Account Entries Counts",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `accountEntries.counts`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `ledger:view`, `accounts:view`\n\n**Input schema:** `GetAccountEntryCountsSchema`\n\n**Reads:** accountTransactions\n\n**Side effects:** AGGREGATE_COUNTS\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/GetAccountEntryCountsSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountEntriesCountsResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountEntriesCountsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/accountEntriesVerify": {
+      "post": {
+        "operationId": "accountEntriesVerify",
+        "summary": "[ACTION] Account Entries Verify",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `accountEntries.verify`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:verify`, `accounts:manage`\n\n**Idempotent:** Yes (supply `idempotencyKey` UUID)\n\n**Input schema:** `VerifyAccountEntrySchema`\n\n**Reads:** accountTransactions\n\n**Writes:** accountTransactions, auditLogs\n\n**Side effects:** ENTRY_VERIFIED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/VerifyAccountEntrySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountEntriesVerifyResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountEntriesVerifyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/accountEntriesApprove": {
+      "post": {
+        "operationId": "accountEntriesApprove",
+        "summary": "[ACTION] Account Entries Approve",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `accountEntries.approve`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:approve`, `accounts:manage`\n\n**Idempotent:** Yes (supply `idempotencyKey` UUID)\n\n**Input schema:** `ApproveAccountEntrySchema`\n\n**Reads:** accountTransactions, organizations\n\n**Writes:** accountTransactions, auditLogs\n\n**Side effects:** ENTRY_APPROVED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/ApproveAccountEntrySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountEntriesApproveResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountEntriesApproveResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/accountEntriesReject": {
+      "post": {
+        "operationId": "accountEntriesReject",
+        "summary": "[ACTION] Account Entries Reject",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `accountEntries.reject`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:approve`, `accounts:manage`\n\n**Idempotent:** Yes (supply `idempotencyKey` UUID)\n\n**Input schema:** `RejectAccountEntrySchema`\n\n**Reads:** accountTransactions\n\n**Writes:** accountTransactions, auditLogs\n\n**Side effects:** ENTRY_REJECTED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/RejectAccountEntrySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountEntriesRejectResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountEntriesRejectResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/accountEntriesReverse": {
+      "post": {
+        "operationId": "accountEntriesReverse",
+        "summary": "[ACTION] Account Entries Reverse",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `accountEntries.reverse`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:reverse`, `accounts:manage`\n\n**Idempotent:** Yes (supply `idempotencyKey` UUID)\n\n**Input schema:** `ReverseAccountEntrySchema`\n\n**Reads:** accountTransactions, financialAccounts\n\n**Writes:** accountTransactions, financialAccounts, auditLogs\n\n**Side effects:** ENTRY_REVERSED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/ReverseAccountEntrySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountEntriesReverseResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountEntriesReverseResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/accountEntriesUpdateNote": {
+      "post": {
+        "operationId": "accountEntriesUpdateNote",
+        "summary": "[UPDATE] Account Entries Update Note",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `accountEntries.updateNote`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:manage`\n\n**Input schema:** `UpdateAccountEntryNoteSchema`\n\n**Reads:** accountTransactions\n\n**Writes:** accountTransactions, auditLogs\n\n**Side effects:** NOTE_UPDATED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/UpdateAccountEntryNoteSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountEntriesUpdateNoteResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountEntriesUpdateNoteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/accountEntriesCreateSubEntry": {
+      "post": {
+        "operationId": "accountEntriesCreateSubEntry",
+        "summary": "[CREATE] Account Entries Create Sub Entry",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `accountEntries.createSubEntry`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:entry_create`, `accounts:manage`\n\n**Idempotent:** Yes (supply `idempotencyKey` UUID)\n\n**Input schema:** `CreateSubEntrySchema`\n\n**Reads:** accountTransactions, financialAccounts\n\n**Writes:** accountTransactions, financialAccounts, auditLogs\n\n**Side effects:** SUB_ENTRY_CREATED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CreateSubEntrySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountEntriesCreateSubEntryResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountEntriesCreateSubEntryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/accountingPolicyGet": {
+      "post": {
+        "operationId": "accountingPolicyGet",
+        "summary": "[READ] Accounting Policy Get",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `accountingPolicy.get`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:view`, `org:manage_approval_policy`\n\n**Input schema:** `GetAccountingPolicySchema`\n\n**Reads:** organizations\n\n**Side effects:** READ_POLICY\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/GetAccountingPolicySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountingPolicyGetResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountingPolicyGetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "READ",
+        "x-trado-persona": "Retail Owner / Cashier / Staff",
+        "x-trado-repeatable": true,
+        "x-trado-prerequisites": [
+          "None — safe to execute repeatedly"
+        ]
+      }
+    },
+    "/api/callables/accountingPolicyUpdate": {
+      "post": {
+        "operationId": "accountingPolicyUpdate",
+        "summary": "[UPDATE] Accounting Policy Update",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `accountingPolicy.update`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `org:manage_approval_policy`\n\n**Input schema:** `UpdateAccountingPolicySchema`\n\n**Reads:** organizations\n\n**Writes:** organizations, auditLogs\n\n**Side effects:** POLICY_UPDATED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/UpdateAccountingPolicySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountingPolicyUpdateResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountingPolicyUpdateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/accountTransfersConfirm": {
+      "post": {
+        "operationId": "accountTransfersConfirm",
+        "summary": "[ACTION] Account Transfers Confirm",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `accountTransfers.confirm`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:transfer`\n\n**Idempotent:** Yes (supply `idempotencyKey` UUID)\n\n**Input schema:** `ConfirmAccountTransferSchema`\n\n**Reads:** accountTransfers, financialAccounts\n\n**Writes:** accountTransfers, accountTransactions, financialAccounts, auditLogs\n\n**Side effects:** TRANSFER_CONFIRMED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/ConfirmAccountTransferSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountTransfersConfirmResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountTransfersConfirmResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/accountTransfersDispute": {
+      "post": {
+        "operationId": "accountTransfersDispute",
+        "summary": "[ACTION] Account Transfers Dispute",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `accountTransfers.dispute`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:transfer`\n\n**Idempotent:** Yes (supply `idempotencyKey` UUID)\n\n**Input schema:** `DisputeAccountTransferSchema`\n\n**Reads:** accountTransfers\n\n**Writes:** accountTransfers, auditLogs\n\n**Side effects:** TRANSFER_DISPUTED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/DisputeAccountTransferSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountTransfersDisputeResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountTransfersDisputeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/cashCountsCreate": {
+      "post": {
+        "operationId": "cashCountsCreate",
+        "summary": "[CREATE] Cash Counts Create",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `cashCounts.create`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:manage`\n\n**Idempotent:** Yes (supply `idempotencyKey` UUID)\n\n**Input schema:** `CreateCashCountSchema`\n\n**Reads:** financialAccounts, organizations\n\n**Writes:** cashCounts, accountTransactions, financialAccounts, auditLogs\n\n**Side effects:** CASH_COUNT_CREATED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/CreateCashCountSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (CashCountsCreateResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashCountsCreateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/cashCountsList": {
+      "post": {
+        "operationId": "cashCountsList",
+        "summary": "[READ] Cash Counts List",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `cashCounts.list`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:view`, `accounts:manage`\n\n**Input schema:** `ListCashCountsSchema`\n\n**Reads:** cashCounts\n\n**Side effects:** READ_PAGE\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/ListCashCountsSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (CashCountsListResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashCountsListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "READ",
+        "x-trado-persona": "Retail Owner / Cashier / Staff",
+        "x-trado-repeatable": true,
+        "x-trado-prerequisites": [
+          "None — safe to execute repeatedly"
+        ]
+      }
+    },
+    "/api/callables/cashCountsGet": {
+      "post": {
+        "operationId": "cashCountsGet",
+        "summary": "[READ] Cash Counts Get",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `cashCounts.get`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:view`, `accounts:manage`\n\n**Input schema:** `GetByIdSchema`\n\n**Reads:** cashCounts\n\n**Side effects:** READ_DOC\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FirebaseCallableRequest"
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (CashCountsGetResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CashCountsGetResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "READ",
+        "x-trado-persona": "Retail Owner / Cashier / Staff",
+        "x-trado-repeatable": true,
+        "x-trado-prerequisites": [
+          "None — safe to execute repeatedly"
+        ]
+      }
+    },
+    "/api/callables/accountEntriesRecordFee": {
+      "post": {
+        "operationId": "accountEntriesRecordFee",
+        "summary": "[ACTION] Account Entries Record Fee",
+        "description": "**Risk Classification:** `WRITE`\n\n**Recommended Persona:** `Retail Owner / Admin / Cashier`\n\n**Safe to Repeat:** `No (mutates business state)`\n\n**Logical name:** `accountEntries.recordFee`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `accounts:entry_create`, `accounts:manage`\n\n**Idempotent:** Yes (supply `idempotencyKey` UUID)\n\n**Input schema:** `RecordEntryFeeSchema`\n\n**Reads:** accountTransactions, financialAccounts\n\n**Writes:** accountTransactions, outflows, financialAccounts, auditLogs\n\n**Side effects:** FEE_SUB_ENTRY_RECORDED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Financial Accounts & Banking"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/RecordEntryFeeSchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (AccountEntriesRecordFeeResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountEntriesRecordFeeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "WRITE",
+        "x-trado-persona": "Retail Owner / Admin / Cashier",
+        "x-trado-repeatable": false,
+        "x-trado-prerequisites": [
+          "Valid organization ID and branch context"
+        ]
+      }
+    },
+    "/api/callables/reportsGetBranchSummary": {
+      "post": {
+        "operationId": "reportsGetBranchSummary",
+        "summary": "[READ] Reports Get Branch Summary",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `reports.getBranchSummary`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `reports:view`\n\n**Input schema:** `GetBranchSummarySchema`\n\n**Reads:** organizations, bills, outflows, financialAccounts, stockBalances\n\n**Side effects:** BRANCH_SUMMARY_GENERATED\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "tags": [
+          "Reports & Analytics"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "$ref": "#/components/schemas/GetBranchSummarySchema"
+                  }
+                }
+              },
+              "example": {
+                "data": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful callable response (ReportsGetBranchSummaryResponse)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportsGetBranchSummaryResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or validation failure (INVALID_ARGUMENT)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated or token expired (UNAUTHENTICATED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Permission denied or cross-tenant rejection (PERMISSION_DENIED)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FirebaseCallableError"
+                }
+              }
+            }
+          }
+        },
+        "x-trado-risk": "READ",
+        "x-trado-persona": "Retail Owner / Cashier / Staff",
+        "x-trado-repeatable": true,
+        "x-trado-prerequisites": [
+          "None — safe to execute repeatedly"
+        ]
+      }
     }
   },
   "components": {
@@ -16506,7 +18010,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "default": "bank_1f5rpx3",
+            "default": "bank_ne76rj6",
             "type": "string",
             "minLength": 1
           },
@@ -16563,6 +18067,10 @@
             "default": true,
             "type": "boolean"
           },
+          "printOnInvoice": {
+            "default": false,
+            "type": "boolean"
+          },
           "status": {
             "default": "active",
             "type": "string",
@@ -16587,7 +18095,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "default": "bank_b6ci9o3",
+              "default": "bank_1ury4fg",
               "type": "string",
               "minLength": 1
             },
@@ -16642,6 +18150,10 @@
             },
             "showOnInvoice": {
               "default": true,
+              "type": "boolean"
+            },
+            "printOnInvoice": {
+              "default": false,
               "type": "boolean"
             },
             "status": {
@@ -22511,7 +24023,8 @@
               "return",
               "stock_adjustment",
               "account_transfer",
-              "stock_transfer"
+              "stock_transfer",
+              "account_entry"
             ]
           },
           "documentId": {
@@ -22560,6 +24073,14 @@
             "type": "string",
             "minLength": 3,
             "maxLength": 500
+          },
+          "paymentDisposition": {
+            "default": "reverse_entries",
+            "type": "string",
+            "enum": [
+              "reverse_entries",
+              "keep_as_customer_credit"
+            ]
           },
           "idempotencyKey": {
             "type": "string",
@@ -26041,6 +27562,9 @@
             "type": "string",
             "minLength": 2
           },
+          "internal": {
+            "type": "boolean"
+          },
           "items": {
             "minItems": 1,
             "maxItems": 200,
@@ -26495,7 +28019,8 @@
               "return",
               "stock_adjustment",
               "account_transfer",
-              "stock_transfer"
+              "stock_transfer",
+              "account_entry"
             ]
           },
           "limit": {
@@ -26942,6 +28467,609 @@
             "type": "boolean"
           }
         },
+        "additionalProperties": false
+      },
+      "GetBranchSummarySchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchIds": {
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 2
+            }
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "organization",
+              "branch",
+              "branches"
+            ]
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ListAccountEntriesSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "financialAccountId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "created",
+              "added",
+              "verified",
+              "approved",
+              "rejected",
+              "reversed"
+            ]
+          },
+          "needsReview": {
+            "type": "boolean"
+          },
+          "subEntryType": {
+            "type": "string",
+            "enum": [
+              "transaction_charge",
+              "gateway_fee",
+              "bank_charge",
+              "adjustment",
+              "rounding",
+              "tip",
+              "other"
+            ]
+          },
+          "feeStatus": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "recorded",
+              "waived",
+              "disputed"
+            ]
+          },
+          "parentEntryId": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "to": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "limit": {
+            "default": 50,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "startAfterId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetAccountEntrySchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "entryId": {
+            "type": "string",
+            "minLength": 2
+          }
+        },
+        "required": [
+          "entryId"
+        ],
+        "additionalProperties": false
+      },
+      "GetAccountEntryCountsSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "financialAccountId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "VerifyAccountEntrySchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "entryId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "entryId"
+        ],
+        "additionalProperties": false
+      },
+      "ApproveAccountEntrySchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "entryId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "entryId"
+        ],
+        "additionalProperties": false
+      },
+      "RejectAccountEntrySchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "entryId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "entryId",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "ReverseAccountEntrySchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "entryId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "entryId",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateAccountEntryNoteSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "entryId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "entryId",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "CreateSubEntrySchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "parentEntryId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "subEntryType": {
+            "type": "string",
+            "enum": [
+              "transaction_charge",
+              "gateway_fee",
+              "bank_charge",
+              "adjustment",
+              "rounding",
+              "tip",
+              "other"
+            ]
+          },
+          "amount": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "financialAccountId": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "in",
+              "out"
+            ]
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "parentEntryId",
+          "subEntryType",
+          "amount"
+        ],
+        "additionalProperties": false
+      },
+      "RecordEntryFeeSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "entryId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "feeAmount": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "feeTaxAmount": {
+            "default": 0,
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "entryId",
+          "feeAmount"
+        ],
+        "additionalProperties": false
+      },
+      "GetAccountingPolicySchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateAccountingPolicySchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "minorUnitsThresholds": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "selfApprovalPolicy": {
+            "type": "string",
+            "enum": [
+              "off",
+              "up_to_limit",
+              "on"
+            ]
+          },
+          "selfApprovalLimits": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "roundingMode": {
+            "type": "string",
+            "enum": [
+              "half_up",
+              "half_even"
+            ]
+          },
+          "roundToNearestRupee": {
+            "type": "boolean"
+          },
+          "cashRoundingFils": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateCashCountSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "financialAccountId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "denominations": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "financialAccountId",
+          "denominations"
+        ],
+        "additionalProperties": false
+      },
+      "ListCashCountsSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "financialAccountId": {
+            "type": "string"
+          },
+          "limit": {
+            "default": 50,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "startAfterId": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "GetCashCountSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "countId": {
+            "type": "string",
+            "minLength": 2
+          }
+        },
+        "required": [
+          "countId"
+        ],
+        "additionalProperties": false
+      },
+      "ConfirmAccountTransferSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "transferId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "transferId"
+        ],
+        "additionalProperties": false
+      },
+      "DisputeAccountTransferSchema": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "branchId": {
+            "type": "string"
+          },
+          "transferId": {
+            "type": "string",
+            "minLength": 2
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "transferId",
+          "reason"
+        ],
         "additionalProperties": false
       },
       "AdjustStockSchema": {
@@ -29963,6 +32091,11 @@
                             "description": "Whether the account is printed on invoices.",
                             "x-ts-type": "boolean | undefined"
                           },
+                          "printOnInvoice": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "x-ts-type": "boolean | undefined"
+                          },
                           "status": {
                             "type": "string",
                             "enum": [
@@ -30801,6 +32934,11 @@
                             "description": "Whether the account is printed on invoices.",
                             "x-ts-type": "boolean | undefined"
                           },
+                          "printOnInvoice": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "x-ts-type": "boolean | undefined"
+                          },
                           "status": {
                             "type": "string",
                             "enum": [
@@ -31583,7 +33721,7 @@
             }
           }
         },
-        "x-ts-type": "{ items: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 5 more ...; status?: \"active\" | ... 1 more ... | undefined; }[]; ... 49 more ...; organi..."
+        "x-ts-type": "{ items: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 6 more ...; status?: \"active\" | ... 1 more ... | undefined; }[]; ... 49 more ...; organi..."
       },
       "EmployeesCreateResponse": {
         "type": "object",
@@ -34713,6 +36851,11 @@
                             "description": "Whether the account is printed on invoices.",
                             "x-ts-type": "boolean | undefined"
                           },
+                          "printOnInvoice": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "x-ts-type": "boolean | undefined"
+                          },
                           "status": {
                             "type": "string",
                             "enum": [
@@ -34746,6 +36889,12 @@
                       "type": "number",
                       "description": "Udhaar amount customer owes",
                       "x-ts-type": "number"
+                    },
+                    "advanceBalance": {
+                      "type": "number",
+                      "nullable": true,
+                      "description": "Advance payments / credits unapplied",
+                      "x-ts-type": "number | undefined"
                     },
                     "totalSpend": {
                       "type": "number",
@@ -34825,7 +36974,7 @@
             }
           }
         },
-        "x-ts-type": "{ items: { organizationId: string; customerCode: string; name: string; legalName?: string | null | undefined; partyType?: \"organization\" | \"person\" | undefined; image?: ImageRef | null | undefined; ... 20 more ...; customerId: string; }[]; count: number; nextCursor: string | null; }"
+        "x-ts-type": "{ items: { organizationId: string; customerCode: string; name: string; legalName?: string | null | undefined; partyType?: \"organization\" | \"person\" | undefined; image?: ImageRef | null | undefined; ... 21 more ...; customerId: string; }[]; count: number; nextCursor: string | null; }"
       },
       "CustomersGetResponse": {
         "type": "object",
@@ -35151,6 +37300,11 @@
                       "description": "Whether the account is printed on invoices.",
                       "x-ts-type": "boolean | undefined"
                     },
+                    "printOnInvoice": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
+                    },
                     "status": {
                       "type": "string",
                       "enum": [
@@ -35184,6 +37338,12 @@
                 "type": "number",
                 "description": "Udhaar amount customer owes",
                 "x-ts-type": "number"
+              },
+              "advanceBalance": {
+                "type": "number",
+                "nullable": true,
+                "description": "Advance payments / credits unapplied",
+                "x-ts-type": "number | undefined"
               },
               "totalSpend": {
                 "type": "number",
@@ -35249,7 +37409,7 @@
             }
           }
         },
-        "x-ts-type": "{ organizationId: string; customerCode: string; name: string; legalName?: string | null | undefined; partyType?: \"organization\" | \"person\" | undefined; image?: ImageRef | null | undefined; ... 20 more ...; customerId: string; }"
+        "x-ts-type": "{ organizationId: string; customerCode: string; name: string; legalName?: string | null | undefined; partyType?: \"organization\" | \"person\" | undefined; image?: ImageRef | null | undefined; ... 21 more ...; customerId: string; }"
       },
       "VendorsCreateResponse": {
         "type": "object",
@@ -35604,6 +37764,11 @@
                             "type": "boolean",
                             "nullable": true,
                             "description": "Whether the account is printed on invoices.",
+                            "x-ts-type": "boolean | undefined"
+                          },
+                          "printOnInvoice": {
+                            "type": "boolean",
+                            "nullable": true,
                             "x-ts-type": "boolean | undefined"
                           },
                           "status": {
@@ -36038,6 +38203,11 @@
                       "type": "boolean",
                       "nullable": true,
                       "description": "Whether the account is printed on invoices.",
+                      "x-ts-type": "boolean | undefined"
+                    },
+                    "printOnInvoice": {
+                      "type": "boolean",
+                      "nullable": true,
                       "x-ts-type": "boolean | undefined"
                     },
                     "status": {
@@ -41948,7 +44118,7 @@
                     },
                     "expiresAt": {
                       "description": "BC3: Firestore Timestamp TTL for pruning inactive latestLocations",
-                      "x-ts-type": "any"
+                      "x-ts-type": "Timestamp"
                     }
                   }
                 }
@@ -43809,11 +45979,25 @@
                 "type": "number",
                 "nullable": true,
                 "x-ts-type": "undefined | number"
+              },
+              "reversedPaymentLegs": {
+                "type": "number",
+                "nullable": true,
+                "x-ts-type": "undefined | number"
+              },
+              "paymentDisposition": {
+                "type": "string",
+                "enum": [
+                  "reverse_entries",
+                  "keep_as_customer_credit"
+                ],
+                "nullable": true,
+                "x-ts-type": "undefined | \"reverse_entries\" | \"keep_as_customer_credit\""
               }
             }
           }
         },
-        "x-ts-type": "Record<string, unknown> | { billId: string; status: string; reversedStockLines?: undefined; voidedPayments?: undefined; } | { billId: string; status: string; reversedStockLines: number; voidedPayments: number; } | undefined"
+        "x-ts-type": "Record<string, unknown> | { billId: string; status: string; reversedStockLines?: undefined; voidedPayments?: undefined; reversedPaymentLegs?: undefined; paymentDisposition?: undefined; } | { ...; } | undefined"
       },
       "OutflowsVoidResponse": {
         "type": "object",
@@ -44571,11 +46755,20 @@
                 "type": "string",
                 "description": "Human-readable message.",
                 "x-ts-type": "string"
+              },
+              "documentId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "reversalTransactionId": {
+                "type": "string",
+                "nullable": true,
+                "x-ts-type": "string | null | undefined"
               }
             }
           }
         },
-        "x-ts-type": "{ billId: string; status: string; paymentId?: undefined; } | { billId: string; status: string; paymentId: string | null; } | { outflowId: string; status: string; paymentId?: undefined; } | { outflowId: string; status: OutflowStatus; paymentId: string | null; } | { ...; } | { ...; } | { ...; } | undefined"
+        "x-ts-type": "{ billId: string; status: string; paymentId?: undefined; } | { billId: string; status: string; paymentId: string | null; } | { outflowId: string; status: string; paymentId?: undefined; } | { outflowId: string; status: OutflowStatus; paymentId: string | null; } | ... 5 more ... | undefined"
       },
       "PaymentsVoidResponse": {
         "type": "object",
@@ -44798,6 +46991,11 @@
                           "type": "boolean",
                           "nullable": true,
                           "description": "Whether the account is printed on invoices.",
+                          "x-ts-type": "boolean | undefined | boolean | undefined"
+                        },
+                        "printOnInvoice": {
+                          "type": "boolean",
+                          "nullable": true,
                           "x-ts-type": "boolean | undefined | boolean | undefined"
                         },
                         "status": {
@@ -45613,7 +47811,7 @@
             }
           }
         },
-        "x-ts-type": "{ organization: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 5 more ...; status?: \"active\" | ... 1 more ... | undefined; }[]; ... 49 more ...;..."
+        "x-ts-type": "{ organization: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 6 more ...; status?: \"active\" | ... 1 more ... | undefined; }[]; ... 49 more ...;..."
       },
       "OrganizationsRevealBankAccountResponse": {
         "type": "object",
@@ -45630,7 +47828,8 @@
                 "x-ts-type": "string"
               },
               "bankAccountId": {
-                "x-ts-type": "any"
+                "type": "string",
+                "x-ts-type": "string"
               },
               "bankName": {
                 "type": "string",
@@ -45638,8 +47837,9 @@
                 "x-ts-type": "string"
               },
               "accountHolderName": {
+                "type": "string",
                 "description": "Name on the bank account.",
-                "x-ts-type": "any"
+                "x-ts-type": "string"
               },
               "accountNumber": {
                 "type": "string",
@@ -45647,24 +47847,34 @@
                 "x-ts-type": "string"
               },
               "routingType": {
+                "type": "string",
+                "enum": [
+                  "ifsc",
+                  "iban",
+                  "swift",
+                  "us_routing",
+                  "sg_code",
+                  "other"
+                ],
                 "description": "Kind of routing code (IFSC, IBAN, SWIFT, US routing, other).",
-                "x-ts-type": "any"
+                "x-ts-type": "\"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\""
               },
               "routingCode": {
+                "type": "string",
+                "nullable": true,
                 "description": "Routing code of the bank branch, of the kind given by routingType.",
-                "x-ts-type": "any"
+                "x-ts-type": "string | null"
               },
               "upiId": {
+                "type": "string",
+                "nullable": true,
                 "description": "UPI id for payments to this account.",
-                "x-ts-type": "any"
-              },
-              "iban": {
-                "x-ts-type": "any"
+                "x-ts-type": "string | null"
               }
             }
           }
         },
-        "x-ts-type": "{ organizationId: string; bankAccountId: any; bankName: string; accountHolderName: any; accountNumber: string; routingType: any; routingCode: any; upiId: any; iban: any; }"
+        "x-ts-type": "{ organizationId: string; bankAccountId: string; bankName: string; accountHolderName: string; accountNumber: string; routingType: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\"; routingCode: string | null; upiId: string | null; }"
       },
       "EmployeesGetResponse": {
         "type": "object",
@@ -48463,6 +50673,21 @@
                     "description": "Whether this is the default entry of its list.",
                     "x-ts-type": "boolean"
                   },
+                  "printOnInvoice": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "feeMode": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "manual",
+                      "estimated"
+                    ],
+                    "nullable": true,
+                    "x-ts-type": "\"none\" | \"manual\" | \"estimated\" | undefined"
+                  },
                   "isActive": {
                     "type": "boolean",
                     "description": "Whether the record is active (inactive records are kept, not deleted).",
@@ -48510,7 +50735,7 @@
             }
           }
         },
-        "x-ts-type": "Record<string, unknown> | { financialAccountId: string; account: { currentBalance: number; organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; ... 16 more ...; financialAccountId: string; }; message: string; } | undefined"
+        "x-ts-type": "Record<string, unknown> | { financialAccountId: string; account: { currentBalance: number; organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; ... 18 more ...; financialAccountId: string; }; message: string; } | undefined"
       },
       "FinancialAccountsUpdateResponse": {
         "type": "object",
@@ -48668,6 +50893,21 @@
                       "description": "Whether this is the default entry of its list.",
                       "x-ts-type": "boolean"
                     },
+                    "printOnInvoice": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
+                    },
+                    "feeMode": {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "manual",
+                        "estimated"
+                      ],
+                      "nullable": true,
+                      "x-ts-type": "\"none\" | \"manual\" | \"estimated\" | undefined"
+                    },
                     "isActive": {
                       "type": "boolean",
                       "description": "Whether the record is active (inactive records are kept, not deleted).",
@@ -48732,7 +50972,7 @@
             }
           }
         },
-        "x-ts-type": "{ items: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 14 more ...; financialAccountId: string; }[]; count: number; totalCount: number; nextCursor: string | null; hasMore: boolean; }"
+        "x-ts-type": "{ items: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 16 more ...; financialAccountId: string; }[]; count: number; totalCount: number; nextCursor: string | null; hasMore: boolean; }"
       },
       "FinancialAccountsGetResponse": {
         "type": "object",
@@ -48864,6 +51104,21 @@
                     "description": "Whether this is the default entry of its list.",
                     "x-ts-type": "boolean"
                   },
+                  "printOnInvoice": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "feeMode": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "manual",
+                      "estimated"
+                    ],
+                    "nullable": true,
+                    "x-ts-type": "\"none\" | \"manual\" | \"estimated\" | undefined"
+                  },
                   "isActive": {
                     "type": "boolean",
                     "description": "Whether the record is active (inactive records are kept, not deleted).",
@@ -48906,7 +51161,7 @@
             }
           }
         },
-        "x-ts-type": "{ financialAccount: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 14 more ...; financialAccountId: string; }; }"
+        "x-ts-type": "{ financialAccount: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 16 more ...; financialAccountId: string; }; }"
       },
       "FinancialAccountsGetLedgerResponse": {
         "type": "object",
@@ -49016,10 +51271,25 @@
                       "cash_withdrawal",
                       "inter_bank",
                       "petty_cash",
-                      "cashier_handover"
+                      "cashier_handover",
+                      "settlement"
                     ],
                     "nullable": true,
-                    "x-ts-type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined"
+                    "x-ts-type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | undefined"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "instant",
+                      "in_transit"
+                    ],
+                    "nullable": true,
+                    "x-ts-type": "\"instant\" | \"in_transit\" | undefined"
+                  },
+                  "reference": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | undefined"
                   },
                   "sourceAccountId": {
                     "type": "string",
@@ -49050,10 +51320,13 @@
                       "pending_approval",
                       "rejected",
                       "cancelled",
-                      "completed"
+                      "completed",
+                      "in_transit",
+                      "pending_confirmation",
+                      "disputed"
                     ],
                     "description": "Lifecycle status of the record (values: the field's enum).",
-                    "x-ts-type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\""
+                    "x-ts-type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\" | \"in_transit\" | \"pending_confirmation\" | \"disputed\""
                   },
                   "notes": {
                     "type": "string",
@@ -49104,6 +51377,31 @@
                     "nullable": true,
                     "x-ts-type": "string | undefined"
                   },
+                  "confirmedByUid": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "confirmedAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "disputedByUid": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "disputedAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "disputeReason": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
                   "createdAt": {
                     "type": "string",
                     "description": "Time the record was created (ISO-8601).",
@@ -49146,7 +51444,7 @@
             }
           }
         },
-        "x-ts-type": "Record<string, unknown> | { transferId: string; transfer: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined; ... 20 more ...; transferId: string; }; message: string; } | undefined"
+        "x-ts-type": "Record<string, unknown> | { transferId: string; transfer: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | undefined; ... 27 more ...; transferId: string; }; message: string; } | undefi..."
       },
       "AccountTransfersListResponse": {
         "type": "object",
@@ -49179,10 +51477,25 @@
                         "cash_withdrawal",
                         "inter_bank",
                         "petty_cash",
-                        "cashier_handover"
+                        "cashier_handover",
+                        "settlement"
                       ],
                       "nullable": true,
-                      "x-ts-type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined"
+                      "x-ts-type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | undefined"
+                    },
+                    "mode": {
+                      "type": "string",
+                      "enum": [
+                        "instant",
+                        "in_transit"
+                      ],
+                      "nullable": true,
+                      "x-ts-type": "\"instant\" | \"in_transit\" | undefined"
+                    },
+                    "reference": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | undefined"
                     },
                     "sourceAccountId": {
                       "type": "string",
@@ -49213,10 +51526,13 @@
                         "pending_approval",
                         "rejected",
                         "cancelled",
-                        "completed"
+                        "completed",
+                        "in_transit",
+                        "pending_confirmation",
+                        "disputed"
                       ],
                       "description": "Lifecycle status of the record (values: the field's enum).",
-                      "x-ts-type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\""
+                      "x-ts-type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\" | \"in_transit\" | \"pending_confirmation\" | \"disputed\""
                     },
                     "notes": {
                       "type": "string",
@@ -49266,6 +51582,31 @@
                       "type": "string",
                       "nullable": true,
                       "x-ts-type": "string | undefined"
+                    },
+                    "confirmedByUid": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "confirmedAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "disputedByUid": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "disputedAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "disputeReason": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
                     },
                     "createdAt": {
                       "type": "string",
@@ -49326,7 +51667,7 @@
             }
           }
         },
-        "x-ts-type": "{ items: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined; ... 20 more ...; transferId: string; }[]; count: number; totalCount: number; nextCursor: string | null; hasMore: boolean; }"
+        "x-ts-type": "{ items: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | undefined; ... 27 more ...; transferId: string; }[]; count: number; totalCount: number; nextCursor: string | null; hasMore: boo..."
       },
       "AccountTransfersGetResponse": {
         "type": "object",
@@ -49357,10 +51698,25 @@
                       "cash_withdrawal",
                       "inter_bank",
                       "petty_cash",
-                      "cashier_handover"
+                      "cashier_handover",
+                      "settlement"
                     ],
                     "nullable": true,
-                    "x-ts-type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined"
+                    "x-ts-type": "\"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | undefined"
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "instant",
+                      "in_transit"
+                    ],
+                    "nullable": true,
+                    "x-ts-type": "\"instant\" | \"in_transit\" | undefined"
+                  },
+                  "reference": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | undefined"
                   },
                   "sourceAccountId": {
                     "type": "string",
@@ -49391,10 +51747,13 @@
                       "pending_approval",
                       "rejected",
                       "cancelled",
-                      "completed"
+                      "completed",
+                      "in_transit",
+                      "pending_confirmation",
+                      "disputed"
                     ],
                     "description": "Lifecycle status of the record (values: the field's enum).",
-                    "x-ts-type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\""
+                    "x-ts-type": "\"pending_approval\" | \"rejected\" | \"cancelled\" | \"completed\" | \"in_transit\" | \"pending_confirmation\" | \"disputed\""
                   },
                   "notes": {
                     "type": "string",
@@ -49445,6 +51804,31 @@
                     "nullable": true,
                     "x-ts-type": "string | undefined"
                   },
+                  "confirmedByUid": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "confirmedAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "disputedByUid": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "disputedAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "disputeReason": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
                   "createdAt": {
                     "type": "string",
                     "description": "Time the record was created (ISO-8601).",
@@ -49482,7 +51866,7 @@
             }
           }
         },
-        "x-ts-type": "{ transfer: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | undefined; ... 20 more ...; transferId: string; }; }"
+        "x-ts-type": "{ transfer: { organizationId: string; transferNumber: string; transferType?: \"transfer\" | \"cash_deposit\" | \"cash_withdrawal\" | \"inter_bank\" | \"petty_cash\" | \"cashier_handover\" | \"settlement\" | undefined; ... 27 more ...; transferId: string; }; }"
       },
       "CapitalTransactionsCreateResponse": {
         "type": "object",
@@ -49676,6 +52060,10 @@
                 "type": "number",
                 "x-ts-type": "number"
               },
+              "accountEntries": {
+                "type": "number",
+                "x-ts-type": "number"
+              },
               "total": {
                 "type": "number",
                 "x-ts-type": "number"
@@ -49683,7 +52071,7 @@
             }
           }
         },
-        "x-ts-type": "{ bills: number; outflows: number; returns: number; stockAdjustments: number; accountTransfers: number; stockTransfers: number; total: number; }"
+        "x-ts-type": "{ bills: number; outflows: number; returns: number; stockAdjustments: number; accountTransfers: number; stockTransfers: number; accountEntries: number; total: number; }"
       },
       "ApprovalsListResponse": {
         "type": "object",
@@ -49807,11 +52195,11 @@
               "status": {
                 "type": "string",
                 "enum": [
-                  "pending_verification",
-                  "verified"
+                  "verified",
+                  "pending_verification"
                 ],
                 "description": "Lifecycle status of the record (values: the field's enum).",
-                "x-ts-type": "\"pending_verification\" | \"verified\""
+                "x-ts-type": "\"verified\" | \"pending_verification\""
               },
               "expectedFeeAmount": {
                 "type": "number",
@@ -50887,12 +53275,12 @@
                       "type": "string",
                       "enum": [
                         "vendor",
+                        "customer",
                         "financialAccount",
                         "accountTransaction",
-                        "journalEntry",
-                        "customer"
+                        "journalEntry"
                       ],
-                      "x-ts-type": "\"vendor\" | \"financialAccount\" | \"accountTransaction\" | \"journalEntry\" | \"customer\""
+                      "x-ts-type": "\"vendor\" | \"customer\" | \"financialAccount\" | \"accountTransaction\" | \"journalEntry\""
                     },
                     "id": {
                       "type": "string",
@@ -51203,6 +53591,11 @@
               "request": {
                 "type": "object",
                 "properties": {
+                  "requestId": {
+                    "type": "string",
+                    "description": "Id of the approval request or client request this entry belongs to.",
+                    "x-ts-type": "string"
+                  },
                   "requestNumber": {
                     "type": "string",
                     "description": "REQ-YYYY-000123",
@@ -51475,7 +53868,7 @@
             }
           }
         },
-        "x-ts-type": "Record<string, unknown> | { request: RequestDoc; } | undefined"
+        "x-ts-type": "Record<string, unknown> | { request: { requestId: string; requestNumber: string; audience: \"platform\" | \"organization\" | RequestAudience; category: RequestCategory; ... 36 more ...; requestedPlanName?: string | ... 1 more ... | undefined; }; } | undefined"
       },
       "RequestsUpdateResponse": {
         "type": "object",
@@ -53400,6 +55793,12 @@
                     "nullable": true,
                     "x-ts-type": "string | undefined"
                   },
+                  "internal": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "description": "Intra-branch transfer (same branch, different locations)",
+                    "x-ts-type": "boolean | undefined"
+                  },
                   "status": {
                     "description": "Lifecycle status of the record (values: the field's enum).",
                     "x-ts-type": "StockTransferStatus"
@@ -53679,7 +56078,7 @@
             }
           }
         },
-        "x-ts-type": "Record<string, unknown> | { transferId: string; transfer: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; ... 27 more ...; transferId: string; }; message: string; } | undefined"
+        "x-ts-type": "Record<string, unknown> | { transferId: string; transfer: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; ... 28 more ...; transferId: string; }; message: string; } | undefined"
       },
       "StockTransfersSubmitResponse": {
         "type": "object",
@@ -53928,6 +56327,12 @@
                       "type": "string",
                       "nullable": true,
                       "x-ts-type": "string | undefined"
+                    },
+                    "internal": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "description": "Intra-branch transfer (same branch, different locations)",
+                      "x-ts-type": "boolean | undefined"
                     },
                     "status": {
                       "description": "Lifecycle status of the record (values: the field's enum).",
@@ -54225,7 +56630,7 @@
             }
           }
         },
-        "x-ts-type": "{ items: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; destinationLocationId?: string | undefined; ... 26 more ...; transferId: string; }[]; count: number; totalCount: number; nextCursor: string | null; hasMore: boolean; }"
+        "x-ts-type": "{ items: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; destinationLocationId?: string | undefined; ... 27 more ...; transferId: string; }[]; count: number; totalCount: number; nextCursor: string | null; hasMore: boolean; }"
       },
       "StockTransfersGetResponse": {
         "type": "object",
@@ -54265,6 +56670,12 @@
                     "type": "string",
                     "nullable": true,
                     "x-ts-type": "string | undefined"
+                  },
+                  "internal": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "description": "Intra-branch transfer (same branch, different locations)",
+                    "x-ts-type": "boolean | undefined"
                   },
                   "status": {
                     "description": "Lifecycle status of the record (values: the field's enum).",
@@ -54540,7 +56951,7 @@
             }
           }
         },
-        "x-ts-type": "{ transfer: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; destinationLocationId?: string | undefined; ... 26 more ...; transferId: string; }; }"
+        "x-ts-type": "{ transfer: { organizationId: string; transferNumber: string; sourceBranchId: string; destinationBranchId: string; sourceLocationId?: string | undefined; destinationLocationId?: string | undefined; ... 27 more ...; transferId: string; }; }"
       },
       "StorageLocationsUpdateResponse": {
         "type": "object",
@@ -54943,6 +57354,1757 @@
           }
         },
         "x-ts-type": "{ location: { organizationId: string; branchId?: string | null | undefined; name: string; code: string; type: StorageLocationType; isDefault: boolean; isActive: boolean; ... 6 more ...; locationId: string; }; }"
+      },
+      "AccountEntriesListResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "organizationId": {
+                      "type": "string",
+                      "description": "Id of the organization (tenant) the record belongs to.",
+                      "x-ts-type": "string"
+                    },
+                    "branchId": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Id of the branch the record belongs to or applies to.",
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "financialAccountId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "transactionNumber": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "type": {
+                      "x-ts-type": "AccountTransactionType"
+                    },
+                    "direction": {
+                      "type": "string",
+                      "enum": [
+                        "out",
+                        "in"
+                      ],
+                      "x-ts-type": "\"out\" | \"in\""
+                    },
+                    "amount": {
+                      "type": "number",
+                      "description": "Amount in the currency's major unit.",
+                      "x-ts-type": "number"
+                    },
+                    "balanceAfter": {
+                      "type": "number",
+                      "x-ts-type": "number"
+                    },
+                    "amountMinor": {
+                      "type": "number",
+                      "nullable": true,
+                      "x-ts-type": "number | undefined"
+                    },
+                    "balanceAfterMinor": {
+                      "type": "number",
+                      "nullable": true,
+                      "x-ts-type": "number | undefined"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "ISO 4217 currency code.",
+                      "x-ts-type": "string | undefined"
+                    },
+                    "status": {
+                      "nullable": true,
+                      "description": "Lifecycle status of the record (values: the field's enum).",
+                      "x-ts-type": "AccountEntryStatus | undefined"
+                    },
+                    "sourceDocumentType": {
+                      "type": "string",
+                      "enum": [
+                        "return",
+                        "account_transfer",
+                        "bill",
+                        "outflow",
+                        "manual",
+                        "payment",
+                        "reconciliation",
+                        "fee",
+                        "capital",
+                        "cash_count"
+                      ],
+                      "x-ts-type": "\"return\" | \"account_transfer\" | \"bill\" | \"outflow\" | \"manual\" | \"payment\" | \"reconciliation\" | \"fee\" | \"capital\" | \"cash_count\""
+                    },
+                    "sourceDocumentId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "partyType": {
+                      "type": "string",
+                      "enum": [
+                        "vendor",
+                        "customer"
+                      ],
+                      "nullable": true,
+                      "description": "Kind of party.",
+                      "x-ts-type": "\"vendor\" | \"customer\" | null | undefined"
+                    },
+                    "partyId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Free-text description.",
+                      "x-ts-type": "string | undefined"
+                    },
+                    "parentEntryId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "subEntryType": {
+                      "nullable": true,
+                      "x-ts-type": "SubEntryType | null | undefined"
+                    },
+                    "feeStatus": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "disputed",
+                        "recorded",
+                        "waived"
+                      ],
+                      "nullable": true,
+                      "x-ts-type": "\"pending\" | \"disputed\" | \"recorded\" | \"waived\" | null | undefined"
+                    },
+                    "needsReview": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
+                    },
+                    "reviewReasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "x-ts-type": "string"
+                      }
+                    },
+                    "reversedTransactionId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "reversalTransactionId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "workflow": {
+                      "type": "object",
+                      "properties": {
+                        "createdBy": {
+                          "type": "string",
+                          "description": "Firebase Auth uid of the user who created the record.",
+                          "x-ts-type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "description": "Time the record was created (ISO-8601).",
+                          "x-ts-type": "string"
+                        },
+                        "updatedByUids": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "x-ts-type": "string"
+                          }
+                        },
+                        "verifiedBy": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "uid": {
+                                "type": "string",
+                                "description": "Firebase Auth uid.",
+                                "x-ts-type": "string"
+                              },
+                              "verifiedAt": {
+                                "type": "string",
+                                "x-ts-type": "string"
+                              },
+                              "note": {
+                                "type": "string",
+                                "nullable": true,
+                                "x-ts-type": "string | undefined"
+                              }
+                            }
+                          }
+                        },
+                        "approvedBy": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "uid": {
+                                "type": "string",
+                                "description": "Firebase Auth uid.",
+                                "x-ts-type": "string"
+                              },
+                              "approvedAt": {
+                                "type": "string",
+                                "description": "Time the record was approved (ISO-8601).",
+                                "x-ts-type": "string"
+                              },
+                              "note": {
+                                "type": "string",
+                                "nullable": true,
+                                "x-ts-type": "string | undefined"
+                              }
+                            }
+                          }
+                        },
+                        "rejectedBy": {
+                          "type": "object",
+                          "properties": {
+                            "uid": {
+                              "type": "string",
+                              "description": "Firebase Auth uid.",
+                              "x-ts-type": "string"
+                            },
+                            "rejectedAt": {
+                              "type": "string",
+                              "description": "Time the record was rejected (ISO-8601).",
+                              "x-ts-type": "string"
+                            },
+                            "reason": {
+                              "type": "string",
+                              "description": "Reason code or text explaining the outcome.",
+                              "x-ts-type": "string"
+                            }
+                          }
+                        },
+                        "reversedBy": {
+                          "type": "object",
+                          "properties": {
+                            "uid": {
+                              "type": "string",
+                              "description": "Firebase Auth uid.",
+                              "x-ts-type": "string"
+                            },
+                            "reversedAt": {
+                              "type": "string",
+                              "x-ts-type": "string"
+                            },
+                            "reason": {
+                              "type": "string",
+                              "description": "Reason code or text explaining the outcome.",
+                              "x-ts-type": "string"
+                            }
+                          }
+                        },
+                        "notes": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Free-text notes.",
+                          "x-ts-type": "string | undefined"
+                        }
+                      }
+                    },
+                    "reconciled": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
+                    },
+                    "reconciledAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "reconciliationId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "actorUid": {
+                      "type": "string",
+                      "description": "Firebase Auth uid of the user who performed the action.",
+                      "x-ts-type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Time the record was created (ISO-8601).",
+                      "x-ts-type": "string"
+                    },
+                    "transactionId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "entryId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    }
+                  }
+                }
+              },
+              "nextCursor": {
+                "type": "string",
+                "nullable": true,
+                "description": "Cursor for the next page (pass it back as the request's cursor); null on the last page.",
+                "x-ts-type": "string | null"
+              },
+              "totalCount": {
+                "type": "number",
+                "description": "Number of matching records in total.",
+                "x-ts-type": "number"
+              }
+            }
+          }
+        },
+        "x-ts-type": "{ entries: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }[]; nextCursor: string | null; totalCount: number; }"
+      },
+      "AccountEntriesGetResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "entry": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "description": "Id of the organization (tenant) the record belongs to.",
+                    "x-ts-type": "string"
+                  },
+                  "branchId": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Id of the branch the record belongs to or applies to.",
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "financialAccountId": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "transactionNumber": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "type": {
+                    "x-ts-type": "AccountTransactionType"
+                  },
+                  "direction": {
+                    "type": "string",
+                    "enum": [
+                      "out",
+                      "in"
+                    ],
+                    "x-ts-type": "\"out\" | \"in\""
+                  },
+                  "amount": {
+                    "type": "number",
+                    "description": "Amount in the currency's major unit.",
+                    "x-ts-type": "number"
+                  },
+                  "balanceAfter": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "amountMinor": {
+                    "type": "number",
+                    "nullable": true,
+                    "x-ts-type": "number | undefined"
+                  },
+                  "balanceAfterMinor": {
+                    "type": "number",
+                    "nullable": true,
+                    "x-ts-type": "number | undefined"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "ISO 4217 currency code.",
+                    "x-ts-type": "string | undefined"
+                  },
+                  "status": {
+                    "nullable": true,
+                    "description": "Lifecycle status of the record (values: the field's enum).",
+                    "x-ts-type": "AccountEntryStatus | undefined"
+                  },
+                  "sourceDocumentType": {
+                    "type": "string",
+                    "enum": [
+                      "return",
+                      "account_transfer",
+                      "bill",
+                      "outflow",
+                      "manual",
+                      "payment",
+                      "reconciliation",
+                      "fee",
+                      "capital",
+                      "cash_count"
+                    ],
+                    "x-ts-type": "\"return\" | \"account_transfer\" | \"bill\" | \"outflow\" | \"manual\" | \"payment\" | \"reconciliation\" | \"fee\" | \"capital\" | \"cash_count\""
+                  },
+                  "sourceDocumentId": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "partyType": {
+                    "type": "string",
+                    "enum": [
+                      "vendor",
+                      "customer"
+                    ],
+                    "nullable": true,
+                    "description": "Kind of party.",
+                    "x-ts-type": "\"vendor\" | \"customer\" | null | undefined"
+                  },
+                  "partyId": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Free-text description.",
+                    "x-ts-type": "string | undefined"
+                  },
+                  "parentEntryId": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "subEntryType": {
+                    "nullable": true,
+                    "x-ts-type": "SubEntryType | null | undefined"
+                  },
+                  "feeStatus": {
+                    "type": "string",
+                    "enum": [
+                      "pending",
+                      "disputed",
+                      "recorded",
+                      "waived"
+                    ],
+                    "nullable": true,
+                    "x-ts-type": "\"pending\" | \"disputed\" | \"recorded\" | \"waived\" | null | undefined"
+                  },
+                  "needsReview": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "reviewReasons": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    }
+                  },
+                  "reversedTransactionId": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "reversalTransactionId": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "workflow": {
+                    "type": "object",
+                    "properties": {
+                      "createdBy": {
+                        "type": "string",
+                        "description": "Firebase Auth uid of the user who created the record.",
+                        "x-ts-type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string",
+                        "description": "Time the record was created (ISO-8601).",
+                        "x-ts-type": "string"
+                      },
+                      "updatedByUids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "x-ts-type": "string"
+                        }
+                      },
+                      "verifiedBy": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "uid": {
+                              "type": "string",
+                              "description": "Firebase Auth uid.",
+                              "x-ts-type": "string"
+                            },
+                            "verifiedAt": {
+                              "type": "string",
+                              "x-ts-type": "string"
+                            },
+                            "note": {
+                              "type": "string",
+                              "nullable": true,
+                              "x-ts-type": "string | undefined"
+                            }
+                          }
+                        }
+                      },
+                      "approvedBy": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "uid": {
+                              "type": "string",
+                              "description": "Firebase Auth uid.",
+                              "x-ts-type": "string"
+                            },
+                            "approvedAt": {
+                              "type": "string",
+                              "description": "Time the record was approved (ISO-8601).",
+                              "x-ts-type": "string"
+                            },
+                            "note": {
+                              "type": "string",
+                              "nullable": true,
+                              "x-ts-type": "string | undefined"
+                            }
+                          }
+                        }
+                      },
+                      "rejectedBy": {
+                        "type": "object",
+                        "properties": {
+                          "uid": {
+                            "type": "string",
+                            "description": "Firebase Auth uid.",
+                            "x-ts-type": "string"
+                          },
+                          "rejectedAt": {
+                            "type": "string",
+                            "description": "Time the record was rejected (ISO-8601).",
+                            "x-ts-type": "string"
+                          },
+                          "reason": {
+                            "type": "string",
+                            "description": "Reason code or text explaining the outcome.",
+                            "x-ts-type": "string"
+                          }
+                        }
+                      },
+                      "reversedBy": {
+                        "type": "object",
+                        "properties": {
+                          "uid": {
+                            "type": "string",
+                            "description": "Firebase Auth uid.",
+                            "x-ts-type": "string"
+                          },
+                          "reversedAt": {
+                            "type": "string",
+                            "x-ts-type": "string"
+                          },
+                          "reason": {
+                            "type": "string",
+                            "description": "Reason code or text explaining the outcome.",
+                            "x-ts-type": "string"
+                          }
+                        }
+                      },
+                      "notes": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Free-text notes.",
+                        "x-ts-type": "string | undefined"
+                      }
+                    }
+                  },
+                  "reconciled": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "reconciledAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "reconciliationId": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "actorUid": {
+                    "type": "string",
+                    "description": "Firebase Auth uid of the user who performed the action.",
+                    "x-ts-type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "description": "Time the record was created (ISO-8601).",
+                    "x-ts-type": "string"
+                  },
+                  "transactionId": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "entryId": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  }
+                }
+              },
+              "subEntries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "organizationId": {
+                      "type": "string",
+                      "description": "Id of the organization (tenant) the record belongs to.",
+                      "x-ts-type": "string"
+                    },
+                    "branchId": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Id of the branch the record belongs to or applies to.",
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "financialAccountId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "transactionNumber": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "type": {
+                      "x-ts-type": "AccountTransactionType"
+                    },
+                    "direction": {
+                      "type": "string",
+                      "enum": [
+                        "out",
+                        "in"
+                      ],
+                      "x-ts-type": "\"out\" | \"in\""
+                    },
+                    "amount": {
+                      "type": "number",
+                      "description": "Amount in the currency's major unit.",
+                      "x-ts-type": "number"
+                    },
+                    "balanceAfter": {
+                      "type": "number",
+                      "x-ts-type": "number"
+                    },
+                    "amountMinor": {
+                      "type": "number",
+                      "nullable": true,
+                      "x-ts-type": "number | undefined"
+                    },
+                    "balanceAfterMinor": {
+                      "type": "number",
+                      "nullable": true,
+                      "x-ts-type": "number | undefined"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "ISO 4217 currency code.",
+                      "x-ts-type": "string | undefined"
+                    },
+                    "status": {
+                      "nullable": true,
+                      "description": "Lifecycle status of the record (values: the field's enum).",
+                      "x-ts-type": "AccountEntryStatus | undefined"
+                    },
+                    "sourceDocumentType": {
+                      "type": "string",
+                      "enum": [
+                        "return",
+                        "account_transfer",
+                        "bill",
+                        "outflow",
+                        "manual",
+                        "payment",
+                        "reconciliation",
+                        "fee",
+                        "capital",
+                        "cash_count"
+                      ],
+                      "x-ts-type": "\"return\" | \"account_transfer\" | \"bill\" | \"outflow\" | \"manual\" | \"payment\" | \"reconciliation\" | \"fee\" | \"capital\" | \"cash_count\""
+                    },
+                    "sourceDocumentId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "partyType": {
+                      "type": "string",
+                      "enum": [
+                        "vendor",
+                        "customer"
+                      ],
+                      "nullable": true,
+                      "description": "Kind of party.",
+                      "x-ts-type": "\"vendor\" | \"customer\" | null | undefined"
+                    },
+                    "partyId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Free-text description.",
+                      "x-ts-type": "string | undefined"
+                    },
+                    "parentEntryId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "subEntryType": {
+                      "nullable": true,
+                      "x-ts-type": "SubEntryType | null | undefined"
+                    },
+                    "feeStatus": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "disputed",
+                        "recorded",
+                        "waived"
+                      ],
+                      "nullable": true,
+                      "x-ts-type": "\"pending\" | \"disputed\" | \"recorded\" | \"waived\" | null | undefined"
+                    },
+                    "needsReview": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
+                    },
+                    "reviewReasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "x-ts-type": "string"
+                      }
+                    },
+                    "reversedTransactionId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "reversalTransactionId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "workflow": {
+                      "type": "object",
+                      "properties": {
+                        "createdBy": {
+                          "type": "string",
+                          "description": "Firebase Auth uid of the user who created the record.",
+                          "x-ts-type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "description": "Time the record was created (ISO-8601).",
+                          "x-ts-type": "string"
+                        },
+                        "updatedByUids": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "x-ts-type": "string"
+                          }
+                        },
+                        "verifiedBy": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "uid": {
+                                "type": "string",
+                                "description": "Firebase Auth uid.",
+                                "x-ts-type": "string"
+                              },
+                              "verifiedAt": {
+                                "type": "string",
+                                "x-ts-type": "string"
+                              },
+                              "note": {
+                                "type": "string",
+                                "nullable": true,
+                                "x-ts-type": "string | undefined"
+                              }
+                            }
+                          }
+                        },
+                        "approvedBy": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "uid": {
+                                "type": "string",
+                                "description": "Firebase Auth uid.",
+                                "x-ts-type": "string"
+                              },
+                              "approvedAt": {
+                                "type": "string",
+                                "description": "Time the record was approved (ISO-8601).",
+                                "x-ts-type": "string"
+                              },
+                              "note": {
+                                "type": "string",
+                                "nullable": true,
+                                "x-ts-type": "string | undefined"
+                              }
+                            }
+                          }
+                        },
+                        "rejectedBy": {
+                          "type": "object",
+                          "properties": {
+                            "uid": {
+                              "type": "string",
+                              "description": "Firebase Auth uid.",
+                              "x-ts-type": "string"
+                            },
+                            "rejectedAt": {
+                              "type": "string",
+                              "description": "Time the record was rejected (ISO-8601).",
+                              "x-ts-type": "string"
+                            },
+                            "reason": {
+                              "type": "string",
+                              "description": "Reason code or text explaining the outcome.",
+                              "x-ts-type": "string"
+                            }
+                          }
+                        },
+                        "reversedBy": {
+                          "type": "object",
+                          "properties": {
+                            "uid": {
+                              "type": "string",
+                              "description": "Firebase Auth uid.",
+                              "x-ts-type": "string"
+                            },
+                            "reversedAt": {
+                              "type": "string",
+                              "x-ts-type": "string"
+                            },
+                            "reason": {
+                              "type": "string",
+                              "description": "Reason code or text explaining the outcome.",
+                              "x-ts-type": "string"
+                            }
+                          }
+                        },
+                        "notes": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Free-text notes.",
+                          "x-ts-type": "string | undefined"
+                        }
+                      }
+                    },
+                    "reconciled": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
+                    },
+                    "reconciledAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "reconciliationId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "actorUid": {
+                      "type": "string",
+                      "description": "Firebase Auth uid of the user who performed the action.",
+                      "x-ts-type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Time the record was created (ISO-8601).",
+                      "x-ts-type": "string"
+                    },
+                    "transactionId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "entryId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    }
+                  }
+                }
+              },
+              "reversedEntry": {
+                "x-ts-type": "Partial<AccountTransactionDoc>"
+              },
+              "reversalEntry": {
+                "x-ts-type": "Partial<AccountTransactionDoc>"
+              }
+            }
+          }
+        },
+        "x-ts-type": "{ entry: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }; subEntries: { ...; }[]; reversedEntry: Partial<...> | null; reversalEntry: Partial<...> | null; }"
+      },
+      "AccountEntriesCountsResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "number",
+                "x-ts-type": "number"
+              },
+              "byStatus": {
+                "type": "object",
+                "properties": {
+                  "created": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "added": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "verified": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "approved": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "rejected": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "reversed": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  }
+                }
+              },
+              "needsReview": {
+                "type": "number",
+                "x-ts-type": "number"
+              },
+              "pendingFee": {
+                "type": "number",
+                "x-ts-type": "number"
+              }
+            }
+          }
+        },
+        "x-ts-type": "{ total: number; byStatus: { created: number; added: number; verified: number; approved: number; rejected: number; reversed: number; }; needsReview: number; pendingFee: number; }"
+      },
+      "AccountEntriesVerifyResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "entryId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "status": {
+                "type": "string",
+                "description": "Lifecycle status of the record (values: the field's enum).",
+                "x-ts-type": "string"
+              },
+              "verifiedByCount": {
+                "type": "number",
+                "x-ts-type": "number"
+              }
+            }
+          }
+        },
+        "x-ts-type": "Record<string, unknown> | { entryId: string; status: string; verifiedByCount: number; } | undefined"
+      },
+      "AccountEntriesApproveResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "entryId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "status": {
+                "type": "string",
+                "description": "Lifecycle status of the record (values: the field's enum).",
+                "x-ts-type": "string"
+              },
+              "approvedByCount": {
+                "type": "number",
+                "x-ts-type": "number"
+              }
+            }
+          }
+        },
+        "x-ts-type": "Record<string, unknown> | { entryId: string; status: string; approvedByCount: number; } | undefined"
+      },
+      "AccountEntriesRejectResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "entryId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "status": {
+                "type": "string",
+                "description": "Lifecycle status of the record (values: the field's enum).",
+                "x-ts-type": "string"
+              },
+              "reversalTransactionId": {
+                "type": "string",
+                "nullable": true,
+                "x-ts-type": "string | null"
+              }
+            }
+          }
+        },
+        "x-ts-type": "Record<string, unknown> | { entryId: string; status: string; reversalTransactionId: string | null; } | undefined"
+      },
+      "AccountEntriesReverseResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "originalEntryId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "reversalTransactionId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "reversalTransactionNumber": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "status": {
+                "type": "string",
+                "description": "Lifecycle status of the record (values: the field's enum).",
+                "x-ts-type": "string"
+              }
+            }
+          }
+        },
+        "x-ts-type": "Record<string, unknown> | { originalEntryId: string; reversalTransactionId: string; reversalTransactionNumber: string; status: string; } | undefined"
+      },
+      "AccountEntriesUpdateNoteResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "entryId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "description": {
+                "type": "string",
+                "description": "Free-text description.",
+                "x-ts-type": "string"
+              },
+              "updatedAt": {
+                "type": "string",
+                "description": "Time the record was last changed (ISO-8601).",
+                "x-ts-type": "string"
+              }
+            }
+          }
+        },
+        "x-ts-type": "{ entryId: string; description: string; updatedAt: string; }"
+      },
+      "AccountEntriesCreateSubEntryResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "subEntryId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "transactionNumber": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "parentEntryId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "subEntryType": {
+                "type": "string",
+                "enum": [
+                  "other",
+                  "adjustment",
+                  "transaction_charge",
+                  "gateway_fee",
+                  "bank_charge",
+                  "rounding",
+                  "tip"
+                ],
+                "x-ts-type": "\"other\" | \"adjustment\" | \"transaction_charge\" | \"gateway_fee\" | \"bank_charge\" | \"rounding\" | \"tip\""
+              },
+              "amount": {
+                "type": "number",
+                "description": "Amount in the currency's major unit.",
+                "x-ts-type": "number"
+              },
+              "direction": {
+                "type": "string",
+                "enum": [
+                  "out",
+                  "in"
+                ],
+                "x-ts-type": "\"out\" | \"in\""
+              }
+            }
+          }
+        },
+        "x-ts-type": "Record<string, unknown> | { subEntryId: string; transactionNumber: string; parentEntryId: string; subEntryType: \"other\" | \"adjustment\" | \"transaction_charge\" | \"gateway_fee\" | \"bank_charge\" | \"rounding\" | \"tip\"; amount: number; direction: \"out\" | \"in\"; } | undefined"
+      },
+      "AccountingPolicyGetResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "policy": {
+                "x-ts-type": "any"
+              }
+            }
+          }
+        },
+        "x-ts-type": "{ policy: any; }"
+      },
+      "AccountingPolicyUpdateResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "policy": {
+                "x-ts-type": "any"
+              }
+            }
+          }
+        },
+        "x-ts-type": "{ policy: any; }"
+      },
+      "AccountTransfersConfirmResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "transferId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "transferNumber": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "status": {
+                "type": "string",
+                "description": "Lifecycle status of the record (values: the field's enum).",
+                "x-ts-type": "string"
+              },
+              "confirmedByUid": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "confirmedAt": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "destinationTransactionId": {
+                "type": "string",
+                "x-ts-type": "string"
+              }
+            }
+          }
+        },
+        "x-ts-type": "Record<string, unknown> | { transferId: string; transferNumber: string; status: string; confirmedByUid: string; confirmedAt: string; destinationTransactionId: string; } | undefined"
+      },
+      "AccountTransfersDisputeResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "transferId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "transferNumber": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "status": {
+                "type": "string",
+                "description": "Lifecycle status of the record (values: the field's enum).",
+                "x-ts-type": "string"
+              },
+              "disputedByUid": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "disputedAt": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "disputeReason": {
+                "type": "string",
+                "x-ts-type": "string"
+              }
+            }
+          }
+        },
+        "x-ts-type": "Record<string, unknown> | { transferId: string; transferNumber: string; status: string; disputedByUid: string; disputedAt: string; disputeReason: string; } | undefined"
+      },
+      "CashCountsCreateResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "countId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "countNumber": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "countedAmount": {
+                "type": "number",
+                "x-ts-type": "number"
+              },
+              "systemBalance": {
+                "type": "number",
+                "x-ts-type": "number"
+              },
+              "varianceAmount": {
+                "type": "number",
+                "x-ts-type": "number"
+              },
+              "varianceTransactionId": {
+                "type": "string",
+                "nullable": true,
+                "x-ts-type": "string | null"
+              },
+              "needsApproval": {
+                "type": "boolean",
+                "nullable": true,
+                "x-ts-type": "boolean | undefined"
+              }
+            }
+          }
+        },
+        "x-ts-type": "Record<string, unknown> | { countId: string; countNumber: string; countedAmount: number; systemBalance: number; varianceAmount: number; varianceTransactionId: string | null; needsApproval: boolean | undefined; } | undefined"
+      },
+      "CashCountsListResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "organizationId": {
+                      "type": "string",
+                      "description": "Id of the organization (tenant) the record belongs to.",
+                      "x-ts-type": "string"
+                    },
+                    "branchId": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Id of the branch the record belongs to or applies to.",
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "countNumber": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "financialAccountId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "countedAmount": {
+                      "type": "number",
+                      "x-ts-type": "number"
+                    },
+                    "systemBalance": {
+                      "type": "number",
+                      "x-ts-type": "number"
+                    },
+                    "varianceAmount": {
+                      "type": "number",
+                      "x-ts-type": "number"
+                    },
+                    "denominations": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number",
+                        "x-ts-type": "number"
+                      },
+                      "x-ts-type": "Record<string, number>"
+                    },
+                    "varianceTransactionId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "needsApproval": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
+                    },
+                    "approvedBy": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Firebase Auth uid of the approver.",
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "approvedAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Time the record was approved (ISO-8601).",
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "notes": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Free-text notes.",
+                      "x-ts-type": "string | undefined"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Time the record was created (ISO-8601).",
+                      "x-ts-type": "string"
+                    },
+                    "createdBy": {
+                      "type": "string",
+                      "description": "Firebase Auth uid of the user who created the record.",
+                      "x-ts-type": "string"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Time the record was last changed (ISO-8601).",
+                      "x-ts-type": "string | undefined"
+                    },
+                    "updatedBy": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Firebase Auth uid of the user who last changed the record.",
+                      "x-ts-type": "string | undefined"
+                    },
+                    "countId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    }
+                  }
+                }
+              },
+              "nextCursor": {
+                "type": "string",
+                "nullable": true,
+                "description": "Cursor for the next page (pass it back as the request's cursor); null on the last page.",
+                "x-ts-type": "string | null"
+              },
+              "totalCount": {
+                "type": "number",
+                "description": "Number of matching records in total.",
+                "x-ts-type": "number"
+              }
+            }
+          }
+        },
+        "x-ts-type": "{ items: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 10 more ...; countId: string; }[]; nextCursor: string | null; totalCount: number; }"
+      },
+      "CashCountsGetResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "description": "Id of the organization (tenant) the record belongs to.",
+                    "x-ts-type": "string"
+                  },
+                  "branchId": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Id of the branch the record belongs to or applies to.",
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "countNumber": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "financialAccountId": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "countedAmount": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "systemBalance": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "varianceAmount": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "denominations": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "number",
+                      "x-ts-type": "number"
+                    },
+                    "x-ts-type": "Record<string, number>"
+                  },
+                  "varianceTransactionId": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "needsApproval": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "approvedBy": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Firebase Auth uid of the approver.",
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "approvedAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Time the record was approved (ISO-8601).",
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Free-text notes.",
+                    "x-ts-type": "string | undefined"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "description": "Time the record was created (ISO-8601).",
+                    "x-ts-type": "string"
+                  },
+                  "createdBy": {
+                    "type": "string",
+                    "description": "Firebase Auth uid of the user who created the record.",
+                    "x-ts-type": "string"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Time the record was last changed (ISO-8601).",
+                    "x-ts-type": "string | undefined"
+                  },
+                  "updatedBy": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Firebase Auth uid of the user who last changed the record.",
+                    "x-ts-type": "string | undefined"
+                  },
+                  "countId": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-ts-type": "{ count: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 10 more ...; countId: string; }; }"
+      },
+      "AccountEntriesRecordFeeResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "parentEntryId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "subEntryId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "subEntryTransactionNumber": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "feeAmount": {
+                "type": "number",
+                "x-ts-type": "number"
+              },
+              "feeStatus": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "linkedOutflowId": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "linkedOutflowNumber": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "needsReview": {
+                "type": "boolean",
+                "x-ts-type": "boolean"
+              }
+            }
+          }
+        },
+        "x-ts-type": "Record<string, unknown> | { parentEntryId: string; subEntryId: string; subEntryTransactionNumber: string; feeAmount: number; feeStatus: string; linkedOutflowId: string; linkedOutflowNumber: string; needsReview: boolean; } | undefined"
+      },
+      "ReportsGetBranchSummaryResponse": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "object",
+            "properties": {
+              "organizationId": {
+                "type": "string",
+                "description": "Id of the organization (tenant) the record belongs to.",
+                "x-ts-type": "string"
+              },
+              "scope": {
+                "type": "string",
+                "enum": [
+                  "organization",
+                  "branches",
+                  "branch"
+                ],
+                "x-ts-type": "\"organization\" | \"branches\" | \"branch\""
+              },
+              "branchSummaries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "branchId": {
+                      "type": "string",
+                      "description": "Id of the branch the record belongs to or applies to.",
+                      "x-ts-type": "string"
+                    },
+                    "branchName": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "branchCode": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "sales": {
+                      "type": "object",
+                      "properties": {
+                        "totalRevenue": {
+                          "type": "number",
+                          "description": "Total revenue in the period.",
+                          "x-ts-type": "number"
+                        },
+                        "billCount": {
+                          "type": "number",
+                          "description": "Number of bills.",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    },
+                    "outflows": {
+                      "type": "object",
+                      "properties": {
+                        "totalPurchases": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "totalExpenses": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "outflowCount": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    },
+                    "liquidity": {
+                      "type": "object",
+                      "properties": {
+                        "cashBalance": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "bankBalance": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "totalLiquidity": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "accountCount": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "orgTotals": {
+                "type": "object",
+                "properties": {
+                  "totalRevenue": {
+                    "type": "number",
+                    "description": "Total revenue in the period.",
+                    "x-ts-type": "number"
+                  },
+                  "totalBills": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "totalPurchases": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "totalExpenses": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "totalLiquidity": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "branchCount": {
+                    "type": "number",
+                    "description": "Number of active branches.",
+                    "x-ts-type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-ts-type": "{ organizationId: string; scope: \"organization\" | \"branches\" | \"branch\"; branchSummaries: { branchId: string; branchName: string; branchCode: string; sales: { totalRevenue: number; billCount: number; }; outflows: { ...; }; liquidity: { ...; }; }[]; orgTotals: { ...; }; }"
       }
     }
   },
@@ -55060,11 +59222,11 @@
   "x-meta": {
     "projectId": "trado-x",
     "region": "asia-south1",
-    "callableCount": 189,
+    "callableCount": 207,
     "triggerCount": 8,
-    "totalExports": 197,
+    "totalExports": 215,
     "zodSchemasResolved": true,
-    "resolvedSchemaCount": 214,
+    "resolvedSchemaCount": 232,
     "operationsWithExamples": 121
   }
 }

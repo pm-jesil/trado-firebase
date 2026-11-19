@@ -449,7 +449,7 @@ Back to [Master Index](./INDEX.md).
 ## `reportsGetBranchSummary`
 - **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:440`
 - **Permission(s):** `branch:manage`, `report:view` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** No · **Audit:** `reports.read` (`none`) · **State Machine:** —
+- **Idempotency:** No · **Audit:** `report.get_branch_summary` (`none`) · **State Machine:** —
 
 **Input (`GetBranchSummarySchema` — strict, unknown fields rejected):**
 
@@ -462,7 +462,7 @@ Back to [Master Index](./INDEX.md).
 | `from` | `string` | No | — | `Sample from` |
 | `to` | `string` | No | — | `Sample to` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "branchSummaries", "orgTotals", "organizationId", "scope" (20 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "branchSummaries", "branches", "orgTotals", "organizationId", "scope", "totals" (38 typed leaf paths).
 **Declared Errors:** `BRANCH_ACCESS_DENIED`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -476,9 +476,11 @@ Back to [Master Index](./INDEX.md).
   },
   "response": {
     "branchSummaries": "...",
+    "branches": "...",
     "orgTotals": "...",
     "organizationId": "organizationId_001",
-    "scope": "..."
+    "scope": "...",
+    "totals": "..."
   }
 }
 ```

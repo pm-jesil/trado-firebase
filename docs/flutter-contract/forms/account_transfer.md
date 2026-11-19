@@ -10,6 +10,8 @@
 | `sourceAccountId` | `string` | **Yes** | No | `text` | {"minLength":2} | `sourceAccount_001` |
 | `destinationAccountId` | `string` | **Yes** | No | `text` | {"minLength":2} | `destinationAccount_001` |
 | `amount` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":false} | `2500` |
-| `transferType` | `enum` | No | No | `dropdown` | Enum: `transfer`, `cash_deposit`, `cash_withdrawal`, `inter_bank`, `petty_cash`, `cashier_handover` | `transfer` |
+| `transferType` | `enum` | No | No | `dropdown` | Enum: `transfer`, `cash_deposit`, `cash_withdrawal`, `inter_bank`, `petty_cash`, `cashier_handover`, `settlement` | `transfer` |
+| `mode` | `enum` | No | No | `dropdown` | Enum: `instant`, `in_transit` | `instant` |
+| `reference` | `string` | No | No | `text` | {"maxLength":120} | `Sample reference` |
 | `notes` | `string` | No | No | `textarea` | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | No | `text` | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |

@@ -65,7 +65,7 @@ export const ALLOWED_TRANSFER_TRANSITIONS: Record<StockTransferStatus, StockTran
   draft: ["submitted", "cancelled"],
   submitted: ["approved", "rejected", "cancelled", "dispatched"],
   approved: ["dispatched", "cancelled"],
-  dispatched: ["received", "partially_received", "cancelled"],
+  dispatched: ["received", "partially_received"],
   partially_received: ["received"],
   received: [],
   rejected: [],
@@ -467,12 +467,12 @@ export const stockTransfersDispatch = onCall({ region: "asia-south1" }, async (r
     const itemsToDispatch = input.items && input.items.length > 0
       ? input.items
       : transfer.items.map((it) => ({
-          productId: it.productId,
-          dispatchedQty: it.requestedQty,
-          serialNumbers: it.serialNumbers,
-          batchNumber: it.batchNumber,
-          expiryDate: it.expiryDate,
-        }));
+        productId: it.productId,
+        dispatchedQty: it.requestedQty,
+        serialNumbers: it.serialNumbers,
+        batchNumber: it.batchNumber,
+        expiryDate: it.expiryDate,
+      }));
 
     // Pre-read source stock balances and product documents
     const linePlans: Array<{
@@ -571,11 +571,11 @@ export const stockTransfersDispatch = onCall({ region: "asia-south1" }, async (r
     // Prepare serial transactions
     const serialCommit = serialLinesToDispatch.length > 0
       ? await prepareSerialsInTxn(txn, {
-          organizationId: orgId,
-          branchId: transfer.sourceBranchId,
-          lines: serialLinesToDispatch,
-          action: { kind: "transfer_dispatch", transferId: input.transferId },
-        })
+        organizationId: orgId,
+        branchId: transfer.sourceBranchId,
+        lines: serialLinesToDispatch,
+        action: { kind: "transfer_dispatch", transferId: input.transferId },
+      })
       : () => undefined;
 
     // Optional Handling Fee Pre-reads (Phase 1 Ledger Wiring)
@@ -893,15 +893,15 @@ export const stockTransfersReceive = onCall({ region: "asia-south1" }, async (re
     // Prepare serial receive commit
     const serialCommit = serialLinesToReceive.length > 0
       ? await prepareSerialsInTxn(txn, {
-          organizationId: orgId,
-          branchId: transfer.destinationBranchId,
-          lines: serialLinesToReceive,
-          action: {
-            kind: "transfer_receive",
-            transferId: input.transferId,
-            destinationBranchId: transfer.destinationBranchId,
-          },
-        })
+        organizationId: orgId,
+        branchId: transfer.destinationBranchId,
+        lines: serialLinesToReceive,
+        action: {
+          kind: "transfer_receive",
+          transferId: input.transferId,
+          destinationBranchId: transfer.destinationBranchId,
+        },
+      })
       : () => undefined;
 
     // 2. Transactional Writes
@@ -1146,7 +1146,7 @@ export const stockTransfersResolveDiscrepancy = onCall({ region: "asia-south1" }
           discountTotal: 0,
           taxTotal: 0,
           totalAmount: writeOffAmount,
-          paidAmount: 0,
+          paidAmount: writeOffAmount,
           balanceAmount: 0,
           payee: "Transit Loss / Write-off",
           notes: input.notes || `Damaged stock transfer write-off (${transfer.transferNumber}) - ${prodData.name} (${discrepancyBaseQty} units)`,

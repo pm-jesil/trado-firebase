@@ -220,7 +220,7 @@ Back to [Master Index](./INDEX.md).
 | `status` | `enum` | No | Enum: `active`, `inactive`, `suspended` | `active` |
 | `planId` | `string` | No | — | `plan_001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "organizations", "totalCount" (254 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "organizations", "totalCount" (268 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -301,7 +301,7 @@ Back to [Master Index](./INDEX.md).
 |---|---|---|---|---|
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "evaluation", "organization" (132 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "evaluation", "organization" (139 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json

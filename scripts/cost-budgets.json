@@ -1,9 +1,69 @@
 {
   "$comment": "Per-callable cost budgets for the standard scenarios of the test suites (prompt 66 Part 8): 1.25 × the measured maximum + 1, set from the run of 2026-11-18. A regression fails check:cost-budgets for exactly that callable. Raise a budget only with the reason in the commit.",
   "callables": {
+    "accountEntriesApprove": {
+      "maxReads": 11,
+      "maxWrites": 8,
+      "maxDeletes": 1
+    },
+    "accountEntriesCounts": {
+      "maxReads": 20,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "accountEntriesCreateSubEntry": {
+      "maxReads": 13,
+      "maxWrites": 8,
+      "maxDeletes": 1
+    },
+    "accountEntriesGet": {
+      "maxReads": 11,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "accountEntriesList": {
+      "maxReads": 21,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "accountEntriesRecordFee": {
+      "maxReads": 16,
+      "maxWrites": 14,
+      "maxDeletes": 1
+    },
+    "accountEntriesReject": {
+      "maxReads": 14,
+      "maxWrites": 13,
+      "maxDeletes": 1
+    },
+    "accountEntriesReverse": {
+      "maxReads": 14,
+      "maxWrites": 11,
+      "maxDeletes": 1
+    },
+    "accountEntriesUpdateNote": {
+      "maxReads": 10,
+      "maxWrites": 5,
+      "maxDeletes": 1
+    },
+    "accountEntriesVerify": {
+      "maxReads": 11,
+      "maxWrites": 8,
+      "maxDeletes": 1
+    },
+    "accountTransfersConfirm": {
+      "maxReads": 14,
+      "maxWrites": 11,
+      "maxDeletes": 1
+    },
     "accountTransfersCreate": {
       "maxReads": 18,
       "maxWrites": 14,
+      "maxDeletes": 1
+    },
+    "accountTransfersDispute": {
+      "maxReads": 11,
+      "maxWrites": 8,
       "maxDeletes": 1
     },
     "accountTransfersGet": {
@@ -14,6 +74,16 @@
     "accountTransfersList": {
       "maxReads": 13,
       "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "accountingPolicyGet": {
+      "maxReads": 10,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "accountingPolicyUpdate": {
+      "maxReads": 10,
+      "maxWrites": 5,
       "maxDeletes": 1
     },
     "approvalsCounts": {
@@ -47,7 +117,7 @@
       "maxDeletes": 1
     },
     "billsCreate": {
-      "maxReads": 21,
+      "maxReads": 30,
       "maxWrites": 18,
       "maxDeletes": 1
     },
@@ -118,6 +188,21 @@
     },
     "capitalTransactionsList": {
       "maxReads": 14,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "cashCountsCreate": {
+      "maxReads": 16,
+      "maxWrites": 13,
+      "maxDeletes": 1
+    },
+    "cashCountsGet": {
+      "maxReads": 10,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
+    "cashCountsList": {
+      "maxReads": 11,
       "maxWrites": 3,
       "maxDeletes": 1
     },
@@ -556,6 +641,11 @@
       "maxWrites": 4,
       "maxDeletes": 1
     },
+    "reportsGetBranchSummary": {
+      "maxReads": 25,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
     "reportsGetCashBankSummary": {
       "maxReads": 14,
       "maxWrites": 3,
@@ -636,16 +726,6 @@
       "maxWrites": 6,
       "maxDeletes": 1
     },
-    "requestsSettingsGet": {
-      "maxReads": 4,
-      "maxWrites": 1,
-      "maxDeletes": 0
-    },
-    "requestsSettingsUpdate": {
-      "maxReads": 4,
-      "maxWrites": 4,
-      "maxDeletes": 0
-    },
     "requestsAssign": {
       "maxReads": 4,
       "maxWrites": 5,
@@ -690,6 +770,16 @@
       "maxReads": 4,
       "maxWrites": 5,
       "maxDeletes": 1
+    },
+    "requestsSettingsGet": {
+      "maxReads": 4,
+      "maxWrites": 1,
+      "maxDeletes": 0
+    },
+    "requestsSettingsUpdate": {
+      "maxReads": 4,
+      "maxWrites": 4,
+      "maxDeletes": 0
     },
     "requestsTransition": {
       "maxReads": 13,

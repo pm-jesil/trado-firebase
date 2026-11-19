@@ -1246,6 +1246,26 @@ node tools/api-explorer/server.js
 - `requestsSettingsGet`
 - `requestsSettingsUpdate`
 
+### Money, Stock & Account Integrity (Prompt 77)
+- `accountEntriesList`
+- `accountEntriesGet`
+- `accountEntriesCounts`
+- `accountEntriesVerify`
+- `accountEntriesApprove`
+- `accountEntriesReject`
+- `accountEntriesReverse`
+- `accountEntriesUpdateNote`
+- `accountEntriesCreateSubEntry`
+- `accountingPolicyGet`
+- `accountingPolicyUpdate`
+- `accountTransfersConfirm`
+- `accountTransfersDispute`
+- `cashCountsCreate`
+- `cashCountsList`
+- `cashCountsGet`
+- `accountEntriesRecordFee`
+- `reportsGetBranchSummary`
+
 ### Triggers & Scheduled Jobs
 - `onRequestActivityWritten`
 - `requestsSlaAndLifecycleSweep`

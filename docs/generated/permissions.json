@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-11-19T00:13:28.438Z",
-  "totalPermissions": 151,
+  "generatedAt": "2026-11-19T11:06:32.953Z",
+  "totalPermissions": 157,
   "permissions": [
     {
       "name": "ALL",
@@ -1448,6 +1448,42 @@
       ]
     },
     {
+      "name": "ACCOUNT_ENTRY_CREATE",
+      "code": "accounts:entry_create",
+      "module": "accounts",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ACCOUNT_VERIFY",
+      "code": "accounts:verify",
+      "module": "accounts",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ACCOUNT_APPROVE",
+      "code": "accounts:approve",
+      "module": "accounts",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "ACCOUNT_REVERSE",
+      "code": "accounts:reverse",
+      "module": "accounts",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
       "name": "LEDGER_VIEW",
       "code": "ledger:view",
       "module": "ledger",
@@ -1511,6 +1547,24 @@
         "role_org_owner",
         "role_admin",
         "role_store_manager"
+      ]
+    },
+    {
+      "name": "APPROVALS_DECIDE",
+      "code": "approvals:decide",
+      "module": "approvals",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
+      ]
+    },
+    {
+      "name": "APPROVALS_SELF_APPROVE",
+      "code": "approvals:self_approve",
+      "module": "approvals",
+      "isPlatform": false,
+      "allowedRoles": [
+        "role_org_owner"
       ]
     },
     {

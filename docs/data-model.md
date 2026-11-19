@@ -853,6 +853,10 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 |---|---|---|---|---|---|---|
 | DUP-085 | BOUNDED_ARRAY | `accountReconciliations` | `reconciledTransactionIds` | Array of reconciled ledger transaction IDs bounded per statement period. | — | cap 500 |
 | DUP-083 | R4 | `accountTransactions` | `balanceAfter` | Running account balance snapshot at the exact time of the transaction for point-in-time statements and audit. | — | — |
+| DUP-101 | BOUNDED_ARRAY | `accountTransactions` | `reviewReasons` | Flagged review reasons array on ledger transactions bounded by prepareEntriesInTxn. | `prepareEntriesInTxn` | cap 10 |
+| DUP-104 | BOUNDED_ARRAY | `accountTransactions` | `workflow.approvedBy` | Audit list of approval actors and timestamps for multi-level approval, bounded to at most 10 approvers. | `updateEntryWorkflowInTxn` | cap 10 |
+| DUP-102 | BOUNDED_ARRAY | `accountTransactions` | `workflow.updatedByUids` | Audit trail of actor UIDs who updated the entry note, bounded to at most 20 actors. | `updateEntryWorkflowInTxn` | cap 20 |
+| DUP-103 | BOUNDED_ARRAY | `accountTransactions` | `workflow.verifiedBy` | Audit list of verification actors and timestamps for maker-checker review, bounded to at most 10 verifiers. | `updateEntryWorkflowInTxn` | cap 10 |
 | DUP-080 | BOUNDED_ARRAY | `activity` | `attachments` | Activity comment attachments array capped at 5 in RequestAttachmentSchema. | — | cap 5 |
 | DUP-079 | OWNED | `activity` | `author.roleLabel` | Snapshot of author role label at activity creation time for timeline rendering without role hydration. | — | — |
 | DUP-020 | R3 | `auditLogs` | `changedFields` | Top-level field names of the event's changes, stored for array-contains queries. Bounded by the entity's field count; written only by the audit recorder. | `recordCommitEvent` | reconcile:auditChangedFields |

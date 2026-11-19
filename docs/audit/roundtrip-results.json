@@ -1,6 +1,6 @@
 {
- "runId": "roundtrip-mwn6hq7h",
- "generatedAt": "2026-11-19T06:37:51.726Z",
+ "runId": "roundtrip-mwo2pzdd",
+ "generatedAt": "2026-11-19T21:40:04.561Z",
  "callables": {
   "usersUpdateMe": {
    "calls": 1,
@@ -18,7 +18,7 @@
    ],
    "transformed": [],
    "documents": [
-    "imageUploadSessions/up_60ac56cf2d166cd962202154ba28e784"
+    "imageUploadSessions/up_ef3cfee456df4f9e113c9165b4b94288"
    ]
   },
   "imagesAttach": {
@@ -52,6 +52,7 @@
     "bankAccounts[].id",
     "bankAccounts[].isDefault",
     "bankAccounts[].label",
+    "bankAccounts[].printOnInvoice",
     "bankAccounts[].routingCode",
     "bankAccounts[].routingType",
     "bankAccounts[].showOnInvoice",
@@ -94,8 +95,8 @@
     "minorUnitNamePlural"
    ],
    "documents": [
-    "organizations/QpRe7nfd1tAqLwXzdq41",
-    "organizations/hPVL5uUvU3HmqDvDcCuQ"
+    "organizations/8hWlC2qvK57pncJfG6kn",
+    "organizations/kM1O0UoB0KuRqlTKuV93"
    ]
   },
   "organizationsUpdate": {
@@ -123,6 +124,7 @@
     "bankAccounts[].id",
     "bankAccounts[].isDefault",
     "bankAccounts[].label",
+    "bankAccounts[].printOnInvoice",
     "bankAccounts[].routingType",
     "bankAccounts[].showOnInvoice",
     "bankAccounts[].status",
@@ -165,8 +167,8 @@
    ],
    "transformed": [],
    "documents": [
-    "organizations/QpRe7nfd1tAqLwXzdq41",
-    "organizations/Dsax2nGz6FfTOFB3Hzc6"
+    "organizations/8hWlC2qvK57pncJfG6kn",
+    "organizations/6cWJqOyTKe4bVr34S2be"
    ]
   },
   "organizationsReactivate": {
@@ -174,7 +176,7 @@
    "proven": [],
    "transformed": [],
    "documents": [
-    "organizations/Dsax2nGz6FfTOFB3Hzc6"
+    "organizations/6cWJqOyTKe4bVr34S2be"
    ]
   },
   "organizationsSetSubscription": {
@@ -187,7 +189,7 @@
     "status"
    ],
    "documents": [
-    "organizations/Dsax2nGz6FfTOFB3Hzc6"
+    "organizations/6cWJqOyTKe4bVr34S2be"
    ]
   },
   "organizationsProvisionUser": {
@@ -209,7 +211,7 @@
     "name"
    ],
    "documents": [
-    "organizations/Dsax2nGz6FfTOFB3Hzc6"
+    "organizations/6cWJqOyTKe4bVr34S2be"
    ]
   },
   "branchesUpdate": {
@@ -222,7 +224,7 @@
     "name"
    ],
    "documents": [
-    "organizations/Dsax2nGz6FfTOFB3Hzc6"
+    "organizations/6cWJqOyTKe4bVr34S2be"
    ]
   },
   "branchContextSwitch": {
@@ -230,7 +232,7 @@
    "proven": [],
    "transformed": [],
    "documents": [
-    "organizations/Dsax2nGz6FfTOFB3Hzc6"
+    "organizations/6cWJqOyTKe4bVr34S2be"
    ]
   },
   "sharingPoliciesUpdate": {
@@ -238,7 +240,7 @@
    "proven": [],
    "transformed": [],
    "documents": [
-    "organizations/Dsax2nGz6FfTOFB3Hzc6"
+    "organizations/6cWJqOyTKe4bVr34S2be"
    ]
   },
   "employeesCreate": {
@@ -250,7 +252,7 @@
    ],
    "transformed": [],
    "documents": [
-    "users/em8cEgvX4mUOIprwLBhsED706g3X"
+    "users/yCDv5J2lcqbe0qoJAMPu5IgWQ7zc"
    ]
   },
   "employeesUpdate": {
@@ -265,7 +267,7 @@
    ],
    "transformed": [],
    "documents": [
-    "memberships/em8cEgvX4mUOIprwLBhsED706g3X_Dsax2nGz6FfTOFB3Hzc6"
+    "memberships/yCDv5J2lcqbe0qoJAMPu5IgWQ7zc_6cWJqOyTKe4bVr34S2be"
    ]
   },
   "rolesCreate": {
@@ -278,7 +280,7 @@
    ],
    "transformed": [],
    "documents": [
-    "roles/nlMCEVTRXVnX9Vpe6WDj"
+    "roles/SfQUWyFAVNnUZEe8zsrh"
    ]
   },
   "rolesUpdate": {
@@ -290,7 +292,7 @@
    ],
    "transformed": [],
    "documents": [
-    "roles/nlMCEVTRXVnX9Vpe6WDj"
+    "roles/SfQUWyFAVNnUZEe8zsrh"
    ]
   },
   "departmentsCreate": {
@@ -301,7 +303,7 @@
    ],
    "transformed": [],
    "documents": [
-    "departments/nwbZKqgy47DCnWUGacYY"
+    "departments/tqCSfDrxtglmQNEdDMiM"
    ]
   },
   "departmentsUpdate": {
@@ -312,7 +314,7 @@
    ],
    "transformed": [],
    "documents": [
-    "departments/nwbZKqgy47DCnWUGacYY"
+    "departments/tqCSfDrxtglmQNEdDMiM"
    ]
   },
   "jobRolesCreate": {
@@ -323,7 +325,7 @@
    ],
    "transformed": [],
    "documents": [
-    "jobRoles/lB23OJFOsXcIjy8YfmxW"
+    "jobRoles/LBXrBotMkBnWfYhBo9Tl"
    ]
   },
   "jobRolesUpdate": {
@@ -333,7 +335,7 @@
    ],
    "transformed": [],
    "documents": [
-    "jobRoles/lB23OJFOsXcIjy8YfmxW"
+    "jobRoles/LBXrBotMkBnWfYhBo9Tl"
    ]
   },
   "teamsCreate": {
@@ -345,7 +347,7 @@
    ],
    "transformed": [],
    "documents": [
-    "teams/CXtbY8IZomfyQJlKX6O8"
+    "teams/meTLMzIT4aRwL3P4Bd3N"
    ]
   },
   "teamsUpdate": {
@@ -358,7 +360,7 @@
    ],
    "transformed": [],
    "documents": [
-    "teams/CXtbY8IZomfyQJlKX6O8"
+    "teams/meTLMzIT4aRwL3P4Bd3N"
    ]
   },
   "teamsAssignMember": {
@@ -368,7 +370,7 @@
    ],
    "transformed": [],
    "documents": [
-    "memberships/em8cEgvX4mUOIprwLBhsED706g3X_Dsax2nGz6FfTOFB3Hzc6"
+    "memberships/yCDv5J2lcqbe0qoJAMPu5IgWQ7zc_6cWJqOyTKe4bVr34S2be"
    ]
   },
   "plansCreate": {
@@ -386,8 +388,8 @@
    ],
    "transformed": [],
    "documents": [
-    "subscriptionPlans/HBqK7PFPvsxlxgSn5UFI",
-    "subscriptionPlans/OzlqEX2VdDh4nYo2uyGH"
+    "subscriptionPlans/NSurcpD5KZUpe0ae6n6T",
+    "subscriptionPlans/IwuBTX7b33xPJEEFcKro"
    ]
   },
   "plansUpdate": {
@@ -400,7 +402,7 @@
    ],
    "transformed": [],
    "documents": [
-    "subscriptionPlans/OzlqEX2VdDh4nYo2uyGH"
+    "subscriptionPlans/IwuBTX7b33xPJEEFcKro"
    ]
   },
   "notificationsRegisterFcmToken": {
@@ -472,8 +474,8 @@
    ],
    "transformed": [],
    "documents": [
-    "products/JtrP5W4Vbtcivq56ymQ2",
-    "products/xG4RC3AoI1vN73RV6wvB"
+    "products/rOnY5gIBVUcu49vh79Mz",
+    "products/8u85d8zRnS3oQwR9mz0X"
    ]
   },
   "productsUpdate": {
@@ -536,8 +538,8 @@
    ],
    "transformed": [],
    "documents": [
-    "products/JtrP5W4Vbtcivq56ymQ2",
-    "products/xG4RC3AoI1vN73RV6wvB"
+    "products/rOnY5gIBVUcu49vh79Mz",
+    "products/8u85d8zRnS3oQwR9mz0X"
    ]
   },
   "categoriesCreate": {
@@ -549,7 +551,7 @@
    ],
    "transformed": [],
    "documents": [
-    "categories/WlW5ed77kvXNXuRBRmua"
+    "categories/BZkp8BMlIY8mb2iTZcji"
    ]
   },
   "categoriesUpdate": {
@@ -562,7 +564,7 @@
    ],
    "transformed": [],
    "documents": [
-    "categories/WlW5ed77kvXNXuRBRmua"
+    "categories/BZkp8BMlIY8mb2iTZcji"
    ]
   },
   "unitsCreate": {
@@ -577,7 +579,7 @@
    ],
    "transformed": [],
    "documents": [
-    "units/UNFTWBV55vNiLhxSfitJ"
+    "units/V7v0KoTzg5xd99lvAe4y"
    ]
   },
   "unitsUpdate": {
@@ -589,7 +591,7 @@
    ],
    "transformed": [],
    "documents": [
-    "units/UNFTWBV55vNiLhxSfitJ"
+    "units/V7v0KoTzg5xd99lvAe4y"
    ]
   },
   "customersCreate": {
@@ -618,6 +620,7 @@
     "bankAccounts[].id",
     "bankAccounts[].isDefault",
     "bankAccounts[].label",
+    "bankAccounts[].printOnInvoice",
     "bankAccounts[].routingCode",
     "bankAccounts[].routingType",
     "bankAccounts[].showOnInvoice",
@@ -646,8 +649,8 @@
     "creditPeriodDays"
    ],
    "documents": [
-    "customers/77GINx4VuyzkcIHoSyR9",
-    "customers/A6ul9MQxP8F3RcScw6f2"
+    "customers/tatF33uhP2UDwMVZ4Qev",
+    "customers/vIMiOe8zm9i5MhWGSH9P"
    ]
   },
   "customersUpdate": {
@@ -676,6 +679,7 @@
     "bankAccounts[].id",
     "bankAccounts[].isDefault",
     "bankAccounts[].label",
+    "bankAccounts[].printOnInvoice",
     "bankAccounts[].routingType",
     "bankAccounts[].showOnInvoice",
     "bankAccounts[].status",
@@ -701,8 +705,8 @@
    ],
    "transformed": [],
    "documents": [
-    "customers/77GINx4VuyzkcIHoSyR9",
-    "customers/A6ul9MQxP8F3RcScw6f2"
+    "customers/tatF33uhP2UDwMVZ4Qev",
+    "customers/vIMiOe8zm9i5MhWGSH9P"
    ]
   },
   "vendorsCreate": {
@@ -731,6 +735,7 @@
     "bankAccounts[].id",
     "bankAccounts[].isDefault",
     "bankAccounts[].label",
+    "bankAccounts[].printOnInvoice",
     "bankAccounts[].routingCode",
     "bankAccounts[].routingType",
     "bankAccounts[].showOnInvoice",
@@ -756,8 +761,8 @@
    ],
    "transformed": [],
    "documents": [
-    "vendors/pHdjpi0FkAGekwbhVsO0",
-    "vendors/qiec8zX8wRGkO4zruFh1"
+    "vendors/KuOx1RVpXEPhzG8SHoma",
+    "vendors/jP517GWtGFWNkP0UWg9s"
    ]
   },
   "vendorsUpdate": {
@@ -786,6 +791,7 @@
     "bankAccounts[].id",
     "bankAccounts[].isDefault",
     "bankAccounts[].label",
+    "bankAccounts[].printOnInvoice",
     "bankAccounts[].routingType",
     "bankAccounts[].showOnInvoice",
     "bankAccounts[].status",
@@ -810,8 +816,8 @@
    ],
    "transformed": [],
    "documents": [
-    "vendors/pHdjpi0FkAGekwbhVsO0",
-    "vendors/qiec8zX8wRGkO4zruFh1"
+    "vendors/KuOx1RVpXEPhzG8SHoma",
+    "vendors/jP517GWtGFWNkP0UWg9s"
    ]
   },
   "outflowsCreate": {
@@ -828,7 +834,7 @@
    ],
    "transformed": [],
    "documents": [
-    "outflows/nzgmbVnaIgqXiNFcBkX3"
+    "outflows/ImsqFG3b6NE2Tlrltz0a"
    ]
   },
   "billsCreate": {
@@ -844,7 +850,7 @@
    ],
    "transformed": [],
    "documents": [
-    "bills/l9ujFa87PVYltXDUfIgw"
+    "bills/C7cgaBhTls1lxpZCJEh0"
    ]
   },
   "billsUpdateDraft": {
@@ -882,7 +888,7 @@
    ],
    "transformed": [],
    "documents": [
-    "recurringExpenses/ur8t8nUoFnlMCCkY26o0"
+    "recurringExpenses/QExxebWZxDHBU4bX4mVE"
    ]
   },
   "recurringExpensesUpdate": {
@@ -907,7 +913,7 @@
    ],
    "transformed": [],
    "documents": [
-    "recurringExpenses/ur8t8nUoFnlMCCkY26o0"
+    "recurringExpenses/QExxebWZxDHBU4bX4mVE"
    ]
   },
   "financialAccountsCreate": {
@@ -929,6 +935,56 @@
    "documents": []
   },
   "capitalTransactionsCreate": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "accountEntriesApprove": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "accountEntriesReject": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "accountEntriesUpdateNote": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "accountEntriesCreateSubEntry": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "accountingPolicyUpdate": {
+   "calls": 1,
+   "proven": [],
+   "transformed": [],
+   "documents": [
+    "organizations/6cWJqOyTKe4bVr34S2be"
+   ]
+  },
+  "accountTransfersConfirm": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "cashCountsCreate": {
+   "calls": 0,
+   "proven": [],
+   "transformed": [],
+   "documents": []
+  },
+  "accountEntriesRecordFee": {
    "calls": 0,
    "proven": [],
    "transformed": [],
@@ -976,7 +1032,7 @@
    ],
    "transformed": [],
    "documents": [
-    "deliveries/8V7zQ5eMhSRyBs29OkXk"
+    "deliveries/GcRoGMt3W1vWiUidEj0p"
    ]
   },
   "deliveriesUpdateStatus": {
@@ -988,7 +1044,7 @@
    ],
    "transformed": [],
    "documents": [
-    "deliveries/8V7zQ5eMhSRyBs29OkXk"
+    "deliveries/GcRoGMt3W1vWiUidEj0p"
    ]
   },
   "returnsCreate": {
@@ -1004,7 +1060,7 @@
    ],
    "transformed": [],
    "documents": [
-    "returns/mwEriVRW0bhWEiPYpwy3"
+    "returns/Z3rWvYJyNum44TemZOkz"
    ]
   },
   "paymentsCreate": {
@@ -1021,7 +1077,7 @@
    ],
    "transformed": [],
    "documents": [
-    "payments/L7vMnzAHCnkCRGgWz2NW"
+    "payments/ElXUJuig5ywefKdIVsSB"
    ]
   },
   "stockAdjust": {
@@ -1029,8 +1085,8 @@
    "proven": [],
    "transformed": [],
    "documents": [
-    "products/JtrP5W4Vbtcivq56ymQ2",
-    "products/xG4RC3AoI1vN73RV6wvB"
+    "products/rOnY5gIBVUcu49vh79Mz",
+    "products/8u85d8zRnS3oQwR9mz0X"
    ]
   },
   "tasksCreate": {
@@ -1046,7 +1102,7 @@
    ],
    "transformed": [],
    "documents": [
-    "tasks/rmWzbPLP0wApiPdWQjus"
+    "tasks/MYGpnHKklbvPQpjwnOJo"
    ]
   },
   "tasksUpdate": {
@@ -1061,7 +1117,7 @@
    ],
    "transformed": [],
    "documents": [
-    "tasks/rmWzbPLP0wApiPdWQjus"
+    "tasks/MYGpnHKklbvPQpjwnOJo"
    ]
   },
   "tasksAssign": {
@@ -1071,7 +1127,7 @@
    ],
    "transformed": [],
    "documents": [
-    "tasks/rmWzbPLP0wApiPdWQjus"
+    "tasks/MYGpnHKklbvPQpjwnOJo"
    ]
   },
   "tasksUpdateStatus": {
@@ -1081,7 +1137,7 @@
    ],
    "transformed": [],
    "documents": [
-    "tasks/rmWzbPLP0wApiPdWQjus"
+    "tasks/MYGpnHKklbvPQpjwnOJo"
    ]
   },
   "locationsRecordPing": {
@@ -1149,7 +1205,7 @@
    "proven": [],
    "transformed": [],
    "documents": [
-    "organizations/Dsax2nGz6FfTOFB3Hzc6"
+    "organizations/6cWJqOyTKe4bVr34S2be"
    ]
   },
   "usageRecordClientMetric": {

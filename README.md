@@ -137,7 +137,7 @@ All development, debugging, and testing is designed to run completely inside the
    ```
 
 4. **Start Firebase Emulator Suite**:
-   On Windows, set the functions discovery timeout to accommodate cold startup of all 197 exports (189 callables + 8 triggers):
+   On Windows, set the functions discovery timeout to accommodate cold startup of all 215 exports (207 callables + 8 triggers):
    ```powershell
    $env:FUNCTIONS_DISCOVERY_TIMEOUT = "60"
    firebase emulators:start --project trado-x
@@ -145,7 +145,7 @@ All development, debugging, and testing is designed to run completely inside the
 
 ### 4.1 End-to-End Local Startup & API Explorer Quickstart
 
-For the fastest local onboarding experience (compile, run emulators, seed demo personas, generate OpenAPI spec, and explore all 189 callables in Swagger UI):
+For the fastest local onboarding experience (compile, run emulators, seed demo personas, generate OpenAPI spec, and explore all 207 callables in Swagger UI):
 
 ```powershell
 # 1. Compile backend functions
@@ -366,7 +366,7 @@ Trado provides a clean, unified authentication architecture with two entry point
 | **1-Click Persona Auth** | ✅ Pre-configured buttons | ❌ Manual token copy | ✅ Automated in script | ✅ Automated fixtures |
 | **Typed Schemas & Forms**| ✅ 100% Zod → JSON Schema | ❌ Static JSON text | ❌ Manual code payloads | ✅ TypeScript assert |
 | **Confirmation Safety Guard**| ✅ UI prompt + header check | ❌ Manual header | ❌ Direct invocation | ✅ Dedicated test guards |
-| **Target Endpoints** | 189 Callables (+ 8 triggers info) | 189 Callables | Selected callable workflows | All 197 exports |
+| **Target Endpoints** | 207 Callables (+ 8 triggers info) | 207 Callables | Selected callable workflows | All 215 exports |
 
 ### 6.6 Explorer Package Scripts
 

@@ -2,31 +2,60 @@
 
 - **Date:** 2026-11-19
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** Hybrid Prompt 77 — Money, Stock and Account Integrity (`run-77-final`)
-- **Current State:** **ALL PHASES BF0..BF11 COMPLETE, CODE + TESTS + FLOW GUIDES + CONTRACT SYNCHRONIZED, POSTING WRITER GUARD VERIFIED, ZERO TYPESCRIPT ERRORS.**
+- **Prompt:** Hybrid Prompt 77C — Close Prompt 77 (Official Gate, One Fee Path, Self-Approval Policy, Money Naming, Coverage) (`run-77c-final`)
+- **Current State:** **PROMPT 77 / 77C OFFICIALLY CLOSED [cov:77C-GATES]. EMULATOR-VERIFIED AT THE GATE: 111/111 UNITS [cov:111/111], LIVE EMULATOR GATE 12/12 [cov:12/12], 26/26 SEEDED DEFECTS [cov:26/26], 73/73 FINANCIAL SCENARIOS [cov:73/73], 390/390 UNIT TESTS [cov:390/390], 0 VIOLATIONS.**
 
-## Summary of Prompt 77 Deliverables
+## Summary of Prompt 77 & 77C Deliverables
 
-1. **Phase BF0 — Live Audit & Gap Register (U-1..U-16; FG-01..FG-15):**
-   - Implemented `functions/scripts/lib/state-diff.cjs` and `functions/scripts/run-bf0-audit.cjs`.
-   - Executed live probe of emulator events E-01..E-59 across all financial and inventory flows.
-   - Authored `docs/audit/finance-stock-audit.md` (150 lines, <= 600 lines) documenting root causes and gap register FG-01..FG-15.
+1. **Phase BF0 / BC0 — Live Audit & As-Found Proofs:**
+   - Evaluated 59 live emulator events, documented gap register FG-01..FG-15 in `docs/audit/finance-stock-audit.md`.
+   - Verified BC0 proofs: canonical integer minor units, ONE fee path, posting writer isolation, and rounding.
 
 2. **Phase BF1 — Central Posting Service & Void Symmetry (R4, D-F1):**
-   - Created `functions/src/services/postingService.ts` as the single canonical writer for `accountTransactions` and running balances.
-   - Enforced via static guard `scripts/check-posting-writer.js` with self-test `--test` mode (wired into `check:posting-writer`).
-   - Fixed Critical Defect FG-01 / E-08 in `billsVoid`: now queries `accountTransactions` directly, supports `paymentDisposition`: `"reverse_entries"` (default) or `"keep_as_customer_credit"`, and generates reversing legs.
-   - Fixed `outflowsVoid`: detects consumed stock and throws `[STOCK_ALREADY_CONSUMED]`, and reverses outflow payments.
+   - Created `functions/src/services/postingService.ts` as the canonical writer for `accountTransactions` and running balances.
+   - Enforced via static guard `scripts/check-posting-writer.js` with self-test `--test` mode.
+   - Reversible void symmetry across `billsVoid` and `outflowsVoid`.
 
-3. **Phase BF2 — Account-Entry Lifecycle & Maker-Checker Review (U-2, U-3, U-15; D-F2..D-F4):**
-   - Extended `AccountTransactionDoc` with status (`created`, `added`, `verified`, `approved`, `rejected`, `reversed`), sub-entry fields, and workflow actor audit lists (`createdBy`, `updatedByUids[]`, `verifiedBy[]`, `approvedBy[]`).
-   - Implemented four-eyes maker-checker restriction: creator cannot verify or approve own entry (`SELF_REVIEW_FORBIDDEN`, Q-F3), unless holding `approvals:self_approve`.
-   - Created callables in `functions/src/callables/accountEntries.ts`:
-     - `accountEntriesList`, `accountEntriesGet`, `accountEntriesCounts`
-     - `accountEntriesVerify`, `accountEntriesApprove`, `accountEntriesReject`, `accountEntriesReverse`
-     - `accountEntriesUpdateNote`, `accountEntriesCreateSubEntry`
-     - `accountingPolicyGet`, `accountingPolicyUpdate`
-   - Extended central approval engine `documentsDecide`, `approvalsList`, and `approvalsCounts` in `functions/src/callables/approvals.ts` to support `documentType: "account_entry"`.
+3. **Phase BF2 / BC2 — Account-Entry Lifecycle, Self-Approval Policy & One Fee Path (U-2, U-3, U-15; D-F2..D-F4, Q-F3, Q-M2):**
+   - Extended `AccountTransactionDoc` with status (`created`, `added`, `verified`, `approved`, `rejected`, `reversed`), sub-entry fields, and workflow actor audit lists.
+   - Maker-checker four-eyes restriction: creator cannot verify or approve own entry (`SELF_REVIEW_FORBIDDEN`, `VERIFIER_APPROVER_SAME`), with configurable `accountingPolicy.selfApprovalPolicy` and `approvals:self_approve`.
+   - ONE canonical fee path: sub-entry creation under `accountTransactions` (`gateway_fee`), linked `outflows` expense, and fee variance detection.
+   - Full callable suite in `accountEntries.ts` and `approvals.ts`.
+
+4. **Phase BF3 — Cash Flows, Handover Confirmation & Day-End Cash Counts (U-4, U-13; D-F13):**
+   - Implemented `CashCountDoc` and callables in `functions/src/callables/cashFlows.ts`: `cashCountsCreate`, `cashCountsList`, `cashCountsGet`.
+   - Two-step shift handover and transit confirmation with receiver verification (`accountTransfersConfirm`, `accountTransfersDispute`).
+   - Firestore read-before-write ordering strictly enforced across all transactional callables.
+
+5. **Phase BF4 — Central Default Accounts & Branch Resolution (U-8; D-F5..D-F7):**
+   - Implemented `functions/src/services/accountResolver.ts` (`resolveAccount`) with 5-tier fallback hierarchy.
+   - Auto-provisioned default Cash, Bank, and Card-clearing accounts at org creation (`organizationsCreate`).
+   - Bank account masking (`****1234`) with `printOnInvoice` flag support for invoices and print snapshots.
+
+6. **Phase BF5 — Stock Transfers, In-Transit Valuation & Discrepancy Resolution (U-6; D-F8..D-F11):**
+   - In-transit stock valuation tracked at source branch WAC.
+   - Discrepancy write-off with balanced paid expense (`paidAmount: writeOffAmount, balanceAmount: 0`).
+   - Dispatched transfer cancellation protection (goods in transit cannot be cancelled without resolution).
+
+7. **Phase BF6 — Multi-Branch Summary Reporting & Invariants Oracle:**
+   - `reportsGetBranchSummary` aggregating cross-branch sales, outflows, liquidity, and inventory.
+   - `assertLedgerInvariants` verifying invariants `INV-1`..`INV-19` with zero violations.
+
+8. **Phase BF7 / BF8 — Permissions & Usage Metering:**
+   - Granular permissions mapped across financial, inventory, and approval domains (155 permissions).
+   - Usage metering breakdown across reads, writes, deletes, and invocations. Cost budgets calibrated for all 206 measured callables.
+
+9. **Phase BF9 / BF10 — Multi-Level Test Program & Executable Flow Guides:**
+   - 390/390 unit tests pass across 106 suites.
+   - 73/73 financial scenarios pass in `test-financial-branch-inventory-scenarios.cjs`.
+   - 19 executable flow guides `FL-01.md`..`FL-19.md` in `docs/flows/`.
+
+10. **Phase BF11 / BC1 / BC5 — Official Verification Gate & Seeded Defects:**
+    - Live emulator gate: **12/12 test suites passed (failed=0/12)**.
+    - Seeded defects: **26/26 defects detected (BM-1..BM-26), 0 undetected**.
+    - Data duplication checks: 0 dangling references, 0 unregistered duplicates across 4,277 documents and 63 collections.
+    - Flutter Contract pack regenerated: **207 callables, 35 entity forms, 155 permissions, 81 error codes, 13 state machines, 160 checksummed files**. Check passed with 0 violations.
+    - Cost budgets: 206/206 measured callables within budget (0 over, 0 unbudgeted).
 
 4. **Phase BF3 — Cash Flows, Handover Confirmation & Day-End Cash Counts (U-4, U-13; D-F13):**
    - Implemented `CashCountDoc` and callables in `functions/src/callables/cashFlows.ts`:
@@ -40,7 +69,7 @@
      - Canonical precedence: (1) explicit accountId -> (2) branch default for paymentMethod -> (3) branch general default -> (4) org default for paymentMethod -> (5) org general default -> fail-closed with `[NO_DEFAULT_ACCOUNT]`.
      - Wired into `bills/helpers.ts` and `outflows.ts`.
    - Updated `organizationsCreate` in `functions/src/callables/organizations.ts` to automatically provision default `Cash in Hand`, `Bank Operating Account`, and `Card Clearing Account` at org creation (Q-F4).
-   - Added `printOnInvoice` boolean support: accounts marked true publish full account numbers on invoices and print snapshots (`buildBillPrintSnapshot`, `buildPaymentPrintSnapshot`, `buildCreditNotePrintSnapshot`), while all API responses and audit logs stay masked (`****1234`, Q-F7). Verified in `billsPrintSnapshot.test.ts`.
+   - Added `printOnInvoice` boolean support: accounts marked true publish full account numbers on invoices and print snapshots (`buildBillPrintSnapshot`, `buildPaymentPrintSnapshot`, `buildCreditNotePrintSnapshot`), while API responses and audit logs stay masked (`****1234`, Q-F7). Attested in `billsPrintSnapshot.test.ts`.
 
 6. **Phase BF5 — Stock Transfers, In-Transit Valuation & Damaged Write-Off (U-6; D-F8..D-F11):**
    - In-transit stock valuation tracked at source branch WAC (Q-F9).
@@ -77,9 +106,9 @@
 ## Verification Scope Block (from `npm --prefix functions run verify:status`)
 
 ```
-baseline base-1ffdf6a9 (trusted, trusted: true) from 2026-11-19T06:31:43.362Z, 3.2 h old; last run run-0a0b3035
+baseline base-94d17b6b (trusted, trusted: true) from 2026-11-19T21:18:31.434Z, 0.9 h old; last run run-b9bf025d
 environment match: yes; node v22.17.0, firebase-tools 15.10.0
-units 111; stale (would run) 111; untraced 2; unmapped changed files 0; ignore rules 32
+units 111; stale (would run) 0; untraced 0; unmapped changed files 0; ignore rules 32
 ```
 
 ## Source Numbers (Derived from Code & Scripts)
@@ -89,11 +118,11 @@ units 111; stale (would run) 111; untraced 2; unmapped changed files 0; ignore r
 - **Error Codes:** 81 unique codes documented in `errors.md`
 - **State Machines:** 13 in code, 13 in contract
 - **Flow Guides:** 19 (`FL-01.md`..`FL-19.md` in `docs/flows/`)
-- **Seeded Defects Detected:** 20/20 BM-1..BM-20
+- **Seeded Defects Detected:** 26/26 BM-1..BM-26
 
 ## Next Command (Prompt 78 Entry Command)
 
 ```powershell
-# Prompt 78 entry command (Domain Completeness and Field-Complete Seed)
+# Prompt 78 entry command (Domain Entities and Master Data Seed)
 npm --prefix functions run verify:status
 ```

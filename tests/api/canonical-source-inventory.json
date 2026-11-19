@@ -1,11 +1,11 @@
 {
   "projectId": "trado-x",
   "region": "asia-south1",
-  "totalExports": 197,
+  "totalExports": 215,
   "summary": {
-    "callableCount": 189,
+    "callableCount": 207,
     "triggerCount": 8,
-    "concreteCollectionsCount": 61,
+    "concreteCollectionsCount": 63,
     "categoryCounts": {
       "PUBLIC_AUTH_ADAPTER": 2,
       "CALLER_IDENTITY": 5,
@@ -13,22 +13,22 @@
       "ORGANIZATION_ONBOARDING": 4,
       "PLATFORM_SUPER_ADMIN": 29,
       "REFERENCE_DATA": 5,
-      "DERIVED_TENANT_OPERATION": 73,
-      "FILTER_OPTIONAL_TENANT": 70
+      "DERIVED_TENANT_OPERATION": 84,
+      "FILTER_OPTIONAL_TENANT": 77
     },
     "subgroupCounts": {
       "DERIVED_TENANT_OPERATION": {
         "RBAC & Memberships": 13,
         "Catalog & Parties": 10,
-        "Transactions & Operations": 30,
+        "Transactions & Operations": 41,
         "Stock & Reconciliation": 6,
         "Tasks & Telemetry": 7,
         "Media & Assets": 3,
         "Requests & Support Desk": 4
       },
       "FILTER_OPTIONAL_TENANT": {
-        "Entities & Catalog Lists": 52,
-        "Reports & Telemetry": 15,
+        "Entities & Catalog Lists": 58,
+        "Reports & Telemetry": 16,
         "Usage & Quotas": 3
       }
     }
@@ -176,6 +176,16 @@
     },
     {
       "path": "capitalTransactions/{id}",
+      "type": "root",
+      "domain": "Operations & Transactions"
+    },
+    {
+      "path": "carrierClaims/{id}",
+      "type": "root",
+      "domain": "Operations & Transactions"
+    },
+    {
+      "path": "cashCounts/{id}",
       "type": "root",
       "domain": "Operations & Transactions"
     },
@@ -572,7 +582,18 @@
           "stockTransfersDispatch",
           "stockTransfersReceive",
           "stockTransfersCancel",
-          "stockTransfersResolveDiscrepancy"
+          "stockTransfersResolveDiscrepancy",
+          "accountEntriesVerify",
+          "accountEntriesApprove",
+          "accountEntriesReject",
+          "accountEntriesReverse",
+          "accountEntriesUpdateNote",
+          "accountEntriesCreateSubEntry",
+          "accountingPolicyUpdate",
+          "accountTransfersConfirm",
+          "accountTransfersDispute",
+          "cashCountsCreate",
+          "accountEntriesRecordFee"
         ],
         "Stock & Reconciliation": [
           "stockAdjust",
@@ -659,7 +680,13 @@
           "stockTransfersList",
           "stockTransfersGet",
           "approvalsList",
-          "approvalsCounts"
+          "approvalsCounts",
+          "accountEntriesList",
+          "accountEntriesGet",
+          "accountEntriesCounts",
+          "accountingPolicyGet",
+          "cashCountsList",
+          "cashCountsGet"
         ],
         "Reports & Telemetry": [
           "reportsGetRevenue",
@@ -674,6 +701,7 @@
           "reportsGetPayablesAgeing",
           "reportsGetCashBankSummary",
           "reportsGetTrialBalance",
+          "reportsGetBranchSummary",
           "tasksList",
           "locationsGetLatest",
           "locationsGetHistory"

@@ -4010,7 +4010,7 @@
           "organizations",
           "totalCount"
         ],
-        "leafCount": 254,
+        "leafCount": 268,
         "sampleLeaves": [
           {
             "path": "items[].bankAccounts[].id",
@@ -4541,7 +4541,7 @@
           "evaluation",
           "organization"
         ],
-        "leafCount": 132,
+        "leafCount": 139,
         "sampleLeaves": [
           {
             "path": "organization.bankAccounts[].id",
@@ -26718,10 +26718,36 @@
             "cash_withdrawal",
             "inter_bank",
             "petty_cash",
-            "cashier_handover"
+            "cashier_handover",
+            "settlement"
           ],
           "uiHint": "dropdown",
           "example": "transfer"
+        },
+        {
+          "path": "mode",
+          "type": "enum",
+          "required": false,
+          "nullable": false,
+          "bounds": {},
+          "enumValues": [
+            "instant",
+            "in_transit"
+          ],
+          "uiHint": "dropdown",
+          "example": "instant"
+        },
+        {
+          "path": "reference",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "maxLength": 120
+          },
+          "enumValues": [],
+          "uiHint": "text",
+          "example": "Sample reference"
         },
         {
           "path": "notes",
@@ -26944,7 +26970,7 @@
       "name": "accountTransfersList",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 536,
+      "line": 542,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -27253,7 +27279,7 @@
       "name": "accountTransfersGet",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 590,
+      "line": 596,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -27486,7 +27512,7 @@
       "name": "capitalTransactionsCreate",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 624,
+      "line": 630,
       "gate": "tenant",
       "kind": "create",
       "permissions": [
@@ -27703,7 +27729,7 @@
       "name": "capitalTransactionsList",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 741,
+      "line": 747,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -27907,7 +27933,7 @@
       "name": "accountEntriesList",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 48,
+      "line": 49,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -27919,11 +27945,11 @@
       "idempotent": false,
       "idempotencyField": null,
       "audit": {
-        "action": "accountEntries.list",
+        "action": "account.entries_list",
         "category": "none",
         "collection": null
       },
-      "purpose": "LIST endpoint in accountEntries domain (accountEntries.list).",
+      "purpose": "LIST endpoint in accountEntries domain (account.entries_list).",
       "inputSchema": "ListAccountEntriesSchema",
       "inputFields": [
         {
@@ -28080,218 +28106,222 @@
         }
       ],
       "response": {
-        "envelope": "ACTION",
-        "tsType": "{ entries: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }[]; nextCursor: string | null; totalCount: nu",
+        "envelope": "LIST",
+        "tsType": "{ items: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 28 more ...; entryId: string; }[]; entries: { ...; }[]; count: number; nextCur",
         "topLevelKeys": [
+          "count",
           "entries",
+          "items",
           "nextCursor",
           "totalCount"
         ],
         "requiredTopKeys": [
+          "count",
           "entries",
+          "items",
           "totalCount"
         ],
-        "leafCount": 49,
+        "leafCount": 103,
         "sampleLeaves": [
           {
-            "path": "entries[].organizationId",
+            "path": "items[].organizationId",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].branchId",
+            "path": "items[].branchId",
             "type": "string | null | undefined",
             "optional": true
           },
           {
-            "path": "entries[].financialAccountId",
+            "path": "items[].financialAccountId",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].transactionNumber",
+            "path": "items[].transactionNumber",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].type",
+            "path": "items[].type",
             "type": "AccountTransactionType",
             "optional": false
           },
           {
-            "path": "entries[].direction",
+            "path": "items[].direction",
             "type": "\"out\" | \"in\"",
             "optional": false
           },
           {
-            "path": "entries[].amount",
+            "path": "items[].amount",
             "type": "number",
             "optional": false
           },
           {
-            "path": "entries[].balanceAfter",
+            "path": "items[].balanceAfter",
             "type": "number",
             "optional": false
           },
           {
-            "path": "entries[].amountMinor",
+            "path": "items[].amountMinor",
             "type": "number | undefined",
             "optional": true
           },
           {
-            "path": "entries[].balanceAfterMinor",
+            "path": "items[].balanceAfterMinor",
             "type": "number | undefined",
             "optional": true
           },
           {
-            "path": "entries[].currency",
+            "path": "items[].currency",
             "type": "string | undefined",
             "optional": true
           },
           {
-            "path": "entries[].status",
+            "path": "items[].status",
             "type": "AccountEntryStatus | undefined",
             "optional": true
           },
           {
-            "path": "entries[].sourceDocumentType",
+            "path": "items[].sourceDocumentType",
             "type": "\"return\" | \"account_transfer\" | \"bill\" | \"outflow\" | \"manual\" | \"payment\" | \"reconciliation\" | \"fee\" | \"capital\" | \"cash_count\"",
             "optional": false
           },
           {
-            "path": "entries[].sourceDocumentId",
+            "path": "items[].sourceDocumentId",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].partyType",
+            "path": "items[].partyType",
             "type": "\"vendor\" | \"customer\" | null | undefined",
             "optional": true
           },
           {
-            "path": "entries[].partyId",
+            "path": "items[].partyId",
             "type": "string | null | undefined",
             "optional": true
           },
           {
-            "path": "entries[].description",
+            "path": "items[].description",
             "type": "string | undefined",
             "optional": true
           },
           {
-            "path": "entries[].parentEntryId",
+            "path": "items[].parentEntryId",
             "type": "string | null | undefined",
             "optional": true
           },
           {
-            "path": "entries[].subEntryType",
+            "path": "items[].subEntryType",
             "type": "SubEntryType | null | undefined",
             "optional": true
           },
           {
-            "path": "entries[].feeStatus",
+            "path": "items[].feeStatus",
             "type": "\"pending\" | \"disputed\" | \"recorded\" | \"waived\" | null | undefined",
             "optional": true
           },
           {
-            "path": "entries[].needsReview",
+            "path": "items[].needsReview",
             "type": "boolean | undefined",
             "optional": true
           },
           {
-            "path": "entries[].reviewReasons[]",
+            "path": "items[].reviewReasons[]",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].reversedTransactionId",
+            "path": "items[].reversedTransactionId",
             "type": "string | null | undefined",
             "optional": true
           },
           {
-            "path": "entries[].reversalTransactionId",
+            "path": "items[].reversalTransactionId",
             "type": "string | null | undefined",
             "optional": true
           },
           {
-            "path": "entries[].workflow.createdBy",
+            "path": "items[].selfApproved",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].workflow.createdBy",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.createdAt",
+            "path": "items[].workflow.createdAt",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.updatedByUids[]",
+            "path": "items[].workflow.updatedByUids[]",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.verifiedBy[].uid",
+            "path": "items[].workflow.verifiedBy[].uid",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.verifiedBy[].verifiedAt",
+            "path": "items[].workflow.verifiedBy[].verifiedAt",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.verifiedBy[].note",
+            "path": "items[].workflow.verifiedBy[].note",
             "type": "string | undefined",
             "optional": true
           },
           {
-            "path": "entries[].workflow.approvedBy[].uid",
+            "path": "items[].workflow.approvedBy[].uid",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.approvedBy[].approvedAt",
+            "path": "items[].workflow.approvedBy[].approvedAt",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.approvedBy[].note",
+            "path": "items[].workflow.approvedBy[].note",
             "type": "string | undefined",
             "optional": true
           },
           {
-            "path": "entries[].workflow.rejectedBy.uid",
+            "path": "items[].workflow.rejectedBy.uid",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.rejectedBy.rejectedAt",
+            "path": "items[].workflow.rejectedBy.rejectedAt",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.rejectedBy.reason",
+            "path": "items[].workflow.rejectedBy.reason",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.reversedBy.uid",
+            "path": "items[].workflow.reversedBy.uid",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.reversedBy.reversedAt",
+            "path": "items[].workflow.reversedBy.reversedAt",
             "type": "string",
             "optional": false
           },
           {
-            "path": "entries[].workflow.reversedBy.reason",
+            "path": "items[].workflow.reversedBy.reason",
             "type": "string",
             "optional": false
-          },
-          {
-            "path": "entries[].workflow.notes",
-            "type": "string | undefined",
-            "optional": true
           }
         ]
       },
@@ -28307,7 +28337,7 @@
       "name": "accountEntriesGet",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 114,
+      "line": 116,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -28319,11 +28349,11 @@
       "idempotent": false,
       "idempotencyField": null,
       "audit": {
-        "action": "accountEntries.read",
+        "action": "account.entries_get",
         "category": "none",
         "collection": null
       },
-      "purpose": "READ endpoint in accountEntries domain (accountEntries.read).",
+      "purpose": "READ endpoint in accountEntries domain (account.entries_get).",
       "inputSchema": "GetAccountEntrySchema",
       "inputFields": [
         {
@@ -28363,7 +28393,7 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "{ entry: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }; subEntries: { ...; }[]; reversedEntry: Partia",
+        "tsType": "{ entry: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 28 more ...; entryId: string; }; subEntries: { ...; }[]; reversedEntry: (Parti",
         "topLevelKeys": [
           "entry",
           "reversalEntry",
@@ -28374,7 +28404,7 @@
           "entry",
           "subEntries"
         ],
-        "leafCount": 96,
+        "leafCount": 101,
         "sampleLeaves": [
           {
             "path": "entry.organizationId",
@@ -28497,6 +28527,11 @@
             "optional": true
           },
           {
+            "path": "entry.selfApproved",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
             "path": "entry.workflow.createdBy",
             "type": "string",
             "optional": false
@@ -28570,11 +28605,6 @@
             "path": "entry.workflow.reversedBy.reason",
             "type": "string",
             "optional": false
-          },
-          {
-            "path": "entry.workflow.notes",
-            "type": "string | undefined",
-            "optional": true
           }
         ]
       },
@@ -28590,7 +28620,7 @@
       "name": "accountEntriesCounts",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 171,
+      "line": 173,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -28602,11 +28632,11 @@
       "idempotent": false,
       "idempotencyField": null,
       "audit": {
-        "action": "accountEntries.action",
-        "category": "none",
+        "action": "account.entries_counts",
+        "category": "mutation",
         "collection": null
       },
-      "purpose": "ACTION endpoint in accountEntries domain (accountEntries.action).",
+      "purpose": "ACTION endpoint in accountEntries domain (account.entries_counts).",
       "inputSchema": "GetAccountEntryCountsSchema",
       "inputFields": [
         {
@@ -28718,7 +28748,7 @@
       "name": "accountEntriesVerify",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 224,
+      "line": 226,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -28731,11 +28761,11 @@
       "idempotent": true,
       "idempotencyField": "idempotencyKey",
       "audit": {
-        "action": "accountEntries.action",
-        "category": "none",
+        "action": "account.entries_verify",
+        "category": "mutation",
         "collection": null
       },
-      "purpose": "ACTION endpoint in accountEntries domain (accountEntries.action).",
+      "purpose": "ACTION endpoint in accountEntries domain (account.entries_verify).",
       "inputSchema": "VerifyAccountEntrySchema",
       "inputFields": [
         {
@@ -28844,7 +28874,7 @@
       "name": "accountEntriesApprove",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 287,
+      "line": 289,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -28857,11 +28887,11 @@
       "idempotent": true,
       "idempotencyField": "idempotencyKey",
       "audit": {
-        "action": "accountEntries.update",
-        "category": "none",
+        "action": "account.entries_approve",
+        "category": "mutation",
         "collection": null
       },
-      "purpose": "UPDATE endpoint in accountEntries domain (accountEntries.update).",
+      "purpose": "UPDATE endpoint in accountEntries domain (account.entries_approve).",
       "inputSchema": "ApproveAccountEntrySchema",
       "inputFields": [
         {
@@ -28971,7 +29001,7 @@
       "name": "accountEntriesReject",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 362,
+      "line": 364,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -28984,11 +29014,11 @@
       "idempotent": true,
       "idempotencyField": "idempotencyKey",
       "audit": {
-        "action": "accountEntries.update",
-        "category": "none",
+        "action": "account.entries_reject",
+        "category": "mutation",
         "collection": null
       },
-      "purpose": "UPDATE endpoint in accountEntries domain (accountEntries.update).",
+      "purpose": "UPDATE endpoint in accountEntries domain (account.entries_reject).",
       "inputSchema": "RejectAccountEntrySchema",
       "inputFields": [
         {
@@ -29097,7 +29127,7 @@
       "name": "accountEntriesReverse",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 445,
+      "line": 447,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -29109,11 +29139,11 @@
       "idempotent": true,
       "idempotencyField": "idempotencyKey",
       "audit": {
-        "action": "accountEntries.action",
-        "category": "none",
+        "action": "account.entries_reverse",
+        "category": "mutation",
         "collection": null
       },
-      "purpose": "ACTION endpoint in accountEntries domain (accountEntries.action).",
+      "purpose": "ACTION endpoint in accountEntries domain (account.entries_reverse).",
       "inputSchema": "ReverseAccountEntrySchema",
       "inputFields": [
         {
@@ -29231,7 +29261,7 @@
       "name": "accountEntriesUpdateNote",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 522,
+      "line": 524,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -29242,11 +29272,11 @@
       "idempotent": false,
       "idempotencyField": null,
       "audit": {
-        "action": "accountEntries.update",
-        "category": "none",
+        "action": "account.entries_update_note",
+        "category": "mutation",
         "collection": null
       },
-      "purpose": "UPDATE endpoint in accountEntries domain (accountEntries.update).",
+      "purpose": "UPDATE endpoint in accountEntries domain (account.entries_update_note).",
       "inputSchema": "UpdateAccountEntryNoteSchema",
       "inputFields": [
         {
@@ -29299,21 +29329,35 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "{ entryId: string; description: string; updatedAt: string; }",
+        "tsType": "{ entryId: string; note: string; notes: string; description: string; updatedAt: string; }",
         "topLevelKeys": [
           "description",
           "entryId",
+          "note",
+          "notes",
           "updatedAt"
         ],
         "requiredTopKeys": [
           "description",
           "entryId",
+          "note",
+          "notes",
           "updatedAt"
         ],
-        "leafCount": 3,
+        "leafCount": 5,
         "sampleLeaves": [
           {
             "path": "entryId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "note",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "notes",
             "type": "string",
             "optional": false
           },
@@ -29341,7 +29385,7 @@
       "name": "accountEntriesCreateSubEntry",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 554,
+      "line": 556,
       "gate": "tenant",
       "kind": "create",
       "permissions": [
@@ -29353,11 +29397,11 @@
       "idempotent": true,
       "idempotencyField": "idempotencyKey",
       "audit": {
-        "action": "accountEntries.create",
-        "category": "none",
+        "action": "account.entries_create_sub_entry",
+        "category": "mutation",
         "collection": null
       },
-      "purpose": "CREATE endpoint in accountEntries domain (accountEntries.create).",
+      "purpose": "CREATE endpoint in accountEntries domain (account.entries_create_sub_entry).",
       "inputSchema": "CreateSubEntrySchema",
       "inputFields": [
         {
@@ -29462,6 +29506,18 @@
           "example": "Sample notes"
         },
         {
+          "path": "description",
+          "type": "string",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "maxLength": 500
+          },
+          "enumValues": [],
+          "uiHint": "textarea",
+          "example": "2026-11-18"
+        },
+        {
           "path": "idempotencyKey",
           "type": "string",
           "required": false,
@@ -29543,7 +29599,7 @@
       "name": "accountingPolicyGet",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 656,
+      "line": 658,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -29555,11 +29611,11 @@
       "idempotent": false,
       "idempotencyField": null,
       "audit": {
-        "action": "accountEntries.read",
+        "action": "accounting.policy_get",
         "category": "none",
         "collection": null
       },
-      "purpose": "READ endpoint in accountEntries domain (accountEntries.read).",
+      "purpose": "READ endpoint in accountEntries domain (accounting.policy_get).",
       "inputSchema": "GetAccountingPolicySchema",
       "inputFields": [
         {
@@ -29587,19 +29643,47 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "{ policy: any; }",
+        "tsType": "{ policy: AccountingPolicy; }",
         "topLevelKeys": [
           "policy"
         ],
-        "requiredTopKeys": [
-          "policy"
-        ],
-        "leafCount": 1,
+        "requiredTopKeys": [],
+        "leafCount": 7,
         "sampleLeaves": [
           {
-            "path": "policy",
-            "type": "any",
-            "optional": false
+            "path": "policy.minorUnitsThresholds",
+            "type": "Record<string, number>",
+            "optional": true
+          },
+          {
+            "path": "policy.selfApprovalPolicy",
+            "type": "\"off\" | \"up_to_limit\" | \"on\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.selfApprovalLimits",
+            "type": "Record<string, number>",
+            "optional": true
+          },
+          {
+            "path": "policy.roundingMode",
+            "type": "\"half_up\" | \"half_even\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.roundToNearestRupee",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.cashRoundingFils",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.cashCountVarianceThresholdMinor",
+            "type": "number | undefined",
+            "optional": true
           }
         ]
       },
@@ -29615,7 +29699,7 @@
       "name": "accountingPolicyUpdate",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 679,
+      "line": 681,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -29626,11 +29710,11 @@
       "idempotent": false,
       "idempotencyField": null,
       "audit": {
-        "action": "accountEntries.update",
-        "category": "none",
+        "action": "accounting.policy_update",
+        "category": "mutation",
         "collection": null
       },
-      "purpose": "UPDATE endpoint in accountEntries domain (accountEntries.update).",
+      "purpose": "UPDATE endpoint in accountEntries domain (accounting.policy_update).",
       "inputSchema": "UpdateAccountingPolicySchema",
       "inputFields": [
         {
@@ -29733,19 +29817,59 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "{ policy: any; }",
+        "tsType": "{ policy: { updatedAt: string; updatedBy: string; cashRoundingFils?: boolean | undefined; roundToNearestRupee?: boolean | undefined; roundingMode?: \"half_up\" | \"half_even\" | undefined; selfApprovalLimits?: Record<...> | undefined; selfAppro",
         "topLevelKeys": [
           "policy"
         ],
         "requiredTopKeys": [
           "policy"
         ],
-        "leafCount": 1,
+        "leafCount": 9,
         "sampleLeaves": [
           {
-            "path": "policy",
-            "type": "any",
+            "path": "policy.updatedAt",
+            "type": "string",
             "optional": false
+          },
+          {
+            "path": "policy.updatedBy",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "policy.cashRoundingFils",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.roundToNearestRupee",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.roundingMode",
+            "type": "\"half_up\" | \"half_even\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.selfApprovalLimits",
+            "type": "Record<string, number>",
+            "optional": true
+          },
+          {
+            "path": "policy.selfApprovalPolicy",
+            "type": "\"off\" | \"up_to_limit\" | \"on\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.minorUnitsThresholds",
+            "type": "Record<string, number>",
+            "optional": true
+          },
+          {
+            "path": "policy.cashCountVarianceThresholdMinor",
+            "type": "number | undefined",
+            "optional": true
           }
         ]
       },
@@ -29761,7 +29885,7 @@
       "name": "accountTransfersConfirm",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 46,
+      "line": 48,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -29772,11 +29896,11 @@
       "idempotent": true,
       "idempotencyField": "idempotencyKey",
       "audit": {
-        "action": "cashFlows.update",
-        "category": "none",
-        "collection": null
+        "action": "account_transfer.confirm",
+        "category": "mutation",
+        "collection": "accountTransfers"
       },
-      "purpose": "UPDATE endpoint in cashFlows domain (cashFlows.update).",
+      "purpose": "UPDATE endpoint in cashFlows domain (account_transfer.confirm).",
       "inputSchema": "ConfirmAccountTransferSchema",
       "inputFields": [
         {
@@ -29907,7 +30031,7 @@
       "name": "accountTransfersDispute",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 145,
+      "line": 147,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -29918,11 +30042,11 @@
       "idempotent": true,
       "idempotencyField": "idempotencyKey",
       "audit": {
-        "action": "cashFlows.action",
-        "category": "none",
-        "collection": null
+        "action": "account_transfer.dispute",
+        "category": "mutation",
+        "collection": "accountTransfers"
       },
-      "purpose": "ACTION endpoint in cashFlows domain (cashFlows.action).",
+      "purpose": "ACTION endpoint in cashFlows domain (account_transfer.dispute).",
       "inputSchema": "DisputeAccountTransferSchema",
       "inputFields": [
         {
@@ -30053,7 +30177,7 @@
       "name": "cashCountsCreate",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 212,
+      "line": 214,
       "gate": "tenant",
       "kind": "create",
       "permissions": [
@@ -30064,11 +30188,11 @@
       "idempotent": true,
       "idempotencyField": "idempotencyKey",
       "audit": {
-        "action": "cashFlows.create",
-        "category": "none",
-        "collection": null
+        "action": "cash_count.create",
+        "category": "mutation",
+        "collection": "cashCounts"
       },
-      "purpose": "CREATE endpoint in cashFlows domain (cashFlows.create).",
+      "purpose": "CREATE endpoint in cashFlows domain (cash_count.create).",
       "inputSchema": "CreateCashCountSchema",
       "inputFields": [
         {
@@ -30216,7 +30340,7 @@
       "name": "cashCountsList",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 341,
+      "line": 344,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -30227,11 +30351,11 @@
       "idempotent": false,
       "idempotencyField": null,
       "audit": {
-        "action": "cashFlows.list",
+        "action": "cash_count.list",
         "category": "none",
-        "collection": null
+        "collection": "cashCounts"
       },
-      "purpose": "LIST endpoint in cashFlows domain (cashFlows.list).",
+      "purpose": "LIST endpoint in cashFlows domain (cash_count.list).",
       "inputSchema": "ListCashCountsSchema",
       "inputFields": [
         {
@@ -30295,7 +30419,7 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 10 more ...; countId: string; }[]; nextCurso",
+        "tsType": "{ items: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 11 more ...; countId: string; }[]; nextCurso",
         "topLevelKeys": [
           "items",
           "nextCursor",
@@ -30305,7 +30429,7 @@
           "items",
           "totalCount"
         ],
-        "leafCount": 20,
+        "leafCount": 21,
         "sampleLeaves": [
           {
             "path": "items[].organizationId",
@@ -30393,6 +30517,11 @@
             "optional": true
           },
           {
+            "path": "items[].id",
+            "type": "string",
+            "optional": false
+          },
+          {
             "path": "items[].countId",
             "type": "string",
             "optional": false
@@ -30421,7 +30550,7 @@
       "name": "cashCountsGet",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 374,
+      "line": 378,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -30432,11 +30561,11 @@
       "idempotent": false,
       "idempotencyField": null,
       "audit": {
-        "action": "cashFlows.read",
+        "action": "cash_count.get",
         "category": "none",
-        "collection": null
+        "collection": "cashCounts"
       },
-      "purpose": "READ endpoint in cashFlows domain (cashFlows.read).",
+      "purpose": "READ endpoint in cashFlows domain (cash_count.get).",
       "inputSchema": "GetCashCountSchema",
       "inputFields": [
         {
@@ -30475,16 +30604,113 @@
         }
       ],
       "response": {
-        "envelope": "ENTITY",
-        "tsType": "{ count: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 10 more ...; countId: string; }; }",
+        "envelope": "ACTION",
+        "tsType": "{ cashCount: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 11 more ...; countId: string; }; count: ",
         "topLevelKeys": [
+          "cashCount",
           "count"
         ],
         "requiredTopKeys": [
+          "cashCount",
           "count"
         ],
-        "leafCount": 18,
+        "leafCount": 38,
         "sampleLeaves": [
+          {
+            "path": "cashCount.organizationId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "cashCount.branchId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "cashCount.countNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "cashCount.financialAccountId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "cashCount.countedAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "cashCount.systemBalance",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "cashCount.varianceAmount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "cashCount.denominations",
+            "type": "Record<string, number>",
+            "optional": false
+          },
+          {
+            "path": "cashCount.varianceTransactionId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "cashCount.needsApproval",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "cashCount.approvedBy",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "cashCount.approvedAt",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "cashCount.notes",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "cashCount.createdAt",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "cashCount.createdBy",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "cashCount.updatedAt",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "cashCount.updatedBy",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "cashCount.id",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "cashCount.countId",
+            "type": "string",
+            "optional": false
+          },
           {
             "path": "count.organizationId",
             "type": "string",
@@ -30571,6 +30797,11 @@
             "optional": true
           },
           {
+            "path": "count.id",
+            "type": "string",
+            "optional": false
+          },
+          {
             "path": "count.countId",
             "type": "string",
             "optional": false
@@ -30589,7 +30820,7 @@
       "name": "accountEntriesRecordFee",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 395,
+      "line": 402,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -30601,11 +30832,11 @@
       "idempotent": true,
       "idempotencyField": "idempotencyKey",
       "audit": {
-        "action": "cashFlows.update",
-        "category": "none",
+        "action": "account.entries_record_fee",
+        "category": "mutation",
         "collection": null
       },
-      "purpose": "UPDATE endpoint in cashFlows domain (cashFlows.update).",
+      "purpose": "UPDATE endpoint in cashFlows domain (account.entries_record_fee).",
       "inputSchema": "RecordEntryFeeSchema",
       "inputFields": [
         {
@@ -30698,10 +30929,13 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "Record<string, unknown> | { parentEntryId: string; subEntryId: string; subEntryTransactionNumber: string; feeAmount: number; feeStatus: string; } | undefined",
+        "tsType": "Record<string, unknown> | { parentEntryId: string; subEntryId: string; subEntryTransactionNumber: string; feeAmount: number; feeStatus: string; linkedOutflowId: string; linkedOutflowNumber: string; needsReview: boolean; } | undefined",
         "topLevelKeys": [
           "feeAmount",
           "feeStatus",
+          "linkedOutflowId",
+          "linkedOutflowNumber",
+          "needsReview",
           "parentEntryId",
           "subEntryId",
           "subEntryTransactionNumber"
@@ -30709,11 +30943,14 @@
         "requiredTopKeys": [
           "feeAmount",
           "feeStatus",
+          "linkedOutflowId",
+          "linkedOutflowNumber",
+          "needsReview",
           "parentEntryId",
           "subEntryId",
           "subEntryTransactionNumber"
         ],
-        "leafCount": 5,
+        "leafCount": 8,
         "sampleLeaves": [
           {
             "path": "parentEntryId",
@@ -30738,6 +30975,21 @@
           {
             "path": "feeStatus",
             "type": "string",
+            "optional": false
+          },
+          {
+            "path": "linkedOutflowId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "linkedOutflowNumber",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "needsReview",
+            "type": "boolean",
             "optional": false
           }
         ]
@@ -41281,11 +41533,11 @@
       "idempotent": false,
       "idempotencyField": null,
       "audit": {
-        "action": "reports.read",
+        "action": "report.get_branch_summary",
         "category": "none",
         "collection": null
       },
-      "purpose": "READ endpoint in reports domain (reports.read).",
+      "purpose": "READ endpoint in reports domain (report.get_branch_summary).",
       "inputSchema": "GetBranchSummarySchema",
       "inputFields": [
         {
@@ -41364,17 +41616,21 @@
         "tsType": "{ organizationId: string; scope: \"organization\" | \"branches\" | \"branch\"; branchSummaries: { branchId: string; branchName: string; branchCode: string; sales: { totalRevenue: number; billCount: number; }; outflows: { ...; }; liquidity: { ...;",
         "topLevelKeys": [
           "branchSummaries",
+          "branches",
           "orgTotals",
           "organizationId",
-          "scope"
+          "scope",
+          "totals"
         ],
         "requiredTopKeys": [
           "branchSummaries",
+          "branches",
           "orgTotals",
           "organizationId",
-          "scope"
+          "scope",
+          "totals"
         ],
-        "leafCount": 20,
+        "leafCount": 38,
         "sampleLeaves": [
           {
             "path": "organizationId",
@@ -41447,6 +41703,66 @@
             "optional": false
           },
           {
+            "path": "branches[].branchId",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "branches[].branchName",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "branches[].branchCode",
+            "type": "string",
+            "optional": false
+          },
+          {
+            "path": "branches[].sales.totalRevenue",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branches[].sales.billCount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branches[].outflows.totalPurchases",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branches[].outflows.totalExpenses",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branches[].outflows.outflowCount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branches[].liquidity.cashBalance",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branches[].liquidity.bankBalance",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branches[].liquidity.totalLiquidity",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "branches[].liquidity.accountCount",
+            "type": "number",
+            "optional": false
+          },
+          {
             "path": "orgTotals.totalRevenue",
             "type": "number",
             "optional": false
@@ -41473,6 +41789,36 @@
           },
           {
             "path": "orgTotals.branchCount",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "totals.totalRevenue",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "totals.totalBills",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "totals.totalPurchases",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "totals.totalExpenses",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "totals.totalLiquidity",
+            "type": "number",
+            "optional": false
+          },
+          {
+            "path": "totals.branchCount",
             "type": "number",
             "optional": false
           }

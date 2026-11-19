@@ -6,7 +6,21 @@ Gate order for `tenant-gate`: authenticated → user active → membership activ
 
 | Callable | Source | Gate | Permission (any of) | Plan module(s) | Allowlist reason |
 |---|---|---|---|---|---|
+| `accountEntriesApprove` | accountEntries.ts | tenant-gate | `accounts:approve`, `accounts:manage` | billing |  |
+| `accountEntriesCounts` | accountEntries.ts | tenant-gate | `ledger:view`, `accounts:view` | billing |  |
+| `accountEntriesCreateSubEntry` | accountEntries.ts | tenant-gate | `accounts:entry_create`, `accounts:manage` | billing |  |
+| `accountEntriesGet` | accountEntries.ts | tenant-gate | `ledger:view`, `accounts:view` | billing |  |
+| `accountEntriesList` | accountEntries.ts | tenant-gate | `ledger:view`, `accounts:view` | billing |  |
+| `accountEntriesRecordFee` | cashFlows.ts | tenant-gate | `accounts:entry_create`, `accounts:manage` | billing |  |
+| `accountEntriesReject` | accountEntries.ts | tenant-gate | `accounts:approve`, `accounts:manage` | billing |  |
+| `accountEntriesReverse` | accountEntries.ts | tenant-gate | `accounts:reverse`, `accounts:manage` | billing |  |
+| `accountEntriesUpdateNote` | accountEntries.ts | tenant-gate | `accounts:manage` | billing |  |
+| `accountEntriesVerify` | accountEntries.ts | tenant-gate | `accounts:verify`, `accounts:manage` | billing |  |
+| `accountingPolicyGet` | accountEntries.ts | tenant-gate | `accounts:view`, `org:manage_approval_policy` | billing, staff |  |
+| `accountingPolicyUpdate` | accountEntries.ts | tenant-gate | `org:manage_approval_policy` | staff |  |
+| `accountTransfersConfirm` | cashFlows.ts | tenant-gate | `accounts:transfer` | billing |  |
 | `accountTransfersCreate` | financialAccounts.ts | tenant-gate | `accounts:transfer` | billing |  |
+| `accountTransfersDispute` | cashFlows.ts | tenant-gate | `accounts:transfer` | billing |  |
 | `accountTransfersGet` | financialAccounts.ts | tenant-gate | `accounts:view` | billing |  |
 | `accountTransfersList` | financialAccounts.ts | tenant-gate | `accounts:view` | billing |  |
 | `approvalsCounts` | approvals.ts | tenant-gate | `approvals:view` | system |  |
@@ -23,6 +37,9 @@ Gate order for `tenant-gate`: authenticated → user active → membership activ
 | `branchesUpdate` | branches.ts | tenant-gate | `branch:update` | staff |  |
 | `capitalTransactionsCreate` | financialAccounts.ts | tenant-gate | `capital:manage` | billing |  |
 | `capitalTransactionsList` | financialAccounts.ts | tenant-gate | `capital:view` | billing |  |
+| `cashCountsCreate` | cashFlows.ts | tenant-gate | `accounts:manage` | billing |  |
+| `cashCountsGet` | cashFlows.ts | tenant-gate | `accounts:view` | billing |  |
+| `cashCountsList` | cashFlows.ts | tenant-gate | `accounts:view` | billing |  |
 | `categoriesCreate` | categories.ts | catalog-gate | `category:manage`, `inventory:manage` | inventory |  |
 | `categoriesList` | categories.ts | NONE | — | — | reference list visible to members |
 | `categoriesUpdate` | categories.ts | catalog-gate | `category:manage`, `inventory:manage` | inventory |  |

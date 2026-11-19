@@ -279,6 +279,11 @@ function reconcile() {
     for (const [did, d] of byOrg(name)) {
       if (d.status !== open) continue;
       stats.reconcileChecks++;
+      if (name === "outflows" && d.kind !== "purchase") {
+        if (Math.abs((d.totalAmount - (d.paidAmount || 0)) - (d.balanceAmount || 0)) > EPS) fail("reconcile:documentPayments", `${name}/${did} balanceAmount ${d.balanceAmount} ≠ total − paid`);
+        if (d.paymentStatus !== statusFor(d.totalAmount, d.paidAmount || 0)) fail("reconcile:documentPayments", `${name}/${did} paymentStatus ${d.paymentStatus} ≠ ${statusFor(d.totalAmount, d.paidAmount || 0)}`);
+        continue;
+      }
       const paid = paidByDoc.get(did) || 0;
       if (Math.abs(paid - (d.paidAmount || 0)) > EPS) fail("reconcile:documentPayments", `${name}/${did} paidAmount ${d.paidAmount} ≠ SUM(payments) ${paid}`);
       if (Math.abs((d.totalAmount - (d.paidAmount || 0)) - (d.balanceAmount || 0)) > EPS) fail("reconcile:documentPayments", `${name}/${did} balanceAmount ${d.balanceAmount} ≠ total − paid`);

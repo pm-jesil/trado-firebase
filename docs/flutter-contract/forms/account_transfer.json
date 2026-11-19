@@ -85,10 +85,38 @@
         "cash_withdrawal",
         "inter_bank",
         "petty_cash",
-        "cashier_handover"
+        "cashier_handover",
+        "settlement"
       ],
       "uiHint": "dropdown",
       "example": "transfer"
+    },
+    {
+      "path": "mode",
+      "type": "enum",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {},
+      "enumValues": [
+        "instant",
+        "in_transit"
+      ],
+      "uiHint": "dropdown",
+      "example": "instant"
+    },
+    {
+      "path": "reference",
+      "type": "string",
+      "requiredCreate": false,
+      "updatable": false,
+      "nullable": false,
+      "bounds": {
+        "maxLength": 120
+      },
+      "enumValues": [],
+      "uiHint": "text",
+      "example": "Sample reference"
     },
     {
       "path": "notes",

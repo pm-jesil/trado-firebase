@@ -6,7 +6,7 @@ import path from "node:path";
 const reportNumbersPath = path.resolve(__dirname, "..", "..", "..", "scripts", "report-numbers.js");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { collectNumbers, formatTextReport } = require(reportNumbersPath) as {
-  collectNumbers: (opts?: { runUnit?: boolean }) => {
+  collectNumbers: (opts?: { runUnit?: boolean; skipRules?: boolean }) => {
     meta: { utcTime: string; gitSha: string | null; gitDirty: boolean | null; nodeVersion: string; command: string };
     exports: { total: number; callables: number; triggers: number; schedules: number; callablesByDomain: Record<string, number>; callablesByGate: Record<string, number> };
     collections: { inSourceCount: number; docInterfacesCount: number; explicitRulesBlocksCount: number };
@@ -23,7 +23,7 @@ const { collectNumbers, formatTextReport } = require(reportNumbersPath) as {
 
 describe("Source-Derived Numbers Reporter (BX0 A-1, D-N1)", () => {
   it("derives consistent export totals (callables + triggers + schedules === total)", () => {
-    const n = collectNumbers({ runUnit: false });
+    const n = collectNumbers({ runUnit: false, skipRules: true });
     assert.strictEqual(
       n.exports.callables + n.exports.triggers + n.exports.schedules,
       n.exports.total,
@@ -41,7 +41,7 @@ describe("Source-Derived Numbers Reporter (BX0 A-1, D-N1)", () => {
   });
 
   it("derives non-empty metadata, permissions, collections, contract, allowlist, and formats text output", () => {
-    const n = collectNumbers({ runUnit: false });
+    const n = collectNumbers({ runUnit: false, skipRules: true });
     assert.ok(n.meta.utcTime.endsWith("Z"), "UTC ISO timestamp expected");
     assert.ok(n.meta.nodeVersion.startsWith("v"), "Node version expected");
     assert.strictEqual(n.permissions.concreteCount + n.permissions.wildcards.length, n.permissions.totalEntries);

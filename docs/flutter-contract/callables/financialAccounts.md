@@ -221,6 +221,8 @@ Back to [Master Index](./INDEX.md).
 | `destinationAccountId` | `string` | **Yes** | {"minLength":2} | `destinationAccount_001` |
 | `amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
 | `transferType` | `enum` | No | Enum: `transfer`, `cash_deposit`, `cash_withdrawal`, `inter_bank`, `petty_cash`, `cashier_handover` | `transfer` |
+| `mode` | `enum` | No | Enum: `instant`, `in_transit` | `instant` |
+| `reference` | `string` | No | {"maxLength":120} | `Sample reference` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
@@ -236,8 +238,8 @@ Back to [Master Index](./INDEX.md).
     "destinationAccountId": "destinationAccount_001",
     "amount": 2500,
     "transferType": "transfer",
-    "notes": "Sample notes",
-    "idempotencyKey": "idem_20261118_0001"
+    "mode": "instant",
+    "reference": "Sample reference"
   },
   "response": {
     "message": "...",
@@ -248,7 +250,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountTransfersList`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/financialAccounts.ts:536`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/financialAccounts.ts:542`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `account_transfer.list` (`none`) · **State Machine:** —
 
@@ -287,7 +289,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountTransfersGet`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/financialAccounts.ts:590`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/financialAccounts.ts:596`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `account_transfer.get` (`none`) · **State Machine:** —
 
@@ -316,7 +318,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `capitalTransactionsCreate`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/financialAccounts.ts:624`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/financialAccounts.ts:630`
 - **Permission(s):** `capital:manage` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `capital_transaction.create` (`mutation`) · **State Machine:** —
 
@@ -363,7 +365,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `capitalTransactionsList`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/financialAccounts.ts:741`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/financialAccounts.ts:747`
 - **Permission(s):** `capital:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `capital_transaction.list` (`none`) · **State Machine:** —
 

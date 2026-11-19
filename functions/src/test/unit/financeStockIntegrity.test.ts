@@ -133,9 +133,9 @@ describe("Prompt 77: Money, Stock and Account Integrity", () => {
   });
 
   describe("5. Stock Transfer Lifecycle & Intra-Branch Moves (U-6; Q-F11, INV-11)", () => {
-    it("Allows cancellation after dispatch and transitions to cancelled", () => {
+    it("Forbids direct cancellation after dispatch and enforces receive or discrepancy resolution (U-6)", () => {
       const transitionsFromDispatched = ALLOWED_TRANSFER_TRANSITIONS["dispatched"];
-      assert.ok(transitionsFromDispatched.includes("cancelled"), "Dispatched transfers must be cancellable");
+      assert.strictEqual(transitionsFromDispatched.includes("cancelled"), false, "Dispatched transfers cannot be directly cancelled");
       assert.ok(transitionsFromDispatched.includes("received"));
       assert.ok(transitionsFromDispatched.includes("partially_received"));
     });

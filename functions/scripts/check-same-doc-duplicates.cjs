@@ -159,6 +159,35 @@ const REGISTERED_PAIRS = new Set([
   "actorUid|updatedBy",
   // Membership IDs — membership and reference on join docs
   "membershipId|primaryBranchId",
+  // Account transactions workflow stamps & reversal coincidence
+  "description|workflow.reversedBy.reason",
+  "actorUid|workflow.createdBy",
+  "actorUid|workflow.reversedBy.uid",
+  "workflow.createdBy|workflow.reversedBy.uid",
+  "createdAt|workflow.createdAt",
+  "createdAt|workflow.reversedBy.reversedAt",
+  "workflow.createdAt|workflow.reversedBy.reversedAt",
+  "updatedAt|workflow.rejectedBy.rejectedAt",
+  "updatedBy|workflow.rejectedBy.uid",
+  "updatedAt|workflow.verifiedBy.verifiedAt",
+  "updatedBy|workflow.verifiedBy.uid",
+  "updatedAt|workflow.approvedBy.approvedAt",
+  "updatedBy|workflow.approvedBy.uid",
+  // Account transfer handover confirmation & dispute stamps
+  "confirmedAt|updatedAt",
+  "confirmedByUid|updatedBy",
+  "disputedAt|updatedAt",
+  "disputedByUid|updatedBy",
+  // Organization accounting policy update stamps
+  "ownerUserId|settings.accountingPolicy.updatedBy",
+  "settings.accountingPolicy.updatedBy|updatedBy",
+  "settings.accountingPolicy.updatedAt|updatedAt",
+  // Intra-branch account transfers (transfer between accounts in same branch)
+  "destinationBranchId|sourceBranchId",
+  // Payment fees on payment documents (sourceDocumentType == 'payment')
+  "paymentId|sourceDocumentId",
+  // Stock transfer lifecycle submission timestamp
+  "submittedAt|updatedAt",
   // Subscription plan numeric limits
   "branchLimit|storageLimitMb",
   "seatLimits.admin|storageLimitMb",

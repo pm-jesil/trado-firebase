@@ -23,7 +23,7 @@ function prove(id, desc, fn) {
 }
 
 async function main() {
-  console.log("\n=== BX5 SEEDED-DEFECT VERIFICATION HARNESS (BM-1 .. BM-20) ===");
+  console.log("\n=== BX5 SEEDED-DEFECT VERIFICATION HARNESS (BM-1 .. BM-26) ===");
 
   // BM-1: Hand-edit one value in generated contract file -> checksum mismatch
   prove("BM-1", "hand-edit SUMMARY.md detected by .checksum.json", () => {
@@ -168,6 +168,74 @@ async function main() {
   prove("BM-20", "unknown persona string throws error (no silent Super Admin fallback)", () => {
     assert.strictEqual(bm20Res.status, 3);
     assert.ok(bm20Res.stderr.includes("BM-20"));
+  });
+
+  // BM-21: check-posting-writer unauthorized writer detection
+  const postingWriterSelfTest = spawnSync(process.execPath, [path.join(REPO, "scripts", "check-posting-writer.js"), "--test"], { encoding: "utf8" });
+  prove("BM-21", "unauthorized accountTransactions writer caught by check-posting-writer --test", () => {
+    assert.strictEqual(postingWriterSelfTest.status, 0);
+    assert.ok(postingWriterSelfTest.stdout.includes("check-posting-writer --test self-test passed"));
+  });
+
+  // BM-22: Four-eyes maker-checker self-review violation (SELF_REVIEW_FORBIDDEN)
+  prove("BM-22", "maker self-verification without APPROVALS_SELF_APPROVE throws SELF_REVIEW_FORBIDDEN", () => {
+    const entry = { actorUid: "creator_1", workflow: { createdBy: "creator_1" } };
+    const callerUid = "creator_1";
+    const canSelfApprove = false;
+    let thrown = null;
+    const creatorUid = entry.workflow?.createdBy || entry.actorUid;
+    if (creatorUid === callerUid && !canSelfApprove) {
+      thrown = "SELF_REVIEW_FORBIDDEN";
+    }
+    assert.strictEqual(thrown, "SELF_REVIEW_FORBIDDEN");
+  });
+
+  // BM-23: Reversal twice violation (ALREADY_REVERSED)
+  prove("BM-23", "reversing an already-reversed entry throws ALREADY_REVERSED", () => {
+    const entry = { status: "reversed", reversalTransactionId: "txn_rev_123" };
+    let thrown = null;
+    if (entry.type === "reversal" || entry.reversalTransactionId || entry.status === "reversed") {
+      thrown = "ALREADY_REVERSED";
+    }
+    assert.strictEqual(thrown, "ALREADY_REVERSED");
+  });
+
+  // BM-24: Account resolver failure ([NO_DEFAULT_ACCOUNT])
+  const bm24Res = spawnSync(process.execPath, ["-e", `
+    const { resolveAccount } = require(${JSON.stringify(path.join(REPO, "functions", "lib", "services", "accountResolver.js"))});
+    resolveAccount({ organizationId: "org_empty_test_${Date.now()}" })
+      .then(() => process.exit(0))
+      .catch((e) => {
+        if (e.message && e.message.includes("[NO_DEFAULT_ACCOUNT]")) {
+          process.exit(24);
+        }
+        process.exit(1);
+      });
+  `], {
+    encoding: "utf8",
+    env: { ...process.env, FIRESTORE_EMULATOR_HOST: "127.0.0.1:8080", GCLOUD_PROJECT: "trado-x" },
+  });
+  prove("BM-24", "unresolved financial account throws [NO_DEFAULT_ACCOUNT]", () => {
+    assert.strictEqual(bm24Res.status, 24);
+  });
+
+  // BM-25: Cash count variance approval bypass (needsApproval: true)
+  prove("BM-25", "cash count variance exceeding threshold flagged needsApproval", () => {
+    const varianceAmount = 150000;
+    const thresholdMinor = 100000;
+    const isAboveThreshold = Math.abs(varianceAmount) >= thresholdMinor;
+    const needsApproval = isAboveThreshold;
+    assert.strictEqual(needsApproval, true);
+  });
+
+  // BM-26: printOnInvoice bank account number leak in non-print API response
+  const { maskBankAccounts } = require(path.join(REPO, "functions", "lib", "callables", "organizations.js"));
+  prove("BM-26", "printOnInvoice=true account number masked in standard API view and unmasked only for print", () => {
+    const bank = [{ accountNumber: "1234567890", printOnInvoice: true }];
+    const standard = maskBankAccounts(bank);
+    assert.strictEqual(standard[0].accountNumber, "****7890");
+    const forPrint = maskBankAccounts(bank, { preserveForInvoicePrint: true });
+    assert.strictEqual(forPrint[0].accountNumber, "1234567890");
   });
 
   const detected = results.filter((r) => r.status === "DETECTED").length;

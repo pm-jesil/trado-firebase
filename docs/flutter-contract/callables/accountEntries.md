@@ -4,9 +4,9 @@
 Back to [Master Index](./INDEX.md).
 
 ## `accountEntriesList`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/accountEntries.ts:48`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/accountEntries.ts:49`
 - **Permission(s):** `accounts:view`, `ledger:view` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** No · **Audit:** `accountEntries.list` (`none`) · **State Machine:** —
+- **Idempotency:** No · **Audit:** `account.entries_list` (`none`) · **State Machine:** —
 
 **Input (`ListAccountEntriesSchema` — strict, unknown fields rejected):**
 
@@ -25,7 +25,7 @@ Back to [Master Index](./INDEX.md).
 | `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":200,"maxInclusive":true} | `2500` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "entries", "nextCursor", "totalCount" (49 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "entries", "items", "nextCursor", "totalCount" (103 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -41,17 +41,17 @@ Back to [Master Index](./INDEX.md).
     "parentEntryId": "parentEntry_001"
   },
   "response": {
-    "entries": "...",
-    "nextCursor": "...",
-    "totalCount": "..."
+    "items": [],
+    "count": 0,
+    "nextCursor": null
   }
 }
 ```
 
 ## `accountEntriesGet`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/accountEntries.ts:114`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/accountEntries.ts:116`
 - **Permission(s):** `accounts:view`, `ledger:view` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** No · **Audit:** `accountEntries.read` (`none`) · **State Machine:** —
+- **Idempotency:** No · **Audit:** `account.entries_get` (`none`) · **State Machine:** —
 
 **Input (`GetAccountEntrySchema` — strict, unknown fields rejected):**
 
@@ -61,7 +61,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `entryId` | `string` | **Yes** | {"minLength":2} | `entry_001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "entry", "reversalEntry", "reversedEntry", "subEntries" (96 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "entry", "reversalEntry", "reversedEntry", "subEntries" (101 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -81,9 +81,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesCounts`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:171`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:173`
 - **Permission(s):** `accounts:view`, `ledger:view` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** No · **Audit:** `accountEntries.action` (`none`) · **State Machine:** —
+- **Idempotency:** No · **Audit:** `account.entries_counts` (`mutation`) · **State Machine:** —
 
 **Input (`GetAccountEntryCountsSchema` — strict, unknown fields rejected):**
 
@@ -113,9 +113,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesVerify`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:224`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:226`
 - **Permission(s):** `accounts:manage`, `accounts:verify`, `approvals:self_approve` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `accountEntries.action` (`none`) · **State Machine:** —
+- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_verify` (`mutation`) · **State Machine:** —
 
 **Input (`VerifyAccountEntrySchema` — strict, unknown fields rejected):**
 
@@ -148,9 +148,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesApprove`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:287`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:289`
 - **Permission(s):** `accounts:approve`, `accounts:manage`, `approvals:self_approve` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `accountEntries.update` (`none`) · **State Machine:** —
+- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_approve` (`mutation`) · **State Machine:** —
 
 **Input (`ApproveAccountEntrySchema` — strict, unknown fields rejected):**
 
@@ -183,9 +183,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesReject`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:362`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:364`
 - **Permission(s):** `accounts:approve`, `accounts:manage`, `approvals:self_approve` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `accountEntries.update` (`none`) · **State Machine:** —
+- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_reject` (`mutation`) · **State Machine:** —
 
 **Input (`RejectAccountEntrySchema` — strict, unknown fields rejected):**
 
@@ -218,9 +218,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesReverse`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:445`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:447`
 - **Permission(s):** `accounts:manage`, `accounts:reverse` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `accountEntries.action` (`none`) · **State Machine:** —
+- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_reverse` (`mutation`) · **State Machine:** —
 
 **Input (`ReverseAccountEntrySchema` — strict, unknown fields rejected):**
 
@@ -254,9 +254,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesUpdateNote`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:522`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:524`
 - **Permission(s):** `accounts:manage` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** No · **Audit:** `accountEntries.update` (`none`) · **State Machine:** —
+- **Idempotency:** No · **Audit:** `account.entries_update_note` (`mutation`) · **State Machine:** —
 
 **Input (`UpdateAccountEntryNoteSchema` — strict, unknown fields rejected):**
 
@@ -267,7 +267,7 @@ Back to [Master Index](./INDEX.md).
 | `entryId` | `string` | **Yes** | {"minLength":2} | `entry_001` |
 | `note` | `string` | **Yes** | {"minLength":1,"maxLength":500} | `Sample note` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "description", "entryId", "updatedAt" (3 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "description", "entryId", "note", "notes", "updatedAt" (5 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -281,15 +281,17 @@ Back to [Master Index](./INDEX.md).
   "response": {
     "description": "...",
     "entryId": "entryId_001",
+    "note": "...",
+    "notes": "...",
     "updatedAt": "..."
   }
 }
 ```
 
 ## `accountEntriesCreateSubEntry`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/accountEntries.ts:554`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/accountEntries.ts:556`
 - **Permission(s):** `accounts:entry_create`, `accounts:manage` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `accountEntries.create` (`none`) · **State Machine:** —
+- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_create_sub_entry` (`mutation`) · **State Machine:** —
 
 **Input (`CreateSubEntrySchema` — strict, unknown fields rejected):**
 
@@ -303,6 +305,7 @@ Back to [Master Index](./INDEX.md).
 | `financialAccountId` | `string` | No | — | `financialAccount_001` |
 | `direction` | `enum` | No | Enum: `in`, `out` | `in` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
+| `description` | `string` | No | {"maxLength":500} | `2026-11-18` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
 **Response:** Envelope `ACTION` · Top-level keys: "amount", "direction", "parentEntryId", "subEntryId", "subEntryType", "transactionNumber" (6 typed leaf paths).
@@ -332,9 +335,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountingPolicyGet`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/accountEntries.ts:656`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/accountEntries.ts:658`
 - **Permission(s):** `accounts:view`, `org:manage_approval_policy` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** No · **Audit:** `accountEntries.read` (`none`) · **State Machine:** —
+- **Idempotency:** No · **Audit:** `accounting.policy_get` (`none`) · **State Machine:** —
 
 **Input (`GetAccountingPolicySchema` — strict, unknown fields rejected):**
 
@@ -343,7 +346,7 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "policy" (1 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "policy" (7 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -359,9 +362,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountingPolicyUpdate`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:679`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:681`
 - **Permission(s):** `org:manage_approval_policy` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** No · **Audit:** `accountEntries.update` (`none`) · **State Machine:** —
+- **Idempotency:** No · **Audit:** `accounting.policy_update` (`mutation`) · **State Machine:** —
 
 **Input (`UpdateAccountingPolicySchema` — strict, unknown fields rejected):**
 
@@ -376,7 +379,7 @@ Back to [Master Index](./INDEX.md).
 | `roundToNearestRupee` | `boolean` | No | — | `true` |
 | `cashRoundingFils` | `boolean` | No | — | `true` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "policy" (1 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "policy" (9 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json

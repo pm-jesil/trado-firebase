@@ -782,11 +782,12 @@ export const outflowsVoid = onCall({ region: "asia-south1" }, async (request) =>
             actorUid: ctx.callerUid,
             items: reversal,
           });
-        } catch (stockErr: any) {
-          if (stockErr?.message?.includes("Insufficient branch stock")) {
+        } catch (stockErr) {
+          const errMessage = stockErr instanceof Error ? stockErr.message : String(stockErr);
+          if (errMessage.includes("Insufficient branch stock")) {
             throw new HttpsError(
               "failed-precondition",
-              `[STOCK_ALREADY_CONSUMED] Stock from purchase ${doc.outflowNumber} has already been consumed. ${stockErr.message}`,
+              `[STOCK_ALREADY_CONSUMED] Stock from purchase ${doc.outflowNumber} has already been consumed. ${errMessage}`,
               { reason: "STOCK_ALREADY_CONSUMED" }
             );
           }

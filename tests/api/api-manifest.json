@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "generatedAt": "2026-11-07T00:00:00Z",
   "projectId": "trado-x",
-  "totalExports": 197,
+  "totalExports": 215,
   "phases": {
     "phase1Count": 29,
     "phase2Count": 37,
@@ -5873,6 +5873,555 @@
       ],
       "sideEffects": [
         "SLA breaches marked, overdue auto-escalations"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountEntriesList",
+      "logicalName": "accountEntries.list",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "ledger:view",
+        "accounts:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ListAccountEntriesSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "accountTransactions"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [
+        "READ_PAGE"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountEntriesGet",
+      "logicalName": "accountEntries.get",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "ledger:view",
+        "accounts:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetAccountEntrySchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "accountTransactions"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [
+        "READ_ENTRY"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountEntriesCounts",
+      "logicalName": "accountEntries.counts",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "ledger:view",
+        "accounts:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetAccountEntryCountsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "accountTransactions"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [
+        "AGGREGATE_COUNTS"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountEntriesVerify",
+      "logicalName": "accountEntries.verify",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:verify",
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "VerifyAccountEntrySchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "accountTransactions"
+      ],
+      "firestoreCollectionsWritten": [
+        "accountTransactions",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "ENTRY_VERIFIED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountEntriesApprove",
+      "logicalName": "accountEntries.approve",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:approve",
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ApproveAccountEntrySchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "accountTransactions",
+        "organizations"
+      ],
+      "firestoreCollectionsWritten": [
+        "accountTransactions",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "ENTRY_APPROVED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountEntriesReject",
+      "logicalName": "accountEntries.reject",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:approve",
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "RejectAccountEntrySchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "accountTransactions"
+      ],
+      "firestoreCollectionsWritten": [
+        "accountTransactions",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "ENTRY_REJECTED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountEntriesReverse",
+      "logicalName": "accountEntries.reverse",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:reverse",
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ReverseAccountEntrySchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "accountTransactions",
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [
+        "accountTransactions",
+        "financialAccounts",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "ENTRY_REVERSED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountEntriesUpdateNote",
+      "logicalName": "accountEntries.updateNote",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "UpdateAccountEntryNoteSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "accountTransactions"
+      ],
+      "firestoreCollectionsWritten": [
+        "accountTransactions",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "NOTE_UPDATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountEntriesCreateSubEntry",
+      "logicalName": "accountEntries.createSubEntry",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:entry_create",
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "CreateSubEntrySchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "accountTransactions",
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [
+        "accountTransactions",
+        "financialAccounts",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "SUB_ENTRY_CREATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountingPolicyGet",
+      "logicalName": "accountingPolicy.get",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:view",
+        "org:manage_approval_policy"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetAccountingPolicySchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "organizations"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [
+        "READ_POLICY"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountingPolicyUpdate",
+      "logicalName": "accountingPolicy.update",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "org:manage_approval_policy"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "UpdateAccountingPolicySchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "organizations"
+      ],
+      "firestoreCollectionsWritten": [
+        "organizations",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "POLICY_UPDATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountTransfersConfirm",
+      "logicalName": "accountTransfers.confirm",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:transfer"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ConfirmAccountTransferSchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "accountTransfers",
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [
+        "accountTransfers",
+        "accountTransactions",
+        "financialAccounts",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "TRANSFER_CONFIRMED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountTransfersDispute",
+      "logicalName": "accountTransfers.dispute",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:transfer"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "DisputeAccountTransferSchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "accountTransfers"
+      ],
+      "firestoreCollectionsWritten": [
+        "accountTransfers",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "TRANSFER_DISPUTED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "cashCountsCreate",
+      "logicalName": "cashCounts.create",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "CreateCashCountSchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "financialAccounts",
+        "organizations"
+      ],
+      "firestoreCollectionsWritten": [
+        "cashCounts",
+        "accountTransactions",
+        "financialAccounts",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "CASH_COUNT_CREATED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "cashCountsList",
+      "logicalName": "cashCounts.list",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:view",
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "ListCashCountsSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "cashCounts"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [
+        "READ_PAGE"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "cashCountsGet",
+      "logicalName": "cashCounts.get",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:view",
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetByIdSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "cashCounts"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [
+        "READ_DOC"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "accountEntriesRecordFee",
+      "logicalName": "accountEntries.recordFee",
+      "phase": 3,
+      "domain": "financialAccounts",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "accounts:entry_create",
+        "accounts:manage"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "RecordEntryFeeSchema",
+      "idempotent": true,
+      "firestoreCollectionsRead": [
+        "accountTransactions",
+        "financialAccounts"
+      ],
+      "firestoreCollectionsWritten": [
+        "accountTransactions",
+        "outflows",
+        "financialAccounts",
+        "auditLogs"
+      ],
+      "sideEffects": [
+        "FEE_SUB_ENTRY_RECORDED"
+      ],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "reportsGetBranchSummary",
+      "logicalName": "reports.getBranchSummary",
+      "phase": 3,
+      "domain": "reports",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "body.organizationId_verified_via_memberships",
+      "requiredPermissions": [
+        "reports:view"
+      ],
+      "superAdminBypass": false,
+      "inputSchema": "GetBranchSummarySchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "organizations",
+        "bills",
+        "outflows",
+        "financialAccounts",
+        "stockBalances"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [
+        "BRANCH_SUMMARY_GENERATED"
       ],
       "indexesRequired": [],
       "coveredInIntegrationTests": true,

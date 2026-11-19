@@ -368,6 +368,7 @@ export interface UpdateEntryWorkflowParams {
   reason?: string;
   feeStatus?: "pending" | "recorded" | "waived" | "disputed";
   needsReview?: boolean;
+  selfApproved?: boolean;
   now?: string;
 }
 
@@ -378,7 +379,7 @@ export function updateEntryWorkflowInTxn(
   params: UpdateEntryWorkflowParams
 ): void {
   const now = params.now || new Date().toISOString();
-  const updates: Record<string, any> = {
+  const updates: Record<string, unknown> = {
     updatedAt: now,
     updatedBy: params.actorUid,
   };
@@ -393,6 +394,11 @@ export function updateEntryWorkflowInTxn(
 
   const updatedByUids = Array.from(new Set([...(workflow.updatedByUids || []), params.actorUid]));
   updates["workflow.updatedByUids"] = updatedByUids;
+
+  if (params.selfApproved) {
+    updates["selfApproved"] = true;
+    updates["workflow.selfApproved"] = true;
+  }
 
   if (params.action === "verify") {
     const verifiedBy = [...(workflow.verifiedBy || [])];
@@ -427,7 +433,6 @@ export function updateEntryWorkflowInTxn(
     };
   } else if (params.action === "update_note") {
     updates["notes"] = params.note || "";
-    updates["workflow.notes"] = params.note || "";
   } else if (params.action === "record_fee") {
     if (params.feeStatus) {
       updates["feeStatus"] = params.feeStatus;

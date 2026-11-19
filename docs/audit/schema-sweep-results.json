@@ -1,6 +1,6 @@
 {
- "runId": "sweep-mwn6ievp",
- "generatedAt": "2026-11-19T06:38:23.701Z",
+ "runId": "sweep-mwo2u3os",
+ "generatedAt": "2026-11-19T21:43:16.780Z",
  "items": [
   {
    "id": "healthCheck:organizationId:min",
@@ -8903,6 +8903,18 @@
    "pass": true
   },
   {
+   "id": "outflowsVoid:paymentDisposition:enum=reverse_entries",
+   "pass": true
+  },
+  {
+   "id": "outflowsVoid:paymentDisposition:enum=keep_as_customer_credit",
+   "pass": true
+  },
+  {
+   "id": "outflowsVoid:paymentDisposition:enum-invalid",
+   "pass": true
+  },
+  {
    "id": "outflowsVoid:idempotencyKey:max",
    "pass": true
   },
@@ -9516,6 +9528,18 @@
   },
   {
    "id": "billsVoid:reason:min-1",
+   "pass": true
+  },
+  {
+   "id": "billsVoid:paymentDisposition:enum=reverse_entries",
+   "pass": true
+  },
+  {
+   "id": "billsVoid:paymentDisposition:enum=keep_as_customer_credit",
+   "pass": true
+  },
+  {
+   "id": "billsVoid:paymentDisposition:enum-invalid",
    "pass": true
   },
   {
@@ -10311,6 +10335,10 @@
    "pass": true
   },
   {
+   "id": "documentsDecide:documentType:enum=account_entry",
+   "pass": true
+  },
+  {
    "id": "documentsDecide:documentType:enum-invalid",
    "pass": true
   },
@@ -10388,6 +10416,10 @@
   },
   {
    "id": "approvalsList:documentType:enum=stock_transfer",
+   "pass": true
+  },
+  {
+   "id": "approvalsList:documentType:enum=account_entry",
    "pass": true
   },
   {
@@ -10971,7 +11003,31 @@
    "pass": true
   },
   {
+   "id": "accountTransfersCreate:transferType:enum=settlement",
+   "pass": true
+  },
+  {
    "id": "accountTransfersCreate:transferType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:mode:enum=instant",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:mode:enum=in_transit",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:mode:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:reference:max",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersCreate:reference:max+1",
    "pass": true
   },
   {
@@ -11200,6 +11256,734 @@
   },
   {
    "id": "capitalTransactionsList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:status:enum=created",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:status:enum=added",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:status:enum=verified",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:status:enum=approved",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:status:enum=rejected",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:status:enum=reversed",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:status:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:subEntryType:enum=transaction_charge",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:subEntryType:enum=gateway_fee",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:subEntryType:enum=bank_charge",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:subEntryType:enum=adjustment",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:subEntryType:enum=rounding",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:subEntryType:enum=tip",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:subEntryType:enum=other",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:subEntryType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:feeStatus:enum=pending",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:feeStatus:enum=recorded",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:feeStatus:enum=waived",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:feeStatus:enum=disputed",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:feeStatus:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:limit:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:limit:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesGet:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesGet:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesGet:entryId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesGet:entryId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCounts:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCounts:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesVerify:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesVerify:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesVerify:entryId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesVerify:entryId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesVerify:note:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesVerify:note:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesVerify:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesVerify:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesVerify:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesVerify:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesApprove:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesApprove:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesApprove:entryId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesApprove:entryId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesApprove:note:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesApprove:note:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesApprove:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesApprove:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesApprove:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesApprove:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:entryId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:entryId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:reason:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:reason:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:reason:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:reason:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReject:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:entryId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:entryId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:reason:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:reason:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:reason:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:reason:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesReverse:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesUpdateNote:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesUpdateNote:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesUpdateNote:entryId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesUpdateNote:entryId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesUpdateNote:note:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesUpdateNote:note:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesUpdateNote:note:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesUpdateNote:note:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:parentEntryId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:parentEntryId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:subEntryType:enum=transaction_charge",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:subEntryType:enum=gateway_fee",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:subEntryType:enum=bank_charge",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:subEntryType:enum=adjustment",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:subEntryType:enum=rounding",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:subEntryType:enum=tip",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:subEntryType:enum=other",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:subEntryType:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:amount:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:amount:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:direction:enum=in",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:direction:enum=out",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:direction:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:notes:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:description:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:description:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesCreateSubEntry:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyGet:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyGet:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:minorUnitsThresholds.*:min",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:minorUnitsThresholds.*:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:selfApprovalPolicy:enum=off",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:selfApprovalPolicy:enum=up_to_limit",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:selfApprovalPolicy:enum=on",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:selfApprovalPolicy:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:selfApprovalLimits.*:min",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:selfApprovalLimits.*:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:roundingMode:enum=half_up",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:roundingMode:enum=half_even",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:roundingMode:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersConfirm:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersConfirm:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersConfirm:transferId:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersConfirm:transferId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersConfirm:notes:max",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersConfirm:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersConfirm:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersConfirm:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersConfirm:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersConfirm:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:transferId:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:transferId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:reason:max",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:reason:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:reason:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:reason:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "accountTransfersDispute:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:financialAccountId:min",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:financialAccountId:min-1",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:denominations.*:min",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:denominations.*:min-1",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:notes:max",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "cashCountsCreate:idempotencyKey:min-1",
+   "pass": true
+  },
+  {
+   "id": "cashCountsList:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "cashCountsList:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "cashCountsList:limit:max",
+   "pass": true
+  },
+  {
+   "id": "cashCountsList:limit:max+1",
+   "pass": true
+  },
+  {
+   "id": "cashCountsList:limit:min",
+   "pass": true
+  },
+  {
+   "id": "cashCountsList:limit:min-1",
+   "pass": true
+  },
+  {
+   "id": "cashCountsGet:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "cashCountsGet:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "cashCountsGet:countId:min",
+   "pass": true
+  },
+  {
+   "id": "cashCountsGet:countId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:entryId:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:entryId:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:feeAmount:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:feeAmount:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:feeTaxAmount:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:feeTaxAmount:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:notes:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:notes:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:idempotencyKey:max",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:idempotencyKey:max+1",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:idempotencyKey:min",
+   "pass": true
+  },
+  {
+   "id": "accountEntriesRecordFee:idempotencyKey:min-1",
    "pass": true
   },
   {
@@ -13980,6 +14764,54 @@
   },
   {
    "id": "reportsGetCashBankSummary:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:organizationId:min",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:organizationId:min-1",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:branchId:min",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:branchId:min-1",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:branchIds[]:min",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:branchIds[]:min-1",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:scope:enum=organization",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:scope:enum=branch",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:scope:enum=branches",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:scope:enum-invalid",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:branchIds[length]:max",
+   "pass": true
+  },
+  {
+   "id": "reportsGetBranchSummary:branchIds[length]:max+1",
    "pass": true
   },
   {

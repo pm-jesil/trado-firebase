@@ -557,6 +557,8 @@ export const reportsGetBranchSummary = onCall({ region: "asia-south1" }, async (
     organizationId: orgId,
     scope: input.scope || (input.branchId ? "branch" : input.branchIds ? "branches" : "organization"),
     branchSummaries,
+    branches: branchSummaries,
     orgTotals,
+    totals: orgTotals,
   };
 });

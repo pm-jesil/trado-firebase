@@ -4,9 +4,9 @@
 Back to [Master Index](./INDEX.md).
 
 ## `accountTransfersConfirm`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/cashFlows.ts:46`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/cashFlows.ts:48`
 - **Permission(s):** `accounts:transfer` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `cashFlows.update` (`none`) · **State Machine:** —
+- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account_transfer.confirm` (`mutation`) · **State Machine:** —
 
 **Input (`ConfirmAccountTransferSchema` — strict, unknown fields rejected):**
 
@@ -42,9 +42,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountTransfersDispute`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/cashFlows.ts:145`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/cashFlows.ts:147`
 - **Permission(s):** `accounts:transfer` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `cashFlows.action` (`none`) · **State Machine:** —
+- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account_transfer.dispute` (`mutation`) · **State Machine:** —
 
 **Input (`DisputeAccountTransferSchema` — strict, unknown fields rejected):**
 
@@ -80,9 +80,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `cashCountsCreate`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/cashFlows.ts:212`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/cashFlows.ts:214`
 - **Permission(s):** `accounts:manage` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `cashFlows.create` (`none`) · **State Machine:** —
+- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `cash_count.create` (`mutation`) · **State Machine:** —
 
 **Input (`CreateCashCountSchema` — strict, unknown fields rejected):**
 
@@ -120,9 +120,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `cashCountsList`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/cashFlows.ts:341`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/cashFlows.ts:344`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** No · **Audit:** `cashFlows.list` (`none`) · **State Machine:** —
+- **Idempotency:** No · **Audit:** `cash_count.list` (`none`) · **State Machine:** —
 
 **Input (`ListCashCountsSchema` — strict, unknown fields rejected):**
 
@@ -134,7 +134,7 @@ Back to [Master Index](./INDEX.md).
 | `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "items", "nextCursor", "totalCount" (20 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "items", "nextCursor", "totalCount" (21 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -155,9 +155,9 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `cashCountsGet`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/cashFlows.ts:374`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/cashFlows.ts:378`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** No · **Audit:** `cashFlows.read` (`none`) · **State Machine:** —
+- **Idempotency:** No · **Audit:** `cash_count.get` (`none`) · **State Machine:** —
 
 **Input (`GetCashCountSchema` — strict, unknown fields rejected):**
 
@@ -167,7 +167,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `countId` | `string` | **Yes** | {"minLength":2} | `count_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "count" (18 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "cashCount", "count" (38 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -178,15 +178,16 @@ Back to [Master Index](./INDEX.md).
     "countId": "count_001"
   },
   "response": {
+    "cashCount": "...",
     "count": 1
   }
 }
 ```
 
 ## `accountEntriesRecordFee`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/cashFlows.ts:395`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/cashFlows.ts:402`
 - **Permission(s):** `accounts:entry_create`, `accounts:manage` · **Module:** — · **Feature Flag:** —
-- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `cashFlows.update` (`none`) · **State Machine:** —
+- **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_record_fee` (`mutation`) · **State Machine:** —
 
 **Input (`RecordEntryFeeSchema` — strict, unknown fields rejected):**
 
@@ -200,7 +201,7 @@ Back to [Master Index](./INDEX.md).
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "feeAmount", "feeStatus", "parentEntryId", "subEntryId", "subEntryTransactionNumber" (5 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "feeAmount", "feeStatus", "linkedOutflowId", "linkedOutflowNumber", "needsReview", "parentEntryId", "subEntryId", "subEntryTransactionNumber" (8 typed leaf paths).
 **Declared Errors:** `FEE_ALREADY_RECORDED`, `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -217,6 +218,9 @@ Back to [Master Index](./INDEX.md).
   "response": {
     "feeAmount": "...",
     "feeStatus": "...",
+    "linkedOutflowId": "linkedOutflowId_001",
+    "linkedOutflowNumber": "...",
+    "needsReview": "...",
     "parentEntryId": "parentEntryId_001",
     "subEntryId": "subEntryId_001",
     "subEntryTransactionNumber": "..."

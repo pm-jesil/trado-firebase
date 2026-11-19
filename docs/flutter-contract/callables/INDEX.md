@@ -106,23 +106,23 @@ Total documented callables: **207** across **44** domains. Response shapes docum
 | `accountTransfersGet` | `financialAccounts` | `tenant` | `accounts:view` | — | READ endpoint in financialAccounts domain (account_transfer.get). | [financialAccounts.md](./financialAccounts.md) |
 | `capitalTransactionsCreate` | `financialAccounts` | `tenant` | `capital:manage` | — | CREATE endpoint in financialAccounts domain (capital_transaction.create). | [financialAccounts.md](./financialAccounts.md) |
 | `capitalTransactionsList` | `financialAccounts` | `tenant` | `capital:view` | — | LIST endpoint in financialAccounts domain (capital_transaction.list). | [financialAccounts.md](./financialAccounts.md) |
-| `accountEntriesList` | `accountEntries` | `tenant` | `accounts:view`, `ledger:view` | — | LIST endpoint in accountEntries domain (accountEntries.list). | [accountEntries.md](./accountEntries.md) |
-| `accountEntriesGet` | `accountEntries` | `tenant` | `accounts:view`, `ledger:view` | — | READ endpoint in accountEntries domain (accountEntries.read). | [accountEntries.md](./accountEntries.md) |
-| `accountEntriesCounts` | `accountEntries` | `tenant` | `accounts:view`, `ledger:view` | — | ACTION endpoint in accountEntries domain (accountEntries.action). | [accountEntries.md](./accountEntries.md) |
-| `accountEntriesVerify` | `accountEntries` | `tenant` | `accounts:manage`, `accounts:verify` (+1) | — | ACTION endpoint in accountEntries domain (accountEntries.action). | [accountEntries.md](./accountEntries.md) |
-| `accountEntriesApprove` | `accountEntries` | `tenant` | `accounts:approve`, `accounts:manage` (+1) | — | UPDATE endpoint in accountEntries domain (accountEntries.update). | [accountEntries.md](./accountEntries.md) |
-| `accountEntriesReject` | `accountEntries` | `tenant` | `accounts:approve`, `accounts:manage` (+1) | — | UPDATE endpoint in accountEntries domain (accountEntries.update). | [accountEntries.md](./accountEntries.md) |
-| `accountEntriesReverse` | `accountEntries` | `tenant` | `accounts:manage`, `accounts:reverse` | — | ACTION endpoint in accountEntries domain (accountEntries.action). | [accountEntries.md](./accountEntries.md) |
-| `accountEntriesUpdateNote` | `accountEntries` | `tenant` | `accounts:manage` | — | UPDATE endpoint in accountEntries domain (accountEntries.update). | [accountEntries.md](./accountEntries.md) |
-| `accountEntriesCreateSubEntry` | `accountEntries` | `tenant` | `accounts:entry_create`, `accounts:manage` | — | CREATE endpoint in accountEntries domain (accountEntries.create). | [accountEntries.md](./accountEntries.md) |
-| `accountingPolicyGet` | `accountEntries` | `tenant` | `accounts:view`, `org:manage_approval_policy` | — | READ endpoint in accountEntries domain (accountEntries.read). | [accountEntries.md](./accountEntries.md) |
-| `accountingPolicyUpdate` | `accountEntries` | `tenant` | `org:manage_approval_policy` | — | UPDATE endpoint in accountEntries domain (accountEntries.update). | [accountEntries.md](./accountEntries.md) |
-| `accountTransfersConfirm` | `cashFlows` | `tenant` | `accounts:transfer` | — | UPDATE endpoint in cashFlows domain (cashFlows.update). | [cashFlows.md](./cashFlows.md) |
-| `accountTransfersDispute` | `cashFlows` | `tenant` | `accounts:transfer` | — | ACTION endpoint in cashFlows domain (cashFlows.action). | [cashFlows.md](./cashFlows.md) |
-| `cashCountsCreate` | `cashFlows` | `tenant` | `accounts:manage` | — | CREATE endpoint in cashFlows domain (cashFlows.create). | [cashFlows.md](./cashFlows.md) |
-| `cashCountsList` | `cashFlows` | `tenant` | `accounts:view` | — | LIST endpoint in cashFlows domain (cashFlows.list). | [cashFlows.md](./cashFlows.md) |
-| `cashCountsGet` | `cashFlows` | `tenant` | `accounts:view` | — | READ endpoint in cashFlows domain (cashFlows.read). | [cashFlows.md](./cashFlows.md) |
-| `accountEntriesRecordFee` | `cashFlows` | `tenant` | `accounts:entry_create`, `accounts:manage` | — | UPDATE endpoint in cashFlows domain (cashFlows.update). | [cashFlows.md](./cashFlows.md) |
+| `accountEntriesList` | `accountEntries` | `tenant` | `accounts:view`, `ledger:view` | — | LIST endpoint in accountEntries domain (account.entries_list). | [accountEntries.md](./accountEntries.md) |
+| `accountEntriesGet` | `accountEntries` | `tenant` | `accounts:view`, `ledger:view` | — | READ endpoint in accountEntries domain (account.entries_get). | [accountEntries.md](./accountEntries.md) |
+| `accountEntriesCounts` | `accountEntries` | `tenant` | `accounts:view`, `ledger:view` | — | ACTION endpoint in accountEntries domain (account.entries_counts). | [accountEntries.md](./accountEntries.md) |
+| `accountEntriesVerify` | `accountEntries` | `tenant` | `accounts:manage`, `accounts:verify` (+1) | — | ACTION endpoint in accountEntries domain (account.entries_verify). | [accountEntries.md](./accountEntries.md) |
+| `accountEntriesApprove` | `accountEntries` | `tenant` | `accounts:approve`, `accounts:manage` (+1) | — | UPDATE endpoint in accountEntries domain (account.entries_approve). | [accountEntries.md](./accountEntries.md) |
+| `accountEntriesReject` | `accountEntries` | `tenant` | `accounts:approve`, `accounts:manage` (+1) | — | UPDATE endpoint in accountEntries domain (account.entries_reject). | [accountEntries.md](./accountEntries.md) |
+| `accountEntriesReverse` | `accountEntries` | `tenant` | `accounts:manage`, `accounts:reverse` | — | ACTION endpoint in accountEntries domain (account.entries_reverse). | [accountEntries.md](./accountEntries.md) |
+| `accountEntriesUpdateNote` | `accountEntries` | `tenant` | `accounts:manage` | — | UPDATE endpoint in accountEntries domain (account.entries_update_note). | [accountEntries.md](./accountEntries.md) |
+| `accountEntriesCreateSubEntry` | `accountEntries` | `tenant` | `accounts:entry_create`, `accounts:manage` | — | CREATE endpoint in accountEntries domain (account.entries_create_sub_entry). | [accountEntries.md](./accountEntries.md) |
+| `accountingPolicyGet` | `accountEntries` | `tenant` | `accounts:view`, `org:manage_approval_policy` | — | READ endpoint in accountEntries domain (accounting.policy_get). | [accountEntries.md](./accountEntries.md) |
+| `accountingPolicyUpdate` | `accountEntries` | `tenant` | `org:manage_approval_policy` | — | UPDATE endpoint in accountEntries domain (accounting.policy_update). | [accountEntries.md](./accountEntries.md) |
+| `accountTransfersConfirm` | `cashFlows` | `tenant` | `accounts:transfer` | — | UPDATE endpoint in cashFlows domain (account_transfer.confirm). | [cashFlows.md](./cashFlows.md) |
+| `accountTransfersDispute` | `cashFlows` | `tenant` | `accounts:transfer` | — | ACTION endpoint in cashFlows domain (account_transfer.dispute). | [cashFlows.md](./cashFlows.md) |
+| `cashCountsCreate` | `cashFlows` | `tenant` | `accounts:manage` | — | CREATE endpoint in cashFlows domain (cash_count.create). | [cashFlows.md](./cashFlows.md) |
+| `cashCountsList` | `cashFlows` | `tenant` | `accounts:view` | — | LIST endpoint in cashFlows domain (cash_count.list). | [cashFlows.md](./cashFlows.md) |
+| `cashCountsGet` | `cashFlows` | `tenant` | `accounts:view` | — | READ endpoint in cashFlows domain (cash_count.get). | [cashFlows.md](./cashFlows.md) |
+| `accountEntriesRecordFee` | `cashFlows` | `tenant` | `accounts:entry_create`, `accounts:manage` | — | UPDATE endpoint in cashFlows domain (account.entries_record_fee). | [cashFlows.md](./cashFlows.md) |
 | `paymentsRecordFee` | `paymentFees` | `tenant` | `payment:fee_manage` | — | UPDATE endpoint in paymentFees domain (payment.record_fee). | [paymentFees.md](./paymentFees.md) |
 | `paymentsVerifyFee` | `paymentFees` | `tenant` | `payment:fee_verify` | — | ACTION endpoint in paymentFees domain (payment.verify_fee). | [paymentFees.md](./paymentFees.md) |
 | `paymentsDisputeFee` | `paymentFees` | `tenant` | `payment:fee_manage` | — | ACTION endpoint in paymentFees domain (payment.dispute_fee). | [paymentFees.md](./paymentFees.md) |
@@ -170,7 +170,7 @@ Total documented callables: **207** across **44** domains. Response shapes docum
 | `reportsGetReceivablesAgeing` | `reports` | `tenant` | `receivables:view` | — | READ endpoint in reports domain (report.get_receivables_ageing). | [reports.md](./reports.md) |
 | `reportsGetPayablesAgeing` | `reports` | `tenant` | `payables:view` | — | READ endpoint in reports domain (report.get_payables_ageing). | [reports.md](./reports.md) |
 | `reportsGetCashBankSummary` | `reports` | `tenant` | `accounts:view` | — | READ endpoint in reports domain (report.get_cash_bank_summary). | [reports.md](./reports.md) |
-| `reportsGetBranchSummary` | `reports` | `tenant` | `branch:manage`, `report:view` | — | READ endpoint in reports domain (reports.read). | [reports.md](./reports.md) |
+| `reportsGetBranchSummary` | `reports` | `tenant` | `branch:manage`, `report:view` | — | READ endpoint in reports domain (report.get_branch_summary). | [reports.md](./reports.md) |
 | `platformUsersList` | `platformUsers` | `platform` | — | — | LIST endpoint in platformUsers domain (platform.users_list). | [platformUsers.md](./platformUsers.md) |
 | `platformUsersGet` | `platformUsers` | `platform` | — | — | READ endpoint in platformUsers domain (platform.users_get). | [platformUsers.md](./platformUsers.md) |
 | `auditGetEntityHistory` | `history` | `tenant` | `audit:read_own`, `audit:view` | — | READ endpoint in history domain (audit.get_entity_history). | [history.md](./history.md) |

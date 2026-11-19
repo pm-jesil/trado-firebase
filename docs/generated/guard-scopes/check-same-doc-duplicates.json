@@ -1,7 +1,7 @@
 {
   "guard": "check-same-doc-duplicates",
-  "runId": "check-same-doc-duplicates-mwn6rc4u",
-  "generatedAt": "2026-11-19T06:45:20.046Z",
+  "runId": "check-same-doc-duplicates-mwo3j0kz",
+  "generatedAt": "2026-11-19T22:02:39.155Z",
   "scanned": [
     "accountTransactions",
     "accountTransfers",
@@ -11,6 +11,8 @@
     "branchUsageDaily",
     "branchUsageMonthly",
     "capitalTransactions",
+    "carrierClaims",
+    "cashCounts",
     "categories",
     "counters",
     "customers",

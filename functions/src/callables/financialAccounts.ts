@@ -458,14 +458,16 @@ export const accountTransfersCreate = onCall({ region: "asia-south1" }, async (r
       transferType === "cash_deposit"
         ? "[Cash Deposit] "
         : transferType === "cash_withdrawal"
-        ? "[Cash Withdrawal] "
-        : transferType === "inter_bank"
-        ? "[Inter-Bank Transfer] "
-        : transferType === "petty_cash"
-        ? "[Petty Cash Replenishment] "
-        : transferType === "cashier_handover"
-        ? "[Cashier Shift Handover] "
-        : "";
+          ? "[Cash Withdrawal] "
+          : transferType === "inter_bank"
+            ? "[Inter-Bank Transfer] "
+            : transferType === "petty_cash"
+              ? "[Petty Cash Replenishment] "
+              : transferType === "cashier_handover"
+                ? "[Cashier Shift Handover] "
+                : "";
+
+    const isTransit = input.mode === "in_transit";
 
     if (!needsApproval) {
       sourceTxnResult = applyAccountTransactionInTxn(txn, sourcePrep, {
@@ -481,30 +483,34 @@ export const accountTransfersCreate = onCall({ region: "asia-south1" }, async (r
         now,
       });
 
-      destTxnResult = applyAccountTransactionInTxn(txn, destPrep, {
-        organizationId: orgId,
-        financialAccountId: input.destinationAccountId,
-        type: "transfer_in",
-        direction: "in",
-        amount: transferAmount,
-        sourceDocumentType: "account_transfer",
-        sourceDocumentId: transferId,
-        description: `${typeLabel}Transfer from ${sourcePrep.accountData.name} (${transferNumber})`,
-        actorUid: callerUid,
-        now,
-      });
+      if (!isTransit) {
+        destTxnResult = applyAccountTransactionInTxn(txn, destPrep, {
+          organizationId: orgId,
+          financialAccountId: input.destinationAccountId,
+          type: "transfer_in",
+          direction: "in",
+          amount: transferAmount,
+          sourceDocumentType: "account_transfer",
+          sourceDocumentId: transferId,
+          description: `${typeLabel}Transfer from ${sourcePrep.accountData.name} (${transferNumber})`,
+          actorUid: callerUid,
+          now,
+        });
+      }
     }
 
     const transferDoc: AccountTransferDoc = {
       organizationId: orgId,
       transferNumber,
       transferType,
+      mode: input.mode || "instant",
+      ...(input.reference ? { reference: input.reference } : {}),
       sourceAccountId: input.sourceAccountId,
       destinationAccountId: input.destinationAccountId,
       sourceBranchId: sourcePrep.accountData.branchId || null,
       destinationBranchId: destPrep.accountData.branchId || null,
       amount: transferAmount,
-      status: needsApproval ? "pending_approval" : "completed",
+      status: needsApproval ? "pending_approval" : (isTransit ? "in_transit" : "completed"),
       ...(input.notes ? { notes: input.notes } : {}),
       ...(sourceTxnResult ? { sourceTransactionId: sourceTxnResult.transactionId } : {}),
       ...(destTxnResult ? { destinationTransactionId: destTxnResult.transactionId } : {}),

@@ -819,6 +819,50 @@
       "serverWritten": true,
       "cap": 20,
       "reason": "Tax snapshot breakdown line items array computed deterministically by taxCalculation engine."
+    },
+    {
+      "id": "DUP-101",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "accountTransactions",
+      "field": "reviewReasons",
+      "owner": "accountTransactions",
+      "serverWritten": true,
+      "writerFunction": "prepareEntriesInTxn",
+      "cap": 10,
+      "reason": "Flagged review reasons array on ledger transactions bounded by prepareEntriesInTxn."
+    },
+    {
+      "id": "DUP-102",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "accountTransactions",
+      "field": "workflow.updatedByUids",
+      "owner": "accountTransactions",
+      "serverWritten": true,
+      "writerFunction": "updateEntryWorkflowInTxn",
+      "cap": 20,
+      "reason": "Audit trail of actor UIDs who updated the entry note, bounded to at most 20 actors."
+    },
+    {
+      "id": "DUP-103",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "accountTransactions",
+      "field": "workflow.verifiedBy",
+      "owner": "accountTransactions",
+      "serverWritten": true,
+      "writerFunction": "updateEntryWorkflowInTxn",
+      "cap": 10,
+      "reason": "Audit list of verification actors and timestamps for maker-checker review, bounded to at most 10 verifiers."
+    },
+    {
+      "id": "DUP-104",
+      "kind": "BOUNDED_ARRAY",
+      "collection": "accountTransactions",
+      "field": "workflow.approvedBy",
+      "owner": "accountTransactions",
+      "serverWritten": true,
+      "writerFunction": "updateEntryWorkflowInTxn",
+      "cap": 10,
+      "reason": "Audit list of approval actors and timestamps for multi-level approval, bounded to at most 10 approvers."
     }
   ]
 }

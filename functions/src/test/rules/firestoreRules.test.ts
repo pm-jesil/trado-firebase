@@ -65,6 +65,7 @@ const RULES_MATRIX: Record<string, { path: string; data?: Record<string, unknown
     "documentCounters", "idempotencyRecords", "auditLogs", "notificationOutbox", "uniqueKeys", "imageUploadSessions",
     "accountTransactions", "accountTransfers", "branchProductStock", "capitalTransactions", "counters", "financialAccounts",
     "journalEntries", "paymentProcessingFees", "platformSettings", "requests", "stockTransfers", "storageLocations",
+    "carrierClaims", "cashCounts",
   ].map((c) => [c, { path: `${c}/x1`, readers: NOBODY }])),
 };
 

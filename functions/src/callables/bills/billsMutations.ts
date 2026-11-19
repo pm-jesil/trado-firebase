@@ -721,7 +721,7 @@ export const billsVoid = onCall({ region: "asia-south1" }, async (request) => {
       if (custRef && custSnap?.exists) {
         const cust = custSnap.data() as CustomerDoc;
         const totalPaid = bill.paidAmount || 0;
-        const custUpdates: Record<string, any> = {
+        const custUpdates: Partial<CustomerDoc> = {
           totalSpend: Money.amount((cust.totalSpend || 0) - bill.totalAmount),
           outstandingBalance: Money.amount((cust.outstandingBalance || 0) - bill.balanceAmount),
           updatedAt: now,

@@ -282,7 +282,7 @@ function collectNumbers(options = {}) {
     byGate[g] = (byGate[g] || 0) + 1;
   }
 
-  const colInfo = truth.getCollections();
+  const colInfo = truth.getCollections({ skipRules: options.skipRules });
   const docTypes = truth.getDocTypes();
   const pkg = JSON.parse(fs.readFileSync(path.join(FUNCTIONS_DIR, "package.json"), "utf8"));
 

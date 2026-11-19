@@ -1,7 +1,7 @@
 {
   "guard": "check-raw-field-census",
-  "runId": "check-raw-field-census-mwn6qp15",
-  "generatedAt": "2026-11-19T06:44:50.105Z",
+  "runId": "check-raw-field-census-mwo3ig1b",
+  "generatedAt": "2026-11-19T22:02:12.527Z",
   "scanned": [
     "accountTransactions",
     "accountTransfers",
@@ -11,6 +11,8 @@
     "branchUsageDaily",
     "branchUsageMonthly",
     "capitalTransactions",
+    "carrierClaims",
+    "cashCounts",
     "categories",
     "counters",
     "customers",

@@ -151,6 +151,17 @@ const CLASSIFICATION_DEFINITIONS = {
         "stockTransfersReceive",
         "stockTransfersCancel",
         "stockTransfersResolveDiscrepancy",
+        "accountEntriesVerify",
+        "accountEntriesApprove",
+        "accountEntriesReject",
+        "accountEntriesReverse",
+        "accountEntriesUpdateNote",
+        "accountEntriesCreateSubEntry",
+        "accountingPolicyUpdate",
+        "accountTransfersConfirm",
+        "accountTransfersDispute",
+        "cashCountsCreate",
+        "accountEntriesRecordFee",
       ],
       "Stock & Reconciliation": [
         "stockAdjust",
@@ -238,6 +249,12 @@ const CLASSIFICATION_DEFINITIONS = {
         "stockTransfersGet",
         "approvalsList",
         "approvalsCounts",
+        "accountEntriesList",
+        "accountEntriesGet",
+        "accountEntriesCounts",
+        "accountingPolicyGet",
+        "cashCountsList",
+        "cashCountsGet",
       ],
       "Reports & Telemetry": [
         "reportsGetRevenue",
@@ -252,6 +269,7 @@ const CLASSIFICATION_DEFINITIONS = {
         "reportsGetPayablesAgeing",
         "reportsGetCashBankSummary",
         "reportsGetTrialBalance",
+        "reportsGetBranchSummary",
         "tasksList",
         "locationsGetLatest",
         "locationsGetHistory",
@@ -427,6 +445,8 @@ const COLLECTION_DOMAINS = {
   "paymentProcessingFees": "Operations & Transactions",
   "stockTransfers": "Catalog & Inventory",
   "storageLocations": "Catalog & Inventory",
+  "carrierClaims": "Operations & Transactions",
+  "cashCounts": "Operations & Transactions",
 };
 
 function deriveCollections() {

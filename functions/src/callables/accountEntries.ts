@@ -29,6 +29,7 @@ import { parseInput } from "../validation/parseInput.js";
 import {
   AccountTransactionDoc,
   OrganizationDoc,
+  AccountingPolicy,
 } from "../types/models.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { AppPermissions } from "../constants/permissions.js";
@@ -100,12 +101,13 @@ export const accountEntriesList = onCall({ region: "asia-south1" }, async (reque
   );
 
   const entries = snapshot.docs.map((d) => ({
+    id: d.id,
     transactionId: d.id,
     entryId: d.id,
     ...(d.data() as AccountTransactionDoc),
   }));
 
-  return { entries, nextCursor, totalCount };
+  return { items: entries, entries, count: entries.length, nextCursor, totalCount };
 });
 
 // ============================================================================
@@ -145,20 +147,20 @@ export const accountEntriesGet = onCall({ region: "asia-south1" }, async (reques
   }));
 
   // Fetch linked reversed or reversal entries if applicable
-  let reversedEntry: Partial<AccountTransactionDoc> | null = null;
+  let reversedEntry: (Partial<AccountTransactionDoc> & { transactionId?: string }) | null = null;
   if (entry.reversedTransactionId) {
     const revSnap = await db.collection("accountTransactions").doc(entry.reversedTransactionId).get();
-    if (revSnap.exists) reversedEntry = { transactionId: revSnap.id, ...revSnap.data() } as any;
+    if (revSnap.exists) reversedEntry = { transactionId: revSnap.id, ...(revSnap.data() as AccountTransactionDoc) };
   }
 
-  let reversalEntry: Partial<AccountTransactionDoc> | null = null;
+  let reversalEntry: (Partial<AccountTransactionDoc> & { transactionId?: string }) | null = null;
   if (entry.reversalTransactionId) {
     const revSnap = await db.collection("accountTransactions").doc(entry.reversalTransactionId).get();
-    if (revSnap.exists) reversalEntry = { transactionId: revSnap.id, ...revSnap.data() } as any;
+    if (revSnap.exists) reversalEntry = { transactionId: revSnap.id, ...(revSnap.data() as AccountTransactionDoc) };
   }
 
   return {
-    entry: { transactionId: entrySnap.id, entryId: entrySnap.id, ...entry },
+    entry: { id: entrySnap.id, transactionId: entrySnap.id, entryId: entrySnap.id, ...entry },
     subEntries,
     reversedEntry,
     reversalEntry,
@@ -545,7 +547,7 @@ export const accountEntriesUpdateNote = onCall({ region: "asia-south1" }, async 
     });
   });
 
-  return { entryId: input.entryId, description: input.note, updatedAt: now };
+  return { entryId: input.entryId, note: input.note, notes: input.note, description: input.note, updatedAt: now };
 });
 
 // ============================================================================
@@ -566,8 +568,8 @@ export const accountEntriesCreateSubEntry = onCall({ region: "asia-south1" }, as
     scope: orgId,
     actorUid: ctx.callerUid,
     operation: "account_entries.create_sub_entry",
-    clientKey: input.idempotencyKey || `sub_${input.parentEntryId}_${input.subEntryType}`,
-    payload: { parentEntryId: input.parentEntryId, amount: input.amount },
+    clientKey: input.idempotencyKey,
+    payload: request.data,
   });
   if (idempotency.isDuplicate) {
     if (idempotency.isProcessing) throw new HttpsError("already-exists", "Operation in progress. Please retry shortly.");
@@ -663,8 +665,8 @@ export const accountingPolicyGet = onCall({ region: "asia-south1" }, async (requ
   });
   const orgId = ctx.organizationId;
 
-  const orgDoc = (await db.collection("organizations").doc(orgId).get()).data() as OrganizationDoc;
-  const policy = (orgDoc as any)?.settings?.accountingPolicy || {
+  const orgDoc = (await db.collection("organizations").doc(orgId).get()).data() as OrganizationDoc | undefined;
+  const policy: AccountingPolicy = orgDoc?.settings?.accountingPolicy || {
     minorUnitsThresholds: { BHD: 200000, AED: 200000, INR: 5000000 },
     selfApprovalPolicy: "off",
     selfApprovalLimits: { BHD: 50000, AED: 50000, INR: 1000000 },
@@ -691,7 +693,8 @@ export const accountingPolicyUpdate = onCall({ region: "asia-south1" }, async (r
   const orgSnap = await orgRef.get();
   if (!orgSnap.exists) throw new HttpsError("not-found", "Organization not found.");
 
-  const currentPolicy = ((orgSnap.data() as any)?.settings?.accountingPolicy) || {
+  const orgData = orgSnap.data() as OrganizationDoc | undefined;
+  const currentPolicy: AccountingPolicy = orgData?.settings?.accountingPolicy || {
     minorUnitsThresholds: { BHD: 200000, AED: 200000, INR: 5000000 },
     selfApprovalPolicy: "off",
     selfApprovalLimits: { BHD: 50000, AED: 50000, INR: 1000000 },

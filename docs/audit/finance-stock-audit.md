@@ -95,7 +95,7 @@
 ### A-3.1 Ledger Model Analysis
 - **Collection:** `accountTransactions`
 - **Model Architecture:** Single-entry per-account ledger with running `balanceAfter` (not a double-entry journal). Contra transfers write two separate single-entry documents.
-- **Immutability:** Implemented. Updates to financial fields are prohibited. However, entries lack a `status` field (`created`, `added`, `verified`, `approved`). All entries are immediately posted (`added`).
+- **Immutability:** Implemented. Updates to financial fields are prohibited. However, entries lack entry lifecycle states (created, added, statement-checked, approved). Individual entries are posted directly (added).
 - **Two-Phase Commit:** Implemented via `prepareAccountTransactionInTxn` and `applyAccountTransactionInTxn`.
 
 ### A-3.2 Actors, Status & Reporting Line

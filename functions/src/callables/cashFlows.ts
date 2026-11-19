@@ -25,7 +25,9 @@ import {
   FinancialAccountDoc,
   AccountTransactionDoc,
   OrganizationDoc,
+  OutflowDoc,
 } from "../types/models.js";
+import { OutflowKind, OutflowStatus, PaymentStatus } from "../constants/enums.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { AppPermissions } from "../constants/permissions.js";
 import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
@@ -263,11 +265,10 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
         organizationId: orgId,
         type: "CNT",
       });
-      commitDocumentNumberInTxn(txn, reservation);
       const countNumber = reservation.formattedNumber;
 
       const orgData = (orgSnap.exists ? orgSnap.data() : null) as OrganizationDoc | null;
-      const thresholdMinor = (orgData as any)?.accountingPolicy?.cashCountVarianceThresholdMinor || 100000;
+      const thresholdMinor = orgData?.settings?.accountingPolicy?.cashCountVarianceThresholdMinor || 100000;
       const reviewThresholdMinor = Math.floor(thresholdMinor / 2);
 
       let varianceTransactionId: string | null = null;
@@ -298,6 +299,8 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
         const postResult = applyEntriesInTxn(txn, prep);
         varianceTransactionId = postResult.results[0].transactionId;
       }
+
+      commitDocumentNumberInTxn(txn, reservation);
 
       const countRef = db.collection("cashCounts").doc();
       const countDoc: CashCountDoc = {
@@ -364,6 +367,7 @@ export const cashCountsList = onCall({ region: "asia-south1" }, async (request) 
   const { snapshot, nextCursor } = await fetchPage(query, "cashCounts", input.startAfterId, input.limit || 50);
 
   const items = snapshot.docs.map((d) => ({
+    id: d.id,
     countId: d.id,
     ...(d.data() as CashCountDoc),
   }));
@@ -386,7 +390,10 @@ export const cashCountsGet = onCall({ region: "asia-south1" }, async (request) =
   const data = countSnap.data() as CashCountDoc;
   if (data.organizationId !== orgId) throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
 
-  return { count: { countId: countSnap.id, ...data } };
+  return {
+    cashCount: { id: countSnap.id, countId: countSnap.id, ...data },
+    count: { id: countSnap.id, countId: countSnap.id, ...data },
+  };
 });
 
 // ============================================================================
@@ -427,6 +434,35 @@ export const accountEntriesRecordFee = onCall({ region: "asia-south1" }, async (
         throw new HttpsError("failed-precondition", "Fee has already been recorded for this entry.", { reason: "FEE_ALREADY_RECORDED" });
       }
 
+      // Check account fee rule for variance detection
+      const accRef = db.collection("financialAccounts").doc(parent.financialAccountId);
+      const accSnap = await txn.get(accRef);
+      const account = accSnap.exists ? (accSnap.data() as FinancialAccountDoc) : null;
+
+      let hasVariance = false;
+      let reviewReasons: string[] | undefined = undefined;
+      const totalFee = input.feeAmount + (input.feeTaxAmount || 0);
+
+      if (account?.feeRule) {
+        const fixed = account.feeRule.feeFixed ?? 0;
+        const pct = account.feeRule.feePercent ?? 0;
+        const taxPct = account.feeRule.feeTaxPercent ?? 0;
+        const gross = parent.amount;
+        const baseFee = fixed + Math.round((gross * pct) / 100);
+        const feeTax = Math.round((baseFee * taxPct) / 100);
+        const expectedFee = baseFee + feeTax;
+        if (totalFee !== expectedFee) {
+          hasVariance = true;
+          reviewReasons = ["fee_variance"];
+        }
+      }
+
+      // Reserve document numbers: EXP for linked expense
+      const expRes = await readNextDocumentNumberInTxn(txn, {
+        organizationId: orgId,
+        type: "EXP",
+      });
+
       // Create linked child sub-entry of type "gateway_fee"
       const prep = await prepareEntriesInTxn(txn, {
         organizationId: orgId,
@@ -447,12 +483,55 @@ export const accountEntriesRecordFee = onCall({ region: "asia-south1" }, async (
             parentEntryId: snap.id,
             subEntryType: "gateway_fee",
             status: "added",
+            needsReview: hasVariance,
+            reviewReasons,
           },
         ],
       });
 
+      commitDocumentNumberInTxn(txn, expRes);
       const postResult = applyEntriesInTxn(txn, prep);
       const subEntry = postResult.results[0];
+
+      // Create linked Outflows expense document
+      const outflowRef = db.collection("outflows").doc();
+      const outflowDoc: OutflowDoc = {
+        organizationId: orgId,
+        branchId: parent.branchId || undefined,
+        outflowNumber: expRes.formattedNumber,
+        kind: OutflowKind.EXPENSE,
+        status: OutflowStatus.CONFIRMED,
+        paymentStatus: PaymentStatus.PAID,
+        docDate: now,
+        payeeType: "other",
+        payee: "Payment Gateway / Bank",
+        expenseCategoryId: "payment_processing_fees",
+        lines: [
+          {
+            lineId: "L1",
+            itemName: "Payment processing fee",
+            quantity: 1,
+            unit: "unit",
+            unitPrice: totalFee,
+            grossAmount: totalFee,
+            discountAmount: 0,
+            taxAmount: input.feeTaxAmount || 0,
+            lineTotal: totalFee,
+            addToStock: false,
+          },
+        ],
+        subTotal: input.feeAmount,
+        discountTotal: 0,
+        taxTotal: input.feeTaxAmount || 0,
+        totalAmount: totalFee,
+        paidAmount: totalFee,
+        balanceAmount: 0,
+        financialAccountId: parent.financialAccountId,
+        notes: input.notes || `Gateway fee for ${parent.transactionNumber}`,
+        createdAt: now,
+        createdBy: ctx.callerUid,
+      };
+      txn.set(outflowRef, outflowDoc);
 
       // Update parent entry feeStatus
       updateEntryWorkflowInTxn(txn, entryRef, parent, {
@@ -469,6 +548,9 @@ export const accountEntriesRecordFee = onCall({ region: "asia-south1" }, async (
         subEntryTransactionNumber: subEntry.transactionNumber,
         feeAmount: input.feeAmount,
         feeStatus: "recorded",
+        linkedOutflowId: outflowRef.id,
+        linkedOutflowNumber: expRes.formattedNumber,
+        needsReview: hasVariance,
       };
     });
 

@@ -51,7 +51,7 @@
 | `financial_account` | `financialAccountsCreate` | 4 | 16 | 15 |
 | `storage_location` | `storageLocationsCreate` | 3 | 20 | 20 |
 | `stock_transfer` | `stockTransfersCreate` | 4 | 16 | 0 |
-| `account_transfer` | `accountTransfersCreate` | 3 | 5 | 0 |
+| `account_transfer` | `accountTransfersCreate` | 3 | 7 | 0 |
 | `payment_processing_fee` | `paymentsRecordFee` | 5 | 9 | 0 |
 | `capital_transaction` | `capitalTransactionsCreate` | 3 | 7 | 0 |
 | `user_profile` | `usersUpdateMe` | 0 | 11 | 11 |

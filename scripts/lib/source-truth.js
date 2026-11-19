@@ -492,7 +492,7 @@ function rulesCollectionKey(matchPath) {
   return names.join("/");
 }
 
-function getCollections() {
+function getCollections(options = {}) {
   const parents = subcollectionParents();
   const names = new Set();
   const usedIn = {};
@@ -507,6 +507,9 @@ function getCollections() {
     const parent = parents[name];
     return { key: parent ? `${parent}/${name}` : name, name, parent: parent || null, type: parent ? "subcollection" : "root", usedIn: [...usedIn[name]].sort() };
   });
+  if (options.skipRules) {
+    return { collections, explicitRules: [], rulesNotInRegistry: [], defaultDeny: [] };
+  }
   const keys = new Set(collections.map((c) => c.key));
   const rules = getRules().firestore;
   const explicitRules = rules.matches.map((m) => ({ ...m, key: rulesCollectionKey(m.path) })).filter((m) => m.key);

@@ -1,6 +1,6 @@
 {
-  "runId": "rules-mwn6ecje",
-  "generatedAt": "2026-11-19T06:35:14.042Z",
+  "runId": "rules-mwo21lah",
+  "generatedAt": "2026-11-19T21:21:06.569Z",
   "firestore": {
     "38:read": {
       "allowed": 4,
@@ -28,11 +28,11 @@
     },
     "66:read": {
       "allowed": 45,
-      "denied": 1257
+      "denied": 1293
     },
     "70:read": {
       "allowed": 20,
-      "denied": 854
+      "denied": 878
     },
     "75:read": {
       "allowed": 0,
@@ -76,7 +76,7 @@
     }
   },
   "firestoreMeta": {
-    "projectId": "trado-x-rules-mwn6dr4u",
+    "projectId": "trado-x-rules-mwo213fo",
     "recordedOutcomes": 12
   },
   "storage": {

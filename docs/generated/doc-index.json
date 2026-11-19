@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "totalDocuments": 213,
+  "totalDocuments": 235,
   "countsByClassification": {
-    "KEEP+UPDATE": 60,
+    "KEEP+UPDATE": 79,
     "REWRITE": 2,
-    "ARCHIVE": 19,
-    "GENERATED": 132
+    "ARCHIVE": 20,
+    "GENERATED": 134
   },
   "documents": [
     {
@@ -24,7 +24,7 @@
       "path": "docs/api-reference.md",
       "title": "Trado API Reference",
       "classification": "KEEP+UPDATE",
-      "lineCount": 1267
+      "lineCount": 1287
     },
     {
       "path": "docs/architecture.md",
@@ -147,6 +147,12 @@
       "lineCount": null
     },
     {
+      "path": "docs/audit/finance-stock-audit.md",
+      "title": "Trado Finance, Money & Stock Integrity Audit (Prompt 77 — BF0)",
+      "classification": "ARCHIVE",
+      "lineCount": 150
+    },
+    {
       "path": "docs/audit/flutter-gate.md",
       "title": "Final Backend Gate Verdict — Prompt 69 (G1–G5)",
       "classification": "ARCHIVE",
@@ -156,7 +162,7 @@
       "path": "docs/audit/handoff.md",
       "title": "Trado Engineering Handoff (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 87
+      "lineCount": 129
     },
     {
       "path": "docs/audit/implementation-status.md",
@@ -222,7 +228,7 @@
       "path": "docs/audit/run-ledger.md",
       "title": "Trado Engineering Run Ledger (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 36
+      "lineCount": 38
     },
     {
       "path": "docs/audit/test-coverage-matrix.md",
@@ -276,13 +282,13 @@
       "path": "docs/data-model.md",
       "title": "Trado Data Model & Schema Specification",
       "classification": "KEEP+UPDATE",
-      "lineCount": 946
+      "lineCount": 950
     },
     {
       "path": "docs/decisions/decision-register.md",
       "title": "Trado Architectural Decision Register (D-1 .. D-61)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 102
+      "lineCount": 125
     },
     {
       "path": "docs/decisions-log.md",
@@ -399,6 +405,120 @@
       "lineCount": 328
     },
     {
+      "path": "docs/flows/FL-01.md",
+      "title": "FL-01: Cash Sale & Immediate Ledger Posting",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 59
+    },
+    {
+      "path": "docs/flows/FL-02.md",
+      "title": "FL-02: Split-Tender Sale (Cash + Card + UPI)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 59
+    },
+    {
+      "path": "docs/flows/FL-03.md",
+      "title": "FL-03: Credit Sale & Subsequent Customer Collection",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 53
+    },
+    {
+      "path": "docs/flows/FL-04.md",
+      "title": "FL-04: Direct Vendor Purchase & Payment Voucher",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 44
+    },
+    {
+      "path": "docs/flows/FL-05.md",
+      "title": "FL-05: Vendor Credit Purchase & Subsequent Settlement",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 45
+    },
+    {
+      "path": "docs/flows/FL-06.md",
+      "title": "FL-06: Operational Expense Posting (Cash & Bank)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 43
+    },
+    {
+      "path": "docs/flows/FL-07.md",
+      "title": "FL-07: Sales Return with Cash Refund",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 49
+    },
+    {
+      "path": "docs/flows/FL-08.md",
+      "title": "FL-08: Sales Return with Customer Store Credit",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 45
+    },
+    {
+      "path": "docs/flows/FL-09.md",
+      "title": "FL-09: Purchase Return with Debit Note / Bank Refund",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 36
+    },
+    {
+      "path": "docs/flows/FL-10.md",
+      "title": "FL-10: Inter-Branch Stock Transfer (Dispatch -> Transit -> Receipt)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 72
+    },
+    {
+      "path": "docs/flows/FL-11.md",
+      "title": "FL-11: Inter-Branch Transfer Discrepancy & Damage Write-Off",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 49
+    },
+    {
+      "path": "docs/flows/FL-12.md",
+      "title": "FL-12: Intra-Branch Location Move (Internal Stock Transfer)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 39
+    },
+    {
+      "path": "docs/flows/FL-13.md",
+      "title": "FL-13: Stock Transfer Cancel-After-Dispatch (In-Transit Reversal)",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 39
+    },
+    {
+      "path": "docs/flows/FL-14.md",
+      "title": "FL-14: Cashier Shift Handover & Receiver Confirmation",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 42
+    },
+    {
+      "path": "docs/flows/FL-15.md",
+      "title": "FL-15: Day-End Physical Cash Count & Variance Adjustment",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 43
+    },
+    {
+      "path": "docs/flows/FL-16.md",
+      "title": "FL-16: Card Gateway Interchange Fee Recording & Settlement",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 31
+    },
+    {
+      "path": "docs/flows/FL-17.md",
+      "title": "FL-17: Cash Bank Deposit & Inter-Account Transfers",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 42
+    },
+    {
+      "path": "docs/flows/FL-18.md",
+      "title": "FL-18: Maker-Checker Document & Entry Approval Workflow",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 41
+    },
+    {
+      "path": "docs/flows/FL-19.md",
+      "title": "FL-19: Cross-Branch Comparative Performance & Liquidity Summary",
+      "classification": "KEEP+UPDATE",
+      "lineCount": 29
+    },
+    {
       "path": "docs/flutter-client-integration.md",
       "title": "Trado Firebase Backend — Flutter Web Client Integration Guide",
       "classification": "KEEP+UPDATE",
@@ -413,6 +533,12 @@
     {
       "path": "docs/flutter-contract/auth.md",
       "title": "Authentication & Session Bootstrap Contract (`authMe` / `authLogin`)",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/accountEntries.md",
+      "title": "Callable API Reference — `accountEntries`",
       "classification": "GENERATED",
       "lineCount": null
     },
@@ -443,6 +569,12 @@
     {
       "path": "docs/flutter-contract/callables/branches.md",
       "title": "Callable API Reference — `branches`",
+      "classification": "GENERATED",
+      "lineCount": null
+    },
+    {
+      "path": "docs/flutter-contract/callables/cashFlows.md",
+      "title": "Callable API Reference — `cashFlows`",
       "classification": "GENERATED",
       "lineCount": null
     },
