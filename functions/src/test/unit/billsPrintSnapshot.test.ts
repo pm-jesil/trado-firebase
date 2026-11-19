@@ -1,6 +1,10 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { buildBillPrintSnapshot } from "../../callables/bills/helpers.js";
+import {
+  buildBillPrintSnapshot,
+  buildPaymentPrintSnapshot,
+  buildCreditNotePrintSnapshot,
+} from "../../callables/bills/helpers.js";
 
 describe("BC4.1 / Q-B8: Complete Print Snapshot for Bills/Receipts", () => {
   const sampleOrg = {
@@ -128,10 +132,137 @@ describe("BC4.1 / Q-B8: Complete Print Snapshot for Bills/Receipts", () => {
     };
 
     const snap = buildBillPrintSnapshot(sampleOrg as any, walkInBill as any);
-    assert.strictEqual(snap.invoiceTitle, "RETAIL INVOICE");
+    assert.strictEqual(snap.invoiceTitle, "SALES RECEIPT");
     assert.strictEqual(snap.customer, null);
     assert.strictEqual(snap.totals.totalAmount, 1500);
     assert.strictEqual(snap.totals.balanceAmount, 0);
     assert.strictEqual(snap.organization.bankAccounts[0].accountNumber, "****5678");
+  });
+
+  it("Generates a payment print snapshot for customer collections and vendor vouchers [paymentsCreate#ok]", () => {
+    const customerPayment = {
+      paymentNumber: "PAY-2026-000001",
+      direction: "in",
+      partyName: "Acme Enterprises",
+      partyType: "customer",
+      partyPhone: "+919123456780",
+      partyTaxId: "27AAACA1234A1Z5",
+      amount: 50000,
+      method: "upi",
+      referenceId: "INV-2026-00042",
+      allocations: [{ documentId: "INV-2026-00042", documentType: "bill", amount: 50000 }],
+      notes: "Advance installment via UPI",
+      createdAt: "2026-11-19T09:00:00.000Z",
+    };
+
+    const receiptSnap = buildPaymentPrintSnapshot(sampleOrg as any, customerPayment as any);
+    assert.strictEqual(receiptSnap.version, 1);
+    assert.strictEqual(receiptSnap.voucherTitle, "PAYMENT RECEIPT");
+    assert.strictEqual(receiptSnap.paymentNumber, "PAY-2026-000001");
+    assert.strictEqual(receiptSnap.issueDate, "2026-11-19");
+    assert.strictEqual(receiptSnap.amount, 50000);
+    assert.strictEqual(receiptSnap.paymentMethod, "upi");
+    assert.strictEqual(receiptSnap.party?.name, "Acme Enterprises");
+    assert.strictEqual(receiptSnap.allocations.length, 1);
+    assert.strictEqual(receiptSnap.organization.bankAccounts[0].accountNumber, "****5678");
+
+    const vendorPayment = {
+      paymentNumber: "PAY-2026-000002",
+      direction: "out",
+      partyName: "Steel Suppliers Ltd",
+      partyType: "vendor",
+      amount: 75000,
+      method: "bank_transfer",
+      allocations: [{ documentId: "PUR-2026-00010", documentType: "outflow", amount: 75000 }],
+      createdAt: "2026-11-19T09:30:00.000Z",
+    };
+
+    const voucherSnap = buildPaymentPrintSnapshot(sampleOrg as any, vendorPayment as any);
+    assert.strictEqual(voucherSnap.voucherTitle, "PAYMENT VOUCHER");
+    assert.strictEqual(voucherSnap.direction, "out");
+    assert.strictEqual(voucherSnap.amount, 75000);
+  });
+
+  it("Generates a credit note print snapshot for sales returns [returnsCreate#ok]", () => {
+    const salesReturn = {
+      returnNumber: "RET-2026-000001",
+      returnType: "sales_return",
+      referenceId: "INV-2026-00042",
+      customerSnapshot: {
+        name: "Acme Enterprises",
+        phone: "+919123456780",
+        taxId: "27AAACA1234A1Z5",
+        address: "45 Industrial Area, Pune",
+      },
+      items: [
+        {
+          sourceLineId: "line_1",
+          productId: "prod_widget_a",
+          name: "Standard Steel Widget",
+          quantity: 2,
+          unitPrice: 10000,
+          refundAmount: 21240,
+          reason: "Damaged packaging",
+          disposition: "restocked_to_inventory",
+        },
+      ],
+      totalRefundAmount: 21240,
+      refundMethod: "credit_note",
+      notes: "Customer accepted store credit",
+      createdAt: "2026-11-19T10:00:00.000Z",
+    };
+
+    const cnSnap = buildCreditNotePrintSnapshot(sampleOrg as any, salesReturn as any);
+    assert.strictEqual(cnSnap.version, 1);
+    assert.strictEqual(cnSnap.documentTitle, "CREDIT NOTE");
+    assert.strictEqual(cnSnap.returnNumber, "RET-2026-000001");
+    assert.strictEqual(cnSnap.issueDate, "2026-11-19");
+    assert.strictEqual(cnSnap.referenceId, "INV-2026-00042");
+    assert.strictEqual(cnSnap.customer?.name, "Acme Enterprises");
+    assert.strictEqual(cnSnap.items.length, 1);
+    assert.strictEqual(cnSnap.items[0].quantity, 2);
+    assert.strictEqual(cnSnap.items[0].refundAmount, 21240);
+    assert.strictEqual(cnSnap.totalRefundAmount, 21240);
+    assert.strictEqual(cnSnap.refundMethod, "credit_note");
+    assert.strictEqual(cnSnap.organization.bankAccounts[0].accountNumber, "****5678");
+
+    const purchaseReturn = {
+      returnNumber: "RET-2026-000002",
+      returnType: "purchase_return",
+      referenceId: "PUR-2026-00010",
+      totalRefundAmount: 15000,
+    };
+    const dnSnap = buildCreditNotePrintSnapshot(sampleOrg as any, purchaseReturn as any);
+    assert.strictEqual(dnSnap.documentTitle, "DEBIT NOTE");
+  });
+
+  it("Honors printOnInvoice: true to publish full account number on invoices while masking others (Q-F7)", () => {
+    const orgWithPublishedBank = {
+      ...sampleOrg,
+      bankAccounts: [
+        {
+          id: "ba_pub",
+          bankName: "HDFC Bank",
+          accountHolderName: "Trado Retail Pvt Ltd",
+          accountNumber: "50100012345678",
+          routingType: "ifsc",
+          routingCode: "HDFC0001234",
+          printOnInvoice: true,
+        },
+        {
+          id: "ba_priv",
+          bankName: "ICICI Bank",
+          accountHolderName: "Trado Retail Pvt Ltd",
+          accountNumber: "12345678901234",
+          routingType: "ifsc",
+          routingCode: "ICIC0001234",
+          printOnInvoice: false,
+        },
+      ],
+    };
+
+    const snap = buildBillPrintSnapshot(orgWithPublishedBank as any, sampleBill as any);
+    assert.strictEqual(snap.organization.bankAccounts[0].accountNumber, "50100012345678", "Published bank account should display unmasked");
+    assert.strictEqual(snap.organization.bankAccounts[1].accountNumber, "****1234", "Private bank account should remain masked");
   });
 });

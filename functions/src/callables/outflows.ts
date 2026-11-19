@@ -34,11 +34,18 @@ import {
   ProductDoc,
   MembershipDoc,
   SplitPaymentEntry,
+  AccountTransactionDoc,
 } from "../types/models.js";
 import {
   prepareAccountTransactionInTxn,
   applyAccountTransactionInTxn,
 } from "../services/ledgerService.js";
+import { resolveAccount } from "../services/accountResolver.js";
+import {
+  prepareReversalInTxn,
+  applyReversalInTxn,
+  type PreparedReversal,
+} from "../services/postingService.js";
 import {
   OutflowKind,
   OutflowStatus,
@@ -179,9 +186,18 @@ async function prepareOutflowEffects(txn: Transaction, p: OutflowEffectsParams) 
   if (p.splitPayments && p.splitPayments.length > 0) {
     for (const split of p.splitPayments) {
       if (split.amount > 0) {
+        let splitAccountId = split.financialAccountId;
+        if (!splitAccountId) {
+          const resolved = await resolveAccount({
+            organizationId: orgId,
+            branchId: p.branchId,
+            paymentMethod: split.method,
+          }, txn);
+          splitAccountId = resolved.id;
+        }
         const prep = await prepareAccountTransactionInTxn(txn, {
           organizationId: orgId,
-          financialAccountId: split.financialAccountId,
+          financialAccountId: splitAccountId,
           branchId: p.branchId,
           type: txnType,
           direction: "out",
@@ -193,13 +209,22 @@ async function prepareOutflowEffects(txn: Transaction, p: OutflowEffectsParams) 
           description: `${p.doc.kind === OutflowKind.PURCHASE ? "Purchase" : "Expense"} ${p.outflowId} (${split.method})`,
           actorUid: p.ctx.callerUid,
         });
-        splitPreps.push({ prep, accountId: split.financialAccountId, method: split.method, amount: split.amount });
+        splitPreps.push({ prep, accountId: splitAccountId, method: split.method, amount: split.amount });
       }
     }
-  } else if (p.paidAmount > 0 && p.financialAccountId) {
+  } else if (p.paidAmount > 0) {
+    let targetAccountId = p.financialAccountId;
+    if (!targetAccountId) {
+      const resolved = await resolveAccount({
+        organizationId: orgId,
+        branchId: p.branchId,
+        paymentMethod: p.paymentMethod || "cash",
+      }, txn);
+      targetAccountId = resolved.id;
+    }
     const singlePrep = await prepareAccountTransactionInTxn(txn, {
       organizationId: orgId,
-      financialAccountId: p.financialAccountId,
+      financialAccountId: targetAccountId,
       branchId: p.branchId,
       type: txnType,
       direction: "out",
@@ -211,7 +236,7 @@ async function prepareOutflowEffects(txn: Transaction, p: OutflowEffectsParams) 
       description: `${p.doc.kind === OutflowKind.PURCHASE ? "Purchase" : "Expense"} ${p.outflowId}`,
       actorUid: p.ctx.callerUid,
     });
-    splitPreps.push({ prep: singlePrep, accountId: p.financialAccountId, method: p.paymentMethod, amount: p.paidAmount });
+    splitPreps.push({ prep: singlePrep, accountId: targetAccountId, method: p.paymentMethod || "cash", amount: p.paidAmount });
   }
 
   return (): { paymentId: string | null } => {
@@ -697,9 +722,10 @@ export const outflowsVoid = onCall({ region: "asia-south1" }, async (request) =>
   }
 
   try {
-    const [returnsSnap, paymentsSnap] = await Promise.all([
+    const [returnsSnap, paymentsSnap, outflowTxnsSnap] = await Promise.all([
       db.collection("returns").where("organizationId", "==", orgId).where("referenceId", "==", input.documentId).get(),
       db.collection("payments").where("organizationId", "==", orgId).where("referenceId", "==", input.documentId).get(),
+      db.collection("accountTransactions").where("organizationId", "==", orgId).where("sourceDocumentType", "==", "outflow").where("sourceDocumentId", "==", input.documentId).get(),
     ]);
     if (returnsSnap.docs.some((d) => d.data().status !== "voided")) {
       throw new HttpsError("failed-precondition", "Purchase has returns recorded against it; void the returns first.");
@@ -746,9 +772,28 @@ export const outflowsVoid = onCall({ region: "asia-south1" }, async (request) =>
             reason: `Void of ${doc.outflowNumber}: ${input.reason}`,
           }))
         : [];
-      const preparedStock = reversal.length
-        ? await prepareStockChangesInTxn(txn, { organizationId: orgId, branchId: doc.branchId || "main-branch", actorUid: ctx.callerUid, items: reversal })
-        : null;
+
+      let preparedStock: Awaited<ReturnType<typeof prepareStockChangesInTxn>> | null = null;
+      if (reversal.length > 0) {
+        try {
+          preparedStock = await prepareStockChangesInTxn(txn, {
+            organizationId: orgId,
+            branchId: doc.branchId || "main-branch",
+            actorUid: ctx.callerUid,
+            items: reversal,
+          });
+        } catch (stockErr: any) {
+          if (stockErr?.message?.includes("Insufficient branch stock")) {
+            throw new HttpsError(
+              "failed-precondition",
+              `[STOCK_ALREADY_CONSUMED] Stock from purchase ${doc.outflowNumber} has already been consumed. ${stockErr.message}`,
+              { reason: "STOCK_ALREADY_CONSUMED" }
+            );
+          }
+          throw stockErr;
+        }
+      }
+
       const vendRef = doc.kind === OutflowKind.PURCHASE && doc.vendorId ? db.collection("vendors").doc(doc.vendorId) : null;
       const vendSnap = vendRef ? await txn.get(vendRef) : null;
       // Serials received by this purchase must all still be in stock; they are removed with it
@@ -757,26 +802,51 @@ export const outflowsVoid = onCall({ region: "asia-south1" }, async (request) =>
         : null;
 
       // Prepare reversals for payments tied to financial accounts
-      const paymentReversalPreps: Array<{
-        prep: Awaited<ReturnType<typeof prepareAccountTransactionInTxn>>;
-        pDoc: PaymentDoc;
-      }> = [];
+      const paymentReversalPreps: PreparedReversal[] = [];
+      const seenAccountAmounts = new Set<string>();
+
+      // 1. Direct outflow account transactions (e.g. cash paid at outflow creation)
+      for (const tDoc of outflowTxnsSnap.docs) {
+        const t = tDoc.data() as AccountTransactionDoc;
+        if (t.direction === "out" && t.type !== "reversal" && !t.reversalTransactionId) {
+          const prep = await prepareReversalInTxn(txn, {
+            organizationId: orgId,
+            originalTransactionId: tDoc.id,
+            financialAccountId: t.financialAccountId,
+            branchId: t.branchId || doc.branchId,
+            amount: t.amount,
+            currency: t.currency,
+            sourceDocumentType: "outflow",
+            sourceDocumentId: snap.id,
+            reason: `Void outflow ${doc.outflowNumber}: ${input.reason}`,
+            actorUid: ctx.callerUid,
+            now,
+          });
+          paymentReversalPreps.push(prep);
+          seenAccountAmounts.add(`${t.financialAccountId}_${t.amount}`);
+        }
+      }
+
+      // 2. Payments recorded separately
       for (const p of paymentsSnap.docs) {
         const pDoc = p.data() as PaymentDoc;
         if (pDoc.status === "completed" && pDoc.financialAccountId) {
-          const prep = await prepareAccountTransactionInTxn(txn, {
-            organizationId: orgId,
-            financialAccountId: pDoc.financialAccountId,
-            branchId: pDoc.branchId || doc.branchId,
-            type: "reversal",
-            direction: pDoc.direction === "in" ? "out" : "in",
-            amount: pDoc.amount,
-            sourceDocumentType: "outflow",
-            sourceDocumentId: snap.id,
-            description: `Void outflow ${doc.outflowNumber}`,
-            actorUid: ctx.callerUid,
-          });
-          paymentReversalPreps.push({ prep, pDoc });
+          const key = `${pDoc.financialAccountId}_${pDoc.amount}`;
+          if (!seenAccountAmounts.has(key)) {
+            const prep = await prepareReversalInTxn(txn, {
+              organizationId: orgId,
+              financialAccountId: pDoc.financialAccountId,
+              branchId: pDoc.branchId || doc.branchId,
+              amount: pDoc.amount,
+              sourceDocumentType: "outflow",
+              sourceDocumentId: snap.id,
+              reason: `Void outflow ${doc.outflowNumber}: ${input.reason}`,
+              actorUid: ctx.callerUid,
+              now,
+            });
+            paymentReversalPreps.push(prep);
+            seenAccountAmounts.add(key);
+          }
         }
       }
 
@@ -792,18 +862,7 @@ export const outflowsVoid = onCall({ region: "asia-south1" }, async (request) =>
       }
 
       for (const pr of paymentReversalPreps) {
-        applyAccountTransactionInTxn(txn, pr.prep, {
-          organizationId: orgId,
-          financialAccountId: pr.pDoc.financialAccountId!,
-          branchId: pr.pDoc.branchId || doc.branchId,
-          type: "reversal",
-          direction: pr.pDoc.direction === "in" ? "out" : "in",
-          amount: pr.pDoc.amount,
-          sourceDocumentType: "outflow",
-          sourceDocumentId: snap.id,
-          description: `Void outflow ${doc.outflowNumber}`,
-          actorUid: ctx.callerUid,
-        });
+        applyReversalInTxn(txn, pr);
       }
 
       let voidedPayments = 0;

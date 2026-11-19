@@ -188,14 +188,20 @@ export const AppPermissions = {
   ACCOUNT_MANAGE: "accounts:manage",
   ACCOUNT_TRANSFER: "accounts:transfer",
   ACCOUNT_RECONCILE: "accounts:reconcile",
+  ACCOUNT_ENTRY_CREATE: "accounts:entry_create",
+  ACCOUNT_VERIFY: "accounts:verify",
+  ACCOUNT_APPROVE: "accounts:approve",
+  ACCOUNT_REVERSE: "accounts:reverse",
   LEDGER_VIEW: "ledger:view",
   RECEIVABLES_VIEW: "receivables:view",
   PAYABLES_VIEW: "payables:view",
   CAPITAL_MANAGE: "capital:manage",
   CAPITAL_VIEW: "capital:view",
 
-  // Approvals Inbox
+  // Approvals Inbox & Self-Approval (Q-F3, U-14)
   APPROVALS_VIEW: "approvals:view",
+  APPROVALS_DECIDE: "approvals:decide",
+  APPROVALS_SELF_APPROVE: "approvals:self_approve",
 
   // Warehouse & Storage Locations
   WAREHOUSE_VIEW: "warehouse:view",

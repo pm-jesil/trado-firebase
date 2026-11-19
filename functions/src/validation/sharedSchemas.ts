@@ -74,6 +74,7 @@ export const BankAccountSchema = z.strictObject({
   currency: z.string().trim().length(3).default("INR").optional(),
   isDefault: z.boolean().default(false).optional(),
   showOnInvoice: z.boolean().default(true).optional(),
+  printOnInvoice: z.boolean().default(false).optional(),
   status: z.enum(["active", "archived"]).default("active").optional(),
 }).refine(
   (data) => {

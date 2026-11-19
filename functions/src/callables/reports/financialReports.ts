@@ -17,6 +17,7 @@ import {
   GetRevenueReportSchema,
   GetProfitLossReportSchema,
   GetCashBankSummarySchema,
+  GetBranchSummarySchema,
 } from "../../validation/schemas.js";
 import { parseInput } from "../../validation/parseInput.js";
 import { round2, roundTo } from "../../services/money.js";
@@ -29,6 +30,7 @@ import {
   OrganizationDoc,
   FinancialAccountDoc,
   PaymentProcessingFeeDoc,
+  BranchDoc,
 } from "../../types/models.js";
 import { ReturnType, ReturnDisposition } from "../../constants/enums.js";
 import { WRITE_OFF_MOVEMENT_TYPES, billsInPeriod, sourceLinesById } from "./helpers.js";
@@ -428,5 +430,133 @@ export const reportsGetCashBankSummary = onCall({ region: "asia-south1" }, async
     totals,
     accounts: accounts.sort((a, b) => b.currentBalance - a.currentBalance),
     count: accounts.length,
+  };
+});
+
+/**
+ * 13. reportsGetBranchSummary (U-5; D-F12)
+ * Cross-branch comparative balance and sales metrics with strict scope enforcement.
+ */
+export const reportsGetBranchSummary = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const input = parseInput(GetBranchSummarySchema, request.data);
+  const ctx = await resolveRequestContext(request, {
+    organizationId: input.organizationId,
+    requiredPermission: AppPermissions.REPORT_VIEW,
+  });
+
+  const orgId = ctx.organizationId;
+  const isOrgScoped = ctx.isOwner || ctx.role?.code === "admin" || ctx.isSuperAdmin || ctx.can(AppPermissions.BRANCH_MANAGE);
+
+  // Validate scope convention (Q-F12)
+  if (input.scope === "organization" && !isOrgScoped) {
+    throw new HttpsError("permission-denied", "Unauthorized branch query.", { reason: "BRANCH_ACCESS_DENIED" });
+  }
+
+  if (input.branchId && !isOrgScoped && input.branchId !== ctx.branchId) {
+    throw new HttpsError("permission-denied", "Unauthorized branch query.", { reason: "BRANCH_ACCESS_DENIED" });
+  }
+
+  if (input.branchIds && input.branchIds.length > 0 && !isOrgScoped) {
+    const unauthorized = input.branchIds.some((b) => b !== ctx.branchId);
+    if (unauthorized) {
+      throw new HttpsError("permission-denied", "Unauthorized branch query.", { reason: "BRANCH_ACCESS_DENIED" });
+    }
+  }
+
+  // Determine branch IDs to report on
+  const branchesRef = db.collection("organizations").doc(orgId).collection("branches");
+  const branchesSnap = await branchesRef.where("isActive", "==", true).get();
+  let branches = branchesSnap.docs.map((d) => ({ id: d.id, ...(d.data() as BranchDoc) }));
+
+  if (input.branchId) {
+    branches = branches.filter((b) => b.id === input.branchId);
+  } else if (input.branchIds && input.branchIds.length > 0) {
+    branches = branches.filter((b) => input.branchIds!.includes(b.id));
+  } else if (!isOrgScoped) {
+    branches = branches.filter((b) => b.id === ctx.branchId);
+  }
+
+  // Pre-fetch all operational financial accounts
+  const accountsSnap = await db.collection("financialAccounts").where("organizationId", "==", orgId).where("isActive", "==", true).get();
+  const accounts = accountsSnap.docs.map((d) => ({ id: d.id, ...(d.data() as FinancialAccountDoc) }));
+
+  // Aggregate metrics per branch
+  const branchSummaries = await Promise.all(
+    branches.map(async (branch) => {
+      // 1. Sales (Bills)
+      let billsQuery = db.collection("bills").where("organizationId", "==", orgId).where("branchId", "==", branch.id).where("status", "==", "finalized");
+      if (input.from) billsQuery = billsQuery.where("createdAt", ">=", input.from);
+      if (input.to) billsQuery = billsQuery.where("createdAt", "<=", input.to);
+      const billsSnap = await billsQuery.get();
+      let totalRevenue = 0;
+      billsSnap.docs.forEach((doc) => {
+        const b = doc.data() as BillDoc;
+        totalRevenue += b.totalAmount || 0;
+      });
+
+      // 2. Outflows (Purchases & Expenses)
+      let outflowsQuery = db.collection("outflows").where("organizationId", "==", orgId).where("branchId", "==", branch.id).where("status", "==", "confirmed");
+      if (input.from) outflowsQuery = outflowsQuery.where("createdAt", ">=", input.from);
+      if (input.to) outflowsQuery = outflowsQuery.where("createdAt", "<=", input.to);
+      const outflowsSnap = await outflowsQuery.get();
+      let totalPurchases = 0;
+      let totalExpenses = 0;
+      outflowsSnap.docs.forEach((doc) => {
+        const o = doc.data() as OutflowDoc;
+        if (o.kind === "purchase") totalPurchases += o.totalAmount || 0;
+        else totalExpenses += o.totalAmount || 0;
+      });
+
+      // 3. Financial Accounts Liquidity
+      const branchAccounts = accounts.filter((a) => a.branchId === branch.id || a.assignedBranchIds?.includes(branch.id));
+      let cashBalance = 0;
+      let bankBalance = 0;
+      branchAccounts.forEach((a) => {
+        const bal = a.currentBalance || 0;
+        if (a.accountType === "cash") cashBalance += bal;
+        else bankBalance += bal;
+      });
+
+      return {
+        branchId: branch.id,
+        branchName: branch.name,
+        branchCode: branch.code,
+        sales: {
+          totalRevenue: round2(totalRevenue),
+          billCount: billsSnap.size,
+        },
+        outflows: {
+          totalPurchases: round2(totalPurchases),
+          totalExpenses: round2(totalExpenses),
+          outflowCount: outflowsSnap.size,
+        },
+        liquidity: {
+          cashBalance: round2(cashBalance),
+          bankBalance: round2(bankBalance),
+          totalLiquidity: round2(cashBalance + bankBalance),
+          accountCount: branchAccounts.length,
+        },
+      };
+    })
+  );
+
+  const orgTotals = {
+    totalRevenue: round2(branchSummaries.reduce((s, b) => s + b.sales.totalRevenue, 0)),
+    totalBills: branchSummaries.reduce((s, b) => s + b.sales.billCount, 0),
+    totalPurchases: round2(branchSummaries.reduce((s, b) => s + b.outflows.totalPurchases, 0)),
+    totalExpenses: round2(branchSummaries.reduce((s, b) => s + b.outflows.totalExpenses, 0)),
+    totalLiquidity: round2(branchSummaries.reduce((s, b) => s + b.liquidity.totalLiquidity, 0)),
+    branchCount: branchSummaries.length,
+  };
+
+  return {
+    organizationId: orgId,
+    scope: input.scope || (input.branchId ? "branch" : input.branchIds ? "branches" : "organization"),
+    branchSummaries,
+    orgTotals,
   };
 });

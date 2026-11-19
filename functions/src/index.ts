@@ -203,6 +203,31 @@ export {
   capitalTransactionsList,
 } from "./callables/financialAccounts.js";
 
+// Account Entries & Lifecycle (U-2, U-3, U-15; D-F2..D-F4)
+export {
+  accountEntriesList,
+  accountEntriesGet,
+  accountEntriesCounts,
+  accountEntriesVerify,
+  accountEntriesApprove,
+  accountEntriesReject,
+  accountEntriesReverse,
+  accountEntriesUpdateNote,
+  accountEntriesCreateSubEntry,
+  accountingPolicyGet,
+  accountingPolicyUpdate,
+} from "./callables/accountEntries.js";
+
+// Cash Flows, Transfers Confirmation & Cash Counts (U-4, U-13; D-F13)
+export {
+  accountTransfersConfirm,
+  accountTransfersDispute,
+  cashCountsCreate,
+  cashCountsList,
+  cashCountsGet,
+  accountEntriesRecordFee,
+} from "./callables/cashFlows.js";
+
 // Payment Processing Charges & Fees (Section 9)
 export {
   paymentsRecordFee,
@@ -296,6 +321,7 @@ export {
   reportsGetReceivablesAgeing,
   reportsGetPayablesAgeing,
   reportsGetCashBankSummary,
+  reportsGetBranchSummary,
 } from "./callables/reports.js";
 
 // Platform Super Admin Users Directory

@@ -21,6 +21,7 @@ import {
   TaxBreakdownItem,
 } from "../../types/models.js";
 import { maskBankAccounts } from "../organizations.js";
+import { resolveAccount } from "../../services/accountResolver.js";
 import {
   prepareAccountTransactionInTxn,
   applyAccountTransactionInTxn,
@@ -265,9 +266,18 @@ export async function prepareSaleEffects(txn: Transaction, p: SaleEffectsParams)
   if (p.splitPayments && p.splitPayments.length > 0) {
     for (const split of p.splitPayments) {
       if (split.amount > 0) {
+        let splitAccountId = split.financialAccountId;
+        if (!splitAccountId) {
+          const resolved = await resolveAccount({
+            organizationId: orgId,
+            branchId: p.branchId,
+            paymentMethod: split.method,
+          }, txn);
+          splitAccountId = resolved.id;
+        }
         const prep = await prepareAccountTransactionInTxn(txn, {
           organizationId: orgId,
-          financialAccountId: split.financialAccountId,
+          financialAccountId: splitAccountId,
           branchId: p.branchId,
           type: "sale_collection",
           direction: "in",
@@ -279,13 +289,22 @@ export async function prepareSaleEffects(txn: Transaction, p: SaleEffectsParams)
           description: `Sale ${p.billId} (${split.method})`,
           actorUid: p.ctx.callerUid,
         });
-        splitPreps.push({ prep, accountId: split.financialAccountId, method: split.method, amount: split.amount });
+        splitPreps.push({ prep, accountId: splitAccountId, method: split.method, amount: split.amount });
       }
     }
-  } else if (p.paidAmount > 0 && p.financialAccountId) {
+  } else if (p.paidAmount > 0) {
+    let targetAccountId = p.financialAccountId;
+    if (!targetAccountId) {
+      const resolved = await resolveAccount({
+        organizationId: orgId,
+        branchId: p.branchId,
+        paymentMethod: p.paymentMethod || "cash",
+      }, txn);
+      targetAccountId = resolved.id;
+    }
     const singlePrep = await prepareAccountTransactionInTxn(txn, {
       organizationId: orgId,
-      financialAccountId: p.financialAccountId,
+      financialAccountId: targetAccountId,
       branchId: p.branchId,
       type: "sale_collection",
       direction: "in",
@@ -297,7 +316,7 @@ export async function prepareSaleEffects(txn: Transaction, p: SaleEffectsParams)
       description: `Sale ${p.billId}`,
       actorUid: p.ctx.callerUid,
     });
-    splitPreps.push({ prep: singlePrep, accountId: p.financialAccountId, method: p.paymentMethod, amount: p.paidAmount });
+    splitPreps.push({ prep: singlePrep, accountId: targetAccountId, method: p.paymentMethod || "cash", amount: p.paidAmount });
   }
 
   return (): { paymentId: string | null; billToSnapshot: BillToSnapshot | null } => {
@@ -474,7 +493,7 @@ export function buildBillPrintSnapshot(
 ): BillPrintSnapshot {
   const org = orgDoc || {};
   const maskedAccounts = Array.isArray(org.bankAccounts)
-    ? maskBankAccounts(org.bankAccounts).map((a: BankAccountRecord) => ({
+    ? maskBankAccounts(org.bankAccounts, { preserveForInvoicePrint: true }).map((a: BankAccountRecord) => ({
       id: a.id,
       bankName: a.bankName || "",
       accountHolderName: a.accountHolderName || "",
@@ -488,7 +507,8 @@ export function buildBillPrintSnapshot(
     ("invoiceTitle" in (bill.taxSnapshot || {}) ? (bill.taxSnapshot as { invoiceTitle?: string }).invoiceTitle : null) ||
     (bill.documentType === "quotation" ? "QUOTATION" :
       bill.documentType === "proforma" ? "PROFORMA INVOICE" :
-        bill.salesMode === "b2b" ? "TAX INVOICE" : "RETAIL INVOICE");
+        bill.documentType === "receipt" ? "SALES RECEIPT" :
+          bill.salesMode === "b2b" ? "TAX INVOICE" : "RETAIL INVOICE");
 
   const items = (bill.items || []).map((item) => ({
     lineId: item.lineId || "L1",
@@ -562,5 +582,220 @@ export function buildBillPrintSnapshot(
       balanceAmount,
     },
     taxBreakdown,
+  };
+}
+
+export interface PaymentPrintSnapshot {
+  version: 1;
+  voucherTitle: string; // "PAYMENT RECEIPT" | "PAYMENT VOUCHER"
+  organization: {
+    name: string;
+    legalName: string | null;
+    taxId: string | null;
+    address: Record<string, unknown> | null;
+    contactPhone: string | null;
+    contactEmail: string | null;
+    bankAccounts: Array<{
+      id?: string;
+      bankName: string;
+      accountNumber: string; // masked (****1234)
+      routingType?: string;
+      routingCode?: string | null;
+      accountHolderName?: string;
+    }>;
+  };
+  party: {
+    name: string;
+    partyType: string;
+    phone?: string | null;
+    taxId?: string | null;
+  } | null;
+  paymentNumber: string;
+  issueDate: string; // 10-char YYYY-MM-DD
+  direction: string;
+  paymentMethod: string;
+  amount: number;
+  referenceId?: string | null;
+  allocations: Array<{
+    documentId: string;
+    documentType: string;
+    amount: number;
+  }>;
+  notes: string | null;
+}
+
+export function buildPaymentPrintSnapshot(
+  orgDoc: Partial<OrganizationDoc> | undefined | null,
+  payment: {
+    paymentNumber?: string;
+    direction?: string;
+    partyName?: string;
+    partyType?: string;
+    partyPhone?: string | null;
+    partyTaxId?: string | null;
+    amount?: number;
+    method?: string;
+    referenceId?: string | null;
+    allocations?: Array<{ documentId: string; documentType: string; amount: number }>;
+    notes?: string | null;
+    createdAt?: string;
+  }
+): PaymentPrintSnapshot {
+  const org = orgDoc || {};
+  const maskedAccounts = Array.isArray(org.bankAccounts)
+    ? maskBankAccounts(org.bankAccounts, { preserveForInvoicePrint: true }).map((a: BankAccountRecord) => ({
+      id: a.id,
+      bankName: a.bankName || "",
+      accountHolderName: a.accountHolderName || "",
+      accountNumber: a.accountNumber || "",
+      routingType: a.routingType || "other",
+      routingCode: a.routingCode || null,
+    }))
+    : [];
+
+  const direction = payment.direction || "in";
+  const voucherTitle = direction === "in" ? "PAYMENT RECEIPT" : "PAYMENT VOUCHER";
+
+  return {
+    version: 1,
+    voucherTitle,
+    organization: {
+      name: org.name || "",
+      legalName: org.legalName || org.name || null,
+      taxId: org.taxId || null,
+      address: org.address || (Array.isArray(org.addresses) && org.addresses[0] ? org.addresses[0] : null) || null,
+      contactPhone: org.contactPhone || null,
+      contactEmail: org.contactEmail || null,
+      bankAccounts: maskedAccounts,
+    },
+    party: payment.partyName ? {
+      name: payment.partyName,
+      partyType: payment.partyType || "other",
+      phone: payment.partyPhone || null,
+      taxId: payment.partyTaxId || null,
+    } : null,
+    paymentNumber: payment.paymentNumber || "PREVIEW",
+    issueDate: (payment.createdAt || new Date().toISOString()).slice(0, 10),
+    direction,
+    paymentMethod: payment.method || "cash",
+    amount: payment.amount || 0,
+    referenceId: payment.referenceId || null,
+    allocations: payment.allocations || [],
+    notes: payment.notes || null,
+  };
+}
+
+export interface CreditNotePrintSnapshot {
+  version: 1;
+  documentTitle: string; // "CREDIT NOTE" | "DEBIT NOTE"
+  organization: {
+    name: string;
+    legalName: string | null;
+    taxId: string | null;
+    address: Record<string, unknown> | null;
+    contactPhone: string | null;
+    contactEmail: string | null;
+    bankAccounts: Array<{
+      id?: string;
+      bankName: string;
+      accountNumber: string; // masked (****1234)
+      routingType?: string;
+      routingCode?: string | null;
+      accountHolderName?: string;
+    }>;
+  };
+  customer: {
+    name: string;
+    phone?: string | null;
+    taxId?: string | null;
+    address?: string | null;
+  } | null;
+  returnNumber: string;
+  issueDate: string; // 10-char YYYY-MM-DD
+  returnType: string;
+  referenceId: string;
+  items: Array<{
+    lineId: string;
+    productId: string;
+    name?: string;
+    quantity: number;
+    unitPrice?: number;
+    refundAmount: number;
+    reason: string;
+    disposition: string;
+  }>;
+  totalRefundAmount: number;
+  refundMethod: string;
+  notes: string | null;
+}
+
+export function buildCreditNotePrintSnapshot(
+  orgDoc: Partial<OrganizationDoc> | undefined | null,
+  returnDoc: {
+    returnNumber?: string;
+    returnType?: string;
+    referenceId?: string;
+    customerSnapshot?: { name: string; phone?: string | null; taxId?: string | null; address?: string | null } | null;
+    items?: Array<{
+      sourceLineId?: string;
+      productId: string;
+      name?: string;
+      quantity: number;
+      unitPrice?: number;
+      refundAmount: number;
+      reason?: string;
+      disposition?: string;
+    }>;
+    totalRefundAmount?: number;
+    refundMethod?: string;
+    notes?: string | null;
+    createdAt?: string;
+  }
+): CreditNotePrintSnapshot {
+  const org = orgDoc || {};
+  const maskedAccounts = Array.isArray(org.bankAccounts)
+    ? maskBankAccounts(org.bankAccounts, { preserveForInvoicePrint: true }).map((a: BankAccountRecord) => ({
+      id: a.id,
+      bankName: a.bankName || "",
+      accountHolderName: a.accountHolderName || "",
+      accountNumber: a.accountNumber || "",
+      routingType: a.routingType || "other",
+      routingCode: a.routingCode || null,
+    }))
+    : [];
+
+  const isSalesReturn = returnDoc.returnType === "sales_return" || !returnDoc.returnType;
+  const documentTitle = isSalesReturn ? "CREDIT NOTE" : "DEBIT NOTE";
+
+  return {
+    version: 1,
+    documentTitle,
+    organization: {
+      name: org.name || "",
+      legalName: org.legalName || org.name || null,
+      taxId: org.taxId || null,
+      address: org.address || (Array.isArray(org.addresses) && org.addresses[0] ? org.addresses[0] : null) || null,
+      contactPhone: org.contactPhone || null,
+      contactEmail: org.contactEmail || null,
+      bankAccounts: maskedAccounts,
+    },
+    customer: returnDoc.customerSnapshot || null,
+    returnNumber: returnDoc.returnNumber || "PREVIEW",
+    issueDate: (returnDoc.createdAt || new Date().toISOString()).slice(0, 10),
+    returnType: returnDoc.returnType || "sales_return",
+    referenceId: returnDoc.referenceId || "",
+    items: (returnDoc.items || []).map((it, idx) => ({
+      lineId: it.sourceLineId || `ret_line_${idx + 1}`,
+      productId: it.productId,
+      name: it.name || "Item",
+      quantity: it.quantity,
+      unitPrice: it.unitPrice || 0,
+      refundAmount: it.refundAmount || 0,
+      reason: it.reason || "Return",
+      disposition: it.disposition || "restocked_to_inventory",
+    })),
+    totalRefundAmount: returnDoc.totalRefundAmount || 0,
+    refundMethod: returnDoc.refundMethod || "credit_note",
+    notes: returnDoc.notes || null,
   };
 }

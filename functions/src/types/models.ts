@@ -83,6 +83,7 @@ export interface MembershipDoc {
   departmentId?: string | null; // Reference to departments/{departmentId}
   jobRoleIds: string[]; // References to jobRoles/{jobRoleId}
   teamId?: string | null; // Reference to teams/{teamId}
+  reportsToUid?: string | null; // Direct reporting person UID (Q-F23 hierarchy routing)
   reportingToIds: string[]; // References to memberships/{membershipId} (multi-manager graph)
   permissions: Record<string, boolean>; // Explicit user-level override grants/denies
   status: EntityStatus;
@@ -647,6 +648,7 @@ export interface CustomerDoc {
   creditLimit: number;
   creditPeriodDays: number;
   outstandingBalance: number; // Udhaar amount customer owes
+  advanceBalance?: number; // Advance payments / credits unapplied
   totalSpend: number;
   visibilityScope?: "all_branches" | "selected_branches" | "branch_only"; // Branch visibility scope (default: all_branches)
   sharedForBranchIds?: string[]; // Branch IDs allowed to access this customer record
@@ -1677,6 +1679,8 @@ export interface FinancialAccountDoc {
     settlementDays?: number;
   };
   isDefault: boolean;
+  printOnInvoice?: boolean;
+  feeMode?: "manual" | "estimated" | "none";
   isActive: boolean;
   notes?: string;
   createdAt: string;
@@ -1701,6 +1705,34 @@ export type AccountTransactionType =
   | "refund"
   | "reversal";
 
+export type AccountEntryStatus =
+  | "created"
+  | "added"
+  | "verified"
+  | "approved"
+  | "rejected"
+  | "reversed";
+
+export type SubEntryType =
+  | "transaction_charge"
+  | "gateway_fee"
+  | "bank_charge"
+  | "adjustment"
+  | "rounding"
+  | "tip"
+  | "other";
+
+export interface AccountWorkflowHistory {
+  createdBy: string;
+  createdAt: string;
+  updatedByUids?: string[];
+  verifiedBy?: Array<{ uid: string; verifiedAt: string; note?: string }>;
+  approvedBy?: Array<{ uid: string; approvedAt: string; note?: string }>;
+  rejectedBy?: { uid: string; rejectedAt: string; reason: string };
+  reversedBy?: { uid: string; reversedAt: string; reason: string };
+  notes?: string;
+}
+
 /**
  * 29. accountTransactions/{id}
  * Append-only immutable financial ledger entry (R4).
@@ -1716,11 +1748,31 @@ export interface AccountTransactionDoc {
   balanceAfter: number;
   amountMinor?: number;
   balanceAfterMinor?: number;
-  sourceDocumentType: "bill" | "outflow" | "payment" | "account_transfer" | "reconciliation" | "manual" | "fee" | "capital" | "return";
+  currency?: string;
+  status?: AccountEntryStatus;
+  sourceDocumentType:
+    | "bill"
+    | "outflow"
+    | "payment"
+    | "account_transfer"
+    | "reconciliation"
+    | "manual"
+    | "fee"
+    | "capital"
+    | "return"
+    | "cash_count";
   sourceDocumentId: string;
   partyType?: "customer" | "vendor" | null;
   partyId?: string | null;
   description?: string;
+  parentEntryId?: string | null;
+  subEntryType?: SubEntryType | null;
+  feeStatus?: "pending" | "recorded" | "waived" | "disputed" | null;
+  needsReview?: boolean;
+  reviewReasons?: string[];
+  reversedTransactionId?: string | null;
+  reversalTransactionId?: string | null;
+  workflow?: AccountWorkflowHistory;
   reconciled?: boolean;
   reconciledAt?: string | null;
   reconciliationId?: string | null;
@@ -1735,13 +1787,15 @@ export interface AccountTransactionDoc {
 export interface AccountTransferDoc {
   organizationId: string;
   transferNumber: string;
-  transferType?: "transfer" | "cash_deposit" | "cash_withdrawal" | "inter_bank" | "petty_cash" | "cashier_handover";
+  transferType?: "transfer" | "cash_deposit" | "cash_withdrawal" | "inter_bank" | "petty_cash" | "cashier_handover" | "settlement";
+  mode?: "instant" | "in_transit";
+  reference?: string;
   sourceAccountId: string;
   destinationAccountId: string;
   sourceBranchId?: string | null;
   destinationBranchId?: string | null;
   amount: number;
-  status: "pending_approval" | "completed" | "rejected" | "cancelled";
+  status: "pending_approval" | "in_transit" | "pending_confirmation" | "completed" | "disputed" | "rejected" | "cancelled";
   notes?: string;
   sourceTransactionId?: string;
   destinationTransactionId?: string;
@@ -1751,9 +1805,34 @@ export interface AccountTransferDoc {
   rejectedBy?: string;
   rejectedAt?: string;
   rejectionReason?: string;
+  confirmedByUid?: string | null;
+  confirmedAt?: string | null;
+  disputedByUid?: string | null;
+  disputedAt?: string | null;
+  disputeReason?: string | null;
   createdAt: string;
   createdBy: string;
   createdByMembershipId?: string | null;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+export interface CashCountDoc {
+  organizationId: string;
+  branchId?: string | null;
+  countNumber: string;
+  financialAccountId: string;
+  countedAmount: number;
+  systemBalance: number;
+  varianceAmount: number;
+  denominations: Record<string, number>;
+  varianceTransactionId?: string | null;
+  needsApproval?: boolean;
+  approvedBy?: string | null;
+  approvedAt?: string | null;
+  notes?: string;
+  createdAt: string;
+  createdBy: string;
   updatedAt?: string;
   updatedBy?: string;
 }
@@ -1843,6 +1922,7 @@ export interface StockTransferDoc {
   destinationBranchId: string;
   sourceLocationId?: string;
   destinationLocationId?: string;
+  internal?: boolean; // Intra-branch transfer (same branch, different locations)
   status: StockTransferStatus;
   items: StockTransferLine[];
   transportMode?: string;

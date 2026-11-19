@@ -26,11 +26,13 @@ import {
   PaymentDoc,
   ProductDoc,
   ReturnDoc,
+  AccountTransactionDoc,
 } from "../../types/models.js";
 import {
-  prepareAccountTransactionInTxn,
-  applyAccountTransactionInTxn,
-} from "../../services/ledgerService.js";
+  prepareReversalInTxn,
+  applyReversalInTxn,
+  type PreparedReversal,
+} from "../../services/postingService.js";
 import {
   SalesMode,
   PaymentStatus,
@@ -598,10 +600,11 @@ export const billsVoid = onCall({ region: "asia-south1" }, async (request) => {
   }
 
   try {
-    // Returns and completed payments referencing the bill (queried before the transaction)
-    const [returnsSnap, paymentsSnap] = await Promise.all([
+    // Returns, completed payments, and direct accountTransactions referencing the bill
+    const [returnsSnap, paymentsSnap, billTxnsSnap] = await Promise.all([
       db.collection("returns").where("organizationId", "==", orgId).where("referenceId", "==", input.documentId).get(),
       db.collection("payments").where("organizationId", "==", orgId).where("referenceId", "==", input.documentId).get(),
+      db.collection("accountTransactions").where("organizationId", "==", orgId).where("sourceDocumentType", "==", "bill").where("sourceDocumentId", "==", input.documentId).get(),
     ]);
     if (returnsSnap.docs.some((d) => (d.data() as ReturnDoc).status !== "voided")) {
       throw new HttpsError("failed-precondition", "Bill has returns recorded against it; void the returns first.");
@@ -660,27 +663,56 @@ export const billsVoid = onCall({ region: "asia-south1" }, async (request) => {
       const custRef = bill.customerId ? db.collection("customers").doc(bill.customerId) : null;
       const custSnap = custRef ? await txn.get(custRef) : null;
 
-      // Prepare reversals for payments tied to financial accounts
-      const paymentReversalPreps: Array<{
-        prep: Awaited<ReturnType<typeof prepareAccountTransactionInTxn>>;
-        pDoc: PaymentDoc;
-      }> = [];
-      for (const p of paymentsSnap.docs) {
-        const pDoc = p.data() as PaymentDoc;
-        if (pDoc.status === "completed" && pDoc.financialAccountId) {
-          const prep = await prepareAccountTransactionInTxn(txn, {
-            organizationId: orgId,
-            financialAccountId: pDoc.financialAccountId,
-            branchId: pDoc.branchId || bill.branchId,
-            type: "reversal",
-            direction: pDoc.direction === "in" ? "out" : "in",
-            amount: pDoc.amount,
-            sourceDocumentType: "bill",
-            sourceDocumentId: snap.id,
-            description: `Void bill ${bill.billNumber}`,
-            actorUid: ctx.callerUid,
-          });
-          paymentReversalPreps.push({ prep, pDoc });
+      // Handle payment reversal / customer credit disposition
+      const paymentDisposition = input.paymentDisposition || "reverse_entries";
+      const reversalPreps: PreparedReversal[] = [];
+
+      if (paymentDisposition === "reverse_entries") {
+        const seenAccountAmounts = new Set<string>();
+
+        // 1. Direct bill account transaction legs (cash, card, split payments)
+        for (const tDoc of billTxnsSnap.docs) {
+          const t = tDoc.data() as AccountTransactionDoc;
+          if (t.direction === "in" && t.type !== "reversal" && !t.reversalTransactionId) {
+            const prep = await prepareReversalInTxn(txn, {
+              organizationId: orgId,
+              originalTransactionId: tDoc.id,
+              financialAccountId: t.financialAccountId,
+              branchId: t.branchId || bill.branchId,
+              amount: t.amount,
+              currency: t.currency,
+              sourceDocumentType: "bill",
+              sourceDocumentId: snap.id,
+              reason: `Void bill ${bill.billNumber}: ${input.reason}`,
+              actorUid: ctx.callerUid,
+              now,
+            });
+            reversalPreps.push(prep);
+            seenAccountAmounts.add(`${t.financialAccountId}_${t.amount}`);
+          }
+        }
+
+        // 2. Payments records referencing this bill (if any recorded separately)
+        for (const p of paymentsSnap.docs) {
+          const pDoc = p.data() as PaymentDoc;
+          if (pDoc.status === "completed" && pDoc.financialAccountId) {
+            const key = `${pDoc.financialAccountId}_${pDoc.amount}`;
+            if (!seenAccountAmounts.has(key)) {
+              const prep = await prepareReversalInTxn(txn, {
+                organizationId: orgId,
+                financialAccountId: pDoc.financialAccountId,
+                branchId: pDoc.branchId || bill.branchId,
+                amount: pDoc.amount,
+                sourceDocumentType: "bill",
+                sourceDocumentId: snap.id,
+                reason: `Void bill ${bill.billNumber}: ${input.reason}`,
+                actorUid: ctx.callerUid,
+                now,
+              });
+              reversalPreps.push(prep);
+              seenAccountAmounts.add(key);
+            }
+          }
         }
       }
 
@@ -688,26 +720,20 @@ export const billsVoid = onCall({ region: "asia-south1" }, async (request) => {
       if (releaseSerials) releaseSerials();
       if (custRef && custSnap?.exists) {
         const cust = custSnap.data() as CustomerDoc;
-        txn.update(custRef, {
+        const totalPaid = bill.paidAmount || 0;
+        const custUpdates: Record<string, any> = {
           totalSpend: Money.amount((cust.totalSpend || 0) - bill.totalAmount),
           outstandingBalance: Money.amount((cust.outstandingBalance || 0) - bill.balanceAmount),
           updatedAt: now,
-        });
+        };
+        if (paymentDisposition === "keep_as_customer_credit" && totalPaid > 0) {
+          custUpdates.advanceBalance = Money.amount((cust.advanceBalance || 0) + totalPaid);
+        }
+        txn.update(custRef, custUpdates);
       }
 
-      for (const pr of paymentReversalPreps) {
-        applyAccountTransactionInTxn(txn, pr.prep, {
-          organizationId: orgId,
-          financialAccountId: pr.pDoc.financialAccountId!,
-          branchId: pr.pDoc.branchId || bill.branchId,
-          type: "reversal",
-          direction: pr.pDoc.direction === "in" ? "out" : "in",
-          amount: pr.pDoc.amount,
-          sourceDocumentType: "bill",
-          sourceDocumentId: snap.id,
-          description: `Void bill ${bill.billNumber}`,
-          actorUid: ctx.callerUid,
-        });
+      for (const pr of reversalPreps) {
+        applyReversalInTxn(txn, pr);
       }
 
       let voidedPayments = 0;
@@ -718,13 +744,21 @@ export const billsVoid = onCall({ region: "asia-south1" }, async (request) => {
       }
       txn.update(billRef, {
         status: "voided",
+        paymentDisposition,
         voidReason: input.reason,
         voidedAt: now,
         voidedBy: ctx.callerUid,
         updatedAt: now,
         updatedBy: ctx.callerUid,
       });
-      return { billId: snap.id, status: "voided", reversedStockLines: stockItems.length, voidedPayments };
+      return {
+        billId: snap.id,
+        status: "voided",
+        reversedStockLines: stockItems.length,
+        voidedPayments,
+        reversedPaymentLegs: reversalPreps.length,
+        paymentDisposition,
+      };
     });
 
     await markIdempotencySucceeded(idempotency.recordId, result);

@@ -25,6 +25,7 @@ import {
   commitDocumentNumberInTxn,
   DocumentNumberReservation,
 } from "./documentCounter.js";
+import { applyEntriesInTxn } from "./postingService.js";
 
 // Standard Chart of Accounts Account Codes
 export const STANDARD_ACCOUNTS = {
@@ -237,62 +238,29 @@ export function applyPostingInTxn(
   txn: Transaction,
   prepared: PreparedPosting
 ): AppliedPostingResult {
-  const transactionIds: string[] = [];
-  const accountBalances: AppliedPostingResult["accountBalances"] = [];
-
-  // 1. Process Account Transactions
-  for (const item of prepared.legs) {
-    const { leg, accountRef, accountData, reservation } = item;
-    commitDocumentNumberInTxn(txn, reservation);
-    const transactionNumber = reservation.formattedNumber;
-
-    const currDec = accountData.currency || prepared.currency || "INR";
-    const amountMinor = Money.toMinor(leg.amount, currDec);
-    const currentBalanceMinor = Money.toMinor(accountData.currentBalance || 0, currDec);
-
-    const balanceAfterMinor =
-      leg.direction === "in"
-        ? Money.addMinor(currentBalanceMinor, amountMinor)
-        : Money.subtractMinor(currentBalanceMinor, amountMinor);
-
-    const balanceAfter = Money.fromMinor(balanceAfterMinor, currDec);
-    const normalizedAmount = Money.fromMinor(amountMinor, currDec);
-
-    const txnRef = db.collection("accountTransactions").doc();
-    const txnDoc: AccountTransactionDoc = {
+  // 1. Process Account Transactions via central posting service
+  const postResult = applyEntriesInTxn(txn, {
+    params: {
       organizationId: prepared.organizationId,
-      branchId: prepared.branchId || accountData.branchId || null,
-      financialAccountId: leg.financialAccountId,
-      transactionNumber,
-      type: leg.type,
-      direction: leg.direction,
-      amount: normalizedAmount,
-      balanceAfter,
-      amountMinor,
-      balanceAfterMinor,
       sourceDocumentType: prepared.sourceDocumentType,
       sourceDocumentId: prepared.sourceDocumentId,
-      description: leg.description,
+      origin: prepared.eventCode,
+      legs: prepared.legs.map((l) => ({
+        ...l.leg,
+        notes: l.leg.description,
+      })),
       actorUid: prepared.actorUid,
-      createdAt: prepared.now,
-    };
+      now: prepared.now,
+    },
+    preparedLegs: prepared.legs,
+  });
 
-    txn.set(txnRef, txnDoc);
-
-    txn.update(accountRef, {
-      currentBalance: balanceAfter,
-      currentBalanceMinor: balanceAfterMinor,
-      updatedAt: prepared.now,
-      updatedBy: prepared.actorUid,
-    });
-
-    transactionIds.push(txnRef.id);
-    accountBalances.push({
-      financialAccountId: leg.financialAccountId,
-      balanceAfter,
-      balanceAfterMinor,
-    });
-  }
+  const transactionIds = postResult.results.map((r) => r.transactionId);
+  const accountBalances = postResult.results.map((r) => ({
+    financialAccountId: r.financialAccountId,
+    balanceAfter: r.balanceAfter,
+    balanceAfterMinor: Money.toMinor(r.balanceAfter, prepared.currency),
+  }));
 
   // 2. Process Balanced Double-Entry Journal Entry
   let journalEntryId: string | undefined;

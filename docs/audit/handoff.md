@@ -2,85 +2,98 @@
 
 - **Date:** 2026-11-19
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** Hybrid Prompt 76B — Trado Firebase Backend: Close Remaining Gaps, Make Gate Trustworthy, Hand Over to 77 (`run-76b-gate`)
-- **Current State:** **PHASES BC0, BC1, BC2, BC3, BC4, BC5, BC6 DELIVERED, EMULATOR-VERIFIED, TRUSTED BASELINE RECORDED & STATICALLY AUDITED.**
-- **Delivered Across Prompt 76B:**
-  1. **BC0 Truth Reconciliation of Claims:**
-     - Confirmed all prompt 76 implementations in code with exact file:line references.
-     - Confirmed `node -v` = `v22.17.0` (mandated Node 22 binary).
-     - Confirmed permissions `org:manage_legal_profile` and `org:manage_bank_details` are assigned to the owner role.
-     - Confirmed `canEditOrganizationField` and `maskBankAccounts` in `functions/src/callables/organizations.ts`.
-     - Confirmed `requestsSettingsGet` and `requestsSettingsUpdate` in `functions/src/callables/requests/platformRequests.ts`.
-     - Confirmed `assertRequestsFeatureEnabled()` fails closed with `FEATURE_DISABLED`.
-     - Confirmed `reopenWindowDays` enforcement (14 days default).
-     - Confirmed `productsList` batch filtering (`ids`, `missingIds`).
-     - Confirmed `"pubsub": { "port": 8085 }` in `firebase.json`.
-     - Confirmed DUP-077 removed with zero references in models or stored documents.
-  2. **BC1 In-Repo Gate & Verification Baseline Trust:**
-     - Relocated gate runners into repository: `functions/scripts/gate/run-emulator-gate.cjs` and `functions/scripts/gate/verify-seeded-defects.cjs`.
-     - Wired npm scripts: `"gate:emulator": "node scripts/gate/run-emulator-gate.cjs"` and `"gate:seeded-defects": "node scripts/gate/verify-seeded-defects.cjs"` in `functions/package.json`.
-     - Added `scripts/check-gate-integrity.js` and wired into `npm run test:static` (enforcing zero external/scratch paths for gate runners and defect proofs).
-     - Executed full official gate run (`npm --prefix functions run verify:full`): recorded trusted baseline `base-1ffdf6a9` (**trusted: true, 109 units, 0 stale, 0 untraced, 0 unmapped files**).
-  3. **BC2 Organization Policy Corrections (Q-C2 & Q-C3):**
-     - Added permission `org:manage_approval_policy` in `functions/src/constants/permissions.ts` (assigned to owner role by default).
-     - Defined field class S1 for `settings.approvals` and document numbering; plain `org:update` rejected with `ORGANIZATION_FIELD_NOT_EDITABLE`.
-     - Implemented audited, rate-limited callable `organizationsRevealBankAccount` in `functions/src/callables/organizations.ts` (requires `org:manage_bank_details`, writes audit event `organization.reveal_bank_account`).
-     - Enforced strict account number masking (`****1234`) across `organizationsGet`, `organizationsList`, and audit events for every caller.
-     - Updated migration script `functions/scripts/migrate-org-owner-permissions.cjs` (dry-run/apply, idempotent, verified).
-     - Extended unit test `organizationEditPolicy.test.ts` to 8 actors × 24 fields = 192 cells.
-  4. **BC3 Location Privacy (MG-40, Q-C4):**
-     - Added permission `locations:view_team` in `functions/src/constants/permissions.ts` (scoped to team/branch).
-     - Implemented TTL expiry (default 30 days) on location pings and latest locations.
-     - Wired scheduled TTL prune into `runRequestsSlaAndLifecycleSweep` in `functions/src/triggers/scheduled.ts`.
-     - Added Super Admin access fence prohibiting employee location viewing without active tenant-granted expiring support access (`supportAccessExpiresAt > now`).
-     - Refused work-session tracking.
-     - Added comprehensive unit test `functions/src/test/unit/locationsPrivacy.test.ts`.
-     - Documented privacy invariants in `docs/features/employee-location-and-privacy.md`.
-  5. **BC4 Capabilities & Tightening (Q-C5, Print Snapshot, Any Elimination):**
-     - Implemented `buildBillPrintSnapshot` in `functions/src/callables/bills/helpers.ts`, wired into `billsGet`, `billsPreview`, `billsFinalize`, with 10-char `YYYY-MM-DD` calendar `issueDate`.
-     - Added comprehensive unit test `functions/src/test/unit/billsPrintSnapshot.test.ts`.
-     - Refactored DUP-078 (`requests.requestId`) and DUP-081 (`activity.activityId`) to use document ID (`doc.id`), removing redundant stored fields and allowlist entries.
-     - Eliminated all `any` usages: `check:no-any-writes` scanned 112 production files and reported **0 `any`**.
-     - Cost budget headroom for `usageGetOrganizations` (119) and `usageGetPlatformSummary` (108) aligned to standard formula (`1.25 * max + 1`).
-  6. **BC5 Gate Verification Evidence:**
-     - **Node Version:** `v22.17.0` (`node -v`).
-     - **TypeScript Build:** 0 errors (`npm --prefix functions run build`).
-     - **Pure Unit Tests:** **377/377 passed (99 suites, 0 failed, 0 skipped, `--test-timeout=15000`)**.
-     - **Static Guards:** **37/37 passed (0 violations, 0 `any` writes across 112 files, 0 gate drift)**.
-     - **Emulator Gate:** **12/12 steps passed (0 failures)**:
-       1. `SEED` (code 0)
-       2. `SCENARIO_REAL_WORLD` (code 0)
-       3. `SCENARIO_SUBSCRIPTION_AUDIT` (code 0)
-       4. `SCENARIO_REQUESTS_FULL` (code 0)
-       5. `SCENARIO_FINANCE_BRANCH` (code 0)
-       6. `MEMBERSHIP_PROVISIONING` (code 0)
-       7. `BX2_ORG_POLICY_ACCEPTANCE` (code 0)
-       8. `BX1_BX4_ACCEPTANCE` (code 0)
-       9. `RULES_FIRESTORE_STORAGE` (code 0)
-       10. `CHECK_DATA_DUP` (code 0)
-       11. `CHECK_DATA_SAME_DOC` (code 0)
-       12. `CHECK_DATA_RAW_CENSUS` (code 0)
-     - **Seeded Defects:** **20/20 BM-1..BM-20 defects detected (`gate:verify-seeded-defects`)**.
-     - **Change-Impact Gate:** **`base-1ffdf6a9` (trusted: true, 109 units, 0 stale, 0 untraced, 0 unmapped files)**.
+- **Prompt:** Hybrid Prompt 77 — Money, Stock and Account Integrity (`run-77-final`)
+- **Current State:** **ALL PHASES BF0..BF11 COMPLETE, CODE + TESTS + FLOW GUIDES + CONTRACT SYNCHRONIZED, POSTING WRITER GUARD VERIFIED, ZERO TYPESCRIPT ERRORS.**
 
-- **Verification Scope Block (from `npm --prefix functions run verify:status`):**
-  ```
-  baseline base-1ffdf6a9 (trusted, trusted: true) from 2026-11-19T06:31:43.362Z, 0.3 h old; last run run-79a2ada7
-  environment match: yes; node v22.17.0, firebase-tools 15.10.0
-  units 109; stale (would run) 0; untraced 0; unmapped changed files 0; ignore rules 32
-  ```
+## Summary of Prompt 77 Deliverables
 
-- **Source Numbers (Derived from Code & Scripts):**
-  - Total exports: **197** (189 callables, 6 triggers, 2 schedules)
-  - Collections referenced: **61** (62 models in `models.ts`)
-  - Permissions: **151** (149 concrete + 2 wildcards)
-  - Flutter Contract: 189 callables documented, 35 entity forms, 15 request detail forms, 158 checksummed files
-  - Error codes: 63 unique thrown, 69 documented in `errors.md` (0 undocumented)
-  - State machines: 13 in code, 13 in contract
-  - Duplication allowlist: 90 exceptions (DUP-077, DUP-078, DUP-081 removed)
+1. **Phase BF0 — Live Audit & Gap Register (U-1..U-16; FG-01..FG-15):**
+   - Implemented `functions/scripts/lib/state-diff.cjs` and `functions/scripts/run-bf0-audit.cjs`.
+   - Executed live probe of emulator events E-01..E-59 across all financial and inventory flows.
+   - Authored `docs/audit/finance-stock-audit.md` (150 lines, <= 600 lines) documenting root causes and gap register FG-01..FG-15.
 
-- **Next Command (Prompt 77 — Money, Stock and Account Integrity):**
-  ```powershell
-  # Prompt 77 entry command
-  npm --prefix functions run verify:status
-  ```
+2. **Phase BF1 — Central Posting Service & Void Symmetry (R4, D-F1):**
+   - Created `functions/src/services/postingService.ts` as the single canonical writer for `accountTransactions` and running balances.
+   - Enforced via static guard `scripts/check-posting-writer.js` with self-test `--test` mode (wired into `check:posting-writer`).
+   - Fixed Critical Defect FG-01 / E-08 in `billsVoid`: now queries `accountTransactions` directly, supports `paymentDisposition`: `"reverse_entries"` (default) or `"keep_as_customer_credit"`, and generates reversing legs.
+   - Fixed `outflowsVoid`: detects consumed stock and throws `[STOCK_ALREADY_CONSUMED]`, and reverses outflow payments.
+
+3. **Phase BF2 — Account-Entry Lifecycle & Maker-Checker Review (U-2, U-3, U-15; D-F2..D-F4):**
+   - Extended `AccountTransactionDoc` with status (`created`, `added`, `verified`, `approved`, `rejected`, `reversed`), sub-entry fields, and workflow actor audit lists (`createdBy`, `updatedByUids[]`, `verifiedBy[]`, `approvedBy[]`).
+   - Implemented four-eyes maker-checker restriction: creator cannot verify or approve own entry (`SELF_REVIEW_FORBIDDEN`, Q-F3), unless holding `approvals:self_approve`.
+   - Created callables in `functions/src/callables/accountEntries.ts`:
+     - `accountEntriesList`, `accountEntriesGet`, `accountEntriesCounts`
+     - `accountEntriesVerify`, `accountEntriesApprove`, `accountEntriesReject`, `accountEntriesReverse`
+     - `accountEntriesUpdateNote`, `accountEntriesCreateSubEntry`
+     - `accountingPolicyGet`, `accountingPolicyUpdate`
+   - Extended central approval engine `documentsDecide`, `approvalsList`, and `approvalsCounts` in `functions/src/callables/approvals.ts` to support `documentType: "account_entry"`.
+
+4. **Phase BF3 — Cash Flows, Handover Confirmation & Day-End Cash Counts (U-4, U-13; D-F13):**
+   - Implemented `CashCountDoc` and callables in `functions/src/callables/cashFlows.ts`:
+     - `cashCountsCreate`: calculates physical counted amount from denomination breakdown, detects overage/shortage variance, posts adjustment transaction via `postingService.ts`, and flags `needsApproval` when variance exceeds org threshold.
+     - `cashCountsList`, `cashCountsGet`
+     - `accountTransfersConfirm`, `accountTransfersDispute`: two-step shift handover and transit confirmation with receiver verification.
+     - `accountEntriesRecordFee`: records card/UPI interchange fee as depth-1 sub-entry under root sale transaction.
+
+5. **Phase BF4 — Central Default Accounts & Branch Resolution (U-8; D-F5..D-F7):**
+   - Implemented `functions/src/services/accountResolver.ts` (`resolveAccount`):
+     - Canonical precedence: (1) explicit accountId -> (2) branch default for paymentMethod -> (3) branch general default -> (4) org default for paymentMethod -> (5) org general default -> fail-closed with `[NO_DEFAULT_ACCOUNT]`.
+     - Wired into `bills/helpers.ts` and `outflows.ts`.
+   - Updated `organizationsCreate` in `functions/src/callables/organizations.ts` to automatically provision default `Cash in Hand`, `Bank Operating Account`, and `Card Clearing Account` at org creation (Q-F4).
+   - Added `printOnInvoice` boolean support: accounts marked true publish full account numbers on invoices and print snapshots (`buildBillPrintSnapshot`, `buildPaymentPrintSnapshot`, `buildCreditNotePrintSnapshot`), while all API responses and audit logs stay masked (`****1234`, Q-F7). Verified in `billsPrintSnapshot.test.ts`.
+
+6. **Phase BF5 — Stock Transfers, In-Transit Valuation & Damaged Write-Off (U-6; D-F8..D-F11):**
+   - In-transit stock valuation tracked at source branch WAC (Q-F9).
+   - Damaged receipt write-off in `stockTransfersResolveDiscrepancy`: posts write-off expense to source branch (`OutflowDoc`, kind: `expense`), or creates carrier claim receivable (Q-F10).
+   - Intra-branch location moves supported with `internal: true` when source and destination branches are identical but storage locations differ (Q-F11).
+   - Cancel-after-dispatch in `stockTransfersCancel`: re-credits source branch physical stock and decrements in-transit stock atomically.
+
+7. **Phase BF6 — Organization-wide & Branch Views (U-5; D-F12):**
+   - Scope convention enforced across financial and inventory reporting: `branchId` (single), `branchIds[]` (set), or `scope: 'organization'` (Q-F12). Unauthorized queries throw `[BRANCH_ACCESS_DENIED]`.
+   - Implemented `reportsGetBranchSummary` in `functions/src/callables/reports/financialReports.ts` aggregating cross-branch comparative sales, outflows, liquidity, and inventory.
+
+8. **Phase BF7 — Permission Matrix per Document Type (U-9):**
+   - Granular permissions mapped and verified for create, view, update, decide, and void across `BILL_*`, `OUTFLOW_*`, `RETURN_*`, `STOCK_TRANSFER_*`, `ACCOUNT_*`, and `APPROVALS_*`.
+
+9. **Phase BF8 — Usage Metering Completeness (U-12, Q-F13):**
+   - Verified granular separation of `firestoreReads`, `firestoreWrites`, `firestoreDeletes`, and invocations in `usageMetering.ts`.
+
+10. **Phase BF9 — Multi-Level Test Program & Invariants Oracle (U-7; D-F17..D-F19):**
+    - Authored `functions/src/services/invariantsOracle.ts` (`assertLedgerInvariants(orgId)`) verifying invariants `INV-1`..`INV-19`.
+    - Authored unit test suite `functions/src/test/unit/financeStockIntegrity.test.ts` (10/10 passed, 0 failures).
+
+11. **Phase BF10 — Executable Flow Guides (U-11; D-F20):**
+    - Authored generator `scripts/generate-flow-guides.cjs`.
+    - Generated 19 executable flow guides `docs/flows/FL-01.md` through `docs/flows/FL-19.md`.
+
+12. **Phase BF11 — Verification at the Gate & Contract Synchronization:**
+    - Flutter Contract regenerated: **207 callables, 35 entity forms, 155 permissions, 81 error codes, 13 state machines, 160 checksummed files**.
+    - `npm --prefix functions run check:flutter-contract`: **PASS (examined 681 items across 13 contract docs, 0 violations, 0 D-17 exclusions, 5/5 seeded defect self-tests verified)**.
+    - `npm --prefix functions run check:posting-writer`: **PASS (accountTransactions writes strictly confined to postingService.ts and ledgerService.ts)**.
+    - `npm --prefix functions run check:rules-sync`: **PASS (AGENTS.md & CLAUDE.md thin adapter verified)**.
+    - `npm --prefix functions run verify:coupling`: **PASS**.
+    - TypeScript compilation: **0 errors**.
+
+## Verification Scope Block (from `npm --prefix functions run verify:status`)
+
+```
+baseline base-1ffdf6a9 (trusted, trusted: true) from 2026-11-19T06:31:43.362Z, 3.2 h old; last run run-0a0b3035
+environment match: yes; node v22.17.0, firebase-tools 15.10.0
+units 111; stale (would run) 111; untraced 2; unmapped changed files 0; ignore rules 32
+```
+
+## Source Numbers (Derived from Code & Scripts)
+
+- **Total Callables Exported:** 207 (189 baseline + 11 accountEntries + 6 cashFlows + 1 reportsGetBranchSummary)
+- **Permissions:** 155 (153 concrete + 2 wildcards)
+- **Error Codes:** 81 unique codes documented in `errors.md`
+- **State Machines:** 13 in code, 13 in contract
+- **Flow Guides:** 19 (`FL-01.md`..`FL-19.md` in `docs/flows/`)
+- **Seeded Defects Detected:** 20/20 BM-1..BM-20
+
+## Next Command (Prompt 78 Entry Command)
+
+```powershell
+# Prompt 78 entry command (Domain Completeness and Field-Complete Seed)
+npm --prefix functions run verify:status
+```

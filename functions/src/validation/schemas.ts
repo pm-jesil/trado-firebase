@@ -1525,7 +1525,7 @@ export const DocumentDecisionSchema = z.strictObject({
   organizationId: z.string().trim().min(2).optional(),
   branchId: z.string().trim().optional(),
   // One approval entry point (documentsDecide) for every maker–checker document type
-  documentType: z.enum(["bill", "outflow", "return", "stock_adjustment", "account_transfer", "stock_transfer"]),
+  documentType: z.enum(["bill", "outflow", "return", "stock_adjustment", "account_transfer", "stock_transfer", "account_entry"]),
   documentId: z.string().trim().min(2),
   decision: z.enum(["approve", "reject"]),
   reason: z.string().trim().max(500).optional(),
@@ -1539,6 +1539,7 @@ export const VoidDocumentSchema = z.strictObject({
   branchId: z.string().trim().optional(),
   documentId: z.string().trim().min(2),
   reason: z.string().trim().min(3).max(500),
+  paymentDisposition: z.enum(["reverse_entries", "keep_as_customer_credit"]).default("reverse_entries").optional(),
   idempotencyKey: z.string().min(8).max(128).optional(),
 });
 
@@ -2214,6 +2215,7 @@ export const CreateStockTransferSchema = z.strictObject({
   destinationBranchId: z.string().trim().min(2),
   sourceLocationId: z.string().trim().min(2).optional(),
   destinationLocationId: z.string().trim().min(2).optional(),
+  internal: z.boolean().optional(),
   items: z.array(StockTransferLineInputSchema).min(1).max(MAX_DOCUMENT_LINES),
   handlingFee: z.number().min(0).optional(),
   handlingFeeFinancialAccountId: z.string().trim().min(2).optional(),
@@ -2302,7 +2304,7 @@ export const GetStockTransferSchema = getByIdSchema("transferId");
 
 export const ListApprovalsSchema = z.strictObject({
   ...ContextFields,
-  documentType: z.enum(["bill", "outflow", "return", "stock_adjustment", "account_transfer", "stock_transfer"]).optional(),
+  documentType: z.enum(["bill", "outflow", "return", "stock_adjustment", "account_transfer", "stock_transfer", "account_entry"]).optional(),
   limit: z.number().int().min(1).max(100).default(50).optional(),
   startAfterId: z.string().trim().optional(),
 });
@@ -2421,6 +2423,145 @@ export const ListCapitalTransactionsSchema = z.strictObject({
 export const GetCashBankSummarySchema = z.strictObject({
   ...ContextFields,
   includeInactive: z.boolean().default(false).optional(),
+});
+
+export const GetBranchSummarySchema = z.strictObject({
+  ...ContextFields,
+  branchId: z.string().trim().min(2).optional(),
+  branchIds: z.array(z.string().trim().min(2)).max(50).optional(),
+  scope: z.enum(["organization", "branch", "branches"]).optional(),
+  from: z.string().trim().optional(),
+  to: z.string().trim().optional(),
+});
+
+// ============================================================
+// Account Entries & Lifecycle Validation Schemas (U-2, U-3, U-15; D-F2..D-F4)
+// ============================================================
+
+export const ListAccountEntriesSchema = z.strictObject({
+  ...ContextFields,
+  financialAccountId: z.string().trim().optional(),
+  status: z.enum(["created", "added", "verified", "approved", "rejected", "reversed"]).optional(),
+  needsReview: z.boolean().optional(),
+  subEntryType: z.enum(["transaction_charge", "gateway_fee", "bank_charge", "adjustment", "rounding", "tip", "other"]).optional(),
+  feeStatus: z.enum(["pending", "recorded", "waived", "disputed"]).optional(),
+  parentEntryId: z.string().trim().optional(),
+  from: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "from must be YYYY-MM-DD").optional(),
+  to: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "to must be YYYY-MM-DD").optional(),
+  limit: z.number().int().min(1).max(200).default(50).optional(),
+  startAfterId: z.string().trim().optional(),
+});
+
+export const GetAccountEntrySchema = z.strictObject({
+  ...ContextFields,
+  entryId: z.string().trim().min(2),
+});
+
+export const GetAccountEntryCountsSchema = z.strictObject({
+  ...ContextFields,
+  financialAccountId: z.string().trim().optional(),
+});
+
+export const VerifyAccountEntrySchema = z.strictObject({
+  ...ContextFields,
+  entryId: z.string().trim().min(2),
+  note: z.string().trim().max(500).optional(),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const ApproveAccountEntrySchema = z.strictObject({
+  ...ContextFields,
+  entryId: z.string().trim().min(2),
+  note: z.string().trim().max(500).optional(),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const RejectAccountEntrySchema = z.strictObject({
+  ...ContextFields,
+  entryId: z.string().trim().min(2),
+  reason: z.string().trim().min(3).max(500),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const ReverseAccountEntrySchema = z.strictObject({
+  ...ContextFields,
+  entryId: z.string().trim().min(2),
+  reason: z.string().trim().min(3).max(500),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const UpdateAccountEntryNoteSchema = z.strictObject({
+  ...ContextFields,
+  entryId: z.string().trim().min(2),
+  note: z.string().trim().min(1).max(500),
+});
+
+export const CreateSubEntrySchema = z.strictObject({
+  ...ContextFields,
+  parentEntryId: z.string().trim().min(2),
+  subEntryType: z.enum(["transaction_charge", "gateway_fee", "bank_charge", "adjustment", "rounding", "tip", "other"]),
+  amount: z.number().int().positive("Sub-entry amount must be positive paise"),
+  financialAccountId: z.string().trim().optional(),
+  direction: z.enum(["in", "out"]).optional(),
+  notes: z.string().trim().max(500).optional(),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const RecordEntryFeeSchema = z.strictObject({
+  ...ContextFields,
+  entryId: z.string().trim().min(2),
+  feeAmount: z.number().int().positive("Fee must be positive paise"),
+  feeTaxAmount: z.number().int().min(0).default(0).optional(),
+  notes: z.string().trim().max(500).optional(),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const GetAccountingPolicySchema = z.strictObject({
+  ...ContextFields,
+});
+
+export const UpdateAccountingPolicySchema = z.strictObject({
+  ...ContextFields,
+  minorUnitsThresholds: z.record(z.string(), z.number().int().min(0)).optional(),
+  selfApprovalPolicy: z.enum(["off", "up_to_limit", "on"]).optional(),
+  selfApprovalLimits: z.record(z.string(), z.number().int().min(0)).optional(),
+  roundingMode: z.enum(["half_up", "half_even"]).optional(),
+  roundToNearestRupee: z.boolean().optional(),
+  cashRoundingFils: z.boolean().optional(),
+});
+
+export const CreateCashCountSchema = z.strictObject({
+  ...ContextFields,
+  financialAccountId: z.string().trim().min(2),
+  denominations: z.record(z.string(), z.number().int().min(0)),
+  notes: z.string().trim().max(500).optional(),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const ListCashCountsSchema = z.strictObject({
+  ...ContextFields,
+  financialAccountId: z.string().trim().optional(),
+  limit: z.number().int().min(1).max(100).default(50).optional(),
+  startAfterId: z.string().trim().optional(),
+});
+
+export const GetCashCountSchema = z.strictObject({
+  ...ContextFields,
+  countId: z.string().trim().min(2),
+});
+
+export const ConfirmAccountTransferSchema = z.strictObject({
+  ...ContextFields,
+  transferId: z.string().trim().min(2),
+  notes: z.string().trim().max(500).optional(),
+  idempotencyKey: z.string().min(8).max(128).optional(),
+});
+
+export const DisputeAccountTransferSchema = z.strictObject({
+  ...ContextFields,
+  transferId: z.string().trim().min(2),
+  reason: z.string().trim().min(3).max(500),
+  idempotencyKey: z.string().min(8).max(128).optional(),
 });
 
 

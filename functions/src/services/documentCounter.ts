@@ -29,7 +29,8 @@ export type DocumentTypePrefix =
   | "ACT" // Account Transfers
   | "FEE" // Payment Processing Fees
   | "CAP" // Capital Transactions
-  | "JRN"; // General Journal Entries
+  | "JRN" // General Journal Entries
+  | "CNT"; // Cash Counts
 
 export interface NextNumberParams {
   organizationId: string;

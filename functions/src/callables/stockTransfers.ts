@@ -65,7 +65,7 @@ export const ALLOWED_TRANSFER_TRANSITIONS: Record<StockTransferStatus, StockTran
   draft: ["submitted", "cancelled"],
   submitted: ["approved", "rejected", "cancelled", "dispatched"],
   approved: ["dispatched", "cancelled"],
-  dispatched: ["received", "partially_received"],
+  dispatched: ["received", "partially_received", "cancelled"],
   partially_received: ["received"],
   received: [],
   rejected: [],
@@ -100,8 +100,15 @@ export const stockTransfersCreate = onCall({ region: "asia-south1" }, async (req
   const callerUid = ctx.callerUid;
   const now = new Date().toISOString();
 
-  if (input.sourceBranchId === input.destinationBranchId) {
-    throw new HttpsError("invalid-argument", "Source and destination branches must be different.");
+  const isSameBranch = input.sourceBranchId === input.destinationBranchId;
+  const isInternal = isSameBranch || input.internal === true;
+  if (isSameBranch) {
+    if (!input.sourceLocationId || !input.destinationLocationId || input.sourceLocationId === input.destinationLocationId) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Intra-branch transfers require distinct source and destination storage locations."
+      );
+    }
   }
 
   const idempotency = await reserveIdempotency({
@@ -219,6 +226,7 @@ export const stockTransfersCreate = onCall({ region: "asia-south1" }, async (req
       destinationBranchId: input.destinationBranchId,
       sourceLocationId: input.sourceLocationId,
       destinationLocationId: input.destinationLocationId,
+      internal: isInternal,
       status: "draft",
       version: 1,
       items: resolvedItems,
@@ -342,6 +350,64 @@ export const stockTransfersCancel = onCall({ region: "asia-south1" }, async (req
 
     const now = new Date().toISOString();
     const nextVersion = (transfer.version || 1) + 1;
+
+    // If cancelled after dispatch, return in-transit stock back to source branch
+    if (transfer.status === "dispatched") {
+      for (const line of transfer.items) {
+        const factor = line.conversionFactor || 1;
+        const dispatchedQty = line.dispatchedQty ?? line.requestedQty;
+        const dispatchedBase = line.dispatchedBaseQuantity ?? roundQty(dispatchedQty * factor, 4);
+
+        if (dispatchedBase > 0) {
+          const sourceStockBalanceRef = db.collection("stockBalances").doc(`${orgId}_${transfer.sourceBranchId}_${line.productId}`);
+          const sourceStockSnap = await txn.get(sourceStockBalanceRef);
+          const sourceBalance = sourceStockSnap.exists ? (sourceStockSnap.data() as StockBalanceDoc) : null;
+          const currentStock = sourceBalance?.currentStock || 0;
+          const currentInTransit = sourceBalance?.inTransitQty || dispatchedBase;
+
+          const newSourceStock = roundQty(currentStock + dispatchedBase, 4);
+          const newInTransit = Math.max(0, roundQty(currentInTransit - dispatchedBase, 4));
+
+          txn.set(
+            sourceStockBalanceRef,
+            {
+              organizationId: orgId,
+              branchId: transfer.sourceBranchId,
+              productId: line.productId,
+              currentStock: newSourceStock,
+              inTransitQty: newInTransit,
+              updatedAt: now,
+              updatedBy: callerUid,
+            },
+            { merge: true }
+          );
+
+          txn.set(
+            db.collection("branchProductStock").doc(`${orgId}_${transfer.sourceBranchId}_${line.productId}`),
+            { currentStock: newSourceStock, inTransitQty: newInTransit, updatedAt: now },
+            { merge: true }
+          );
+
+          const movementRef = db.collection("stockMovements").doc();
+          const movementDoc: StockMovementDoc = {
+            organizationId: orgId,
+            branchId: transfer.sourceBranchId,
+            storageLocationId: transfer.sourceLocationId,
+            productId: line.productId,
+            type: StockMovementType.TRANSFER,
+            quantity: dispatchedBase,
+            balanceAfter: newSourceStock,
+            unitCostSnapshot: line.unitCost,
+            referenceId: input.transferId,
+            referenceModel: "stock_transfer",
+            reason: `Dispatched transfer cancelled, in-transit returned to source: ${transfer.transferNumber}`,
+            createdAt: now,
+            createdBy: callerUid,
+          };
+          txn.set(movementRef, movementDoc);
+        }
+      }
+    }
 
     txn.update(transferRef, {
       status: "cancelled",
@@ -1062,9 +1128,60 @@ export const stockTransfersResolveDiscrepancy = onCall({ region: "asia-south1" }
       txn.set(movementRef, movementDoc);
     } else if (input.resolution === "write_off") {
       // Inventory shortage write-off:
-      // The physical discrepancy was already removed from inventory by virtue of being
-      // dispatched from source (-20) but not received at destination (+18), and product.currentStock
-      // was adjusted on receive. Therefore, inventory conservation holds without extra adjustments.
+      // Damaged receipt write-off expense is posted to source branch (Q-F10)
+      const lineUnitCost = line.unitCost || prodData.weightedAverageCost || prodData.costPrice || 0;
+      const writeOffAmount = round2(lineUnitCost * discrepancyBaseQty);
+
+      if (writeOffAmount > 0) {
+        const outflowRef = db.collection("outflows").doc();
+        const outflowDoc: OutflowDoc = {
+          organizationId: orgId,
+          branchId: transfer.sourceBranchId,
+          outflowNumber: `EXP-TRF-${transfer.transferNumber}`,
+          kind: OutflowKind.EXPENSE,
+          docDate: now,
+          status: OutflowStatus.CONFIRMED,
+          paymentStatus: PaymentStatus.PAID,
+          subTotal: writeOffAmount,
+          discountTotal: 0,
+          taxTotal: 0,
+          totalAmount: writeOffAmount,
+          paidAmount: 0,
+          balanceAmount: 0,
+          payee: "Transit Loss / Write-off",
+          notes: input.notes || `Damaged stock transfer write-off (${transfer.transferNumber}) - ${prodData.name} (${discrepancyBaseQty} units)`,
+          lines: [],
+          createdAt: now,
+          createdBy: callerUid,
+          updatedAt: now,
+          updatedBy: callerUid,
+        };
+        txn.set(outflowRef, outflowDoc);
+      }
+    } else if (input.resolution === "claim_carrier") {
+      // Carrier claim records a receivable on source branch (Q-F10)
+      const lineUnitCost = line.unitCost || prodData.weightedAverageCost || prodData.costPrice || 0;
+      const claimAmount = round2(lineUnitCost * discrepancyBaseQty);
+
+      if (claimAmount > 0) {
+        const receivableRef = db.collection("carrierClaims").doc();
+        txn.set(receivableRef, {
+          organizationId: orgId,
+          branchId: transfer.sourceBranchId,
+          transferId: input.transferId,
+          transferNumber: transfer.transferNumber,
+          productId: line.productId,
+          productName: prodData.name,
+          claimAmount,
+          discrepancyQuantity: discrepancyBaseQty,
+          status: "pending_claim",
+          trackingReference: transfer.trackingReference || null,
+          carrierName: transfer.transportMode || "Carrier",
+          notes: input.notes || "Claim submitted for transit damage/loss",
+          createdAt: now,
+          createdBy: callerUid,
+        });
+      }
     }
 
     // Update transfer document line resolution

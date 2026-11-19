@@ -39,6 +39,7 @@ import {
   BranchDoc,
   OrganizationSharingPolicies,
   AuditLogDoc,
+  FinancialAccountDoc,
 } from "../types/models.js";
 import { EntityStatus, SubscriptionStatus, GateReason, SalesChannel, BusinessType } from "../constants/enums.js";
 import {
@@ -132,21 +133,28 @@ export function canEditOrganizationField(actor: OrgPolicyActor, field: string): 
 }
 
 /**
- * Masks bank account numbers to last 4 characters for API responses (Q-B2 / A-19, MG-37).
+ * Masks bank account numbers to last 4 characters for API responses (Q-B2 / A-19, MG-37, Q-F7).
+ * When preserveForInvoicePrint is true, accounts marked with printOnInvoice === true are not masked.
  */
-export function maskBankAccounts<T extends { accountNumber?: string | null; iban?: string | null }>(
-  accounts: T[] | undefined | null
+export function maskBankAccounts<T extends { accountNumber?: string | null; iban?: string | null; printOnInvoice?: boolean }>(
+  accounts: T[] | undefined | null,
+  options?: { preserveForInvoicePrint?: boolean }
 ): T[] {
   if (!Array.isArray(accounts)) return [];
-  return accounts.map((acc) => ({
-    ...acc,
-    ...(typeof acc.accountNumber === "string" && acc.accountNumber.length > 0
-      ? { accountNumber: `****${acc.accountNumber.slice(-4)}` }
-      : {}),
-    ...(typeof acc.iban === "string" && acc.iban.length > 0
-      ? { iban: `****${acc.iban.slice(-4)}` }
-      : {}),
-  }));
+  return accounts.map((acc) => {
+    if (options?.preserveForInvoicePrint && acc.printOnInvoice === true) {
+      return { ...acc };
+    }
+    return {
+      ...acc,
+      ...(typeof acc.accountNumber === "string" && acc.accountNumber.length > 0
+        ? { accountNumber: `****${acc.accountNumber.slice(-4)}` }
+        : {}),
+      ...(typeof acc.iban === "string" && acc.iban.length > 0
+        ? { iban: `****${acc.iban.slice(-4)}` }
+        : {}),
+    };
+  });
 }
 
 /** Derived compatibility sets for contract generation & legacy references (single source: ORGANIZATION_FIELD_CLASS). */
@@ -353,10 +361,68 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
     const lockRef = uniqueKeyRef(orgId, "branch_code", branchCode);
     const lockDoc = { organizationId: orgId, kind: "branch_code", entityType: "branch", entityId: "main-branch", createdAt: now };
 
+    // Default Operational Accounts (Q-F4: Cash, Bank, Card Clearing)
+    const cashAccRef = db.collection("financialAccounts").doc();
+    const defaultCashDoc: FinancialAccountDoc = {
+      organizationId: orgId,
+      branchId: null,
+      assignedBranchIds: [],
+      name: "Cash in Hand",
+      code: "1010",
+      accountType: "cash",
+      currency,
+      openingBalance: 0,
+      currentBalance: 0,
+      isDefault: true,
+      isActive: true,
+      printOnInvoice: false,
+      createdAt: now,
+      createdBy: request.auth.uid,
+    };
+
+    const bankAccRef = db.collection("financialAccounts").doc();
+    const defaultBankDoc: FinancialAccountDoc = {
+      organizationId: orgId,
+      branchId: null,
+      assignedBranchIds: [],
+      name: "Bank Operating Account",
+      code: "1020",
+      accountType: "bank",
+      currency,
+      openingBalance: 0,
+      currentBalance: 0,
+      isDefault: false,
+      isActive: true,
+      printOnInvoice: false,
+      createdAt: now,
+      createdBy: request.auth.uid,
+    };
+
+    const cardAccRef = db.collection("financialAccounts").doc();
+    const defaultCardDoc: FinancialAccountDoc = {
+      organizationId: orgId,
+      branchId: null,
+      assignedBranchIds: [],
+      name: "Card Clearing Account",
+      code: "1030",
+      accountType: "clearing",
+      currency,
+      openingBalance: 0,
+      currentBalance: 0,
+      isDefault: false,
+      isActive: true,
+      printOnInvoice: false,
+      createdAt: now,
+      createdBy: request.auth.uid,
+    };
+
     const batch = db.batch();
     batch.set(orgRef, orgDocData);
     batch.set(branchRef, defaultBranchDoc);
     batch.set(lockRef, lockDoc);
+    batch.set(cashAccRef, defaultCashDoc);
+    batch.set(bankAccRef, defaultBankDoc);
+    batch.set(cardAccRef, defaultCardDoc);
 
 
     await batch.commit();

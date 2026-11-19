@@ -31,11 +31,17 @@ import {
   OutflowDoc,
   ReturnDoc,
   StockAdjustmentRequestDoc,
+  AccountTransactionDoc,
 } from "../types/models.js";
 import {
   prepareAccountTransactionInTxn,
   applyAccountTransactionInTxn,
 } from "../services/ledgerService.js";
+import {
+  prepareReversalInTxn,
+  applyReversalInTxn,
+  updateEntryWorkflowInTxn,
+} from "../services/postingService.js";
 
 const PERMISSIONS = {
   bill: [APPROVE_PERMISSION.sale],
@@ -44,6 +50,7 @@ const PERMISSIONS = {
   stock_adjustment: [APPROVE_PERMISSION.stock_adjustment],
   account_transfer: [APPROVE_PERMISSION.account_transfer],
   stock_transfer: [APPROVE_PERMISSION.stock_transfer],
+  account_entry: [AppPermissions.ACCOUNT_APPROVE, AppPermissions.ACCOUNT_MANAGE],
 } as const;
 
 async function decideAccountTransfer(ctx: RequestContext, input: DocumentDecisionInput) {
@@ -175,6 +182,61 @@ async function decideStockTransfer(ctx: RequestContext, input: DocumentDecisionI
   });
 }
 
+async function decideAccountEntry(ctx: RequestContext, input: DocumentDecisionInput) {
+  const entryRef = db.collection("accountTransactions").doc(input.documentId);
+  const now = new Date().toISOString();
+  return db.runTransaction(async (txn) => {
+    const snap = await txn.get(entryRef);
+    if (!snap.exists) throw new HttpsError("not-found", "Account entry not found.");
+    const entry = snap.data() as AccountTransactionDoc;
+    if (entry.organizationId !== ctx.organizationId) {
+      throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+    }
+    const creatorUid = entry.workflow?.createdBy || entry.actorUid;
+    if (creatorUid === ctx.callerUid && !ctx.can(AppPermissions.APPROVALS_SELF_APPROVE)) {
+      throw new HttpsError("permission-denied", "Makers cannot decide their own entries.", { reason: "SELF_REVIEW_FORBIDDEN" });
+    }
+
+    if (input.decision === "reject") {
+      let reversalResult = null;
+      if (entry.status === "added" || entry.status === "verified" || entry.status === "approved") {
+        const prep = await prepareReversalInTxn(txn, {
+          organizationId: ctx.organizationId,
+          originalTransactionId: snap.id,
+          financialAccountId: entry.financialAccountId,
+          branchId: entry.branchId,
+          amount: entry.amount,
+          currency: entry.currency,
+          sourceDocumentType: entry.sourceDocumentType,
+          sourceDocumentId: entry.sourceDocumentId,
+          reason: input.reason || "Rejected via approvals inbox",
+          actorUid: ctx.callerUid,
+          now,
+        });
+        reversalResult = applyReversalInTxn(txn, prep);
+      }
+      updateEntryWorkflowInTxn(txn, entryRef, entry, {
+        actorUid: ctx.callerUid,
+        action: "reject",
+        reason: input.reason || "Rejected",
+        needsReview: false,
+        now,
+      });
+      return { documentId: snap.id, status: "rejected", reversalTransactionId: reversalResult?.transactionId || null };
+    }
+
+    // Approve
+    updateEntryWorkflowInTxn(txn, entryRef, entry, {
+      actorUid: ctx.callerUid,
+      action: "approve",
+      note: input.reason,
+      needsReview: false,
+      now,
+    });
+    return { documentId: snap.id, status: "approved" };
+  });
+}
+
 export const documentsDecide = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "Authentication required.");
@@ -188,6 +250,7 @@ export const documentsDecide = onCall({ region: "asia-south1" }, async (request)
     case "stock_adjustment": return decideStockAdjustment(ctx, input);
     case "account_transfer": return decideAccountTransfer(ctx, input);
     case "stock_transfer": return decideStockTransfer(ctx, input);
+    case "account_entry": return decideAccountEntry(ctx, input);
   }
 });
 
@@ -335,6 +398,26 @@ export const approvalsList = onCall({ region: "asia-south1" }, async (request) =
     }
   }
 
+  // 7. Account Entries
+  if (!type || type === "account_entry") {
+    let q = db.collection("accountTransactions").where("organizationId", "==", orgId).where("status", "==", "created");
+    if (input.branchId) q = q.where("branchId", "==", input.branchId);
+    const snap = await q.limit(input.limit || 50).get();
+    for (const doc of snap.docs) {
+      const d = doc.data() as AccountTransactionDoc;
+      items.push({
+        documentId: doc.id,
+        documentType: "account_entry",
+        documentNumber: d.transactionNumber,
+        amount: d.amount,
+        branchId: d.branchId || null,
+        createdAt: d.createdAt,
+        createdBy: d.workflow?.createdBy || d.actorUid,
+        title: `Account Entry ${d.transactionNumber} (${d.type}): ${d.description || ""}`,
+      });
+    }
+  }
+
   // Sort by createdAt descending
   items.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
 
@@ -368,6 +451,7 @@ export const approvalsCounts = onCall({ region: "asia-south1" }, async (request)
   let adjustmentsQuery = db.collection("stockAdjustmentRequests").where("organizationId", "==", orgId).where("status", "==", "pending_approval");
   let accountTransfersQuery = db.collection("accountTransfers").where("organizationId", "==", orgId).where("status", "==", "pending_approval");
   let stockTransfersQuery = db.collection("stockTransfers").where("organizationId", "==", orgId).where("status", "==", "submitted");
+  let accountEntriesQuery = db.collection("accountTransactions").where("organizationId", "==", orgId).where("status", "==", "created");
 
   if (branchId) {
     billsQuery = billsQuery.where("branchId", "==", branchId);
@@ -375,15 +459,17 @@ export const approvalsCounts = onCall({ region: "asia-south1" }, async (request)
     returnsQuery = returnsQuery.where("branchId", "==", branchId);
     adjustmentsQuery = adjustmentsQuery.where("branchId", "==", branchId);
     stockTransfersQuery = stockTransfersQuery.where("sourceBranchId", "==", branchId);
+    accountEntriesQuery = accountEntriesQuery.where("branchId", "==", branchId);
   }
 
-  const [billsSnap, outflowsSnap, returnsSnap, adjustmentsSnap, accountTransfersSnap, stockTransfersSnap] = await Promise.all([
+  const [billsSnap, outflowsSnap, returnsSnap, adjustmentsSnap, accountTransfersSnap, stockTransfersSnap, accountEntriesSnap] = await Promise.all([
     billsQuery.count().get(),
     outflowsQuery.count().get(),
     returnsQuery.count().get(),
     adjustmentsQuery.count().get(),
     accountTransfersQuery.count().get(),
     stockTransfersQuery.count().get(),
+    accountEntriesQuery.count().get(),
   ]);
 
   const counts = {
@@ -393,13 +479,15 @@ export const approvalsCounts = onCall({ region: "asia-south1" }, async (request)
     stockAdjustments: adjustmentsSnap.data().count,
     accountTransfers: accountTransfersSnap.data().count,
     stockTransfers: stockTransfersSnap.data().count,
+    accountEntries: accountEntriesSnap.data().count,
     total:
       billsSnap.data().count +
       outflowsSnap.data().count +
       returnsSnap.data().count +
       adjustmentsSnap.data().count +
       accountTransfersSnap.data().count +
-      stockTransfersSnap.data().count,
+      stockTransfersSnap.data().count +
+      accountEntriesSnap.data().count,
   };
 
   return counts;
