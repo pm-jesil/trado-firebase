@@ -1,9 +1,9 @@
 {
   "projectId": "trado-x",
   "region": "asia-south1",
-  "totalExports": 196,
+  "totalExports": 197,
   "summary": {
-    "callableCount": 188,
+    "callableCount": 189,
     "triggerCount": 8,
     "concreteCollectionsCount": 61,
     "categoryCounts": {
@@ -14,7 +14,7 @@
       "PLATFORM_SUPER_ADMIN": 29,
       "REFERENCE_DATA": 5,
       "DERIVED_TENANT_OPERATION": 73,
-      "FILTER_OPTIONAL_TENANT": 69
+      "FILTER_OPTIONAL_TENANT": 70
     },
     "subgroupCounts": {
       "DERIVED_TENANT_OPERATION": {
@@ -27,7 +27,7 @@
         "Requests & Support Desk": 4
       },
       "FILTER_OPTIONAL_TENANT": {
-        "Entities & Catalog Lists": 51,
+        "Entities & Catalog Lists": 52,
         "Reports & Telemetry": 15,
         "Usage & Quotas": 3
       }
@@ -610,6 +610,7 @@
         "Entities & Catalog Lists": [
           "organizationsList",
           "organizationsGet",
+          "organizationsRevealBankAccount",
           "branchesGetDefault",
           "branchesList",
           "employeesList",

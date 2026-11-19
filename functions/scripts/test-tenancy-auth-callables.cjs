@@ -141,6 +141,19 @@ async function run() {
   assert.ok(org && (org.id === owner.organizationId || org.organizationId === owner.organizationId), "organizationsGet must return organization doc");
   console.log(`✓ organizationsGet succeeded for Tenant Owner (currency: ${org.currency})`);
 
+  // organizationsRevealBankAccount
+  await db.collection("organizations").doc(owner.organizationId).update({
+    bankAccounts: [
+      { id: "ba_tenancy_01", bankName: "State Bank", accountNumber: "123456789012", accountHolderName: "Owner Corp", routingType: "ifsc", routingCode: "SBIN0001234" }
+    ]
+  });
+  const revealRes = await callFunction("organizationsRevealBankAccount", {
+    organizationId: owner.organizationId,
+    bankAccountId: "ba_tenancy_01",
+  }, owner.idToken);
+  assert.equal(revealRes.accountNumber, "123456789012", "Must reveal full bank account number");
+  console.log("✓ [organizationsRevealBankAccount#ok] organizationsRevealBankAccount revealed full unmasked account to owner");
+
   // organizationsDeactivate
   const tempOrg = await createTenantOwnerPersona(superAdmin.idToken, "DeactOrg");
   await assertCallableError(
@@ -479,8 +492,21 @@ async function run() {
   const jpeg = await sharp({ create: { width: 320, height: 240, channels: 3, background: { r: 200, g: 80, b: 40 } } }).jpeg().toBuffer();
   const bucket = `${PROJECT_ID}.appspot.com`;
   const storageUrl = (objectPath) => `${STORAGE_ORIGIN}/v0/b/${bucket}/o${objectPath ? `/${encodeURIComponent(objectPath)}` : ""}`;
-  const upload = await fetch(`${storageUrl()}?name=${encodeURIComponent(sessionRes.uploadPath)}`, {
-    method: "POST", headers: { Authorization: `Firebase ${unassigned.idToken}`, "Content-Type": "image/jpeg" }, body: jpeg,
+  const boundary = `boundary_${Date.now()}`;
+  const metadata = JSON.stringify({ name: sessionRes.uploadPath, contentType: "image/jpeg" });
+  const multipartBody = Buffer.concat([
+    Buffer.from(`--${boundary}\r\nContent-Type: application/json; charset=utf-8\r\n\r\n${metadata}\r\n--${boundary}\r\nContent-Type: image/jpeg\r\n\r\n`),
+    jpeg,
+    Buffer.from(`\r\n--${boundary}--\r\n`),
+  ]);
+  const upload = await fetch(`${storageUrl()}?uploadType=multipart&name=${encodeURIComponent(sessionRes.uploadPath)}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Firebase ${unassigned.idToken}`,
+      "Content-Type": `multipart/related; boundary=${boundary}`,
+      "X-Goog-Upload-Protocol": "multipart",
+    },
+    body: multipartBody,
   });
   assert.equal(upload.status, 200, `tmp upload by its owner must be allowed by storage.rules (HTTP ${upload.status})`);
   const attachRes = await callFunction("imagesAttach", { uploadId: sessionRes.uploadId, entityType: "user", entityId: unassigned.uid }, unassigned.idToken);

@@ -15,7 +15,12 @@ import {
   PaymentDoc,
   CustomerDoc,
   SplitPaymentEntry,
+  OrganizationDoc,
+  BankAccountRecord,
+  TaxSnapshot,
+  TaxBreakdownItem,
 } from "../../types/models.js";
+import { maskBankAccounts } from "../organizations.js";
 import {
   prepareAccountTransactionInTxn,
   applyAccountTransactionInTxn,
@@ -383,4 +388,179 @@ export async function markIdempotencySucceeded(recordId: string | undefined | nu
     result,
     updatedAt: new Date().toISOString(),
   });
+}
+
+export interface BillPrintSnapshot {
+  version: 1;
+  invoiceTitle: string;
+  organization: {
+    name: string;
+    legalName: string | null;
+    taxId: string | null;
+    address: Record<string, unknown> | null;
+    contactPhone: string | null;
+    contactEmail: string | null;
+    bankAccounts: Array<{
+      id?: string;
+      bankName: string;
+      accountNumber: string; // masked (****1234)
+      routingType?: string;
+      routingCode?: string | null;
+      accountHolderName?: string;
+    }>;
+  };
+  customer: BillToSnapshot | null;
+  billNumber: string;
+  issueDate: string;
+  salesMode: string;
+  documentType: string;
+  items: Array<{
+    lineId: string;
+    productId: string;
+    name: string;
+    sku: string | null;
+    quantity: number;
+    unit: string;
+    unitPrice: number;
+    discountAmount: number;
+    taxAmount: number;
+    taxRatePercent?: number;
+    totalAmount: number;
+  }>;
+  totals: {
+    subTotal: number;
+    discountTotal: number;
+    taxTotal: number;
+    roundOff: number;
+    totalAmount: number;
+    paidAmount: number;
+    balanceAmount: number;
+  };
+  taxBreakdown: Array<{
+    name: string;
+    ratePercent: number;
+    taxableAmount: number;
+    taxAmount: number;
+  }>;
+}
+
+export function buildBillPrintSnapshot(
+  orgDoc: Partial<OrganizationDoc> | undefined | null,
+  bill: {
+    billNumber?: string;
+    salesMode?: string;
+    documentType?: string;
+    status?: string;
+    createdAt?: string;
+    finalizedAt?: string;
+    billToSnapshot?: BillToSnapshot | null;
+    items?: Array<Partial<BillItem> & { name?: string; sku?: string | null; unitPrice?: number; discountAmount?: number; taxRatePercent?: number; totalAmount?: number }>;
+    subTotal?: number;
+    discountTotal?: number;
+    taxTotal?: number;
+    roundOff?: number;
+    totalAmount?: number;
+    paidAmount?: number;
+    balanceAmount?: number;
+    taxSnapshot?: TaxSnapshot | {
+      labels?: { invoiceTitle?: string; taxName?: string };
+      invoiceTitle?: string;
+      taxName?: string;
+      taxRatePercent?: number;
+      breakdown?: TaxBreakdownItem[];
+      slabs?: Array<{ name: string; rate?: number; ratePercent?: number; taxableAmount?: number; amount?: number; taxAmount?: number }>;
+    } | null;
+  }
+): BillPrintSnapshot {
+  const org = orgDoc || {};
+  const maskedAccounts = Array.isArray(org.bankAccounts)
+    ? maskBankAccounts(org.bankAccounts).map((a: BankAccountRecord) => ({
+      id: a.id,
+      bankName: a.bankName || "",
+      accountHolderName: a.accountHolderName || "",
+      accountNumber: a.accountNumber || "",
+      routingType: a.routingType || "other",
+      routingCode: a.routingCode || null,
+    }))
+    : [];
+
+  const invoiceTitle = bill.taxSnapshot?.labels?.invoiceTitle ||
+    ("invoiceTitle" in (bill.taxSnapshot || {}) ? (bill.taxSnapshot as { invoiceTitle?: string }).invoiceTitle : null) ||
+    (bill.documentType === "quotation" ? "QUOTATION" :
+      bill.documentType === "proforma" ? "PROFORMA INVOICE" :
+        bill.salesMode === "b2b" ? "TAX INVOICE" : "RETAIL INVOICE");
+
+  const items = (bill.items || []).map((item) => ({
+    lineId: item.lineId || "L1",
+    productId: item.productId || "",
+    name: item.name || "",
+    sku: item.sku || null,
+    quantity: item.quantity ?? 1,
+    unit: item.unit || "pcs",
+    unitPrice: item.unitPrice ?? item.priceSnapshot ?? 0,
+    discountAmount: item.discountAmount ?? item.discountValue ?? 0,
+    taxAmount: item.taxAmount || 0,
+    taxRatePercent: item.taxRatePercent || 0,
+    totalAmount: item.totalAmount ?? item.lineTotal ?? 0,
+  }));
+
+  const subTotal = bill.subTotal ?? items.reduce((s, i) => s + (i.unitPrice * i.quantity), 0);
+  const discountTotal = bill.discountTotal ?? items.reduce((s, i) => s + i.discountAmount, 0);
+  const taxTotal = bill.taxTotal ?? items.reduce((s, i) => s + i.taxAmount, 0);
+  const totalAmount = bill.totalAmount ?? (subTotal - discountTotal + taxTotal);
+  const paidAmount = bill.paidAmount ?? 0;
+  const balanceAmount = bill.balanceAmount ?? (totalAmount - paidAmount);
+
+  const taxBreakdown: Array<{ name: string; ratePercent: number; taxableAmount: number; taxAmount: number }> = [];
+  const rawBreakdown = bill.taxSnapshot?.breakdown ||
+    ("slabs" in (bill.taxSnapshot || {}) ? (bill.taxSnapshot as { slabs?: Array<{ name: string; rate?: number; ratePercent?: number; taxableAmount?: number; amount?: number; taxAmount?: number }> }).slabs : null);
+  if (rawBreakdown && Array.isArray(rawBreakdown)) {
+    for (const slab of rawBreakdown) {
+      const rateVal = "ratePercent" in slab && slab.ratePercent !== undefined ? slab.ratePercent : ("rate" in slab ? slab.rate : 0);
+      const amtVal = slab.amount ?? ("taxAmount" in slab ? (slab as { taxAmount?: number }).taxAmount : 0) ?? 0;
+      taxBreakdown.push({
+        name: slab.name || "Tax",
+        ratePercent: rateVal ?? 0,
+        taxableAmount: slab.taxableAmount || (subTotal - discountTotal),
+        taxAmount: amtVal,
+      });
+    }
+  } else if (taxTotal > 0) {
+    taxBreakdown.push({
+      name: bill.taxSnapshot?.labels?.taxName || ("taxName" in (bill.taxSnapshot || {}) ? (bill.taxSnapshot as { taxName?: string }).taxName : null) || "Tax",
+      ratePercent: bill.taxSnapshot?.taxRatePercent || 0,
+      taxableAmount: subTotal - discountTotal,
+      taxAmount: taxTotal,
+    });
+  }
+
+  return {
+    version: 1,
+    invoiceTitle,
+    organization: {
+      name: org.name || "",
+      legalName: org.legalName || org.name || null,
+      taxId: org.taxId || null,
+      address: org.address || (Array.isArray(org.addresses) && org.addresses[0] ? org.addresses[0] : null) || null,
+      contactPhone: org.contactPhone || null,
+      contactEmail: org.contactEmail || null,
+      bankAccounts: maskedAccounts,
+    },
+    customer: bill.billToSnapshot || null,
+    billNumber: bill.billNumber || "PREVIEW",
+    issueDate: (bill.finalizedAt || bill.createdAt || new Date().toISOString()).slice(0, 10),
+    salesMode: bill.salesMode || "pos",
+    documentType: bill.documentType || "invoice",
+    items,
+    totals: {
+      subTotal,
+      discountTotal,
+      taxTotal,
+      roundOff: bill.roundOff || 0,
+      totalAmount,
+      paidAmount,
+      balanceAmount,
+    },
+    taxBreakdown,
+  };
 }

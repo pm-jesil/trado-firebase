@@ -153,8 +153,7 @@ export const requestsTransition = onCall({ region: "asia-south1" }, async (reque
     // Timeline entry
     const activityRef = reqRef.collection("activity").doc();
     const activityDoc: RequestActivityDoc = {
-      activityId: activityRef.id,
-      requestId: current.requestId,
+      requestId: input.requestId,
       type: "status_change",
       visibility: "public",
       author: {
@@ -181,10 +180,10 @@ export const requestsTransition = onCall({ region: "asia-south1" }, async (reque
 
     return {
       success: true,
-      requestId: current.requestId,
+      requestId: input.requestId,
       previousStatus: current.status,
       status: nextStatus,
-      request: updatedRequest,
+      request: { ...updatedRequest, requestId: input.requestId },
     };
   });
 });
@@ -217,7 +216,7 @@ export const requestsInboxList = onCall({ region: "asia-south1" }, async (reques
 
   const snap = await query.get();
   const items = snap.docs
-    .map((d) => d.data() as RequestDoc)
+    .map((d) => ({ requestId: d.id, ...(d.data() as RequestDoc) }))
     .filter((r) => {
       if (input.status && input.status.length && !input.status.includes(r.status)) return false;
       if (input.category && input.category.length && !input.category.includes(r.category)) return false;
@@ -339,8 +338,7 @@ export const requestsAssign = onCall({ region: "asia-south1" }, async (request) 
 
     const activityRef = reqRef.collection("activity").doc();
     txn.set(activityRef, {
-      activityId: activityRef.id,
-      requestId: current.requestId,
+      requestId: input.requestId,
       type: "assignment",
       visibility: "public",
       author: {
@@ -394,8 +392,7 @@ export const requestsSetPriority = onCall({ region: "asia-south1" }, async (requ
 
     const activityRef = reqRef.collection("activity").doc();
     txn.set(activityRef, {
-      activityId: activityRef.id,
-      requestId: current.requestId,
+      requestId: input.requestId,
       type: "priority_change",
       visibility: "public",
       author: {
@@ -435,13 +432,11 @@ export const requestsAddInternalNote = onCall({ region: "asia-south1" }, async (
     if (!snap.exists) {
       throw new HttpsError("not-found", `[${RequestReason.REQUEST_NOT_FOUND}] Request not found.`);
     }
-    const current = snap.data() as RequestDoc;
     const nowIso = new Date().toISOString();
 
     const activityRef = reqRef.collection("activity").doc();
     const activityDoc: RequestActivityDoc = {
-      activityId: activityRef.id,
-      requestId: current.requestId,
+      requestId: input.requestId,
       type: "comment",
       visibility: "internal", // D-38: strictly internal
       author: {
@@ -603,8 +598,7 @@ export const requestsApply = onCall({ region: "asia-south1" }, async (request) =
     // Timeline entry
     const activityRef = reqRef.collection("activity").doc();
     txn.set(activityRef, {
-      activityId: activityRef.id,
-      requestId: current.requestId,
+      requestId: input.requestId,
       type: "apply",
       visibility: "public",
       author: {
@@ -629,7 +623,7 @@ export const requestsApply = onCall({ region: "asia-south1" }, async (request) =
       version: current.version + 1,
     };
 
-    return { success: true, requestId: current.requestId, status: RequestStatus.APPLIED, applyResult, request: updatedRequest };
+    return { success: true, requestId: input.requestId, status: RequestStatus.APPLIED, applyResult, request: { ...updatedRequest, requestId: input.requestId } };
   });
 });
 

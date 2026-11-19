@@ -23,6 +23,7 @@ const REQUIRED_OWNER_PERMISSIONS = [
   "org:update",
   "org:manage_legal_profile",
   "org:manage_bank_details",
+  "org:manage_approval_policy",
 ];
 
 async function runOrgOwnerPermissionsMigration(options = {}) {

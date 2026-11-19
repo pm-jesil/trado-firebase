@@ -279,7 +279,6 @@ export const requestsCreate = onCall({ region: "asia-south1" }, async (request) 
       const reqRef = db.collection("requests").doc();
 
       const requestDoc: RequestDoc = {
-        requestId: reqRef.id,
         requestNumber,
         audience,
         category: input.category,
@@ -328,7 +327,6 @@ export const requestsCreate = onCall({ region: "asia-south1" }, async (request) 
 
       const activityRef = reqRef.collection("activity").doc();
       const activityDoc: RequestActivityDoc = {
-        activityId: activityRef.id,
         requestId: reqRef.id,
         type: "status_change",
         visibility: "public",
@@ -343,7 +341,7 @@ export const requestsCreate = onCall({ region: "asia-south1" }, async (request) 
       };
       txn.set(activityRef, activityDoc);
 
-      return { request: requestDoc };
+      return { request: { ...requestDoc, requestId: reqRef.id } };
     });
 
     if (idempotencyRecordId) {
@@ -413,8 +411,7 @@ export const requestsUpdate = onCall({ region: "asia-south1" }, async (request) 
 
     const activityRef = reqRef.collection("activity").doc();
     txn.set(activityRef, {
-      activityId: activityRef.id,
-      requestId: current.requestId,
+      requestId: input.requestId,
       type: "comment",
       visibility: "public",
       author: {
@@ -459,8 +456,7 @@ export const requestsAddComment = onCall({ region: "asia-south1" }, async (reque
     const nowIso = new Date().toISOString();
     const activityRef = reqRef.collection("activity").doc();
     const activityDoc: RequestActivityDoc = {
-      activityId: activityRef.id,
-      requestId: current.requestId,
+      requestId: input.requestId,
       type: "comment",
       visibility: "public",
       author: {
@@ -540,7 +536,7 @@ export const requestsGet = onCall({ region: "asia-south1" }, async (request) => 
   }
 
   return {
-    request: req,
+    request: { ...req, requestId: reqDoc.id },
     included: {
       blockers,
     },
@@ -573,7 +569,7 @@ export const requestsList = onCall({ region: "asia-south1" }, async (request) =>
 
   const snap = await query.get();
   const items = snap.docs
-    .map((d) => d.data() as RequestDoc)
+    .map((d) => ({ ...d.data(), requestId: d.id } as RequestDoc & { requestId: string }))
     .filter((r) => {
       if (isOrgWide && r.category === RequestCategory.SECURITY_CONCERN && r.requester.uid !== context.callerUid) {
         return false;
@@ -620,7 +616,7 @@ export const requestsActivityList = onCall({ region: "asia-south1" }, async (req
     .limit(input.limit || 50)
     .get();
 
-  const activities = snap.docs.map((d) => d.data() as RequestActivityDoc);
+  const activities = snap.docs.map((d) => ({ ...d.data(), activityId: d.id } as RequestActivityDoc & { activityId: string }));
   const hasInternalNotesAccess = context.isSuperAdmin || context.can(AppPermissions.PLATFORM_REQUESTS_INTERNAL_NOTES);
   const items = filterActivityForTenant(activities, hasInternalNotesAccess);
 

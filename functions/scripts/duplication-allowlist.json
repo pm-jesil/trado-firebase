@@ -656,14 +656,6 @@
       "cap": 10
     },
     {
-      "id": "DUP-078",
-      "kind": "R4",
-      "collection": "requests",
-      "field": "requestId",
-      "owner": "requests",
-      "reason": "Document self ID stored on ticket record for query filtering and client reference."
-    },
-    {
       "id": "DUP-079",
       "kind": "OWNED",
       "collection": "activity",
@@ -679,14 +671,6 @@
       "owner": "requests",
       "reason": "Activity comment attachments array capped at 5 in RequestAttachmentSchema.",
       "cap": 5
-    },
-    {
-      "id": "DUP-081",
-      "kind": "R4",
-      "collection": "activity",
-      "field": "activityId",
-      "owner": "requests",
-      "reason": "Document self ID stored on timeline entry record for client reference and deduplication."
     },
     {
       "id": "DUP-083",

@@ -330,7 +330,6 @@ describe("BX3 Requests Exhaustive Spec Verification (RH-2, RH-3, RH-4, RH-6, RH-
     it("RH-4 / BM-7 [requestsActivityList#ok]: internal notes are ALWAYS stripped when hasInternalNotesPermission is false", () => {
       const sample: RequestActivityDoc[] = [
         {
-          activityId: "a1",
           requestId: "r1",
           type: "comment",
           visibility: "public",
@@ -339,7 +338,6 @@ describe("BX3 Requests Exhaustive Spec Verification (RH-2, RH-3, RH-4, RH-6, RH-
           createdAt: "2026-11-18T10:00:00.000Z",
         },
         {
-          activityId: "a2",
           requestId: "r1",
           type: "comment",
           visibility: "internal",

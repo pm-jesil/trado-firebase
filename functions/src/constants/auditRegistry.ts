@@ -33,6 +33,7 @@ export const AUDIT_REGISTRY: Record<string, AuditRegistryEntry> = {
   organizationsGetSubscriptionHistory: { action: "organization.get_subscription_history", category: "none", collection: null, inputFields: [] },
   organizationsProvisionUser: { action: "organization.provision_user", category: "admin", collection: "organizations", inputFields: ["reason"] },
   organizationsTransferOwnership: { action: "organization.transfer_ownership", category: "mutation", collection: "organizations", inputFields: ["reason"] },
+  organizationsRevealBankAccount: { action: "organization.reveal_bank_account", category: "mutation", collection: "organizations", inputFields: [] },
   branchesGetDefault: { action: "branch.get_default", category: "none", collection: "branches", inputFields: [] },
   branchesList: { action: "branch.list", category: "none", collection: "branches", inputFields: [] },
   branchesCreate: { action: "branch.create", category: "mutation", collection: "branches", inputFields: [] },

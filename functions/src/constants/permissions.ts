@@ -31,6 +31,7 @@ export const AppPermissions = {
   ORG_UPDATE: "org:update",
   ORG_MANAGE_LEGAL_PROFILE: "org:manage_legal_profile", // S1: edit legalName and taxId (owner default)
   ORG_MANAGE_BANK_DETAILS: "org:manage_bank_details", // S1: edit organization invoice bankAccounts (owner default)
+  ORG_MANAGE_APPROVAL_POLICY: "org:manage_approval_policy", // S1: edit approval thresholds, self-approval policy & numbering (owner default)
   ORG_SETTINGS: "org:settings",
   ORG_CREATE: "org:create",
   ORG_MODULES: "org:modules",
@@ -167,6 +168,7 @@ export const AppPermissions = {
   // Live Location Tracking
   LOCATION_PING: "location:ping",
   LOCATION_VIEW_OWN: "location:view_own",
+  LOCATION_VIEW_TEAM: "locations:view_team", // Manager/branch team live location coordinates view (MG-40)
   LOCATION_VIEW_ALL: "location:view_all",
   LOCATION_MANAGE: "location:manage",
 

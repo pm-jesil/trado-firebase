@@ -157,7 +157,7 @@ async function partB(exportsList) {
     tally.sent++;
     for (const token of [owner.idToken, sa.idToken]) {
       try {
-        await callFunction(exp.name, { ...payload, ...(token === owner.idToken && !("organizationId" in payload) ? {} : {}) }, token, 30000);
+        await callFunction(exp.name, { ...payload, ...(token === owner.idToken && !("organizationId" in payload) ? {} : {}) }, token, 5000);
         tally.other.accepted = (tally.other.accepted || 0) + 1;
         return;
       } catch (e) {
@@ -222,13 +222,15 @@ async function partC(exportsList) {
     if ("organizationId" in (schema.def.shape || {})) payload.organizationId = owner.organizationId;
     payload.idempotencyKey = `replay-${exp.name}-${Date.now().toString(36)}`;
     let outcome = "";
-    for (const token of [owner.idToken, sa.idToken]) {
+    const isSuperAdminOnly = exp.name === "plansCreate" || exp.name === "organizationsCreate";
+    const tokens = isSuperAdminOnly ? [sa.idToken] : [owner.idToken];
+    for (const token of tokens) {
       try {
-        const first = await callFunction(exp.name, payload, token, 60000);
-        const second = await callFunction(exp.name, payload, token, 60000);
+        const first = await callFunction(exp.name, payload, token, 5000);
+        const second = await callFunction(exp.name, payload, token, 5000);
         const same = JSON.stringify(first) === JSON.stringify(second);
         let conflict = "not rejected";
-        try { await callFunction(exp.name, { ...payload, ...(payload.name ? { name: `${payload.name}x` } : { notes: "changed" }) }, token, 60000); } catch (e) { conflict = `rejected (${(e.details && e.details.reason) || e.code})`; }
+        try { await callFunction(exp.name, { ...payload, ...(payload.name ? { name: `${payload.name}x` } : { notes: "changed" }) }, token, 5000); } catch (e) { conflict = `rejected (${(e.details && e.details.reason) || e.code})`; }
         outcome = `replay ${same ? "returned the same result" : "returned a DIFFERENT result"}; changed payload under the same key ${conflict}`;
         break;
       } catch (e) {

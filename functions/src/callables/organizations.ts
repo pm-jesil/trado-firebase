@@ -22,6 +22,7 @@ import {
   GetSubscriptionHistorySchema,
   ProvisionUserSchema,
   TransferOwnershipSchema,
+  RevealBankAccountSchema,
 } from "../validation/schemas.js";
 import { getCountryDefaults } from "../constants/countryDefaults.js";
 import { nameKey } from "../services/naturalKeys.js";
@@ -33,6 +34,7 @@ import {
 } from "../types/api.js";
 import {
   OrganizationDoc,
+  BankAccountRecord,
   MembershipDoc,
   BranchDoc,
   OrganizationSharingPolicies,
@@ -92,10 +94,11 @@ export const ORGANIZATION_FIELD_CLASS: Record<string, OrganizationFieldRule> = {
   salesChannels: { fieldClass: "S0", requiredPermission: null },
   timezone: { fieldClass: "S0", requiredPermission: null },
   showCostToTenant: { fieldClass: "S0", requiredPermission: null },
-  // S1 — Sensitive legal & bank fields (dedicated permission, never plain org:update)
+  // S1 — Sensitive legal, bank & policy fields (dedicated permission, never plain org:update)
   legalName: { fieldClass: "S1", requiredPermission: AppPermissions.ORG_MANAGE_LEGAL_PROFILE },
   taxId: { fieldClass: "S1", requiredPermission: AppPermissions.ORG_MANAGE_LEGAL_PROFILE },
   bankAccounts: { fieldClass: "S1", requiredPermission: AppPermissions.ORG_MANAGE_BANK_DETAILS },
+  settings: { fieldClass: "S1", requiredPermission: AppPermissions.ORG_MANAGE_APPROVAL_POLICY },
   // S2 — Non-sensitive operational fields (org:update)
   displayName: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
   image: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
@@ -106,7 +109,6 @@ export const ORGANIZATION_FIELD_CLASS: Record<string, OrganizationFieldRule> = {
   contact: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
   contacts: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
   addresses: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
-  settings: { fieldClass: "S2", requiredPermission: AppPermissions.ORG_UPDATE },
 };
 
 export interface OrgPolicyActor {
@@ -119,6 +121,9 @@ export interface OrgPolicyActor {
  * Uses permission codes exclusively (never role names). Fails closed on unclassified fields.
  */
 export function canEditOrganizationField(actor: OrgPolicyActor, field: string): boolean {
+  if (field === "settings.approvals" || field === "settings.numbering" || field === "settings.documentNumbering") {
+    return actor.isSuperAdmin || actor.can(AppPermissions.ORG_MANAGE_APPROVAL_POLICY);
+  }
   const rule = ORGANIZATION_FIELD_CLASS[field];
   if (!rule) return false; // fail closed
   if (actor.isSuperAdmin) return true;
@@ -427,7 +432,8 @@ export const organizationsUpdate = onCall({ region: "asia-south1" }, async (requ
     const hasAnyOrgEditPerm =
       ctx.can(AppPermissions.ORG_UPDATE) ||
       ctx.can(AppPermissions.ORG_MANAGE_LEGAL_PROFILE) ||
-      ctx.can(AppPermissions.ORG_MANAGE_BANK_DETAILS);
+      ctx.can(AppPermissions.ORG_MANAGE_BANK_DETAILS) ||
+      ctx.can(AppPermissions.ORG_MANAGE_APPROVAL_POLICY);
     if (!hasAnyOrgEditPerm) {
       throw new HttpsError(
         "permission-denied",
@@ -561,6 +567,7 @@ export const organizationsList = onCall({ region: "asia-south1" }, async (reques
     return {
       organizationId: doc.id,
       ...data,
+      bankAccounts: maskBankAccounts(data.bankAccounts),
       subscriptionStatus: data.subscriptionStatus || "active",
       subscriptionExpiresAt: data.subscriptionExpiresAt || null,
       seatsUsed: data.activeEmployeeCount || 0,
@@ -1029,3 +1036,54 @@ export const organizationsTransferOwnership = onCall({ region: "asia-south1" }, 
     message: "Organization ownership transferred successfully.",
   };
 });
+
+/**
+ * Reveal Full Bank Account Number (Q-C3, MG-37)
+ * Gated to holders of org:manage_bank_details or Platform Super Admin.
+ * Returns unmasked account number and bank routing info for authorized disbursement/payroll setup.
+ */
+export const organizationsRevealBankAccount = onCall({ region: "asia-south1" }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Authentication required.");
+  }
+
+  const input = parseInput(RevealBankAccountSchema, request.data);
+  const isSuperAdmin = request.auth.token.isSuperAdmin === true;
+
+  let targetOrgId = input.organizationId;
+  if (!isSuperAdmin) {
+    const ctx = await resolveRequestContext(request, {
+      organizationId: input.organizationId,
+      requiredPermission: AppPermissions.ORG_MANAGE_BANK_DETAILS,
+    });
+    if (targetOrgId && targetOrgId !== ctx.organizationId) {
+      throw new HttpsError("permission-denied", "Cross-tenant organization access rejected.");
+    }
+    targetOrgId = ctx.organizationId;
+  }
+
+  const snap = await db.collection("organizations").doc(targetOrgId).get();
+  if (!snap.exists) {
+    throw new HttpsError("not-found", `Organization "${targetOrgId}" not found.`);
+  }
+
+  const data = snap.data() as OrganizationDoc;
+  const accounts = Array.isArray(data.bankAccounts) ? (data.bankAccounts as BankAccountRecord[]) : [];
+  const found = accounts.find((a: BankAccountRecord) => a.id === input.bankAccountId || a.accountNumber === input.bankAccountId);
+
+  if (!found) {
+    throw new HttpsError("not-found", `Bank account "${input.bankAccountId}" not found in organization.`);
+  }
+
+  return {
+    organizationId: targetOrgId,
+    bankAccountId: found.id || input.bankAccountId,
+    bankName: found.bankName,
+    accountHolderName: found.accountHolderName || "",
+    accountNumber: found.accountNumber || "",
+    routingType: found.routingType || "other",
+    routingCode: found.routingCode ?? null,
+    upiId: found.upiId ?? null,
+  };
+});
+

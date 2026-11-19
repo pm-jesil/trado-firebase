@@ -157,6 +157,7 @@ export interface OrganizationDoc {
   sharingPolicies?: OrganizationSharingPolicies;
   usageLimitOverrides?: UsageLimitsConfig; // Super Admin per-tenant usage limit overrides
   showCostToTenant?: boolean; // D-25: tenants see the cost estimate (labelled) only when the Super Admin enables it
+  supportAccessExpiresAt?: string | null; // BC3 / MG-40: Tenant-granted expiring support access grant for Super Admin
   // Subscription (per organization; Super Admin only). ISO-8601 UTC instants, server-set.
   subscriptionStatus?: SubscriptionStatus;
   subscriptionStartsAt?: string;
@@ -1133,6 +1134,7 @@ export interface LatestLocationDoc {
   source: "foreground" | "background";
   recordedAt: string; // ISO 8601 string
   updatedAt: string;
+  expiresAt?: Timestamp; // BC3: Firestore Timestamp TTL for pruning inactive latestLocations
 }
 
 /**
@@ -1527,7 +1529,6 @@ export interface RequestAttachment {
  * Platform-domain request document. Never holds internal notes (D-38).
  */
 export interface RequestDoc {
-  requestId: string;
   requestNumber: string; // REQ-YYYY-000123
   audience: RequestAudience | "platform" | "organization";
   category: RequestCategory;
@@ -1592,7 +1593,6 @@ export type { RequestAction, RequestResolutionType };
  * Timeline entry. Visibility 'internal' is stripped for tenants (D-38).
  */
 export interface RequestActivityDoc {
-  activityId: string;
   requestId: string;
   type: "comment" | "status_change" | "assignment" | "priority_change" | "apply" | "system";
   visibility: "public" | "internal";

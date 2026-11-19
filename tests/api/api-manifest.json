@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "generatedAt": "2026-11-07T00:00:00Z",
   "projectId": "trado-x",
-  "totalExports": 194,
+  "totalExports": 197,
   "phases": {
     "phase1Count": 29,
     "phase2Count": 37,
@@ -3746,6 +3746,33 @@
       ],
       "firestoreCollectionsWritten": [],
       "sideEffects": [],
+      "indexesRequired": [],
+      "coveredInIntegrationTests": true,
+      "coveredInE2ETest": false
+    },
+    {
+      "exportName": "organizationsRevealBankAccount",
+      "logicalName": "organizations.revealBankAccount",
+      "phase": 2,
+      "domain": "organizations",
+      "triggerType": "callable",
+      "region": "asia-south1",
+      "authRequired": true,
+      "requiredClaims": {},
+      "activeContextDerivation": "token_claim_or_membership",
+      "requiredPermissions": [
+        "org:manage_bank_details"
+      ],
+      "superAdminBypass": true,
+      "inputSchema": "RevealBankAccountSchema",
+      "idempotent": false,
+      "firestoreCollectionsRead": [
+        "organizations"
+      ],
+      "firestoreCollectionsWritten": [],
+      "sideEffects": [
+        "audit_log"
+      ],
       "indexesRequired": [],
       "coveredInIntegrationTests": true,
       "coveredInE2ETest": false

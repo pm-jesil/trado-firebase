@@ -361,6 +361,11 @@
       "maxWrites": 4,
       "maxDeletes": 1
     },
+    "organizationsRevealBankAccount": {
+      "maxReads": 12,
+      "maxWrites": 3,
+      "maxDeletes": 1
+    },
     "organizationsSetSubscription": {
       "maxReads": 4,
       "maxWrites": 4,
@@ -572,7 +577,7 @@
       "maxDeletes": 1
     },
     "reportsGetPlatformOverview": {
-      "maxReads": 344,
+      "maxReads": 450,
       "maxWrites": 1,
       "maxDeletes": 1
     },
@@ -652,7 +657,7 @@
       "maxDeletes": 1
     },
     "requestsCreate": {
-      "maxReads": 25,
+      "maxReads": 35,
       "maxWrites": 8,
       "maxDeletes": 1
     },
@@ -892,12 +897,12 @@
       "maxDeletes": 1
     },
     "usageGetOrganizations": {
-      "maxReads": 84,
+      "maxReads": 119,
       "maxWrites": 1,
       "maxDeletes": 1
     },
     "usageGetPlatformSummary": {
-      "maxReads": 73,
+      "maxReads": 108,
       "maxWrites": 1,
       "maxDeletes": 1
     },

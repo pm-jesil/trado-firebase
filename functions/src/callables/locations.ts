@@ -19,7 +19,7 @@ import {
   GetLocationHistorySchema,
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
-import { LatestLocationDoc, LocationPingDoc, MembershipDoc } from "../types/models.js";
+import { LatestLocationDoc, LocationPingDoc, MembershipDoc, OrganizationDoc } from "../types/models.js";
 
 const MIN_PING_INTERVAL_MS = 5000;
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -115,6 +115,7 @@ export const locationsRecordPing = onCall({ region: "asia-south1" }, async (requ
     source: validated.source || "foreground",
     recordedAt: clientRecordedAt,
     updatedAt: nowIso,
+    expiresAt: expiresAtTimestamp,
   };
 
   const pingDoc: LocationPingDoc = {
@@ -154,7 +155,11 @@ export const locationsRecordPing = onCall({ region: "asia-south1" }, async (requ
  */
 export const locationsGetLatest = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
-    requiredPermission: [AppPermissions.LOCATION_VIEW_OWN, AppPermissions.LOCATION_VIEW_ALL],
+    requiredPermission: [
+      AppPermissions.LOCATION_VIEW_OWN,
+      AppPermissions.LOCATION_VIEW_TEAM,
+      AppPermissions.LOCATION_VIEW_ALL,
+    ],
     allowPlatformSuperAdmin: true,
   });
 
@@ -165,11 +170,26 @@ export const locationsGetLatest = onCall({ region: "asia-south1" }, async (reque
     throw new HttpsError("permission-denied", "Cross-organization access denied");
   }
 
+  // BC3 / MG-40: Super Admin cannot read employee coordinates unless active tenant support grant exists
+  if (context.isSuperAdmin) {
+    const orgSnap = await db.collection("organizations").doc(orgId).get();
+    const orgData = (orgSnap.data() as OrganizationDoc) || {};
+    const supportExpires = orgData.supportAccessExpiresAt ? new Date(orgData.supportAccessExpiresAt).getTime() : 0;
+    if (supportExpires <= Date.now()) {
+      throw new HttpsError(
+        "permission-denied",
+        "Super Admin access to employee location coordinates requires active tenant-granted support access (supportAccessExpiresAt)."
+      );
+    }
+  }
+
   const callerMembershipId = `${context.callerUid}_${orgId}`;
   const isOwnerOrAdmin = context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
-  const canViewAll = isOwnerOrAdmin || context.effectivePermissions.includes(AppPermissions.LOCATION_VIEW_ALL);
+  const canViewTeam = isOwnerOrAdmin ||
+    context.effectivePermissions.includes(AppPermissions.LOCATION_VIEW_TEAM) ||
+    context.effectivePermissions.includes(AppPermissions.LOCATION_VIEW_ALL);
 
-  if (!canViewAll) {
+  if (!canViewTeam && !context.isSuperAdmin) {
     const ownDocId = `${orgId}_${callerMembershipId}`;
     const ownSnap = await db.collection("latestLocations").doc(ownDocId).get();
     if (!ownSnap.exists) {
@@ -201,7 +221,11 @@ export const locationsGetLatest = onCall({ region: "asia-south1" }, async (reque
  */
 export const locationsGetHistory = onCall({ region: "asia-south1" }, async (request) => {
   const context = await resolveRequestContext(request, {
-    requiredPermission: [AppPermissions.LOCATION_VIEW_OWN, AppPermissions.LOCATION_VIEW_ALL],
+    requiredPermission: [
+      AppPermissions.LOCATION_VIEW_OWN,
+      AppPermissions.LOCATION_VIEW_TEAM,
+      AppPermissions.LOCATION_VIEW_ALL,
+    ],
     allowPlatformSuperAdmin: true,
   });
 
@@ -212,14 +236,29 @@ export const locationsGetHistory = onCall({ region: "asia-south1" }, async (requ
     throw new HttpsError("permission-denied", "Cross-organization access denied");
   }
 
+  // BC3 / MG-40: Super Admin cannot read employee coordinates unless active tenant support grant exists
+  if (context.isSuperAdmin) {
+    const orgSnap = await db.collection("organizations").doc(orgId).get();
+    const orgData = (orgSnap.data() as OrganizationDoc) || {};
+    const supportExpires = orgData.supportAccessExpiresAt ? new Date(orgData.supportAccessExpiresAt).getTime() : 0;
+    if (supportExpires <= Date.now()) {
+      throw new HttpsError(
+        "permission-denied",
+        "Super Admin access to employee location coordinates requires active tenant-granted support access (supportAccessExpiresAt)."
+      );
+    }
+  }
+
   const callerMembershipId = `${context.callerUid}_${orgId}`;
   const isOwnerOrAdmin = context.isOwner || context.role?.code === "admin" || context.role?.code === "org_owner" || context.role?.code === "owner";
-  const canViewAll = isOwnerOrAdmin || context.effectivePermissions.includes(AppPermissions.LOCATION_VIEW_ALL);
+  const canViewTeam = isOwnerOrAdmin ||
+    context.effectivePermissions.includes(AppPermissions.LOCATION_VIEW_TEAM) ||
+    context.effectivePermissions.includes(AppPermissions.LOCATION_VIEW_ALL);
 
-  if (!canViewAll && validated.membershipId !== callerMembershipId) {
+  if (!canViewTeam && !context.isSuperAdmin && validated.membershipId !== callerMembershipId) {
     throw new HttpsError(
       "permission-denied",
-      "Employees can only view their own location history. Admin permission required."
+      "Employees can only view their own location history. Team manager permission (locations:view_team) required."
     );
   }
 

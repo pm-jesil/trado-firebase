@@ -188,6 +188,7 @@ const CLASSIFICATION_DEFINITIONS = {
       "Entities & Catalog Lists": [
         "organizationsList",
         "organizationsGet",
+        "organizationsRevealBankAccount",
         "branchesGetDefault",
         "branchesList",
         "employeesList",

@@ -452,6 +452,8 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
         "payment:fee_verify",
         "capital:manage",
         "capital:view",
+        "org:manage_approval_policy",
+        "locations:view_team",
       ];
 
       for (const perm of requiredNew) {
@@ -460,7 +462,7 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
           `Permission "${perm}" must be registered in AppPermissions catalog`
         );
       }
-      assert.strictEqual(permissions.length, 149, "AppPermissions catalog must contain exactly 149 keys (incl. org:manage_legal_profile & org:manage_bank_details)");
+      assert.strictEqual(permissions.length, 151, "AppPermissions catalog must contain exactly 151 keys (incl. org:manage_approval_policy & locations:view_team)");
     });
 
     it("Maps maker-checker approval permissions for account and stock transfers", () => {
@@ -510,7 +512,6 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
         "contactPhone",
         "contact",
         "addresses",
-        "settings",
       ];
 
       for (const field of allowedForS2) {
@@ -533,6 +534,7 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
         "legalName",
         "taxId",
         "bankAccounts",
+        "settings",
       ];
 
       for (const field of protectedFromPlainUpdate) {

@@ -240,9 +240,14 @@ export const UpdateOrganizationSchema = z.strictObject({
         expense: z.boolean().optional(),
         return: z.boolean().optional(),
         stock_adjustment: z.boolean().optional(),
+        account_transfer: z.boolean().optional(),
+        stock_transfer: z.boolean().optional(),
       }).optional(),
       amountThreshold: z.number().min(0).optional(),
+      allowSelfApproval: z.boolean().optional(),
+      thresholds: z.record(z.string(), z.number().min(0)).optional(),
     }).optional(),
+    numbering: z.record(z.string(), z.string()).optional(),
     // Overrides of the business-type defaults (absent = default; constants/businessDefaults.ts)
     businessConfig: z.strictObject({
       defaultUnits: z.array(z.string().trim().min(1).max(20)).max(20).optional(),
@@ -271,6 +276,12 @@ export const DeactivateOrganizationSchema = z.strictObject({
   branchId: ContextFields.branchId,
   organizationId: z.string().trim().min(2),
   reason: z.string().trim().max(500).optional(),
+});
+
+export const RevealBankAccountSchema = z.strictObject({
+  branchId: ContextFields.branchId,
+  organizationId: z.string().trim().min(2),
+  bankAccountId: z.string().trim().min(1).max(128),
 });
 
 export const ListOrganizationsSchema = z.strictObject({

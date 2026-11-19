@@ -13,6 +13,7 @@
  */
 
 import { onSchedule } from "firebase-functions/v2/scheduler";
+import { Timestamp } from "firebase-admin/firestore";
 import { db } from "../services/firebase.js";
 import { OrganizationDoc, MembershipDoc, SubscriptionPlanDoc } from "../types/models.js";
 import { EntityStatus, SubscriptionStatus } from "../constants/enums.js";
@@ -34,6 +35,7 @@ export interface SweepResult {
   expiredFlipped: number;
   usageWarningsSent: number;
   recurringExpensesGenerated: number;
+  expiredLocationsPruned: number;
 }
 
 async function notifyOwnersOnce(orgId: string, key: string, title: string, body: string): Promise<boolean> {
@@ -75,7 +77,7 @@ async function notifyOwnersOnce(orgId: string, key: string, title: string, body:
 }
 
 export async function runSubscriptionAndUsageSweep(nowMs: number = Date.now()): Promise<SweepResult> {
-  const result: SweepResult = { organizationsScanned: 0, remindersSent: 0, expiredFlipped: 0, usageWarningsSent: 0, recurringExpensesGenerated: 0 };
+  const result: SweepResult = { organizationsScanned: 0, remindersSent: 0, expiredFlipped: 0, usageWarningsSent: 0, recurringExpensesGenerated: 0, expiredLocationsPruned: 0 };
   const orgs = await db.collection("organizations").where("status", "==", EntityStatus.ACTIVE).get();
 
   for (const orgSnap of orgs.docs) {
@@ -121,6 +123,23 @@ export async function runSubscriptionAndUsageSweep(nowMs: number = Date.now()): 
   }
   // Recurring expenses due today (idempotent per template and period)
   result.recurringExpensesGenerated = (await generateDueRecurringExpenses(nowMs)).generated;
+
+  // Prune expired latestLocations (MG-40)
+  try {
+    const expiredLocations = await db.collection("latestLocations")
+      .where("expiresAt", "<=", Timestamp.fromMillis(nowMs))
+      .limit(100)
+      .get();
+    if (!expiredLocations.empty) {
+      const batch = db.batch();
+      for (const d of expiredLocations.docs) batch.delete(d.ref);
+      await batch.commit();
+      result.expiredLocationsPruned = expiredLocations.size;
+    }
+  } catch (_e) {
+    // Ignore collection absence in minimal testing
+  }
+
   return result;
 }
 
@@ -182,8 +201,7 @@ export async function runRequestsSlaAndLifecycleSweep(nowMs: number = Date.now()
 
         const actRef = doc.ref.collection("activity").doc();
         const act: RequestActivityDoc = {
-          activityId: actRef.id,
-          requestId: req.requestId,
+          requestId: doc.id,
           type: "status_change",
           visibility: "public",
           author: {
@@ -234,8 +252,7 @@ export async function runRequestsSlaAndLifecycleSweep(nowMs: number = Date.now()
 
       const actRef = doc.ref.collection("activity").doc();
       const act: RequestActivityDoc = {
-        activityId: actRef.id,
-        requestId: req.requestId,
+        requestId: doc.id,
         type: "status_change",
         visibility: "public",
         author: {

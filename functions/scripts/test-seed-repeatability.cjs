@@ -33,11 +33,20 @@ async function main() {
   enforceLocalEmulatorSafety();
   await verifyEmulatorHealth();
   console.log("=== SEED REPEATABILITY ===");
+  const waitForTriggers = async (timeoutMs = 15000) => {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+      const ds = (await db.collection("dailySummaries").count().get()).data().count;
+      if (ds >= 2) break;
+      await new Promise((r) => setTimeout(r, 1000));
+    }
+    await new Promise((r) => setTimeout(r, 3000));
+  };
   const passes1 = runSeed();
-  await new Promise((r) => setTimeout(r, 4000));
+  await waitForTriggers();
   const first = await counts();
   const passes2 = runSeed();
-  await new Promise((r) => setTimeout(r, 4000));
+  await waitForTriggers();
   const second = await counts();
   console.log(`Collections counted: ${COLLECTIONS.length} (derived from source; ${COLLECTIONS.filter((c) => c.parent).length} subcollections)`);
   for (const c of COLLECTIONS) console.log(`  ${c.key.padEnd(28)} ${c.parent ? "sub " : "root"} ${String(first[c.key]).padStart(6)} → ${String(second[c.key]).padStart(6)}`);

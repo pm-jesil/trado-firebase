@@ -93,7 +93,7 @@ async function run() {
   });
   assert.ok(cashAccRes.financialAccountId, "Must return financialAccountId");
   assert.equal(cashAccRes.account.currentBalance, 500000, "Current balance must match opening balance");
-  ok("Financial account created with initial opening balance ₹5,000.00");
+  ok("[financialAccountsCreate#ok] Financial account created with initial opening balance ₹5,000.00");
 
   const cashAccId = cashAccRes.financialAccountId;
 
@@ -103,7 +103,7 @@ async function run() {
     financialAccountId: cashAccId,
   });
   assert.equal((getAcc.financialAccount || getAcc.account).financialAccountId, cashAccId);
-  ok("financialAccountsGet retrieved single account");
+  ok("[financialAccountsGet#ok] financialAccountsGet retrieved single account");
 
   // Verify financialAccountsUpdate
   const updAcc = await callFunction(owner, "financialAccountsUpdate", {
@@ -112,14 +112,14 @@ async function run() {
     name: "Main Cash Desk Updated",
   });
   assert.equal(updAcc.success, true);
-  ok("financialAccountsUpdate updated account name");
+  ok("[financialAccountsUpdate#ok] financialAccountsUpdate updated account name");
 
   // Verify financialAccountsList
   const accList = await callFunction(owner, "financialAccountsList", {
     organizationId: orgId,
   });
   assert.ok(accList.items.some((a) => a.financialAccountId === cashAccId));
-  ok("financialAccountsList listed accounts");
+  ok("[financialAccountsList#ok] financialAccountsList listed accounts");
 
   // Verify ledger entry created for opening balance
   const cashLedger = await callFunction(owner, "financialAccountsGetLedger", {
@@ -135,7 +135,7 @@ async function run() {
     .where("financialAccountId", "==", cashAccId)
     .get();
   assert.equal(accountTxnSnap.empty, false, "accountTransactions collection must contain the opening transaction");
-  ok("Immutable ledger transaction verified for account opening (R4)");
+  ok("[financialAccountsGetLedger#ok] Immutable ledger transaction verified for account opening (R4)");
 
   console.log("\n--- SCENARIO 2: Two-Phase Payment with Account Linking & Ledger Entry (R4, D-47) ---");
   // Create a customer
@@ -160,7 +160,7 @@ async function run() {
   assert.ok(paymentRes.paymentId, "Must create payment record");
   const pDoc = await db.collection("payments").doc(paymentRes.paymentId).get();
   assert.equal(pDoc.data().financialAccountId, cashAccId);
-  ok("Payment recorded with explicit financialAccountId");
+  ok("[paymentsCreate#ok] Payment recorded with explicit financialAccountId");
 
   // Check updated cash account ledger and running balance
   const updatedCashLedger = await callFunction(owner, "financialAccountsGetLedger", {
@@ -274,14 +274,14 @@ async function run() {
     transferId: transferRes.transferId,
   });
   assert.equal(trfDoc.transfer.transferId, transferRes.transferId);
-  ok("accountTransfersGet retrieved transfer by ID");
+  ok("[accountTransfersGet#ok] accountTransfersGet retrieved transfer by ID");
 
   // Verify accountTransfersList
   const trfList = await callFunction(owner, "accountTransfersList", {
     organizationId: orgId,
   });
   assert.ok(trfList.items.some((t) => t.transferId === transferRes.transferId));
-  ok("accountTransfersList listed transfers");
+  ok("[accountTransfersList#ok] accountTransfersList listed transfers");
 
   // Verify balances
   const bankLedger = await callFunction(owner, "financialAccountsGetLedger", {
@@ -300,7 +300,7 @@ async function run() {
     }),
     "failed-precondition"
   );
-  ok("Account-to-account transfer executed with double-entry ledger entries and balance protection");
+  ok("[accountTransfersCreate#ok] Account-to-account transfer executed with double-entry ledger entries and balance protection");
 
   console.log("\n--- SCENARIO 5: Storage Locations & Warehouse Management ---");
   const locRes = await callFunction(owner, "storageLocationsCreate", {
@@ -327,7 +327,7 @@ async function run() {
     locationId: locId,
   });
   assert.equal((locGet.location.locationId || locGet.location.storageLocationId), locId);
-  ok("storageLocationsGet retrieved location by ID");
+  ok("[storageLocationsGet#ok] storageLocationsGet retrieved location by ID");
 
   // Verify storageLocationsUpdate
   const locUpd = await callFunction(owner, "storageLocationsUpdate", {
@@ -336,8 +336,8 @@ async function run() {
     name: "Central Reserve Yard (Expanded)",
   });
   assert.equal(locUpd.success, true);
-  ok("storageLocationsUpdate updated storage location");
-  ok("Storage locations created, mapped to branch, and retrieved successfully");
+  ok("[storageLocationsUpdate#ok] storageLocationsUpdate updated storage location");
+  ok("[storageLocationsCreate#ok] [storageLocationsList#ok] Storage locations created, mapped to branch, and retrieved successfully");
 
   console.log("\n--- SCENARIO 6: Inter-Branch Stock Transfer End-to-End Workflow (D-49) ---");
   // Create a product with initial stock
@@ -377,7 +377,7 @@ async function run() {
   });
   assert.equal(draftTrf.transfer?.status || draftTrf.status, "draft");
   const transferId = draftTrf.transferId;
-  ok("Stock transfer created in draft status");
+  ok("[stockTransfersCreate#ok] Stock transfer created in draft status");
 
   // Concurrency check (U-7): Mismatched version on submit must fail
   await assertCallableError(
@@ -409,7 +409,7 @@ async function run() {
     version: 1,
   });
   assert.equal(submitTrf.status, "submitted");
-  ok("Stock transfer submitted for approval with version progression");
+  ok("[stockTransfersSubmit#ok] Stock transfer submitted for approval with version progression");
 
   // 2b. Assert maker-checker: Creator cannot self-approve (assertCanDecide enforces SELF_APPROVAL_FORBIDDEN)
   await assertCallableError(
@@ -421,7 +421,7 @@ async function run() {
     }),
     "permission-denied"
   );
-  ok("Self-approval forbidden: Maker cannot approve their own transfer (FB-7, D-50)");
+  ok("[documentsDecide#PERMISSION_DENIED] Self-approval forbidden: Maker cannot approve their own transfer (FB-7, D-50)");
 
   // 3. Approve Transfer via documentsDecide (Admin persona decides; maker cannot self-approve)
   const approveTrf = await callFunction(adminEmployee, "documentsDecide", {
@@ -431,7 +431,7 @@ async function run() {
     decision: "approve",
   });
   assert.equal(approveTrf.decision, "approved");
-  ok("Stock transfer approved via maker-checker decision router");
+  ok("[documentsDecide#ok] Stock transfer approved via maker-checker decision router");
 
   // 4. Dispatch Transfer: Source stock deducted atomically
   const dispatchTrf = await callFunction(owner, "stockTransfersDispatch", {
@@ -454,7 +454,7 @@ async function run() {
   const dstStockKey = `${orgId}_${branchSecondId}_${productId}`;
   const dstPreSnap = await db.collection("branchProductStock").doc(dstStockKey).get();
   assert.equal(dstPreSnap.exists ? dstPreSnap.data().currentStock : 0, 0, "Destination stock must remain 0 during transit");
-  ok("Stock transfer dispatched: Source stock deducted, inTransitQty tracked, destination stock isolated without duplication");
+  ok("[stockTransfersDispatch#ok] Stock transfer dispatched: Source stock deducted, inTransitQty tracked, destination stock isolated without duplication");
 
   // State machine check: Attempting to cancel an in-transit transfer must fail
   await assertCallableError(
@@ -506,7 +506,7 @@ async function run() {
   });
   assert.equal(resolvedTrf.status, "received");
   assert.equal(resolvedTrf.discrepancyStatus, "resolved");
-  ok("Discrepancy resolved via write_off with automated inventory adjustment");
+  ok("[stockTransfersResolveDiscrepancy#ok] Discrepancy resolved via write_off with automated inventory adjustment");
 
   // 5c. Create and cancel a draft transfer to verify clean cancellation lifecycle
   const draftToCancel = await callFunction(owner, "stockTransfersCreate", {
@@ -521,7 +521,7 @@ async function run() {
     reason: "Order requirements changed",
   });
   assert.equal(cancelRes.status, "cancelled");
-  ok("Stock transfer draft cancelled cleanly via stockTransfersCancel (U-6)");
+  ok("[stockTransfersCancel#ok] Stock transfer draft cancelled cleanly via stockTransfersCancel (U-6)");
 
   // Verify stockTransfersGet
   const stGet = await callFunction(owner, "stockTransfersGet", {
@@ -529,16 +529,16 @@ async function run() {
     transferId,
   });
   assert.equal(stGet.transfer.transferId, transferId);
-  ok("stockTransfersGet retrieved transfer by ID");
+  ok("[stockTransfersGet#ok] stockTransfersGet retrieved transfer by ID");
 
   // Verify stockTransfersList
   const stList = await callFunction(owner, "stockTransfersList", {
     organizationId: orgId,
   });
   assert.ok(stList.items.some((t) => t.transferId === transferId));
-  ok("stockTransfersList listed transfers");
+  ok("[stockTransfersList#ok] stockTransfersList listed transfers");
 
-  ok("Stock transfer received with discrepancy logging and total inventory conservation verified");
+  ok("[stockTransfersReceive#ok] Stock transfer received with discrepancy logging and total inventory conservation verified");
 
   console.log("\n--- SCENARIO 7: Unified Approvals Inbox & Pending Counts (FB-7, D-50) ---");
   // Query pending approvals
@@ -553,7 +553,7 @@ async function run() {
   });
   assert.ok(typeof counts.total === "number");
   assert.ok(typeof counts.bills === "number");
-  ok("Unified approvals inbox and aggregate counts retrieved successfully");
+  ok("[approvalsList#ok] [approvalsCounts#ok] Unified approvals inbox and aggregate counts retrieved successfully");
 
   console.log("\n--- SCENARIO 8: Receivables & Payables Ageing Analytics ---");
   const recvAgeing = await callFunction(owner, "reportsGetReceivablesAgeing", {
@@ -643,7 +643,7 @@ async function run() {
   assert.equal(feeRes.balanceAfter, 98000, "Clearing account must be debited by feeAmount (₹1000 - ₹20 = ₹980)");
   const feeDocSnap = await db.collection("paymentProcessingFees").doc(feeRes.feeId).get();
   assert.equal(feeDocSnap.exists, true, "paymentProcessingFees collection must contain fee doc");
-  ok("Payment fee recorded atomically and debited from financial account (D-51)");
+  ok("[paymentsRecordFee#ok] Payment fee recorded atomically and debited from financial account (D-51)");
 
   // 3. Verify fee in list
   const feeList = await callFunction(owner, "paymentsListFees", {
@@ -652,7 +652,7 @@ async function run() {
   });
   assert.equal(feeList.items.length, 1, "Must list the recorded fee");
   assert.equal(feeList.items[0].feeNumber, feeRes.feeNumber);
-  ok("Payment fee retrievable via list filter by source document");
+  ok("[paymentsListFees#ok] Payment fee retrievable via list filter by source document");
 
   // 4. Verify paymentsGetFee
   const feeGet = await callFunction(owner, "paymentsGetFee", {
@@ -660,7 +660,7 @@ async function run() {
     feeId: feeRes.feeId,
   });
   assert.equal(feeGet.fee.feeId, feeRes.feeId);
-  ok("paymentsGetFee retrieved single fee record by ID");
+  ok("[paymentsGetFee#ok] paymentsGetFee retrieved single fee record by ID");
 
   // 5. Verify Fee Lifecycle: Maker-Checker guard, Dispute, and Reversal (Phase 1, G2)
   await assert.rejects(
@@ -671,7 +671,7 @@ async function run() {
     /Maker-checker rule violation/,
     "Cannot self-verify payment fee entered by oneself"
   );
-  ok("Payment fee maker-checker self-verification guard verified");
+  ok("[paymentsVerifyFee#PERMISSION_DENIED] Payment fee maker-checker self-verification guard verified");
 
   const disputeRes = await callFunction(owner, "paymentsDisputeFee", {
     organizationId: orgId,
@@ -679,7 +679,7 @@ async function run() {
     reason: "Gateway charged 2.5% instead of contracted 1.8%",
   });
   assert.equal(disputeRes.status, "disputed");
-  ok("Payment fee disputed with audit trail");
+  ok("[paymentsDisputeFee#ok] Payment fee disputed with audit trail");
 
   const reverseRes = await callFunction(owner, "paymentsReverseFee", {
     organizationId: orgId,
@@ -688,7 +688,7 @@ async function run() {
   });
   assert.equal(reverseRes.status, "reversed");
   assert.equal(reverseRes.balanceAfter, 100000, "Fee deduction reversed back to clearing account (98000 + 2000 = 100000)");
-  ok("Payment fee reversed, clearing account credited back, and expense voided");
+  ok("[paymentsReverseFee#ok] Payment fee reversed, clearing account credited back, and expense voided");
 
   console.log("\n--- SCENARIO 11: Capital Introduction & Drawings Flow (D-52, GAP-CAP-01) ---");
   // 1. Capital infusion by owner (₹50,000.00 = 5,000,000 paise) into cash account
@@ -702,7 +702,7 @@ async function run() {
   });
   assert.ok(capInRes.capitalTransactionId, "Must return capitalTransactionId");
   assert.ok(capInRes.transactionNumber.startsWith("CAP-"), "Capital txn number must start with CAP- prefix");
-  ok("Owner capital contribution recorded with CAP- prefix (D-52)");
+  ok("[capitalTransactionsCreate#ok] Owner capital contribution recorded with CAP- prefix (D-52)");
 
   // 2. Capital drawings (₹10,000.00 = 1,000,000 paise) by owner from cash account
   const capOutRes = await callFunction(owner, "capitalTransactionsCreate", {
@@ -713,14 +713,14 @@ async function run() {
     description: "Owner personal drawings",
   });
   assert.ok(capOutRes.capitalTransactionId);
-  ok("Owner capital drawings recorded and deducted from cash account");
+  ok("[capitalTransactionsCreate#ok] Owner capital drawings recorded and deducted from cash account");
 
   // 3. Verify capital transactions listing
   const capList = await callFunction(owner, "capitalTransactionsList", {
     organizationId: orgId,
   });
   assert.ok(capList.items.length >= 2, "Must list both capital transactions");
-  ok("Capital transactions listing verified with type attribution");
+  ok("[capitalTransactionsList#ok] Capital transactions listing verified with type attribution");
 
   console.log("\n--- SCENARIO 12: Cash & Bank Liquidity Summary (GAP-REP-01) ---");
   const cashBankSummary = await callFunction(owner, "reportsGetCashBankSummary", {
@@ -780,7 +780,7 @@ async function run() {
   );
   assert.ok(hasClearingSplitTxn, "Must have posted 4000 paise ledger transaction to clearing account");
 
-  ok("Bill created with multi-account split payments (₹60 cash + ₹40 card) and atomically posted to ledgers");
+  ok("[billsCreate#ok] Bill created with multi-account split payments (₹60 cash + ₹40 card) and atomically posted to ledgers");
 
   console.log("\n--- SCENARIO 14: Sales Return with Cash Refund & Financial Account Deduction (G1, FB-5) ---");
   const cashBeforeReturn = await callFunction(owner, "financialAccountsGet", {
@@ -820,7 +820,7 @@ async function run() {
     beforeAcc.currentBalance - 10000,
     "Cash account balance must decrease by exact refund amount"
   );
-  ok("Sales return executed with automatic financial account deduction and ledger entry (G1)");
+  ok("[returnsCreate#ok] Sales return executed with automatic financial account deduction and ledger entry (G1)");
 
   console.log("\n--- SCENARIO 15: Double-Entry Trial Balance & Invariant Verification (G3, G4, Section 1D) ---");
   const trialBalance = await callFunction(owner, "reportsGetTrialBalance", {
@@ -838,7 +838,7 @@ async function run() {
   assert.ok(ledgerVerification.transactionsChecked > 0, "Must check account transactions");
   const jrnSnap = await db.collection("journalEntries").where("organizationId", "==", orgId).get();
   assert.ok(Array.isArray(jrnSnap.docs), "journalEntries collection query must execute successfully");
-  ok("System-wide ledger invariant verification passed with 0 discrepancies (G4, Section 1D)");
+  ok("[ledgerVerify#ok] System-wide ledger invariant verification passed with 0 discrepancies (G4, Section 1D)");
 
   console.log("\n--- SCENARIO 16: System-Wide Stock Invariant Verification (G6, Section 8) ---");
   const stockVerification = await callFunction(owner, "stockVerify", {
@@ -848,7 +848,7 @@ async function run() {
   assert.ok(stockVerification.productsChecked > 0, "Must check stock products");
   assert.ok(stockVerification.movementsChecked > 0, "Must check stock movements");
   assert.equal(stockVerification.discrepancies.length, 0, "Must have zero stock discrepancies");
-  ok("System-wide stock invariant verification passed with 0 discrepancies (G6, Section 8)");
+  ok("[stockVerify#ok] System-wide stock invariant verification passed with 0 discrepancies (G6, Section 8)");
 
   console.log("\n--- SCENARIO 17: Worldwide Tax, Regions & 3-Decimal Currency (G7, G8) ---");
   const bhOrgCode = `org_bh_${uniq()}`;

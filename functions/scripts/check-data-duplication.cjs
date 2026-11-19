@@ -40,7 +40,12 @@ async function loadAll() {
   }
 }
 const col = (name) => store.get(name) || new Map();
-const inScope = (doc) => !ONLY_ORG || doc.organizationId === ONLY_ORG || doc.organizationId === undefined;
+const inScope = (collection, id, doc) => {
+  if (!ONLY_ORG) return true;
+  if (collection === "organizations") return id === ONLY_ORG;
+  if (doc.organizationId !== undefined) return doc.organizationId === ONLY_ORG;
+  return true;
+};
 
 // ---------------------------------------------------------------------------
 // 1. Reference integrity
@@ -367,7 +372,7 @@ function reconcile() {
 const INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?Z$/;
 const CAL_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const YEAR_MONTH = /^\d{4}-\d{2}$/;
-const TTL_FIELDS = new Set(["locationPings.expiresAt", "auditLogs.expireAt", "auditLogs.occurredAt", "organizationUsageDaily.expireAt", "organizationUsageDaily.lastSeenAt", "userUsageDaily.expireAt", "userUsageDaily.lastSeenAt"]);
+const TTL_FIELDS = new Set(["locationPings.expiresAt", "latestLocations.expiresAt", "auditLogs.expireAt", "auditLogs.occurredAt", "organizationUsageDaily.expireAt", "organizationUsageDaily.lastSeenAt", "userUsageDaily.expireAt", "userUsageDaily.lastSeenAt"]);
 const CALENDAR_FIELDS = new Set(["date", "dueDate", "expiryDate", "expiresOn", "day", "startDate", "endDate", "startOn", "nextRunOn", "endOn", "occurredLocalDate", "settlementDate"]);
 const dateTable = new Map(); // "collection.field" -> { class, values, bad }
 
@@ -420,7 +425,7 @@ async function main() {
   await loadAll();
   for (const [collection, docs] of store) {
     for (const [id, doc] of docs) {
-      if (!inScope(doc)) continue;
+      if (!inScope(collection, id, doc)) continue;
       stats.docs++;
       checkDates(collection, id, doc);
       if (SKIP_COLLECTIONS.has(collection)) continue;

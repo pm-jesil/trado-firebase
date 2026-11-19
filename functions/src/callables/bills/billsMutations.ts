@@ -74,6 +74,7 @@ import {
   prepareSaleEffects,
   paymentStatusFor,
   markIdempotencySucceeded,
+  buildBillPrintSnapshot,
 } from "./helpers.js";
 
 // ---------------------------------------------------------------------------
@@ -488,6 +489,16 @@ export async function finalizeBillInternal(
       balanceAmount,
       paymentId: effects.paymentId,
       message: `Quotation ${billData.billNumber} finalized into Invoice ${invoiceNumber}. Inventory stock decremented.`,
+      printSnapshot: buildBillPrintSnapshot(ctx.organization, {
+        ...billData,
+        billNumber: invoiceNumber,
+        status: "active",
+        documentType: DocumentType.INVOICE,
+        items: finalizedItems,
+        paidAmount,
+        balanceAmount,
+        finalizedAt: now,
+      }),
     };
   });
 }

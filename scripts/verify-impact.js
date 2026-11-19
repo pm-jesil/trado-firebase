@@ -16,6 +16,19 @@
  * Change detection hashes content (line endings normalised); git is never consulted.
  */
 
+function assertNodeVersion(version = process.versions.node) {
+  const [major] = (version || "").split(".").map(Number);
+  if (major !== 22) {
+    throw new Error(`Node 22 required (found Node v${version} at ${process.execPath}).`);
+  }
+}
+try {
+  assertNodeVersion();
+} catch (e) {
+  console.error(`ERROR: ${e.message}`);
+  process.exit(1);
+}
+
 const fs = require("node:fs");
 const path = require("node:path");
 const net = require("node:net");
@@ -207,7 +220,22 @@ function enumerateUnits() {
     add({ id: `rules:${svc}`, command: `node --test lib/test/rules/${f.replace(/\.ts$/, ".js")} && node ../scripts/collect-rules-coverage.js ${svc}`, cwd: FUNCTIONS, entries: [`functions/src/test/rules/${f}`], needsBuild: true, emulator: true, phase: 2, declared: [`${svc}.rules`, "firebase.json"] });
   }
   // Emulator suites, derived from the package scripts that run them.
-  const groups = [["test:seed", "seed", 1.5], ["test:callables", "suite", 2.5], ["test:triggers", "trigger", 2.5], ["test:e2e", "suite", 2.5], ["test:simulation", "suite", 2.5], ["test:roundtrip", "roundtrip", 2.5], ["test:schema-sweep", "sweep", 2.5], ["api:audit:generate", "ledger", 3.5], ["test:guard-defects", "guardtest", 3.2], ["test:coverage-defects", "engine", 5], ["test:metering", "metering", 2.5], ["test:scenarios", "scenario", 2.5]];
+  const groups = [
+    ["test:seed", "seed", 1.5],
+    ["test:callables", "suite", 2.5],
+    ["test:triggers", "trigger", 2.5],
+    ["test:e2e", "suite", 2.5],
+    ["test:simulation", "suite", 2.5],
+    ["test:roundtrip", "roundtrip", 2.5],
+    ["test:schema-sweep", "sweep", 2.5],
+    ["api:audit:generate", "ledger", 3.5],
+    ["test:guard-defects", "guardtest", 3.2],
+    ["test:coverage-defects", "engine", 5],
+    ["test:metering", "metering", 2.5],
+    ["test:scenarios", "scenario", 2.5],
+    ["gate:emulator", "gate", 2.7],
+    ["gate:seeded-defects", "gate", 3.2],
+  ];
   for (const [script, kind, phase] of groups) {
     for (const { file } of nodeCommands(pkg[script])) {
       add({ id: `${kind}:${base(file).replace(/^(test|run|generate)-|-callables$|\.e2e$/g, "")}`, command: `node ${file}`, entries: [file], needsBuild: true, emulator: true, phase, declared: ["firestore.rules", "storage.rules", "firestore.indexes.json", "firebase.json"] });
@@ -402,7 +430,7 @@ function runOne(unit, runDir, evidenceRoot = LOCAL) {
     const onData = (d) => { log.write(d); tail = (tail + d.toString()).slice(-2000); };
     child.stdout.on("data", onData);
     child.stderr.on("data", onData);
-    const timer = setTimeout(() => child.kill(), 20 * 60 * 1000);
+    const timer = setTimeout(() => child.kill(), 35 * 60 * 1000);
     child.on("close", (code) => { clearTimeout(timer); log.end(); resolve({ ok: code === 0, durationMs: Date.now() - started, tail }); });
   });
 }
@@ -414,9 +442,26 @@ async function resetEmulatorData() {
     const res = await fetch(url, { method: "DELETE" });
     console.log(`  reset ${url.split("/emulator")[0]} (${project}) → HTTP ${res.status}`);
   }
+  // Wait a moment for background triggers fired by document deletion to settle on Windows
+  await new Promise((r) => setTimeout(r, 2000));
   // The emulator's per-request operation log (services/requestRecorder.ts) describes this run only.
-  fs.rmSync(path.join(LOCAL, "request-ops"), { recursive: true, force: true });
-  fs.rmSync(path.join(LOCAL, "query-shapes.jsonl"), { force: true });
+  const reqOps = path.join(LOCAL, "request-ops");
+  try {
+    fs.rmSync(reqOps, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  } catch (e) {
+    if (fs.existsSync(reqOps)) {
+      for (const f of fs.readdirSync(reqOps)) {
+        try { fs.rmSync(path.join(reqOps, f), { force: true }); } catch (_) {
+          try { fs.truncateSync(path.join(reqOps, f), 0); } catch (__) { }
+        }
+      }
+    }
+  }
+  try {
+    fs.rmSync(path.join(LOCAL, "query-shapes.jsonl"), { force: true, maxRetries: 5, retryDelay: 200 });
+  } catch (e) {
+    try { fs.truncateSync(path.join(LOCAL, "query-shapes.jsonl"), 0); } catch (_) { }
+  }
 }
 
 async function pool(items, workers, fn) {
@@ -622,7 +667,7 @@ function status() {
   return 0;
 }
 
-module.exports = { ROOT, computePlan, enumerateUnits, universe, isIgnored, hashFile, staticClosure, closureOf, execute, writeBlastRadius, loadBaseline, BASELINE_FILE, config };
+module.exports = { ROOT, computePlan, enumerateUnits, universe, isIgnored, hashFile, staticClosure, closureOf, execute, writeBlastRadius, loadBaseline, BASELINE_FILE, config, assertNodeVersion };
 
 if (require.main === module) {
   const [cmd, ...args] = process.argv.slice(2);

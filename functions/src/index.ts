@@ -39,6 +39,7 @@ export {
   organizationsGetSubscriptionHistory,
   organizationsProvisionUser,
   organizationsTransferOwnership,
+  organizationsRevealBankAccount,
 } from "./callables/organizations.js";
 
 // Branches & Multi-Branch Context

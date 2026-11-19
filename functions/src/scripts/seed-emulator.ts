@@ -215,7 +215,7 @@ export async function seedReferenceData(db: Firestore): Promise<void> {
       maxCreationsPerHourPerUser: 10,
     },
     autoCloseDays: 7,
-    reopenWindowDays: 30,
+    reopenWindowDays: 14,
     needsInfoReminderDays: 7,
     needsInfoAutoCancelDays: 14,
     updatedAt: new Date().toISOString(),

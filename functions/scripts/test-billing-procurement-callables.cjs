@@ -109,7 +109,7 @@ async function run() {
   assert.ok(purchaseRes.outflowNumber.startsWith("PUR-") || purchaseRes.outflowNumber.startsWith("PO-"), `outflowNumber must start with PUR- or PO-, got ${purchaseRes.outflowNumber}`);
   assert.equal(purchaseRes.paidAmount, 3000);
   const outflowId = purchaseRes.outflowId;
-  console.log(`✓ Purchase outflow created: ID ${outflowId}, Number: ${purchaseRes.outflowNumber}, Total: ₹${purchaseRes.totalAmount}, Bal: ₹${purchaseRes.balanceAmount}`);
+  console.log(`✓ [outflowsCreate#ok] Purchase outflow created: ID ${outflowId}, Number: ${purchaseRes.outflowNumber}, Total: ₹${purchaseRes.totalAmount}, Bal: ₹${purchaseRes.balanceAmount}`);
 
   // Get outflow by ID
   const outflowGetRes = await callFunction("outflowsGet", {
@@ -119,7 +119,7 @@ async function run() {
   assert.equal(outflowGetRes.outflowId, outflowId);
   assert.equal(outflowGetRes.vendorId, vendorId);
   assert.equal(outflowGetRes.kind, "purchase");
-  console.log("✓ outflowsGet retrieved purchase outflow details");
+  console.log("✓ [outflowsGet#ok] outflowsGet retrieved purchase outflow details");
 
   // Reject cross-tenant get
   const otherOwner = await createTenantOwnerPersona({ businessName: "Competitor Mart" });
@@ -130,7 +130,7 @@ async function run() {
     }, otherOwner.idToken),
     ["permission-denied", "not-found"]
   );
-  console.log("✓ outflowsGet rejected cross-tenant access");
+  console.log("✓ [outflowsGet#PERMISSION_DENIED] outflowsGet rejected cross-tenant access");
 
   // List outflows
   const outflowListRes = await callFunction("outflowsList", {
@@ -139,7 +139,7 @@ async function run() {
   }, ownerToken);
   assert.ok(Array.isArray(outflowListRes.items));
   assert.ok(outflowListRes.items.some(o => o.outflowId === outflowId));
-  console.log(`✓ outflowsList returned ${outflowListRes.items.length} purchase outflows`);
+  console.log(`✓ [outflowsList#ok] outflowsList returned ${outflowListRes.items.length} purchase outflows`);
 
   // ============================================================
   // 2. Billing Lifecycle: Create (Draft & Active), Finalize, List, Get
@@ -175,7 +175,7 @@ async function run() {
   const calc = previewBillRes.calculation || previewBillRes;
   assert.ok(calc, "billsPreview must return calculation");
   assert.ok(Array.isArray(previewBillRes.warnings), "billsPreview must return warnings array");
-  console.log(`✓ billsPreview returned live pricing preview (total: ₹${calc.grandTotal || calc.totalAmount})`);
+  console.log(`✓ [billsPreview#ok] billsPreview returned live pricing preview (total: ₹${calc.grandTotal || calc.totalAmount})`);
 
   // Create Active POS Bill (immediate counter sale)
   const activeBillRes = await callFunction("billsCreate", {
@@ -197,7 +197,7 @@ async function run() {
   assert.ok(activeBillRes.billId, "billsCreate must return billId");
   assert.equal(activeBillRes.status, "active");
   const activeBillId = activeBillRes.billId;
-  console.log(`✓ Active POS bill created: ID ${activeBillId}, Number: ${activeBillRes.billNumber}, Total: ₹${activeBillRes.totalAmount}`);
+  console.log(`✓ [billsCreate#ok] Active POS bill created: ID ${activeBillId}, Number: ${activeBillRes.billNumber}, Total: ₹${activeBillRes.totalAmount}`);
 
   // Create Draft / Quotation Bill
   const draftBillRes = await callFunction("billsCreate", {
@@ -229,7 +229,7 @@ async function run() {
   assert.ok(finalizeRes.billId);
   assert.equal(finalizeRes.status, "active");
   assert.ok(finalizeRes.billNumber.startsWith("INV-"), `Finalized bill must have INV- prefix, got ${finalizeRes.billNumber}`);
-  console.log(`✓ billsFinalize converted draft into active Invoice: ${finalizeRes.billNumber}`);
+  console.log(`✓ [billsFinalize#ok] billsFinalize converted draft into active Invoice: ${finalizeRes.billNumber}`);
 
   // Get bill by ID
   const billGetRes = await callFunction("billsGet", {
@@ -238,7 +238,7 @@ async function run() {
   }, ownerToken);
   assert.equal(billGetRes.billId, activeBillId);
   assert.equal(billGetRes.customerId, customerId);
-  console.log("✓ billsGet retrieved bill details");
+  console.log("✓ [billsGet#ok] billsGet retrieved bill details");
 
   // Reject cross-tenant get
   await assertCallableError(
@@ -248,7 +248,7 @@ async function run() {
     }, otherOwner.idToken),
     ["permission-denied", "not-found"]
   );
-  console.log("✓ billsGet rejected cross-tenant access");
+  console.log("✓ [billsGet#PERMISSION_DENIED] billsGet rejected cross-tenant access");
 
   // List bills
   const billListRes = await callFunction("billsList", {
@@ -257,7 +257,7 @@ async function run() {
   assert.ok(Array.isArray(billListRes.items));
   assert.ok(billListRes.items.some(b => b.billId === activeBillId));
   assert.ok(billListRes.items.some(b => b.billId === draftBillId));
-  console.log(`✓ billsList returned ${billListRes.items.length} bills`);
+  console.log(`✓ [billsList#ok] billsList returned ${billListRes.items.length} bills`);
 
   // ============================================================
   // 3. Returns Lifecycle: Create, List
@@ -282,7 +282,7 @@ async function run() {
     }, unassigned.idToken),
     ["permission-denied"]
   );
-  console.log("✓ returnsCreate rejected unassigned user");
+  console.log("✓ [returnsCreate#PERMISSION_DENIED] returnsCreate rejected unassigned user");
 
   // Create Sales Return against active bill
   const returnRes = await callFunction("returnsCreate", {
@@ -305,7 +305,7 @@ async function run() {
   assert.ok(returnRes.returnId, "returnsCreate must return returnId");
   assert.ok(returnRes.returnNumber.startsWith("RET-"), `returnNumber must start with RET-, got ${returnRes.returnNumber}`);
   const returnId = returnRes.returnId;
-  console.log(`✓ Sales return created: ID ${returnId}, Number: ${returnRes.returnNumber}, Refund: ₹${returnRes.totalRefundAmount}`);
+  console.log(`✓ [returnsCreate#ok] Sales return created: ID ${returnId}, Number: ${returnRes.returnNumber}, Refund: ₹${returnRes.totalRefundAmount}`);
 
   // List returns
   const returnListRes = await callFunction("returnsList", {
@@ -314,7 +314,7 @@ async function run() {
   }, ownerToken);
   assert.ok(Array.isArray(returnListRes.items));
   assert.ok(returnListRes.items.some(r => r.returnId === returnId));
-  console.log(`✓ returnsList returned ${returnListRes.items.length} return records`);
+  console.log(`✓ [returnsList#ok] returnsList returned ${returnListRes.items.length} return records`);
 
   console.log("\n================================================================================");
   console.log("   [PASS] ALL 9 BILLING & PROCUREMENT CALLABLES VERIFIED SUCCESSFULLY! ✓        ");

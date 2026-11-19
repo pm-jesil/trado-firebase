@@ -225,7 +225,7 @@ async function run() {
   assert.equal(stockInRes.newStock, 75);
   assert.equal(stockInRes.quantityAdjusted, 25);
   assert.ok(stockInRes.movementId);
-  console.log("✓ stockAdjust (+) increased stock from 50 to 75");
+  console.log("✓ [stockAdjust#ok] stockAdjust (+) increased stock from 50 to 75");
 
   // Negative stock adjustment (-10 for damage/breakage)
   const stockOutRes = await callFunction("stockAdjust", {
@@ -237,7 +237,7 @@ async function run() {
   assert.equal(stockOutRes.previousStock, 75);
   assert.equal(stockOutRes.newStock, 65);
   assert.equal(stockOutRes.quantityAdjusted, -10);
-  console.log("✓ stockAdjust (-) decreased stock from 75 to 65");
+  console.log("✓ [stockAdjust#ok] stockAdjust (-) decreased stock from 75 to 65");
 
   // List stock movements
   const movementsRes = await callFunction("stockMovementsList", {
@@ -247,7 +247,7 @@ async function run() {
   assert.ok(Array.isArray(movementsRes.items));
   // At least 3 movements: opening (50), adjustment (+25), adjustment (-10)
   assert.ok(movementsRes.items.length >= 3, `Expected at least 3 stock movements, got ${movementsRes.items.length}`);
-  console.log(`✓ stockMovementsList returned ${movementsRes.items.length} immutable movement records`);
+  console.log(`✓ [stockMovementsList#ok] stockMovementsList returned ${movementsRes.items.length} immutable movement records`);
 
   // ============================================================
   // 5. Reconciliation: reconcileStockBalances

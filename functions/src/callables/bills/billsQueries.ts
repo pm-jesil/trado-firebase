@@ -33,7 +33,7 @@ import { hydrate } from "../../services/hydration.js";
 import { deliveryProgress } from "../../services/deliveryProgress.js";
 import { serialsOf, linesFromRegistry } from "../../services/serials.js";
 import { fetchPage } from "../../services/pagination.js";
-import { SALE_READ, priceBillLines, billTotals } from "./helpers.js";
+import { SALE_READ, priceBillLines, billTotals, buildBillPrintSnapshot } from "./helpers.js";
 
 export const billsList = onCall({ region: "asia-south1" }, async (request) => {
   if (!request.auth) {
@@ -103,7 +103,8 @@ export const billsGet = onCall({ region: "asia-south1" }, async (request) => {
   for (const l of [...linesFromRegistry(sold, "soldLineId"), ...linesFromRegistry(held, "holdLineId")]) serialsByLine[l.lineId] = l.serials;
   const deliveries = await db.collection("deliveries").where("organizationId", "==", ctx.organizationId).where("billId", "==", docSnap.id).get();
   const delivery = deliveries.empty ? null : deliveryProgress(data, deliveries.docs.map((d) => d.data() as DeliveryDoc));
-  return { ...bill, serialsByLine, delivery, included: await hydrate(ctx, [bill]) };
+  const printSnapshot = buildBillPrintSnapshot(ctx.organization, data);
+  return { ...bill, serialsByLine, delivery, included: await hydrate(ctx, [bill]), printSnapshot };
 });
 
 export const billsPreview = onCall({ region: "asia-south1" }, async (request) => {
@@ -171,6 +172,18 @@ export const billsPreview = onCall({ region: "asia-south1" }, async (request) =>
     });
   }
 
+  const printSnapshot = buildBillPrintSnapshot(ctx.organization, {
+    items: priced.items,
+    subTotal: priced.subTotal,
+    taxTotal: priced.taxTotal,
+    discountTotal: totals.discountTotal,
+    totalAmount: totals.totalAmount,
+    roundOff: totals.roundOff,
+    taxSnapshot: totals.taxSnapshot,
+    salesMode: input.salesMode || "pos",
+    documentType: input.documentType || "invoice",
+  });
+
   return {
     items: priced.items,
     subTotal: priced.subTotal,
@@ -181,5 +194,6 @@ export const billsPreview = onCall({ region: "asia-south1" }, async (request) =>
     taxSnapshot: totals.taxSnapshot,
     currency,
     warnings,
+    printSnapshot,
   };
 });

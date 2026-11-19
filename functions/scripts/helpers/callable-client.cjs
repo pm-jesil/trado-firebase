@@ -105,7 +105,7 @@ async function callFunction(nameOrCaller, dataOrName = {}, tokenOrData = null, t
       : (typeof caller === "string" ? caller : null);
   }
 
-  const headers = { "Content-Type": "application/json" };
+  const headers = { "Content-Type": "application/json", "x-callable-name": name };
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }

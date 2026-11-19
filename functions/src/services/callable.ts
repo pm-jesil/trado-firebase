@@ -18,9 +18,11 @@ import { finishRequest } from "./requestRecorder.js";
 const REQUIRE_META = process.env.REQUIRE_META === "true";
 
 function callableName(request: CallableRequest): string {
+  const header = (request.rawRequest?.headers?.["x-callable-name"] as string | undefined)?.trim();
+  if (header) return header;
   const url = (request.rawRequest && (request.rawRequest.originalUrl || request.rawRequest.url)) || "";
   const last = url.split("?")[0].split("/").filter(Boolean).pop();
-  return last || process.env.FUNCTION_TARGET || process.env.K_SERVICE || "unknown";
+  return (last && last !== "triggers" && last !== "functions") ? last : process.env.FUNCTION_TARGET || process.env.K_SERVICE || "unknown";
 }
 
 function takeMeta(request: CallableRequest): ClientMeta | null {

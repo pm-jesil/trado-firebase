@@ -539,7 +539,7 @@ async function voidReversal(sa) {
   assert.equal(c.totalSpend, 0);
   const pmt = (await db.collection("payments").doc(bill.paymentId).get()).data();
   assert.equal(pmt.status, "voided");
-  ok("billsVoid: stock 7 → 10, customer balance/spend reversed to 0, linked payment voided");
+  ok("[billsVoid#ok] billsVoid: stock 7 → 10, customer balance/spend reversed to 0, linked payment voided");
   await expectReason(callFunction("paymentsCreate", { direction: "in", partyType: "customer", partyId: cust.customerId, amount: 10, referenceId: bill.billId, referenceModel: "bill" }, org.idToken), "failed-precondition", "payment against a voided bill");
   const pv = await callFunction("outflowsVoid", { documentId: pur.outflowId, reason: "wrong vendor" }, org.idToken);
   assert.equal(pv.status, "voided");
@@ -547,7 +547,7 @@ async function voidReversal(sa) {
   assert.equal((await db.collection("vendors").doc(vend.vendorId).get()).data().outstandingPayable, 0);
   const locks = await db.collection("vendorInvoiceLocks").where("organizationId", "==", org.organizationId).get();
   assert.equal(locks.size, 0);
-  ok("outflowsVoid: stock 10 → 0, vendor payable reversed to 0, invoice lock released");
+  ok("[outflowsVoid#ok] outflowsVoid: stock 10 → 0, vendor payable reversed to 0, invoice lock released");
   const again = await callFunction("outflowsCreate", { kind: "purchase", vendorId: vend.vendorId, invoiceNumber: "PC-1", lines: [{ productId: prod.productId, quantity: 1, unit: "piece", unitPrice: 50 }] }, org.idToken);
   assert.equal(again.status, "confirmed");
   ok("voided invoice number can be re-entered");
@@ -562,7 +562,7 @@ async function voidReversal(sa) {
   const fin = await callFunction("billsFinalize", { billId: qtn.billId }, org.idToken);
   assert.equal(fin.totalAmount, 500);
   await expectReason(callFunction("billsUpdateDraft", { billId: qtn.billId, notes: "too late" }, org.idToken), "DOCUMENT_IMMUTABLE", "editing a finalized invoice");
-  ok("quotation edited 2 → 5 units (total 200 → 500 in change history), finalized at 500; finalized invoice is immutable (void and reissue)");
+  ok("[billsUpdateDraft#ok] quotation edited 2 → 5 units (total 200 → 500 in change history), finalized at 500; finalized invoice is immutable (void and reissue)");
 
   // Standalone paymentsVoid: create a payment, void it, verify reversal
   const custPV = await callFunction("customersCreate", { name: "PV Test Shop", phone: "+919876543213" }, org.idToken);
@@ -580,7 +580,7 @@ async function voidReversal(sa) {
   const custAfterVoid = (await db.collection("customers").doc(custPV.customerId).get()).data();
   assert.equal(custAfterVoid.outstandingBalance, billPV.totalAmount);
   await expectReason(callFunction("paymentsVoid", { paymentId: payPV.paymentId, reason: "again" }, org.idToken), "failed-precondition", "double void of same payment");
-  ok("paymentsVoid: reverses bill settlement (paid 200 → 0, pending), restores customer outstanding, rejects double-void");
+  ok("[paymentsVoid#ok] [paymentsCreate#ok] paymentsVoid: reverses bill settlement (paid 200 → 0, pending), restores customer outstanding, rejects double-void");
 }
 
 async function bicycleWholesale(sa) {

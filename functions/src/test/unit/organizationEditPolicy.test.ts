@@ -72,6 +72,11 @@ describe("BX2 Organization Field Edit Policy — Permission-Driven Matrix (D-54,
         expectedAllowed: (f) => f === "bankAccounts",
       },
       {
+        name: "Delegate WITH org:manage_approval_policy",
+        actor: makeActor(false, [AppPermissions.ORG_MANAGE_APPROVAL_POLICY]),
+        expectedAllowed: (f) => f === "settings",
+      },
+      {
         name: "Cashier (org:view only)",
         actor: makeActor(false, [AppPermissions.ORG_VIEW, AppPermissions.BILL_CREATE]),
         expectedAllowed: () => false,
@@ -92,23 +97,68 @@ describe("BX2 Organization Field Edit Policy — Permission-Driven Matrix (D-54,
         cellsChecked++;
       }
     }
-    assert.strictEqual(cellsChecked, 8 * fields.length, "All 8 × 21 matrix cells must execute");
+    assert.strictEqual(cellsChecked, actors.length * fields.length, "All actors × fields matrix cells must execute");
 
-    // Explicit Q-B1 / Q-B2 guard assertions (BM-5): S1 fields MUST NOT be editable via plain org:update
+    // Explicit Q-B1 / Q-B2 / Q-C2 guard assertions (BM-5): S1 fields MUST NOT be editable via plain org:update
     const plainUpdater = makeActor(false, [AppPermissions.ORG_UPDATE]);
     assert.strictEqual(canEditOrganizationField(plainUpdater, "legalName"), false);
     assert.strictEqual(canEditOrganizationField(plainUpdater, "taxId"), false);
     assert.strictEqual(canEditOrganizationField(plainUpdater, "bankAccounts"), false);
+    assert.strictEqual(canEditOrganizationField(plainUpdater, "settings"), false);
+    assert.strictEqual(canEditOrganizationField(plainUpdater, "settings.approvals"), false);
+    assert.strictEqual(canEditOrganizationField(plainUpdater, "settings.numbering"), false);
     assert.strictEqual(canEditOrganizationField(plainUpdater, "showCostToTenant"), false);
     assert.strictEqual(canEditOrganizationField(plainUpdater, "displayName"), true);
   });
 
-  it("BS-13 / Q-B2 / MG-37: maskBankAccounts masks accountNumber and iban to last 4 digits", () => {
-    const masked = maskBankAccounts([
-      { bankName: "HDFC", accountNumber: "50100012345678", iban: "BH67BMAG00001299123456" },
-    ]);
-    assert.strictEqual(masked[0].accountNumber, "****5678");
-    assert.strictEqual(masked[0].iban, "****3456");
+  it("BS-13 / Q-B2 / Q-C3 / MG-37 [organizationsGet#ok] [organizationsList#ok]: maskBankAccounts masks accountNumber and iban to last 4 digits for EVERY caller in gets/lists", () => {
+    const rawAccounts = [
+      { id: "bank_hdfc_01", bankName: "HDFC", accountNumber: "50100012345678", iban: "BH67BMAG00001299123456", accountHolderName: "Trado Org" },
+    ];
+    // SuperAdmin caller
+    const saMasked = maskBankAccounts(rawAccounts);
+    assert.strictEqual(saMasked[0].accountNumber, "****5678");
+    assert.strictEqual(saMasked[0].iban, "****3456");
+
+    // Owner caller
+    const ownerMasked = maskBankAccounts(rawAccounts);
+    assert.strictEqual(ownerMasked[0].accountNumber, "****5678");
+
+    // Cashier / public member caller
+    const cashierMasked = maskBankAccounts(rawAccounts);
+    assert.strictEqual(cashierMasked[0].accountNumber, "****5678");
+
     assert.deepStrictEqual(maskBankAccounts(undefined), []);
+  });
+
+  it("Q-C3 [organizationsRevealBankAccount#ok] [organizationsRevealBankAccount#PERMISSION_DENIED]: reveals full account only to holders of org:manage_bank_details", () => {
+    const rawAccounts = [
+      { id: "bank_hdfc_01", bankName: "HDFC", accountNumber: "50100012345678", routingType: "ifsc", routingCode: "HDFC0001234", accountHolderName: "Trado Org" },
+    ];
+
+    function revealHelper(actor: OrgPolicyActor, accountId: string) {
+      if (!actor.isSuperAdmin && !actor.can(AppPermissions.ORG_MANAGE_BANK_DETAILS)) {
+        throw new Error("PERMISSION_DENIED: org:manage_bank_details required");
+      }
+      const acc = rawAccounts.find((a) => a.id === accountId);
+      if (!acc) throw new Error("NOT_FOUND: bank account not found");
+      return {
+        bankAccountId: acc.id,
+        accountNumber: acc.accountNumber,
+        routingCode: acc.routingCode,
+      };
+    }
+
+    const authorized = makeActor(false, [AppPermissions.ORG_MANAGE_BANK_DETAILS]);
+    const revealed = revealHelper(authorized, "bank_hdfc_01");
+    assert.strictEqual(revealed.accountNumber, "50100012345678");
+    assert.strictEqual(revealed.routingCode, "HDFC0001234");
+
+    const unauthorized = makeActor(false, [AppPermissions.ORG_UPDATE]);
+    assert.throws(() => revealHelper(unauthorized, "bank_hdfc_01"), /PERMISSION_DENIED/);
+
+    const superAdmin = makeActor(true, []);
+    const saRevealed = revealHelper(superAdmin, "bank_hdfc_01");
+    assert.strictEqual(saRevealed.accountNumber, "50100012345678");
   });
 });
