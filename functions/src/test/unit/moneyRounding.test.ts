@@ -332,11 +332,11 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
         if (collName === "bills") {
           return {
             _queryOptions: { collectionId: collName },
-            where: function(field: string, op: string, val: string) {
+            where: function (field: string, op: string, val: string) {
               const org = val;
               return {
                 _queryOptions: { collectionId: collName },
-                where: function() {
+                where: function () {
                   return {
                     _queryOptions: { collectionId: collName },
                     get: async () => {
@@ -355,11 +355,11 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
         if (collName === "outflows") {
           return {
             _queryOptions: { collectionId: collName },
-            where: function(field: string, op: string, val: string) {
+            where: function (field: string, op: string, val: string) {
               const org = val;
               return {
                 _queryOptions: { collectionId: collName },
-                where: function() {
+                where: function () {
                   return {
                     _queryOptions: { collectionId: collName },
                     get: async () => {
@@ -377,7 +377,7 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
         }
         return {
           _queryOptions: { collectionId: collName },
-          where: function() { return this; },
+          where: function () { return this; },
           get: async () => ({ size: 0, docs: [] }),
         };
       };
@@ -430,7 +430,7 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
         if (collName === "bills") {
           return {
             _queryOptions: { collectionId: collName },
-            where: function() { return this; },
+            where: function () { return this; },
             get: async () => ({
               docs: [{
                 ref: { path: "bills/b_bhd" },
@@ -447,7 +447,7 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
         if (collName === "outflows") {
           return {
             _queryOptions: { collectionId: collName },
-            where: function() { return this; },
+            where: function () { return this; },
             get: async () => ({
               docs: [{
                 ref: { path: "outflows/o_bhd" },
@@ -458,7 +458,7 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
         }
         return {
           _queryOptions: { collectionId: collName },
-          where: function() { return this; },
+          where: function () { return this; },
           get: async () => ({ docs: [] }),
         };
       };
