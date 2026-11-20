@@ -23,7 +23,7 @@ function prove(id, desc, fn) {
 }
 
 async function main() {
-  console.log("\n=== BX5 SEEDED-DEFECT VERIFICATION HARNESS (BM-1 .. BM-26) ===");
+  console.log("\n=== BX5 SEEDED-DEFECT VERIFICATION HARNESS (BM-1 .. BM-27) ===");
 
   // BM-1: Hand-edit one value in generated contract file -> checksum mismatch
   prove("BM-1", "hand-edit SUMMARY.md detected by .checksum.json", () => {
@@ -236,6 +236,13 @@ async function main() {
     assert.strictEqual(standard[0].accountNumber, "****7890");
     const forPrint = maskBankAccounts(bank, { preserveForInvoicePrint: true });
     assert.strictEqual(forPrint[0].accountNumber, "1234567890");
+  });
+
+  // BM-27: Currency fallback guard catches || "INR", ?? "INR", .default("INR"), and currency = "INR"
+  const currencyFallbackSelfTest = spawnSync(process.execPath, [path.join(REPO, "scripts", "check-no-currency-fallback.js"), "--test"], { encoding: "utf8" });
+  prove("BM-27", "currency fallbacks caught by check-no-currency-fallback --test", () => {
+    assert.strictEqual(currencyFallbackSelfTest.status, 0);
+    assert.ok(currencyFallbackSelfTest.stdout.includes("4/4 defect assertions"));
   });
 
   const detected = results.filter((r) => r.status === "DETECTED").length;
