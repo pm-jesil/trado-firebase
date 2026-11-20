@@ -107,27 +107,27 @@ describe("Prompt 77: Money, Stock and Account Integrity", () => {
   });
 
   describe("4. Cash Counts Denominations & Variance Adjustment (U-4, U-13; Q-F6, INV-15)", () => {
-    it("Calculates counted total in minor units (paise) from denominations correctly", () => {
+    it("Calculates counted total in major units from denominations correctly", () => {
       const denominations: Record<string, number> = {
-        "500": 10,  // 10 * 500 = ₹5,000 = 500,000 paise
-        "200": 5,   // 5 * 200 = ₹1,000 = 100,000 paise
-        "100": 20,  // 20 * 100 = ₹2,000 = 200,000 paise
-        "50": 10,   // 10 * 50 = ₹500 = 50,000 paise
+        "500": 10,  // 10 * 500 = ₹5,000
+        "200": 5,   // 5 * 200 = ₹1,000
+        "100": 20,  // 20 * 100 = ₹2,000
+        "50": 10,   // 10 * 50 = ₹500
       };
 
-      let countedPaise = 0;
+      let counted = 0;
       for (const [denomStr, count] of Object.entries(denominations)) {
-        countedPaise += Number(denomStr) * 100 * count;
+        counted += Number(denomStr) * count;
       }
 
-      assert.strictEqual(countedPaise, 850000); // ₹8,500.00
-      const systemBalance = 800000; // ₹8,000.00
-      const variance = countedPaise - systemBalance;
-      assert.strictEqual(variance, 50000); // ₹500.00 overage
+      assert.strictEqual(counted, 8500); // ₹8,500.00
+      const systemBalance = 8000; // ₹8,000.00
+      const variance = counted - systemBalance;
+      assert.strictEqual(variance, 500); // ₹500.00 overage
 
-      // Variance > 100000 paise (₹1,000) needs approval
-      const thresholdMinor = 100000;
-      const needsApproval = Math.abs(variance) > thresholdMinor;
+      // Variance > 1000 (₹1,000) needs approval
+      const threshold = 1000;
+      const needsApproval = Math.abs(variance) > threshold;
       assert.strictEqual(needsApproval, false, "Variance ₹500 should not require manager approval under ₹1,000 threshold");
     });
   });

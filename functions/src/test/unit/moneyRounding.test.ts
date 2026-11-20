@@ -170,6 +170,14 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
       );
     });
 
+    it("handles IEEE 754 float noise gracefully via epsilon comparison (0.1 + 0.2 AED, 1.005 + 1.005 AED, 0.1 + 0.2 BHD)", () => {
+      assert.doesNotThrow(() => assertAmountMatchesCurrency(0.1 + 0.2, "AED"));
+      assert.doesNotThrow(() => assertAmountMatchesCurrency(1.005 + 1.005, "AED"));
+      assert.doesNotThrow(() => assertAmountMatchesCurrency(0.1 + 0.2, "BHD"));
+      assert.throws(() => assertAmountMatchesCurrency(12.555, "AED"), /AMOUNT_PRECISION_INVALID/);
+      assert.throws(() => assertAmountMatchesCurrency(100.5, "JPY"), /AMOUNT_PRECISION_INVALID/);
+    });
+
     it("rejects unknown or invalid currencies and non-finite amounts", () => {
       assert.throws(
         () => assertAmountMatchesCurrency(NaN, "AED"),

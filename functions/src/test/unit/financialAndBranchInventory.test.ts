@@ -219,7 +219,7 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
         organizationId: "org_test",
         type: "owner_contribution",
         financialAccountId: "fin_bank",
-        amount: 50000000, // ₹5,00,000.00
+        amount: 500000, // ₹5,00,000.00
         sourceReference: "CHQ#90123",
         description: "Initial equity infusion",
       });
@@ -229,7 +229,7 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
         organizationId: "org_test",
         type: "drawings",
         financialAccountId: "fin_bank",
-        amount: 5000000, // ₹50,000.00
+        amount: 50000, // ₹50,000.00
         description: "Personal withdrawal",
       });
       assert.strictEqual(validDrawings.success, true);
@@ -307,12 +307,12 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
         partyId: "cust_123",
         partyType: "customer",
         direction: "in",
-        amount: 150000, // ₹1,500.00
+        amount: 1500.00, // ₹1,500.00
         method: "bank_transfer",
         financialAccountId: "acc_bank_hdfc",
         allocations: [
-          { documentId: "bill_01", documentType: "bill", amount: 100000 },
-          { documentId: "bill_02", documentType: "bill", amount: 50000 },
+          { documentId: "bill_01", documentType: "bill", amount: 1000.00 },
+          { documentId: "bill_02", documentType: "bill", amount: 500.00 },
         ],
       });
       assert.strictEqual(validPayment.success, true);
@@ -322,7 +322,7 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
         partyId: "cust_123",
         partyType: "customer",
         direction: "in",
-        amount: 150000,
+        amount: 1500.00,
         method: "bank_transfer",
         financialAccountId: "acc_bank_hdfc",
         allocations: [{ documentId: "bill_01", documentType: "bill", amount: -100 }],
@@ -379,27 +379,26 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
   });
 
   describe("2. Financial Ledger & Money Math Precision (R4, D-47)", () => {
-    it("Money.amount normalizes integers and enforces minor unit bounds", () => {
-      const paise = Money.amount(12550, "INR");
-      assert.strictEqual(paise, 12550);
-      assert.strictEqual(Number.isInteger(paise), true);
+    it("Money.amount normalizes decimal amounts and enforces exponent bounds", () => {
+      const amt = Money.amount(125.50, "INR");
+      assert.strictEqual(amt, 125.50);
     });
 
     it("Calculates running balance after debit and credit transactions with zero drift", () => {
-      const opening = 500000; // ₹5,000.00
-      const creditSale = 120050; // + ₹1,200.50
-      const debitExpense = 75025; // - ₹750.25
-      const transferOut = 200000; // - ₹2,000.00
+      const opening = 5000.00; // ₹5,000.00
+      const creditSale = 1200.50; // + ₹1,200.50
+      const debitExpense = 750.25; // - ₹750.25
+      const transferOut = 2000.00; // - ₹2,000.00
 
       let balance = opening;
       balance = Money.amount(balance + creditSale, "INR");
-      assert.strictEqual(balance, 620050);
+      assert.strictEqual(balance, 6200.50);
 
       balance = Money.amount(balance - debitExpense, "INR");
-      assert.strictEqual(balance, 545025);
+      assert.strictEqual(balance, 5450.25);
 
       balance = Money.amount(balance - transferOut, "INR");
-      assert.strictEqual(balance, 345025); // Exactly ₹3,450.25
+      assert.strictEqual(balance, 3450.25); // Exactly ₹3,450.25
     });
   });
 
@@ -596,24 +595,24 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
       assert.strictEqual(valid.success, true);
     });
 
-    it("SplitPaymentEntrySchema requires positive paise amounts and valid financial accounts", () => {
+    it("SplitPaymentEntrySchema requires positive amounts and valid financial accounts", () => {
       const valid = SplitPaymentEntrySchema.safeParse({
         method: "cash",
-        amount: 5000,
+        amount: 50.00,
         financialAccountId: "fin_cash_main",
       });
       assert.strictEqual(valid.success, true);
 
       const negativeAmount = SplitPaymentEntrySchema.safeParse({
         method: "cash",
-        amount: -500,
+        amount: -50.00,
         financialAccountId: "fin_cash_main",
       });
       assert.strictEqual(negativeAmount.success, false, "Must reject negative amount");
 
       const emptyAccount = SplitPaymentEntrySchema.safeParse({
         method: "cash",
-        amount: 5000,
+        amount: 50.00,
         financialAccountId: "",
       });
       assert.strictEqual(emptyAccount.success, false, "Must reject empty financialAccountId");
