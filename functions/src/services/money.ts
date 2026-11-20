@@ -45,14 +45,6 @@ export function roundTo(value: number, decimals: number): number {
 }
 
 /**
- * Round to 2 decimal places (amounts, totals, payments default).
- * Kept during S2 for non-money ratios/percents, to be renamed in S3.
- */
-export function round2(value: number): number {
-  return roundTo(value, 2);
-}
-
-/**
  * Round to 4 decimal places (unit rates, cost prices).
  */
 export function round4(value: number): number {

@@ -20,7 +20,7 @@ import {
   GetBranchSummarySchema,
 } from "../../validation/schemas.js";
 import { parseInput } from "../../validation/parseInput.js";
-import { round2, roundTo } from "../../services/money.js";
+import { Money, roundTo } from "../../services/money.js";
 import {
   BillDoc,
   OutflowDoc,
@@ -52,6 +52,7 @@ export async function computeProfitLoss(orgId: string, validated: {
   const tz = orgData.timezone || DEFAULT_ORG_TIMEZONE;
   const fyStartMonth = (orgData as unknown as { financialYearStartMonth?: number }).financialYearStartMonth || 4;
   const decimals = orgData.currencyDecimals ?? 2;
+  const currency = orgData.currency || "INR";
 
   let effectiveFrom = validated.from;
   let effectiveTo = validated.to;
@@ -218,10 +219,10 @@ export async function computeProfitLoss(orgId: string, validated: {
   });
   inventoryWriteOff = roundTo(inventoryWriteOff, decimals);
 
-  const grossProfit = roundTo(netRevenue - netCogs, decimals);
-  const grossMarginPercent = netRevenue > 0 ? round2((grossProfit / netRevenue) * 100) : 0;
-  const netProfit = roundTo(grossProfit - totalExpenses - inventoryWriteOff, decimals);
-  const netMarginPercent = netRevenue > 0 ? round2((netProfit / netRevenue) * 100) : 0;
+  const grossProfit = Money.amount(netRevenue - netCogs, currency);
+  const grossMarginPercent = netRevenue > 0 ? roundTo((grossProfit / netRevenue) * 100, 2) : 0;
+  const netProfit = Money.amount(grossProfit - totalExpenses - inventoryWriteOff, currency);
+  const netMarginPercent = netRevenue > 0 ? roundTo((netProfit / netRevenue) * 100, 2) : 0;
 
   return {
     branchId: targetBranchId || null,
@@ -270,6 +271,7 @@ export const reportsGetRevenue = onCall({ region: "asia-south1" }, async (reques
   const validated = parseInput(GetRevenueReportSchema, request.data);
   const orgId = validated.organizationId || context.organizationId;
   const targetBranchId = validated.branchId;
+  const currency = context.organization.currency;
 
   if (orgId !== context.organizationId && !context.isSuperAdmin) {
     throw new HttpsError("permission-denied", "Cross-organization access denied");
@@ -295,9 +297,10 @@ export const reportsGetRevenue = onCall({ region: "asia-south1" }, async (reques
     const summariesSnap = await summariesQuery.get();
 
     if (!summariesSnap.empty) {
+      const revs: number[] = [];
       summariesSnap.docs.forEach((doc) => {
         const data = doc.data() as DailySummaryDoc;
-        totalRevenue += data.totalRevenue || 0;
+        revs.push(data.totalRevenue || 0);
         billCount += data.billCount || 0;
         breakdown.push({
           period: data.date,
@@ -305,21 +308,24 @@ export const reportsGetRevenue = onCall({ region: "asia-south1" }, async (reques
           count: data.billCount || 0,
         });
       });
+      totalRevenue = Money.sum(revs, currency);
     }
   }
 
   if (breakdown.length === 0) {
     // Direct scan on source bills (branch-aware)
     const billsSnap = await billsInPeriod(orgId, { branchId: targetBranchId, from: validated.from, to: validated.to }).get();
+    const billAmounts: number[] = [];
     billsSnap.docs.forEach((doc) => {
       const data = doc.data() as BillDoc;
-      totalRevenue += data.totalAmount || 0;
+      billAmounts.push(data.totalAmount || 0);
       billCount++;
     });
+    totalRevenue = Money.sum(billAmounts, currency);
 
     breakdown.push({
       period: validated.from || "all-time",
-      revenue: round2(totalRevenue),
+      revenue: Money.amount(totalRevenue, currency),
       count: billCount,
     });
   }
@@ -327,9 +333,9 @@ export const reportsGetRevenue = onCall({ region: "asia-south1" }, async (reques
   breakdown.sort((a, b) => a.period.localeCompare(b.period));
 
   return {
-    totalRevenue: round2(totalRevenue),
+    totalRevenue: Money.amount(totalRevenue, currency),
     billCount,
-    averageBillValue: billCount > 0 ? round2(totalRevenue / billCount) : 0,
+    averageBillValue: billCount > 0 ? Money.amount(totalRevenue / billCount, currency) : 0,
     breakdown,
   };
 });
@@ -369,6 +375,7 @@ export const reportsGetCashBankSummary = onCall({ region: "asia-south1" }, async
   });
 
   const orgId = ctx.organizationId;
+  const currency = ctx.organization.currency;
   let q: FirebaseFirestore.Query = db
     .collection("financialAccounts")
     .where("organizationId", "==", orgId);
@@ -396,20 +403,20 @@ export const reportsGetCashBankSummary = onCall({ region: "asia-south1" }, async
 
     switch (d.accountType) {
       case "cash":
-        totals.cashInHand = round2(totals.cashInHand + balance);
+        totals.cashInHand = Money.amount(totals.cashInHand + balance, currency);
         break;
       case "bank":
-        totals.bankBalance = round2(totals.bankBalance + balance);
+        totals.bankBalance = Money.amount(totals.bankBalance + balance, currency);
         break;
       case "digital":
-        totals.digitalWallets = round2(totals.digitalWallets + balance);
+        totals.digitalWallets = Money.amount(totals.digitalWallets + balance, currency);
         break;
       case "clearing":
       case "control":
-        totals.clearingAndControl = round2(totals.clearingAndControl + balance);
+        totals.clearingAndControl = Money.amount(totals.clearingAndControl + balance, currency);
         break;
     }
-    totals.totalOperationalLiquidity = round2(totals.totalOperationalLiquidity + balance);
+    totals.totalOperationalLiquidity = Money.amount(totals.totalOperationalLiquidity + balance, currency);
 
     return {
       financialAccountId: doc.id,
@@ -449,6 +456,7 @@ export const reportsGetBranchSummary = onCall({ region: "asia-south1" }, async (
   });
 
   const orgId = ctx.organizationId;
+  const currency = ctx.organization.currency;
   const isOrgScoped = ctx.isOwner || ctx.role?.code === "admin" || ctx.isSuperAdmin || ctx.can(AppPermissions.BRANCH_MANAGE);
 
   // Validate scope convention (Q-F12)
@@ -526,18 +534,18 @@ export const reportsGetBranchSummary = onCall({ region: "asia-south1" }, async (
         branchName: branch.name,
         branchCode: branch.code,
         sales: {
-          totalRevenue: round2(totalRevenue),
+          totalRevenue: Money.amount(totalRevenue, currency),
           billCount: billsSnap.size,
         },
         outflows: {
-          totalPurchases: round2(totalPurchases),
-          totalExpenses: round2(totalExpenses),
+          totalPurchases: Money.amount(totalPurchases, currency),
+          totalExpenses: Money.amount(totalExpenses, currency),
           outflowCount: outflowsSnap.size,
         },
         liquidity: {
-          cashBalance: round2(cashBalance),
-          bankBalance: round2(bankBalance),
-          totalLiquidity: round2(cashBalance + bankBalance),
+          cashBalance: Money.amount(cashBalance, currency),
+          bankBalance: Money.amount(bankBalance, currency),
+          totalLiquidity: Money.amount(cashBalance + bankBalance, currency),
           accountCount: branchAccounts.length,
         },
       };
@@ -545,11 +553,11 @@ export const reportsGetBranchSummary = onCall({ region: "asia-south1" }, async (
   );
 
   const orgTotals = {
-    totalRevenue: round2(branchSummaries.reduce((s, b) => s + b.sales.totalRevenue, 0)),
+    totalRevenue: Money.sum(branchSummaries.map((b) => b.sales.totalRevenue), currency),
     totalBills: branchSummaries.reduce((s, b) => s + b.sales.billCount, 0),
-    totalPurchases: round2(branchSummaries.reduce((s, b) => s + b.outflows.totalPurchases, 0)),
-    totalExpenses: round2(branchSummaries.reduce((s, b) => s + b.outflows.totalExpenses, 0)),
-    totalLiquidity: round2(branchSummaries.reduce((s, b) => s + b.liquidity.totalLiquidity, 0)),
+    totalPurchases: Money.sum(branchSummaries.map((b) => b.outflows.totalPurchases), currency),
+    totalExpenses: Money.sum(branchSummaries.map((b) => b.outflows.totalExpenses), currency),
+    totalLiquidity: Money.sum(branchSummaries.map((b) => b.liquidity.totalLiquidity), currency),
     branchCount: branchSummaries.length,
   };
 

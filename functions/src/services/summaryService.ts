@@ -9,8 +9,8 @@
  */
 
 import { db } from "./firebase.js";
-import { round2 } from "./money.js";
-import { DailySummaryDoc, MonthlySummaryDoc, BillDoc, OutflowDoc } from "../types/models.js";
+import { Money } from "./money.js";
+import { DailySummaryDoc, MonthlySummaryDoc, BillDoc, OutflowDoc, OrganizationDoc } from "../types/models.js";
 
 /**
  * Incrementally records a finalized bill into daily and monthly summaries.
@@ -33,6 +33,8 @@ export async function recordBillSummary(
     // 1. Execute ALL reads first
     const dailySnap = await tx.get(dailyRef);
     const monthlySnap = await tx.get(monthlyRef);
+    const orgSnap = await tx.get(db.collection("organizations").doc(orgId));
+    const currency = (bill as any).currency || (orgSnap.data() as OrganizationDoc | undefined)?.currency || "INR";
 
     // 2. Prepare daily summary
     const existingDaily: DailySummaryDoc = dailySnap.exists
@@ -51,10 +53,10 @@ export async function recordBillSummary(
         updatedAt: new Date().toISOString(),
       };
 
-    const newDailyRevenue = round2(existingDaily.totalRevenue + (bill.totalAmount || 0));
-    const newDailyCogs = round2(existingDaily.cogs + cogsAmount);
-    const newDailyGrossProfit = round2(newDailyRevenue - newDailyCogs);
-    const newDailyNetProfit = round2(newDailyGrossProfit - existingDaily.totalExpenses);
+    const newDailyRevenue = Money.amount(existingDaily.totalRevenue + (bill.totalAmount || 0), currency);
+    const newDailyCogs = Money.amount(existingDaily.cogs + cogsAmount, currency);
+    const newDailyGrossProfit = Money.amount(newDailyRevenue - newDailyCogs, currency);
+    const newDailyNetProfit = Money.amount(newDailyGrossProfit - existingDaily.totalExpenses, currency);
 
     // 3. Prepare monthly summary
     const existingMonthly: MonthlySummaryDoc = monthlySnap.exists
@@ -73,10 +75,10 @@ export async function recordBillSummary(
         updatedAt: new Date().toISOString(),
       };
 
-    const newMonthlyRevenue = round2(existingMonthly.totalRevenue + (bill.totalAmount || 0));
-    const newMonthlyCogs = round2(existingMonthly.cogs + cogsAmount);
-    const newMonthlyGrossProfit = round2(newMonthlyRevenue - newMonthlyCogs);
-    const newMonthlyNetProfit = round2(newMonthlyGrossProfit - existingMonthly.totalExpenses);
+    const newMonthlyRevenue = Money.amount(existingMonthly.totalRevenue + (bill.totalAmount || 0), currency);
+    const newMonthlyCogs = Money.amount(existingMonthly.cogs + cogsAmount, currency);
+    const newMonthlyGrossProfit = Money.amount(newMonthlyRevenue - newMonthlyCogs, currency);
+    const newMonthlyNetProfit = Money.amount(newMonthlyGrossProfit - existingMonthly.totalExpenses, currency);
 
     // 4. Execute ALL writes after reads
     tx.set(
@@ -127,6 +129,8 @@ export async function recordOutflowSummary(outflow: OutflowDoc): Promise<void> {
     // 1. Execute ALL reads first
     const dailySnap = await tx.get(dailyRef);
     const monthlySnap = await tx.get(monthlyRef);
+    const orgSnap = await tx.get(db.collection("organizations").doc(orgId));
+    const currency = (outflow as any).currency || (orgSnap.data() as OrganizationDoc | undefined)?.currency || "INR";
 
     // 2. Prepare daily summary
     const existingDaily: DailySummaryDoc = dailySnap.exists
@@ -145,8 +149,8 @@ export async function recordOutflowSummary(outflow: OutflowDoc): Promise<void> {
         updatedAt: new Date().toISOString(),
       };
 
-    const newDailyExpenses = round2(existingDaily.totalExpenses + (outflow.totalAmount || 0));
-    const newDailyNetProfit = round2(existingDaily.grossProfit - newDailyExpenses);
+    const newDailyExpenses = Money.amount(existingDaily.totalExpenses + (outflow.totalAmount || 0), currency);
+    const newDailyNetProfit = Money.amount(existingDaily.grossProfit - newDailyExpenses, currency);
 
     // 3. Prepare monthly summary
     const existingMonthly: MonthlySummaryDoc = monthlySnap.exists
@@ -165,8 +169,8 @@ export async function recordOutflowSummary(outflow: OutflowDoc): Promise<void> {
         updatedAt: new Date().toISOString(),
       };
 
-    const newMonthlyExpenses = round2(existingMonthly.totalExpenses + (outflow.totalAmount || 0));
-    const newMonthlyNetProfit = round2(existingMonthly.grossProfit - newMonthlyExpenses);
+    const newMonthlyExpenses = Money.amount(existingMonthly.totalExpenses + (outflow.totalAmount || 0), currency);
+    const newMonthlyNetProfit = Money.amount(existingMonthly.grossProfit - newMonthlyExpenses, currency);
 
     // 4. Execute ALL writes after reads
     tx.set(

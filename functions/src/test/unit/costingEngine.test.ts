@@ -91,7 +91,7 @@ describe("Costing Engine — Stock Valuation & COGS", () => {
       },
     ];
 
-    const result = calculateStockValuation(products);
+    const result = calculateStockValuation(products, "INR");
     assert.strictEqual(result.totalItemsCount, 2);
     assert.strictEqual(result.totalStockValuation, 8000); // 6500 + 1500
     assert.strictEqual(result.items[0].valuation, 6500);
@@ -119,7 +119,7 @@ describe("Costing Engine — Stock Valuation & COGS", () => {
     });
 
     const items = [{ productId: "prod-1", quantity: 15 }];
-    const cogs = calculateCOGSForItems(items, productMap);
+    const cogs = calculateCOGSForItems(items, productMap, "INR");
     // 15 * 90 = 1350
     assert.strictEqual(cogs, 1350);
   });
@@ -163,7 +163,7 @@ describe("Costing Engine — WAC Invariant & Single Writer Verification (V-2)", 
       createdBy: "",
     });
 
-    const cogs = calculateCOGSForItems(items, productMap);
+    const cogs = calculateCOGSForItems(items, productMap, "INR");
     assert.strictEqual(cogs, 30 * 95);
     // Product WAC is untouched by sales outflows
     assert.strictEqual(productMap.get("p1")?.weightedAverageCost, 95);

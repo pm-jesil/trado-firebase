@@ -22,7 +22,7 @@ import {
 } from "../../validation/schemas.js";
 import { parseInput } from "../../validation/parseInput.js";
 import { calculateStockValuation } from "../../services/costingEngine.js";
-import { round2 } from "../../services/money.js";
+import { Money } from "../../services/money.js";
 import { hydrate } from "../../services/hydration.js";
 import {
   ProductDoc,
@@ -51,6 +51,7 @@ export const reportsGetStockValuation = onCall({ region: "asia-south1" }, async 
   const validated = parseInput(GetStockValuationReportSchema, request.data);
   const orgId = validated.organizationId || context.organizationId;
   const targetBranchId = validated.branchId;
+  const currency = context.organization.currency;
 
   if (orgId !== context.organizationId && !context.isSuperAdmin) {
     throw new HttpsError("permission-denied", "Cross-organization access denied");
@@ -84,7 +85,7 @@ export const reportsGetStockValuation = onCall({ region: "asia-south1" }, async 
     }));
   }
 
-  const valuationResult = calculateStockValuation(products);
+  const valuationResult = calculateStockValuation(products, currency);
   return valuationResult;
 });
 
@@ -100,6 +101,7 @@ export const reportsGetTopEntities = onCall({ region: "asia-south1" }, async (re
   const validated = parseInput(GetTopEntitiesReportSchema, request.data);
   const orgId = validated.organizationId || context.organizationId;
   const targetBranchId = validated.branchId;
+  const currency = context.organization.currency;
 
   if (orgId !== context.organizationId && !context.isSuperAdmin) {
     throw new HttpsError("permission-denied", "Cross-organization access denied");
@@ -112,7 +114,7 @@ export const reportsGetTopEntities = onCall({ region: "asia-south1" }, async (re
     const items = Array.from(productSalesTotals(billsSnap.docs).values())
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, limit)
-      .map((item) => ({ ...item, revenue: round2(item.revenue) }));
+      .map((item) => ({ ...item, revenue: Money.amount(item.revenue, currency) }));
     return { entityType: "products", items, included: await hydrate(context, items) };
   }
 
@@ -129,8 +131,8 @@ export const reportsGetTopEntities = onCall({ region: "asia-south1" }, async (re
           customerId: d.id,
           name: data.name || "Unknown",
           phone: data.phone || "",
-          totalSpend: round2(data.totalSpend || 0),
-          outstandingBalance: round2(data.outstandingBalance || 0),
+          totalSpend: Money.amount(data.totalSpend || 0, currency),
+          outstandingBalance: Money.amount(data.outstandingBalance || 0, currency),
         };
       })
       .sort((a, b) => b.totalSpend - a.totalSpend)
@@ -152,8 +154,8 @@ export const reportsGetTopEntities = onCall({ region: "asia-south1" }, async (re
         vendorId: d.id,
         name: data.name || "Unknown",
         phone: data.phone || "",
-        totalPurchase: round2(data.totalPurchase || 0),
-        outstandingPayable: round2(data.outstandingPayable || 0),
+        totalPurchase: Money.amount(data.totalPurchase || 0, currency),
+        outstandingPayable: Money.amount(data.outstandingPayable || 0, currency),
       };
     })
     .sort((a, b) => b.totalPurchase - a.totalPurchase)
@@ -174,6 +176,7 @@ export const reportsGetStaffActivity = onCall({ region: "asia-south1" }, async (
 
   const validated = parseInput(GetStaffReportSchema, request.data);
   const orgId = validated.organizationId || context.organizationId;
+  const currency = context.organization.currency;
   if (orgId !== context.organizationId && !context.isSuperAdmin) {
     throw new HttpsError("permission-denied", "Cross-organization access denied");
   }
@@ -280,13 +283,13 @@ export const reportsGetStaffActivity = onCall({ region: "asia-south1" }, async (
 
   const staffSummaries = Array.from(stats.values()).map((s) => ({
     ...s,
-    sales: { count: s.sales.count, amount: round2(s.sales.amount) },
-    purchases: { count: s.purchases.count, amount: round2(s.purchases.amount) },
-    expenses: { count: s.expenses.count, amount: round2(s.expenses.amount) },
-    returns: { count: s.returns.count, amount: round2(s.returns.amount) },
-    totalSales: round2(s.sales.amount),
+    sales: { count: s.sales.count, amount: Money.amount(s.sales.amount, currency) },
+    purchases: { count: s.purchases.count, amount: Money.amount(s.purchases.amount, currency) },
+    expenses: { count: s.expenses.count, amount: Money.amount(s.expenses.amount, currency) },
+    returns: { count: s.returns.count, amount: Money.amount(s.returns.amount, currency) },
+    totalSales: Money.amount(s.sales.amount, currency),
     billCount: s.sales.count,
-    averageBillValue: s.sales.count > 0 ? round2(s.sales.amount / s.sales.count) : 0,
+    averageBillValue: s.sales.count > 0 ? Money.amount(s.sales.amount / s.sales.count, currency) : 0,
   }));
 
   return {
@@ -383,7 +386,7 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
       outflowsCount++;
     });
 
-    orgUsageMap.push({ organizationId: orgId, billsCount: bSnap.size, revenue: round2(orgRev) });
+    orgUsageMap.push({ organizationId: orgId, billsCount: bSnap.size, revenue: Money.amount(orgRev, "INR") });
   });
 
   await Promise.all(orgQueries);
@@ -403,13 +406,13 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
     subscriptionsExpiring,
     atRiskOrganizations: [],
     topOrganizationsByUsage,
-    totalPlatformRevenue: round2(totalPlatformRevenue),
-    totalPlatformOutflows: round2(totalPlatformOutflows),
-    netPlatformCashFlow: round2(totalPlatformRevenue - totalPlatformOutflows),
+    totalPlatformRevenue: Money.amount(totalPlatformRevenue, "INR"),
+    totalPlatformOutflows: Money.amount(totalPlatformOutflows, "INR"),
+    netPlatformCashFlow: Money.amount(totalPlatformRevenue - totalPlatformOutflows, "INR"),
     platformFinancials: {
-      totalRevenue: round2(totalPlatformRevenue),
-      totalOutflows: round2(totalPlatformOutflows),
-      netPlatformCashFlow: round2(totalPlatformRevenue - totalPlatformOutflows),
+      totalRevenue: Money.amount(totalPlatformRevenue, "INR"),
+      totalOutflows: Money.amount(totalPlatformOutflows, "INR"),
+      netPlatformCashFlow: Money.amount(totalPlatformRevenue - totalPlatformOutflows, "INR"),
       billsCount,
       outflowsCount,
     },
@@ -429,6 +432,7 @@ export const reportsExportCsv = onCall({ region: "asia-south1" }, async (request
   const validated = parseInput(ExportReportSchema, request.data);
   const orgId = validated.organizationId || context.organizationId;
   const targetBranchId = validated.branchId;
+  const currency = context.organization.currency;
 
   if (orgId !== context.organizationId && !context.isSuperAdmin) {
     throw new HttpsError("permission-denied", "Cross-organization access denied");
@@ -457,7 +461,7 @@ export const reportsExportCsv = onCall({ region: "asia-south1" }, async (request
       }));
     }
 
-    const result = calculateStockValuation(products);
+    const result = calculateStockValuation(products, currency);
     csvContent = toCsv(
       result.items.map((i) => ({
         ProductId: i.productId,
@@ -504,7 +508,7 @@ export const reportsExportCsv = onCall({ region: "asia-south1" }, async (request
     const billsSnap = await billsInPeriod(orgId, { branchId: targetBranchId, from: validated.from, to: validated.to }).get();
     const totals = Array.from(productSalesTotals(billsSnap.docs).values()).sort((a, b) => b.revenue - a.revenue);
     const names = (await hydrate(context, totals)).products || {};
-    const rows = totals.map((r) => ({ ProductId: r.productId, Name: (names[r.productId]?.name as string) || "", QuantitySold: r.quantity, TotalRevenue: round2(r.revenue), BranchId: targetBranchId || "all" }));
+    const rows = totals.map((r) => ({ ProductId: r.productId, Name: (names[r.productId]?.name as string) || "", QuantitySold: r.quantity, TotalRevenue: Money.amount(r.revenue, currency), BranchId: targetBranchId || "all" }));
     csvContent = toCsv(rows.length > 0 ? rows : [{ ProductId: "none", Name: "No sales", QuantitySold: 0, TotalRevenue: 0, BranchId: targetBranchId || "all" }]);
   } else if (validated.reportType === "staff_sales") {
     const billsSnap = await billsInPeriod(orgId, { branchId: targetBranchId, from: validated.from, to: validated.to }).get();
@@ -526,7 +530,7 @@ export const reportsExportCsv = onCall({ region: "asia-south1" }, async (request
 
     const rows = Array.from(staffStats.values())
       .sort((a, b) => b.TotalRevenue - a.TotalRevenue)
-      .map((r) => ({ ...r, TotalRevenue: round2(r.TotalRevenue) }));
+      .map((r) => ({ ...r, TotalRevenue: Money.amount(r.TotalRevenue, currency) }));
     csvContent = toCsv(rows.length > 0 ? rows : [{ StaffMembershipId: "none", BillCount: 0, TotalRevenue: 0, BranchId: targetBranchId || "all" }]);
   }
 

@@ -20,7 +20,7 @@ import {
   GetPayablesAgeingReportSchema,
 } from "../../validation/schemas.js";
 import { parseInput } from "../../validation/parseInput.js";
-import { round2 } from "../../services/money.js";
+import { Money } from "../../services/money.js";
 import {
   BillDoc,
   OutflowDoc,
@@ -62,6 +62,7 @@ export const reportsGetPartyStatement = onCall({ region: "asia-south1" }, async 
       : [AppPermissions.CUSTOMER_VIEW_BALANCE, AppPermissions.PAYMENT_VIEW],
   });
   const orgId = ctx.organizationId;
+  const currency = ctx.organization.currency;
 
   const partySnap = await db.collection(isVendor ? "vendors" : "customers").doc(input.partyId).get();
   if (!partySnap.exists || partySnap.data()?.organizationId !== orgId) {
@@ -128,13 +129,13 @@ export const reportsGetPartyStatement = onCall({ region: "asia-south1" }, async 
   const lines: Array<Entry & { balance: number }> = [];
   for (const e of entries) {
     if (fromIso && e.at < fromIso) {
-      opening = round2(opening + e.debit - e.credit);
+      opening = Money.amount(opening + e.debit - e.credit, currency);
       running = opening;
       continue;
     }
     if (toIso && e.at > toIso) continue;
-    running = round2(running + e.debit - e.credit);
-    lines.push({ ...e, debit: round2(e.debit), credit: round2(e.credit), balance: running });
+    running = Money.amount(running + e.debit - e.credit, currency);
+    lines.push({ ...e, debit: Money.amount(e.debit, currency), credit: Money.amount(e.credit, currency), balance: running });
   }
 
   // Day-wise document totals within range
@@ -145,9 +146,9 @@ export const reportsGetPartyStatement = onCall({ region: "asia-south1" }, async 
     const k = doc.day as string;
     const row = byDay.get(k) || { day: k, count: 0, total: 0, paid: 0, balance: 0 };
     row.count++;
-    row.total = round2(row.total + (doc.totalAmount as number));
-    row.paid = round2(row.paid + (doc.paidAmount as number));
-    row.balance = round2(row.balance + (doc.balanceAmount as number));
+    row.total = Money.sum([row.total, (doc.totalAmount as number) || 0], currency);
+    row.paid = Money.sum([row.paid, (doc.paidAmount as number) || 0], currency);
+    row.balance = Money.sum([row.balance, (doc.balanceAmount as number) || 0], currency);
     byDay.set(k, row);
   });
 
@@ -159,14 +160,14 @@ export const reportsGetPartyStatement = onCall({ region: "asia-south1" }, async 
     if (!bal || bal <= 0) return;
     const ref = Date.parse((doc.dueDate as string) || (doc.at as string));
     const days = Math.floor((now - ref) / 86_400_000);
-    if (days <= 0) ageing.current = round2(ageing.current + bal);
-    else if (days <= 30) ageing.d1_30 = round2(ageing.d1_30 + bal);
-    else if (days <= 60) ageing.d31_60 = round2(ageing.d31_60 + bal);
-    else if (days <= 90) ageing.d61_90 = round2(ageing.d61_90 + bal);
-    else ageing.d90_plus = round2(ageing.d90_plus + bal);
+    if (days <= 0) ageing.current = Money.sum([ageing.current, bal], currency);
+    else if (days <= 30) ageing.d1_30 = Money.sum([ageing.d1_30, bal], currency);
+    else if (days <= 60) ageing.d31_60 = Money.sum([ageing.d31_60, bal], currency);
+    else if (days <= 90) ageing.d61_90 = Money.sum([ageing.d61_90, bal], currency);
+    else ageing.d90_plus = Money.sum([ageing.d90_plus, bal], currency);
   });
 
-  const totals = lines.reduce((t, l) => ({ debit: round2(t.debit + l.debit), credit: round2(t.credit + l.credit) }), { debit: 0, credit: 0 });
+  const totals = lines.reduce((t, l) => ({ debit: Money.sum([t.debit, l.debit], currency), credit: Money.sum([t.credit, l.credit], currency) }), { debit: 0, credit: 0 });
   return {
     organizationId: orgId,
     partyType: input.partyType,
@@ -199,6 +200,7 @@ export const reportsGetOutflowSummary = onCall({ region: "asia-south1" }, async 
     requiredPermission: [AppPermissions.REPORT_VIEW, AppPermissions.OUTFLOW_VIEW],
   });
   const orgId = ctx.organizationId;
+  const currency = ctx.organization.currency;
   const tz = ctx.organization.timezone || DEFAULT_ORG_TIMEZONE;
   const fromIso = input.from ? (input.from.length === 10 ? `${input.from}T00:00:00.000Z` : input.from) : "0000";
   const toIso = input.to ? (input.to.length === 10 ? `${input.to}T23:59:59.999Z` : input.to) : "9999";
@@ -227,11 +229,11 @@ export const reportsGetOutflowSummary = onCall({ region: "asia-south1" }, async 
       return;
     }
     outflowIds.add(d.id);
-    const amt = o.totalAmount || 0;
-    if (o.kind === "purchase") purchases += amt;
+    const amt = Money.amount(o.totalAmount || 0, currency);
+    if (o.kind === "purchase") purchases = Money.sum([purchases, amt], currency);
     else {
-      expenses += amt;
-      if (o.payeeMembershipId) employeeLinkedExpenses += amt;
+      expenses = Money.sum([expenses, amt], currency);
+      if (o.payeeMembershipId) employeeLinkedExpenses = Money.sum([employeeLinkedExpenses, amt], currency);
     }
     let key: string;
     switch (groupBy) {
@@ -242,9 +244,9 @@ export const reportsGetOutflowSummary = onCall({ region: "asia-south1" }, async 
       default: key = localDateInTimezone(Date.parse(at), tz);
     }
     const g = groups.get(key) || { key, purchases: 0, expenses: 0, total: 0, count: 0 };
-    if (o.kind === "purchase") g.purchases = round2(g.purchases + amt);
-    else g.expenses = round2(g.expenses + amt);
-    g.total = round2(g.total + amt);
+    if (o.kind === "purchase") g.purchases = Money.sum([g.purchases, amt], currency);
+    else g.expenses = Money.sum([g.expenses, amt], currency);
+    g.total = Money.sum([g.total, amt], currency);
     g.count++;
     groups.set(key, g);
   });
@@ -254,7 +256,7 @@ export const reportsGetOutflowSummary = onCall({ region: "asia-south1" }, async 
     const p = d.data() as PaymentDoc;
     if (p.status !== "completed" || p.createdAt < fromIso || p.createdAt > toIso || !branchOk(p.branchId)) return;
     if (p.referenceModel === "outflow" && p.referenceId && !outflowIds.has(p.referenceId)) return;
-    cashPaid += p.amount || 0;
+    cashPaid = Money.sum([cashPaid, p.amount || 0], currency);
   });
 
   return {
@@ -263,12 +265,12 @@ export const reportsGetOutflowSummary = onCall({ region: "asia-south1" }, async 
     from: input.from || null,
     to: input.to || null,
     accrual: {
-      purchases: round2(purchases),
-      expenses: round2(expenses),
-      totalOutflow: round2(purchases + expenses),
-      employeeLinkedExpenses: round2(employeeLinkedExpenses),
+      purchases: Money.amount(purchases, currency),
+      expenses: Money.amount(expenses, currency),
+      totalOutflow: Money.sum([purchases, expenses], currency),
+      employeeLinkedExpenses: Money.amount(employeeLinkedExpenses, currency),
     },
-    cash: { paid: round2(cashPaid) },
+    cash: { paid: Money.amount(cashPaid, currency) },
     groupBy,
     groups: Array.from(groups.values()).sort((a, b) => a.key.localeCompare(b.key)),
     excludedSensitiveCount: hiddenSensitive,
@@ -292,6 +294,7 @@ export const reportsGetReceivablesAgeing = onCall({ region: "asia-south1" }, asy
   });
 
   const orgId = ctx.organizationId;
+  const currency = ctx.organization.currency;
   const asOf = input.asOfDate || new Date().toISOString().slice(0, 10);
   const asOfMs = Date.parse(`${asOf}T23:59:59.999Z`);
 
@@ -359,24 +362,24 @@ export const reportsGetReceivablesAgeing = onCall({ region: "asia-south1" }, asy
     }
 
     cEntry.billCount++;
-    cEntry.totalOutstanding = round2(cEntry.totalOutstanding + balance);
-    totals.totalOutstanding = round2(totals.totalOutstanding + balance);
+    cEntry.totalOutstanding = Money.sum([cEntry.totalOutstanding, balance], currency);
+    totals.totalOutstanding = Money.sum([totals.totalOutstanding, balance], currency);
 
     if (daysOverdue <= 0) {
-      cEntry.current = round2(cEntry.current + balance);
-      totals.current = round2(totals.current + balance);
+      cEntry.current = Money.sum([cEntry.current, balance], currency);
+      totals.current = Money.sum([totals.current, balance], currency);
     } else if (daysOverdue <= 30) {
-      cEntry.days1to30 = round2(cEntry.days1to30 + balance);
-      totals.days1to30 = round2(totals.days1to30 + balance);
+      cEntry.days1to30 = Money.sum([cEntry.days1to30, balance], currency);
+      totals.days1to30 = Money.sum([totals.days1to30, balance], currency);
     } else if (daysOverdue <= 60) {
-      cEntry.days31to60 = round2(cEntry.days31to60 + balance);
-      totals.days31to60 = round2(totals.days31to60 + balance);
+      cEntry.days31to60 = Money.sum([cEntry.days31to60, balance], currency);
+      totals.days31to60 = Money.sum([totals.days31to60, balance], currency);
     } else if (daysOverdue <= 90) {
-      cEntry.days61to90 = round2(cEntry.days61to90 + balance);
-      totals.days61to90 = round2(totals.days61to90 + balance);
+      cEntry.days61to90 = Money.sum([cEntry.days61to90, balance], currency);
+      totals.days61to90 = Money.sum([totals.days61to90, balance], currency);
     } else {
-      cEntry.days90Plus = round2(cEntry.days90Plus + balance);
-      totals.days90Plus = round2(totals.days90Plus + balance);
+      cEntry.days90Plus = Money.sum([cEntry.days90Plus, balance], currency);
+      totals.days90Plus = Money.sum([totals.days90Plus, balance], currency);
     }
   }
 
@@ -405,6 +408,7 @@ export const reportsGetPayablesAgeing = onCall({ region: "asia-south1" }, async 
   });
 
   const orgId = ctx.organizationId;
+  const currency = ctx.organization.currency;
   const asOf = input.asOfDate || new Date().toISOString().slice(0, 10);
   const asOfMs = Date.parse(`${asOf}T23:59:59.999Z`);
 
@@ -472,24 +476,24 @@ export const reportsGetPayablesAgeing = onCall({ region: "asia-south1" }, async 
     }
 
     vEntry.outflowCount++;
-    vEntry.totalOutstanding = round2(vEntry.totalOutstanding + balance);
-    totals.totalOutstanding = round2(totals.totalOutstanding + balance);
+    vEntry.totalOutstanding = Money.sum([vEntry.totalOutstanding, balance], currency);
+    totals.totalOutstanding = Money.sum([totals.totalOutstanding, balance], currency);
 
     if (daysOverdue <= 0) {
-      vEntry.current = round2(vEntry.current + balance);
-      totals.current = round2(totals.current + balance);
+      vEntry.current = Money.sum([vEntry.current, balance], currency);
+      totals.current = Money.sum([totals.current, balance], currency);
     } else if (daysOverdue <= 30) {
-      vEntry.days1to30 = round2(vEntry.days1to30 + balance);
-      totals.days1to30 = round2(totals.days1to30 + balance);
+      vEntry.days1to30 = Money.sum([vEntry.days1to30, balance], currency);
+      totals.days1to30 = Money.sum([totals.days1to30, balance], currency);
     } else if (daysOverdue <= 60) {
-      vEntry.days31to60 = round2(vEntry.days31to60 + balance);
-      totals.days31to60 = round2(totals.days31to60 + balance);
+      vEntry.days31to60 = Money.sum([vEntry.days31to60, balance], currency);
+      totals.days31to60 = Money.sum([totals.days31to60, balance], currency);
     } else if (daysOverdue <= 90) {
-      vEntry.days61to90 = round2(vEntry.days61to90 + balance);
-      totals.days61to90 = round2(totals.days61to90 + balance);
+      vEntry.days61to90 = Money.sum([vEntry.days61to90, balance], currency);
+      totals.days61to90 = Money.sum([totals.days61to90, balance], currency);
     } else {
-      vEntry.days90Plus = round2(vEntry.days90Plus + balance);
-      totals.days90Plus = round2(totals.days90Plus + balance);
+      vEntry.days90Plus = Money.sum([vEntry.days90Plus, balance], currency);
+      totals.days90Plus = Money.sum([totals.days90Plus, balance], currency);
     }
   }
 

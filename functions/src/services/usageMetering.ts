@@ -12,7 +12,7 @@
 
 import { FieldValue } from "firebase-admin/firestore";
 import { db } from "./firebase.js";
-import { round2, round4 } from "./money.js";
+import { Money, round4 } from "./money.js";
 import { readRollups, sumRollups, estimateCost } from "./usageReport.js";
 import {
   ServiceUsageCounts,
@@ -116,7 +116,7 @@ export function calculateEstimatedCost(
     fcmCost +
     locationCost;
 
-  return round2(round4(total));
+  return Money.amount(round4(total), rateCard.currency);
 }
 
 /**
@@ -500,10 +500,10 @@ export async function generateDryRunUsageStatement(params: {
     quantity: l.quantity,
     unit: l.unit,
     unitRate: l.unitPrice,
-    amount: round2(l.cost),
+    amount: Money.amount(l.cost, rateCard.currency),
     verified: l.verified,
   }));
-  const subtotal = round2(lineItems.reduce((acc, curr) => acc + curr.amount, 0));
+  const subtotal = Money.sum(lineItems.map((curr) => curr.amount), rateCard.currency);
   return {
     organizationId,
     billingPeriod,

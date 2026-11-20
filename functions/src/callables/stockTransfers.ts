@@ -49,7 +49,7 @@ import {
   resolveUnitConversion,
 } from "../services/stockEngine.js";
 import { calculateNewWeightedAverageCost } from "../services/costingEngine.js";
-import { round2, roundQty } from "../services/money.js";
+import { Money, roundQty } from "../services/money.js";
 import {
   prepareSerialsInTxn,
   assertSerialCount,
@@ -98,6 +98,7 @@ export const stockTransfersCreate = onCall({ region: "asia-south1" }, async (req
 
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
+  const currency = ctx.organization.currency;
   const now = new Date().toISOString();
 
   const isSameBranch = input.sourceBranchId === input.destinationBranchId;
@@ -198,8 +199,8 @@ export const stockTransfersCreate = onCall({ region: "asia-south1" }, async (req
       const unitCost = prodData.weightedAverageCost && prodData.weightedAverageCost > 0
         ? prodData.weightedAverageCost
         : (prodData.costPrice || 0);
-      const lineTotalCost = round2(unitCost * baseQuantity);
-      totalValuation += lineTotalCost;
+      const lineTotalCost = Money.amount(unitCost * baseQuantity, currency);
+      totalValuation = Money.amount(totalValuation + lineTotalCost, currency);
 
       resolvedItems.push({
         productId: item.productId,
@@ -230,7 +231,7 @@ export const stockTransfersCreate = onCall({ region: "asia-south1" }, async (req
       status: "draft",
       version: 1,
       items: resolvedItems,
-      totalValuation: round2(totalValuation),
+      totalValuation: Money.amount(totalValuation, currency),
       handlingFee: input.handlingFee,
       handlingFeeFinancialAccountId: input.handlingFeeFinancialAccountId,
       discrepancyStatus: "none",
@@ -444,6 +445,7 @@ export const stockTransfersDispatch = onCall({ region: "asia-south1" }, async (r
 
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
+  const currency = ctx.organization.currency;
   const now = new Date().toISOString();
   const transferRef = db.collection("stockTransfers").doc(input.transferId);
 
@@ -545,7 +547,7 @@ export const stockTransfersDispatch = onCall({ region: "asia-south1" }, async (r
       const unitCost = prodData.weightedAverageCost && prodData.weightedAverageCost > 0
         ? prodData.weightedAverageCost
         : (prodData.costPrice || 0);
-      const totalCost = round2(unitCost * dispatchedBaseQuantity);
+      const totalCost = Money.amount(unitCost * dispatchedBaseQuantity, currency);
 
       const newSourceStock = roundQty(currentStock - dispatchedBaseQuantity, 4);
       const currentInTransit = (stockBalanceData?.inTransitQty || Number(branchProductStockData?.inTransitQty) || 0);
@@ -709,7 +711,7 @@ export const stockTransfersDispatch = onCall({ region: "asia-south1" }, async (r
       status: "dispatched",
       version: nextVersion,
       items: updatedItems,
-      totalValuation: round2(totalValuation),
+      totalValuation: Money.amount(totalValuation, currency),
       transportMode: input.transportMode || transfer.transportMode,
       trackingReference: input.trackingReference || transfer.trackingReference,
       dispatchedAt: now,
@@ -722,7 +724,7 @@ export const stockTransfersDispatch = onCall({ region: "asia-south1" }, async (r
       success: true,
       status: "dispatched",
       version: nextVersion,
-      totalValuation: round2(totalValuation),
+      totalValuation: Money.amount(totalValuation, currency),
       message: "Stock transfer dispatched. Source inventory deducted and in-transit stock recorded.",
     };
   });
@@ -1041,6 +1043,7 @@ export const stockTransfersResolveDiscrepancy = onCall({ region: "asia-south1" }
 
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
+  const currency = ctx.organization.currency;
   const now = new Date().toISOString();
   const transferRef = db.collection("stockTransfers").doc(input.transferId);
 
@@ -1130,7 +1133,7 @@ export const stockTransfersResolveDiscrepancy = onCall({ region: "asia-south1" }
       // Inventory shortage write-off:
       // Damaged receipt write-off expense is posted to source branch (Q-F10)
       const lineUnitCost = line.unitCost || prodData.weightedAverageCost || prodData.costPrice || 0;
-      const writeOffAmount = round2(lineUnitCost * discrepancyBaseQty);
+      const writeOffAmount = Money.amount(lineUnitCost * discrepancyBaseQty, currency);
 
       if (writeOffAmount > 0) {
         const outflowRef = db.collection("outflows").doc();
@@ -1161,7 +1164,7 @@ export const stockTransfersResolveDiscrepancy = onCall({ region: "asia-south1" }
     } else if (input.resolution === "claim_carrier") {
       // Carrier claim records a receivable on source branch (Q-F10)
       const lineUnitCost = line.unitCost || prodData.weightedAverageCost || prodData.costPrice || 0;
-      const claimAmount = round2(lineUnitCost * discrepancyBaseQty);
+      const claimAmount = Money.amount(lineUnitCost * discrepancyBaseQty, currency);
 
       if (claimAmount > 0) {
         const receivableRef = db.collection("carrierClaims").doc();

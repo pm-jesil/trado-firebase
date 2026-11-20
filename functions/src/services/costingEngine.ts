@@ -6,10 +6,10 @@
  * 2. Computes line-item and aggregate COGS for sales invoices.
  * 3. Computes inventory stock valuation at current WAC.
  * 
- * All monetary calculations use Trado's canonical money.ts rounding discipline (round2 & round4).
+ * All monetary calculations use Trado's canonical money.ts rounding discipline (Money.amount & round4).
  */
 
-import { round2, round4 } from "./money.js";
+import { Money, round4 } from "./money.js";
 import { ProductDoc } from "../types/models.js";
 
 export interface StockValuationItem {
@@ -65,7 +65,8 @@ export function calculateNewWeightedAverageCost(
  */
 export function calculateCOGSForItems(
   items: Array<{ productId: string; quantity: number }>,
-  productMap: Map<string, ProductDoc>
+  productMap: Map<string, ProductDoc>,
+  currency: string
 ): number {
   let totalCogs = 0;
 
@@ -73,16 +74,19 @@ export function calculateCOGSForItems(
     const product = productMap.get(item.productId);
     const unitCost = product?.weightedAverageCost ?? product?.costPrice ?? 0;
     const lineCogs = item.quantity * unitCost;
-    totalCogs += lineCogs;
+    totalCogs = Money.amount(totalCogs + lineCogs, currency);
   }
 
-  return round2(totalCogs);
+  return Money.amount(totalCogs, currency);
 }
 
 /**
  * Calculates stock valuation across a list of active products.
  */
-export function calculateStockValuation(products: (ProductDoc & { id?: string; productId?: string })[]): StockValuationResult {
+export function calculateStockValuation(
+  products: (ProductDoc & { id?: string; productId?: string })[],
+  currency: string
+): StockValuationResult {
   let totalValuation = 0;
   const items: StockValuationItem[] = [];
 
@@ -92,8 +96,8 @@ export function calculateStockValuation(products: (ProductDoc & { id?: string; p
       ? product.weightedAverageCost
       : (product.costPrice || 0);
 
-    const valuation = round2(stock * effectiveCost);
-    totalValuation += valuation;
+    const valuation = Money.amount(stock * effectiveCost, currency);
+    totalValuation = Money.amount(totalValuation + valuation, currency);
 
     items.push({
       productId: product.id || product.productId || "",
@@ -106,7 +110,7 @@ export function calculateStockValuation(products: (ProductDoc & { id?: string; p
   }
 
   return {
-    totalStockValuation: round2(totalValuation),
+    totalStockValuation: Money.amount(totalValuation, currency),
     totalItemsCount: items.length,
     items,
   };

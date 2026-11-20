@@ -19,7 +19,7 @@ import { StockTransferStatus, ProductDoc } from "../../types/models.js";
 import { resolveUnitConversion } from "../../services/stockEngine.js";
 import { calculateNewWeightedAverageCost } from "../../services/costingEngine.js";
 import { assertSerialCount } from "../../services/serials.js";
-import { round2, roundQty } from "../../services/money.js";
+import { Money, roundQty } from "../../services/money.js";
 
 describe("Phase 2 — Inter-Branch Stock Transfers & State Machine (Unit)", () => {
   describe("1. State Machine Allowed & Illegal Transitions (U-6)", () => {
@@ -163,19 +163,20 @@ describe("Phase 2 — Inter-Branch Stock Transfers & State Machine (Unit)", () =
       const destStockInitial = 20;
       const destWacInitial = 80; // Total dest val = 1,600
 
-      const initialTotalValuation = round2(sourceStockInitial * sourceWac + destStockInitial * destWacInitial); // 6,600
+      const initialTotalValuation = Money.amount(sourceStockInitial * sourceWac + destStockInitial * destWacInitial, "INR"); // 6,600
 
       // Dispatch 10 units from source to dest at source WAC (100)
       const transferQty = 10;
       const transferUnitCost = sourceWac;
-      const transferValuation = round2(transferQty * transferUnitCost); // 1,000
+      const transferValuation = Money.amount(transferQty * transferUnitCost, "INR"); // 1,000
       assert.equal(transferValuation, 1000);
 
       const sourceStockAfter = sourceStockInitial - transferQty; // 40
       const inTransitQty = transferQty; // 10
 
-      const inFlightValuation = round2(
-        sourceStockAfter * sourceWac + inTransitQty * transferUnitCost + destStockInitial * destWacInitial
+      const inFlightValuation = Money.amount(
+        sourceStockAfter * sourceWac + inTransitQty * transferUnitCost + destStockInitial * destWacInitial,
+        "INR"
       );
       assert.equal(inFlightValuation, initialTotalValuation, "In-transit valuation must equal initial valuation");
 
@@ -190,9 +191,9 @@ describe("Phase 2 — Inter-Branch Stock Transfers & State Machine (Unit)", () =
       assert.equal(newDestWac, 86.6667);
 
       const destStockAfter = destStockInitial + transferQty; // 30
-      const finalDestValuation = round2(destStockAfter * newDestWac); // 30 * 86.6667 = 2600.00
-      const finalSourceValuation = round2(sourceStockAfter * sourceWac); // 40 * 100 = 4000.00
-      const finalTotalValuation = round2(finalSourceValuation + finalDestValuation); // 6600.00
+      const finalDestValuation = Money.amount(destStockAfter * newDestWac, "INR"); // 30 * 86.6667 = 2600.00
+      const finalSourceValuation = Money.amount(sourceStockAfter * sourceWac, "INR"); // 40 * 100 = 4000.00
+      const finalTotalValuation = Money.amount(finalSourceValuation + finalDestValuation, "INR"); // 6600.00
 
       assert.equal(finalTotalValuation, initialTotalValuation, "Final total valuation across branches must be strictly conserved");
     });

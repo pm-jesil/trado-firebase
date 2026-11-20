@@ -1,9 +1,9 @@
 # Trado Engineering Handoff (Appendix E)
 
-- **Date:** 2026-11-19
+- **Date:** 2026-11-20
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** Hybrid Prompt 77C — Close Prompt 77 (Official Gate, One Fee Path, Self-Approval Policy, Money Naming, Coverage) (`run-77c-final`)
-- **Current State:** **PROMPT 77 / 77C OFFICIALLY CLOSED [cov:77C-GATES]. EMULATOR-VERIFIED AT THE GATE: 111/111 UNITS [cov:111/111], LIVE EMULATOR GATE 12/12 [cov:12/12], 26/26 SEEDED DEFECTS [cov:26/26], 73/73 FINANCIAL SCENARIOS [cov:73/73], 390/390 UNIT TESTS [cov:390/390], 0 VIOLATIONS.**
+- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1, S2, S3a, S3b)
+- **Current State:** **STEPS S1, S2, S3a, S3b COMPLETED. `round2` completely deleted from codebase (0 occurrences in functions/src). Strict Money.amount(x, currency) and Money.sum(x, currency) deployed across tax calculation, costing engine, summary service, operational reports, financial reports, analytics reports, and stock transfers. 408/408 unit tests pass.**
 
 ## Summary of Prompt 77 & 77C Deliverables
 
@@ -106,9 +106,9 @@
 ## Verification Scope Block (from `npm --prefix functions run verify:status`)
 
 ```
-baseline base-94d17b6b (trusted, trusted: true) from 2026-11-19T21:18:31.434Z, 0.9 h old; last run run-b9bf025d
+baseline base-94d17b6b (trusted, trusted: true) from 2026-11-19T21:18:31.434Z, 10.4 h old; last run run-fbe653d2
 environment match: yes; node v22.17.0, firebase-tools 15.10.0
-units 111; stale (would run) 0; untraced 0; unmapped changed files 0; ignore rules 32
+units 111; stale (would run) 79; untraced 0; unmapped changed files 0; ignore rules 32
 ```
 
 ## Source Numbers (Derived from Code & Scripts)
@@ -119,10 +119,11 @@ units 111; stale (would run) 0; untraced 0; unmapped changed files 0; ignore rul
 - **State Machines:** 13 in code, 13 in contract
 - **Flow Guides:** 19 (`FL-01.md`..`FL-19.md` in `docs/flows/`)
 - **Seeded Defects Detected:** 26/26 BM-1..BM-26
+- **Unit Tests:** 408/408 passed (110 suites, 0 failures)
 
-## Next Command (Prompt 78 Entry Command)
+## Next Command (Prompt 77D S4 Entry Command)
 
 ```powershell
-# Prompt 78 entry command (Domain Entities and Master Data Seed)
+$env:PATH = "C:\Users\jesil.p\node\node--v22.17.0-win-x64;" + $env:PATH; node -v
 npm --prefix functions run verify:status
 ```

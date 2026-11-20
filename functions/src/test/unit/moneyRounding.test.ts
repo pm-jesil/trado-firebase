@@ -256,5 +256,35 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
       assert.equal(getCurrencyDecimals("JPY"), 0);
     });
   });
+
+  describe("Prompt 77D S3b — Multi-document Report Totals by Currency", () => {
+    it("sums BHD report total of 3-decimal values without float drift", () => {
+      const bhdValues = [1.125, 2.375, 0.005, 10.5];
+      const total = Money.sum(bhdValues, "BHD");
+      assert.equal(total, 14.005);
+
+      const rowDebits = [0.1001, 0.2004, 0.3005];
+      const normalizedDebits = rowDebits.map((d) => Money.amount(d, "BHD"));
+      assert.deepEqual(normalizedDebits, [0.1, 0.2, 0.301]);
+      assert.equal(Money.sum(normalizedDebits, "BHD"), 0.601);
+    });
+
+    it("sums JPY report total of 0-decimal values correctly as integers", () => {
+      const jpyValues = [100.4, 250.6, 45.0, 1000.5];
+      const normalized = jpyValues.map((v) => Money.amount(v, "JPY"));
+      assert.deepEqual(normalized, [100, 251, 45, 1001]);
+      const total = Money.sum(normalized, "JPY");
+      assert.equal(total, 1397);
+    });
+
+    it("sums AED report total of 2-decimal values without float accumulation error", () => {
+      const aedValues = [0.1, 0.2, 10.05, 20.655, 30.125];
+      const normalized = aedValues.map((v) => Money.amount(v, "AED"));
+      assert.deepEqual(normalized, [0.1, 0.2, 10.05, 20.66, 30.13]);
+      const total = Money.sum(normalized, "AED");
+      assert.equal(total, 61.14);
+    });
+  });
 });
+
 
