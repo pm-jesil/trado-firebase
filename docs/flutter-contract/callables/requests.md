@@ -301,7 +301,7 @@ Back to [Master Index](./INDEX.md).
 | `category[]` | `enum` | **Yes** | Enum: `plan_change`, `limit_increase`, `module_request`, `billing_query`, `org_profile_change`, `ownership_transfer` | `plan_change` |
 | `priority[]` | `enum` | **Yes** | Enum: `low`, `normal`, `high`, `urgent` | `low` |
 | `search` | `string` | No | {"maxLength":100} | `Sample search` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `cursor` | `string` | No | — | `Sample cursor` |
 | `clientRequestId` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
@@ -337,7 +337,7 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 | `requestId` | `string` | **Yes** | {"minLength":2} | `request_001` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `cursor` | `string` | No | — | `Sample cursor` |
 | `clientRequestId` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
@@ -350,7 +350,7 @@ Back to [Master Index](./INDEX.md).
     "organizationId": "organization_001",
     "branchId": "branch_001",
     "requestId": "request_001",
-    "limit": 2500,
+    "limit": 1,
     "cursor": "Sample cursor",
     "clientRequestId": "idem_20261118_0001"
   },
@@ -413,7 +413,7 @@ Back to [Master Index](./INDEX.md).
 | `search` | `string` | No | {"maxLength":100} | `Sample search` |
 | `sortBy` | `enum` | No | Enum: `createdAt`, `lastActivityAt`, `priority`, `resolutionDueAt` | `createdAt` |
 | `sortOrder` | `enum` | No | Enum: `asc`, `desc` | `asc` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `cursor` | `string` | No | — | `Sample cursor` |
 | `clientRequestId` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
@@ -663,9 +663,9 @@ Back to [Master Index](./INDEX.md).
 | `sla.normal.resolutionHours` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":2160,"maxInclusive":true} | `1` |
 | `sla.low.firstResponseHours` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":720,"maxInclusive":true} | `1` |
 | `sla.low.resolutionHours` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":2160,"maxInclusive":true} | `1` |
-| `limits.maxOpenPerUser` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":1000,"maxInclusive":true} | `2500` |
-| `limits.maxOpenPerOrg` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":10000,"maxInclusive":true} | `2500` |
-| `limits.maxCreationsPerHourPerUser` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":500,"maxInclusive":true} | `2500` |
+| `limits.maxOpenPerUser` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":1000,"maxInclusive":true} | `1` |
+| `limits.maxOpenPerOrg` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":10000,"maxInclusive":true} | `1` |
+| `limits.maxCreationsPerHourPerUser` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":500,"maxInclusive":true} | `1` |
 | `autoCloseDays` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":90,"maxInclusive":true} | `1` |
 | `reopenWindowDays` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":90,"maxInclusive":true} | `1` |
 | `needsInfoReminderDays` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":30,"maxInclusive":true} | `1` |

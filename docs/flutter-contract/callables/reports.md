@@ -126,7 +126,7 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | — | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 | `entityType` | `enum` | **Yes** | Enum: `products`, `customers`, `vendors` | `products` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":50,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":50,"maxInclusive":true} | `1` |
 | `from` | `string` | No | {"format":"regex"} | `Sample from` |
 | `to` | `string` | No | {"format":"regex"} | `Sample to` |
 
@@ -139,7 +139,7 @@ Back to [Master Index](./INDEX.md).
     "organizationId": "organization_001",
     "branchId": "branch_001",
     "entityType": "products",
-    "limit": 2500,
+    "limit": 1,
     "from": "Sample from",
     "to": "Sample to"
   },

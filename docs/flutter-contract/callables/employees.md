@@ -152,7 +152,7 @@ Back to [Master Index](./INDEX.md).
 |---|---|---|---|---|
 | `branchId` | `string` | No | — | `branch_001` |
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 | `status` | `enum` | No | Enum: `active`, `inactive`, `suspended` | `active` |
 
@@ -164,7 +164,7 @@ Back to [Master Index](./INDEX.md).
   "request": {
     "branchId": "branch_001",
     "organizationId": "organization_001",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001",
     "status": "active"
   },

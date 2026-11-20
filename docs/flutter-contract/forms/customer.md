@@ -59,7 +59,7 @@
 | `contacts[].email` | `string` | No | Yes | `email` | — | `owner@example.com` |
 | `contacts[].whatsApp` | `string` | No | Yes | `text` | — | `Sample whatsApp` |
 | `priceGroup` | `string` | No | Yes | `text` | — | `retail` |
-| `creditLimit` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `creditLimit` | `number` | No | Yes | `money` | {"min":0,"minInclusive":true} | `25` |
 | `creditPeriodDays` | `number` | No | Yes | `numeric` | {"format":"safeint","min":0,"minInclusive":true} | `1` |
 | `visibilityScope` | `enum` | No | Yes | `dropdown` | Enum: `all_branches`, `selected_branches`, `branch_only` | `all_branches` |
 | `sharedForBranchIds[]` | `string` | **Yes** | Yes | `text` | — | `Sample sharedForBranchIds[]` |

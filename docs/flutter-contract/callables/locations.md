@@ -90,7 +90,7 @@ Back to [Master Index](./INDEX.md).
 | `membershipId` | `string` | **Yes** | {"minLength":3} | `membership_001` |
 | `from` | `string` | No | {"format":"datetime"} | `Sample from` |
 | `to` | `string` | No | {"format":"datetime"} | `Sample to` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":200,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":200,"maxInclusive":true} | `1` |
 
 **Response:** Envelope `ACTION` · Top-level keys: "count", "membershipId", "organizationId", "pings" (16 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
@@ -103,7 +103,7 @@ Back to [Master Index](./INDEX.md).
     "membershipId": "membership_001",
     "from": "Sample from",
     "to": "Sample to",
-    "limit": 2500
+    "limit": 1
   },
   "response": {
     "count": 1,

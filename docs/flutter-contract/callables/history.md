@@ -16,7 +16,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `entityType` | `enum` | No | Enum: `product`, `customer`, `vendor`, `bill`, `outflow`, `purchase` | `product` |
 | `entityId` | `string` | No | {"minLength":2} | `entity_001` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":200,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":200,"maxInclusive":true} | `1` |
 
 **Response:** Envelope `LIST` · Top-level keys: "entityId", "entityType", "items", "nextCursor" (22 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
@@ -28,7 +28,7 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "entityType": "product",
     "entityId": "entity_001",
-    "limit": 2500
+    "limit": 1
   },
   "response": {
     "items": [],
@@ -62,7 +62,7 @@ Back to [Master Index](./INDEX.md).
 | `includeTotal` | `boolean` | No | — | `true` |
 | `from` | `string` | No | {"format":"regex"} | `Sample from` |
 | `to` | `string` | No | {"format":"regex"} | `Sample to` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `cursor` | `string` | No | — | `Sample cursor` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "included", "items", "nextCursor", "ownActivityOnly", "totalCount" (47 typed leaf paths).

@@ -118,7 +118,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `type` | `enum` | No | Enum: `warehouse`, `stockyard`, `counter`, `backroom`, `quarantine`, `transit` | `warehouse` |
 | `isActive` | `boolean` | No | — | `true` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (32 typed leaf paths).
@@ -131,7 +131,7 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "type": "warehouse",
     "isActive": true,
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {

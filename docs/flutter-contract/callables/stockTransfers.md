@@ -28,7 +28,7 @@ Back to [Master Index](./INDEX.md).
 | `items[].expiryDate` | `string` | No | {"maxLength":50} | `2026-11-18` |
 | `items[].notes` | `string` | No | {"maxLength":200} | `Sample notes` |
 | `items[].serialNumbers[]` | `string` | **Yes** | {"minLength":1,"maxLength":64} | `Sample serialNumbers[]` |
-| `handlingFee` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `handlingFee` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `handlingFeeFinancialAccountId` | `string` | No | {"minLength":2} | `handlingFeeFinancialAccount_001` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
@@ -275,7 +275,7 @@ Back to [Master Index](./INDEX.md).
 | `sourceBranchId` | `string` | No | — | `sourceBranch_001` |
 | `destinationBranchId` | `string` | No | — | `destinationBranch_001` |
 | `status` | `enum` | No | Enum: `draft`, `submitted`, `approved`, `dispatched`, `received`, `partially_received` | `draft` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (59 typed leaf paths).
@@ -289,7 +289,7 @@ Back to [Master Index](./INDEX.md).
     "sourceBranchId": "sourceBranch_001",
     "destinationBranchId": "destinationBranch_001",
     "status": "draft",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {

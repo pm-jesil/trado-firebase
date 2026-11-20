@@ -19,10 +19,10 @@ Back to [Master Index](./INDEX.md).
 | `description` | `string` | No | {"maxLength":1000} | `2026-11-18` |
 | `categoryId` | `string` | No | — | `category_001` |
 | `baseUnit` | `string` | No | {"minLength":1,"maxLength":30} | `Sample baseUnit` |
-| `sellingPrice` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `costPrice` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `sellingPrice` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `costPrice` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `mrp` | `number` | No | {"min":0,"minInclusive":true} | `1` |
-| `wholesalePrice` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `wholesalePrice` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `taxInclusive` | `boolean` | No | — | `true` |
 | `taxRatePercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `taxCode` | `string` | No | {"maxLength":50} | `Sample taxCode` |
@@ -42,8 +42,8 @@ Back to [Master Index](./INDEX.md).
 | `brand` | `string` | No | {"maxLength":100} | `Sample brand` |
 | `alternateUnits[].unit` | `string` | **Yes** | {"minLength":1,"maxLength":30} | `Sample unit` |
 | `alternateUnits[].factor` | `number` | **Yes** | {"min":0,"minInclusive":false} | `1` |
-| `alternateUnits[].sellingPrice` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `alternateUnits[].wholesalePrice` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `alternateUnits[].sellingPrice` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `alternateUnits[].wholesalePrice` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `alternateUnits[].barcode` | `string` | No | {"maxLength":100} | `Sample barcode` |
 | `alternateUnits[].isPurchaseUnit` | `boolean` | No | — | `true` |
 | `alternateUnits[].isSaleUnit` | `boolean` | No | — | `true` |
@@ -62,7 +62,7 @@ Back to [Master Index](./INDEX.md).
     "description": "2026-11-18",
     "categoryId": "category_001",
     "baseUnit": "Sample baseUnit",
-    "sellingPrice": 2500
+    "sellingPrice": 25
   },
   "response": {
     "currentStock": "...",
@@ -91,10 +91,10 @@ Back to [Master Index](./INDEX.md).
 | `description` | `string` | No | {"maxLength":1000} | `2026-11-18` |
 | `categoryId` | `string` | No | — | `category_001` |
 | `baseUnit` | `string` | No | {"minLength":1,"maxLength":30} | `Sample baseUnit` |
-| `sellingPrice` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `costPrice` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `sellingPrice` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `costPrice` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `mrp` | `number` | No | {"min":0,"minInclusive":true} | `1` |
-| `wholesalePrice` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `wholesalePrice` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `taxInclusive` | `boolean` | No | — | `true` |
 | `taxRatePercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `taxCode` | `string` | No | {"maxLength":50} | `Sample taxCode` |
@@ -109,15 +109,15 @@ Back to [Master Index](./INDEX.md).
 | `brand` | `string` | No | {"maxLength":100} | `Sample brand` |
 | `alternateUnits[].unit` | `string` | **Yes** | {"minLength":1,"maxLength":30} | `Sample unit` |
 | `alternateUnits[].factor` | `number` | **Yes** | {"min":0,"minInclusive":false} | `1` |
-| `alternateUnits[].sellingPrice` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `alternateUnits[].wholesalePrice` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `alternateUnits[].sellingPrice` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `alternateUnits[].wholesalePrice` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `alternateUnits[].barcode` | `string` | No | {"maxLength":100} | `Sample barcode` |
 | `alternateUnits[].isPurchaseUnit` | `boolean` | No | — | `true` |
 | `alternateUnits[].isSaleUnit` | `boolean` | No | — | `true` |
 | `isTaxable` | `boolean` | No | — | `true` |
 | `taxExemptionReason` | `string` | No | {"maxLength":200} | `2026-11-18` |
 | `isDiscountable` | `boolean` | No | — | `true` |
-| `maxDiscountPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `maxDiscountPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `isReturnable` | `boolean` | No | — | `true` |
 | *...* | *+23 nested fields* | | | *See `callables.json`* |
 
@@ -134,7 +134,7 @@ Back to [Master Index](./INDEX.md).
     "description": "2026-11-18",
     "categoryId": "category_001",
     "baseUnit": "Sample baseUnit",
-    "sellingPrice": 2500
+    "sellingPrice": 25
   },
   "response": {
     "message": "...",
@@ -157,7 +157,7 @@ Back to [Master Index](./INDEX.md).
 | `categoryId` | `string` | No | — | `category_001` |
 | `isActive` | `boolean` | No | — | `true` |
 | `ids[]` | `string` | **Yes** | {"minLength":1} | `Sample ids[]` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "items", "missingIds", "nextCursor" (72 typed leaf paths).
@@ -170,7 +170,7 @@ Back to [Master Index](./INDEX.md).
     "organizationId": "organization_001",
     "categoryId": "category_001",
     "isActive": true,
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {
@@ -230,7 +230,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `productId` | `string` | **Yes** | {"minLength":2} | `product_001` |
 | `vendorId` | `string` | No | — | `vendor_001` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":200,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":200,"maxInclusive":true} | `1` |
 
 **Response:** Envelope `ACTION` · Top-level keys: "included", "priceChanges", "productId", "purchaseCostVisible", "purchaseStats", "purchases" (14 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
@@ -242,7 +242,7 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "productId": "product_001",
     "vendorId": "vendor_001",
-    "limit": 2500
+    "limit": 1
   },
   "response": {
     "included": "...",

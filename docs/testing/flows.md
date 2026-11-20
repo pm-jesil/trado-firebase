@@ -117,7 +117,7 @@ Uncovered Callables: **0**
 - **Core Invariants & State Validations:**
   - ✓ Natural keys (sku, barcode, category name, unit code) locked in uniqueKeys
   - ✓ Image paths verified against storage bucket and sha256 checksum
-  - ✓ Prices and cost stored as integer paise/cents (D-19)
+  - ✓ Prices and cost stored as decimal major units (D-19)
 
 ---
 

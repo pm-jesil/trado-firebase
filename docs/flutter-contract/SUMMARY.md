@@ -5,7 +5,7 @@
 ## 1. Conventions & Authoritative References
 - **Callable Reference (207/207):** [callables/INDEX.md](./callables/INDEX.md) & [callables.json](./callables.json)
 - **Single Entity / List (D-18):** `{ "<entity>": { ... } }` | `{ "items": [...], "count": N, "nextCursor": "...", "included": { ... } }`
-- **Money:** Integer minor units per org `currencyDecimals` (2 for INR/AED/USD, 3 for BHD/OMR/KWD).
+- **Money:** Decimal major units (e.g. 12.50 AED, 1.250 BHD, 500 INR) per org `currencyInfo.exponent` derived from `currencies.ts`.
 - **Timestamps:** ISO 8601 UTC strings; local dates `YYYY-MM-DD`; org timezone from `authMe` → `context.primaryOrganization.timezone` ([auth.md](./auth.md)).
 - **Images:** Upload to `uploadPath` via `imagesCreateUploadSession`, pass `uploadId`; stored as `ImageRef { path, contentType, width, height, sizeBytes, updatedAt, thumbnailPath? }`; read as hydrated `imageUrl` ([images.md](./images.md)).
 - **Permissions (155 concrete):** [permissions.json](./permissions.json) · **Errors (86 codes):** [errors.md](./errors.md) · **State Machines (13):** [state-machines.md](./state-machines.md)
@@ -16,7 +16,7 @@
 - `forms/approval_request.json` now has real `DocumentDecisionSchema` fields (> 0 fields, MG-15).
 - Added 4 new forms: `user_profile`, `ownership_transfer`, `sharing_policy`, `usage_limits` (total 35 entity/action forms + 15 request-detail forms).
 - `forms/organization.json` now includes per-field `editableBy` and `operations.update` actor map (MG-12).
-- `customer.priceGroup` fixed from `uiHint: money_paise` to `uiHint: text` with example `"retail"` (MG-05).
+- `customer.priceGroup` fixed from `uiHint: money` to `uiHint: text` with example `"retail"` (MG-05).
 - Added machine-readable `callables.json`, `permissions.json`, `images.md`, and `auth.md`.
 - `errors.md` expanded from 24 to 86 thrown reason codes; `REQUEST_REOPEN_WINDOW_CLOSED` now reflects configurable `reopenWindowDays` (default 14 days).
 - `state-machines.md` expanded from 9 to 13 machines (DeliveryStatus fixed to `picked_up`/`out_for_delivery`/`returned`; added `subscription`, `stock-transfer`, `payment-processing-fee`, `approval-decision`).

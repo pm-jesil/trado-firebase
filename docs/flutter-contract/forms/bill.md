@@ -18,17 +18,17 @@
 | `walkInCustomer.billingAddress` | `string` | No | Yes | `textarea` | {"maxLength":500} | `Sample billingAddress` |
 | `items[].productId` | `string` | **Yes** | Yes | `text` | {"minLength":2} | `items___product_001` |
 | `items[].quantity` | `number` | **Yes** | Yes | `numeric` | {"min":0,"minInclusive":false} | `1` |
-| `items[].unitPriceOverride` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
-| `items[].discountValue` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `items[].unitPriceOverride` | `number` | No | Yes | `money` | {"min":0,"minInclusive":true} | `25` |
+| `items[].discountValue` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true} | `1` |
 | `items[].unit` | `string` | No | Yes | `text` | — | `Sample unit` |
 | `items[].serialNumbers[]` | `string` | **Yes** | Yes | `text` | {"minLength":1,"maxLength":64} | `Sample serialNumbers[]` |
-| `discountTotal` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
-| `paidAmount` | `number` | No | No | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `discountTotal` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true} | `1` |
+| `paidAmount` | `number` | No | No | `money` | {"min":0,"minInclusive":true} | `25` |
 | `paymentMethod` | `enum` | No | No | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
 | `financialAccountId` | `string` | No | No | `text` | {"minLength":2} | `financialAccount_001` |
 | `storageLocationId` | `string` | No | No | `text` | {"minLength":2} | `storageLocation_001` |
 | `splitPayments[].method` | `enum` | **Yes** | No | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `splitPayments[].amount` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":false} | `2500` |
+| `splitPayments[].amount` | `number` | **Yes** | No | `money` | {"min":0,"minInclusive":false} | `25` |
 | `splitPayments[].financialAccountId` | `string` | **Yes** | No | `text` | {"minLength":2} | `splitPayments___financialAccount_001` |
 | `splitPayments[].notes` | `string` | No | No | `textarea` | {"maxLength":300} | `Sample notes` |
 | `notes` | `string` | No | Yes | `textarea` | {"maxLength":1000} | `Sample notes` |

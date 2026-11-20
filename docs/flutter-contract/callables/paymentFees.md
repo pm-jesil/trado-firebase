@@ -19,8 +19,8 @@ Back to [Master Index](./INDEX.md).
 | `paymentId` | `string` | No | — | `payment_001` |
 | `financialAccountId` | `string` | **Yes** | {"minLength":2} | `financialAccount_001` |
 | `paymentMethod` | `enum` | **Yes** | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `feeAmount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
-| `feeTaxAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `feeAmount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `25` |
+| `feeTaxAmount` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `settlementTiming` | `enum` | No | Enum: `immediate_deduction`, `billed_later` | `immediate_deduction` |
 | `settlementReference` | `string` | No | {"maxLength":100} | `Sample settlementReference` |
 | `feeExpenseCategoryId` | `string` | No | — | `feeExpenseCategory_001` |
@@ -40,7 +40,7 @@ Back to [Master Index](./INDEX.md).
     "paymentId": "payment_001",
     "financialAccountId": "financialAccount_001",
     "paymentMethod": "cash",
-    "feeAmount": 2500
+    "feeAmount": 25
   },
   "response": {
     "accountTransactionId": "accountTransactionId_001",
@@ -178,7 +178,7 @@ Back to [Master Index](./INDEX.md).
 | `financialAccountId` | `string` | No | — | `financialAccount_001` |
 | `status` | `enum` | No | Enum: `expected`, `pending_verification`, `verified`, `disputed`, `reversed` | `expected` |
 | `highlight` | `enum` | No | Enum: `needs_review` | `needs_review` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (38 typed leaf paths).
@@ -194,7 +194,7 @@ Back to [Master Index](./INDEX.md).
     "financialAccountId": "financialAccount_001",
     "status": "expected",
     "highlight": "needs_review",
-    "limit": 2500
+    "limit": 1
   },
   "response": {
     "items": [],

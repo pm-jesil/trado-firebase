@@ -50,7 +50,7 @@ Back to [Master Index](./INDEX.md).
 |---|---|---|---|---|
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `unreadOnly` | `boolean` | No | — | `true` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "items" (14 typed leaf paths).
@@ -61,7 +61,7 @@ Back to [Master Index](./INDEX.md).
   "request": {
     "organizationId": "organization_001",
     "branchId": "branch_001",
-    "limit": 2500,
+    "limit": 1,
     "unreadOnly": true
   },
   "response": {

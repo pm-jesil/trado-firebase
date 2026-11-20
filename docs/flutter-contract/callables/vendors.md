@@ -155,7 +155,7 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 | `partyType` | `enum` | No | Enum: `organization`, `person` | `organization` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "items", "nextCursor" (65 typed leaf paths).
@@ -167,7 +167,7 @@ Back to [Master Index](./INDEX.md).
     "organizationId": "organization_001",
     "branchId": "branch_001",
     "partyType": "organization",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {

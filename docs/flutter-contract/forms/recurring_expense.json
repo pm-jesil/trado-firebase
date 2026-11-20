@@ -203,8 +203,9 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "lines[].discountAmount",
@@ -217,8 +218,8 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "lines[].taxPercent",

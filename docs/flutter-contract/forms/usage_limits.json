@@ -43,8 +43,8 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "limits.*.weeklyLimit",
@@ -58,8 +58,8 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "limits.*.monthlyLimit",
@@ -73,8 +73,8 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "limits.*.warningThresholdPercent",
@@ -89,8 +89,8 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "limits.*.hardThresholdPercent",
@@ -105,8 +105,8 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "limits.*.enforcementMode",

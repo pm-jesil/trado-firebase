@@ -22,7 +22,7 @@ Back to [Master Index](./INDEX.md).
 | `parentEntryId` | `string` | No | — | `parentEntry_001` |
 | `from` | `string` | No | {"format":"regex"} | `Sample from` |
 | `to` | `string` | No | {"format":"regex"} | `Sample to` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":200,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":200,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "entries", "items", "nextCursor", "totalCount" (99 typed leaf paths).
@@ -301,7 +301,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `parentEntryId` | `string` | **Yes** | {"minLength":2} | `parentEntry_001` |
 | `subEntryType` | `enum` | **Yes** | Enum: `transaction_charge`, `gateway_fee`, `bank_charge`, `adjustment`, `rounding`, `tip` | `transaction_charge` |
-| `amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
+| `amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `25` |
 | `financialAccountId` | `string` | No | — | `financialAccount_001` |
 | `direction` | `enum` | No | Enum: `in`, `out` | `in` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
@@ -318,7 +318,7 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "parentEntryId": "parentEntry_001",
     "subEntryType": "transaction_charge",
-    "amount": 2500,
+    "amount": 25,
     "financialAccountId": "financialAccount_001",
     "direction": "in",
     "notes": "Sample notes"
@@ -374,7 +374,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `moneyConvention` | `literal` | No | Enum: `major` | `2026-11-18` |
 | `selfApprovalPolicy` | `enum` | No | Enum: `off`, `up_to_limit`, `on` | `off` |
-| `selfApprovalLimits.*` | `number` | **Yes** | {"min":0,"minInclusive":true} | `2500` |
+| `selfApprovalLimits.*` | `number` | **Yes** | {"min":0,"minInclusive":true} | `1` |
 | `cashCountVarianceThreshold` | `number` | No | {"min":0,"minInclusive":true} | `1` |
 | `roundingMode` | `enum` | No | Enum: `half_up`, `half_even` | `half_up` |
 | `roundToNearestRupee` | `boolean` | No | — | `true` |

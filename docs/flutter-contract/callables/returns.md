@@ -21,7 +21,7 @@ Back to [Master Index](./INDEX.md).
 | `items[].sourceLineId` | `string` | No | {"minLength":1,"maxLength":10} | `items___sourceLine_001` |
 | `items[].serialNumbers[]` | `string` | **Yes** | {"minLength":1,"maxLength":64} | `Sample serialNumbers[]` |
 | `items[].quantity` | `number` | **Yes** | {"min":0,"minInclusive":false} | `1` |
-| `items[].refundAmount` | `number` | **Yes** | {"min":0,"minInclusive":true} | `2500` |
+| `items[].refundAmount` | `number` | **Yes** | {"min":0,"minInclusive":true} | `25` |
 | `items[].reason` | `string` | **Yes** | {"minLength":1,"maxLength":200} | `2026-11-18` |
 | `items[].disposition` | `enum` | No | Enum: `restocked_to_inventory`, `wasted_discarded` | `restocked_to_inventory` |
 | `refundMethod` | `enum` | No | Enum: `cash`, `credit_note`, `original_payment` | `cash` |
@@ -57,7 +57,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `returnType` | `enum` | No | Enum: `sales_return`, `purchase_return` | `sales_return` |
 | `referenceId` | `string` | No | — | `reference_001` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "included", "items", "nextCursor" (58 typed leaf paths).
@@ -70,7 +70,7 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "returnType": "sales_return",
     "referenceId": "reference_001",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {

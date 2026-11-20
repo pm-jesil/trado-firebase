@@ -21,7 +21,7 @@
 | `items[].expiryDate` | `string` | No | No | `date_picker` | {"maxLength":50} | `2026-11-18` |
 | `items[].notes` | `string` | No | No | `textarea` | {"maxLength":200} | `Sample notes` |
 | `items[].serialNumbers[]` | `string` | **Yes** | No | `text` | {"minLength":1,"maxLength":64} | `Sample serialNumbers[]` |
-| `handlingFee` | `number` | No | No | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `handlingFee` | `number` | No | No | `money` | {"min":0,"minInclusive":true} | `25` |
 | `handlingFeeFinancialAccountId` | `string` | No | No | `text` | {"minLength":2} | `handlingFeeFinancialAccount_001` |
 | `notes` | `string` | No | No | `textarea` | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | No | `text` | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |

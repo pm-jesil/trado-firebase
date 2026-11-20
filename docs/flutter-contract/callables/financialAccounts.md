@@ -24,11 +24,11 @@ Back to [Master Index](./INDEX.md).
 | `bankDetails.ifscOrSwift` | `string` | No | {"minLength":4,"maxLength":20} | `Sample ifscOrSwift` |
 | `bankDetails.bankBranchName` | `string` | No | {"maxLength":100} | `Sample bankBranchName` |
 | `bankDetails.upiId` | `string` | No | {"maxLength":100} | `bankDetails_upi_001` |
-| `feeRule.feePercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
-| `feeRule.feeFixed` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `feeRule.feeTaxPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
-| `feeRule.settlementDays` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
-| `openingBalance` | `number` | No | — | `2500` |
+| `feeRule.feePercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
+| `feeRule.feeFixed` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `feeRule.feeTaxPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
+| `feeRule.settlementDays` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `25` |
+| `openingBalance` | `number` | No | — | `25` |
 | `isDefault` | `boolean` | No | — | `true` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
@@ -73,10 +73,10 @@ Back to [Master Index](./INDEX.md).
 | `bankDetails.ifscOrSwift` | `string` | No | {"minLength":4,"maxLength":20} | `Sample ifscOrSwift` |
 | `bankDetails.bankBranchName` | `string` | No | {"maxLength":100} | `Sample bankBranchName` |
 | `bankDetails.upiId` | `string` | No | {"maxLength":100} | `bankDetails_upi_001` |
-| `feeRule.feePercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
-| `feeRule.feeFixed` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `feeRule.feeTaxPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
-| `feeRule.settlementDays` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
+| `feeRule.feePercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
+| `feeRule.feeFixed` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `feeRule.feeTaxPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
+| `feeRule.settlementDays` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `25` |
 | `isDefault` | `boolean` | No | — | `true` |
 | `isActive` | `boolean` | No | — | `true` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
@@ -112,7 +112,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `accountType` | `enum` | No | Enum: `cash`, `bank`, `digital`, `clearing`, `control` | `cash` |
 | `isActive` | `boolean` | No | — | `true` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (32 typed leaf paths).
@@ -125,7 +125,7 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "accountType": "cash",
     "isActive": true,
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {
@@ -180,7 +180,7 @@ Back to [Master Index](./INDEX.md).
 | `from` | `string` | No | {"format":"regex"} | `Sample from` |
 | `to` | `string` | No | {"format":"regex"} | `Sample to` |
 | `type` | `string` | No | — | `Sample type` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "account", "count", "hasMore", "items", "nextCursor", "totalCount" (10 typed leaf paths).
@@ -195,7 +195,7 @@ Back to [Master Index](./INDEX.md).
     "from": "Sample from",
     "to": "Sample to",
     "type": "Sample type",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {
@@ -219,7 +219,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `sourceAccountId` | `string` | **Yes** | {"minLength":2} | `sourceAccount_001` |
 | `destinationAccountId` | `string` | **Yes** | {"minLength":2} | `destinationAccount_001` |
-| `amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
+| `amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `25` |
 | `transferType` | `enum` | No | Enum: `transfer`, `cash_deposit`, `cash_withdrawal`, `inter_bank`, `petty_cash`, `cashier_handover` | `transfer` |
 | `mode` | `enum` | No | Enum: `instant`, `in_transit` | `instant` |
 | `reference` | `string` | No | {"maxLength":120} | `Sample reference` |
@@ -236,7 +236,7 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "sourceAccountId": "sourceAccount_001",
     "destinationAccountId": "destinationAccount_001",
-    "amount": 2500,
+    "amount": 25,
     "transferType": "transfer",
     "mode": "instant",
     "reference": "Sample reference"
@@ -263,7 +263,7 @@ Back to [Master Index](./INDEX.md).
 | `sourceAccountId` | `string` | No | — | `sourceAccount_001` |
 | `destinationAccountId` | `string` | No | — | `destinationAccount_001` |
 | `status` | `enum` | No | Enum: `pending_approval`, `completed`, `rejected`, `cancelled` | `pending_approval` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (35 typed leaf paths).
@@ -277,7 +277,7 @@ Back to [Master Index](./INDEX.md).
     "sourceAccountId": "sourceAccount_001",
     "destinationAccountId": "destinationAccount_001",
     "status": "pending_approval",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {
@@ -330,7 +330,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `type` | `enum` | **Yes** | Enum: `owner_contribution`, `partner_contribution`, `additional_capital`, `drawings` | `owner_contribution` |
 | `financialAccountId` | `string` | **Yes** | {"minLength":2} | `financialAccount_001` |
-| `amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
+| `amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `25` |
 | `currency` | `string` | No | {"maxLength":3,"minLength":3} | `INR` |
 | `sourceReference` | `string` | No | {"maxLength":100} | `Sample sourceReference` |
 | `description` | `string` | No | {"maxLength":500} | `2026-11-18` |
@@ -347,7 +347,7 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "type": "owner_contribution",
     "financialAccountId": "financialAccount_001",
-    "amount": 2500,
+    "amount": 25,
     "currency": "INR",
     "sourceReference": "Sample sourceReference",
     "description": "2026-11-18"
@@ -376,7 +376,7 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 | `type` | `enum` | No | Enum: `owner_contribution`, `partner_contribution`, `additional_capital`, `drawings` | `owner_contribution` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (18 typed leaf paths).
@@ -388,7 +388,7 @@ Back to [Master Index](./INDEX.md).
     "organizationId": "organization_001",
     "branchId": "branch_001",
     "type": "owner_contribution",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {

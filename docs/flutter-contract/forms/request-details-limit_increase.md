@@ -8,5 +8,5 @@
 |---|---|---|---|---|---|
 | `metric` | `enum` | **Yes** | `dropdown` | Enum: `firestoreReads`, `firestoreWrites`, `firestoreDeletes`, `functionsInvocations`, `functionsErrors`, `functionsExecutionMs`, `storageUploadBytes`, `storageDownloadBytes`, `storageOperations`, `authOperations`, `fcmDispatches`, `locationPings` | `firestoreReads` |
 | `period` | `enum` | **Yes** | `dropdown` | Enum: `daily`, `monthly` | `daily` |
-| `requestedLimit` | `number` | **Yes** | `money_paise` | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `requestedLimit` | `number` | **Yes** | `money` | {"format":"safeint","min":0,"minInclusive":false} | `25` |
 | `reason` | `string` | **Yes** | `textarea` | {"minLength":5,"maxLength":2000} | `2026-11-18` |

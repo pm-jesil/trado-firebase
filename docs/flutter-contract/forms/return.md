@@ -14,7 +14,7 @@
 | `items[].sourceLineId` | `string` | No | No | `text` | {"minLength":1,"maxLength":10} | `items___sourceLine_001` |
 | `items[].serialNumbers[]` | `string` | **Yes** | No | `text` | {"minLength":1,"maxLength":64} | `Sample serialNumbers[]` |
 | `items[].quantity` | `number` | **Yes** | No | `numeric` | {"min":0,"minInclusive":false} | `1` |
-| `items[].refundAmount` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `items[].refundAmount` | `number` | **Yes** | No | `money` | {"min":0,"minInclusive":true} | `25` |
 | `items[].reason` | `string` | **Yes** | No | `textarea` | {"minLength":1,"maxLength":200} | `2026-11-18` |
 | `items[].disposition` | `enum` | No | No | `dropdown` | Enum: `restocked_to_inventory`, `wasted_discarded` | `restocked_to_inventory` |
 | `refundMethod` | `enum` | No | No | `dropdown` | Enum: `cash`, `credit_note`, `original_payment` | `cash` |

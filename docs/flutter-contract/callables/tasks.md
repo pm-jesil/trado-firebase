@@ -183,7 +183,7 @@ Back to [Master Index](./INDEX.md).
 | `assignedToMembershipId` | `string` | No | — | `assignedToMembership_001` |
 | `status` | `enum` | No | Enum: `pending`, `in_progress`, `completed`, `cancelled` | `pending` |
 | `priority` | `enum` | No | Enum: `low`, `medium`, `high`, `urgent` | `low` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "items", "nextCursor", "organizationId" (20 typed leaf paths).
@@ -197,7 +197,7 @@ Back to [Master Index](./INDEX.md).
     "assignedToMembershipId": "assignedToMembership_001",
     "status": "pending",
     "priority": "low",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {

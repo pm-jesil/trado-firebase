@@ -20,7 +20,7 @@
 | `address.pincode` | `string` | **Yes** | No | `textarea` | {"minLength":1} | `Sample pincode` |
 | `riderMembershipId` | `string` | No | Yes | `text` | — | `riderMembership_001` |
 | `partner` | `enum` | No | No | `dropdown` | Enum: `internal`, `swiggy`, `zomato`, `dunzo`, `other` | `internal` |
-| `deliveryFee` | `number` | No | No | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `deliveryFee` | `number` | No | No | `money` | {"min":0,"minInclusive":true} | `25` |
 | `cod.isCod` | `boolean` | No | No | `switch` | — | `true` |
-| `cod.amount` | `number` | No | No | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `cod.amount` | `number` | No | No | `money` | {"min":0,"minInclusive":true} | `25` |
 | `notes` | `string` | No | Yes | `textarea` | {"maxLength":500} | `Sample notes` |

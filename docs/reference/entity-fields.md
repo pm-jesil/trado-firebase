@@ -1,12 +1,12 @@
 # Stored field catalog
 
-Generated 2026-11-19T22:03:04.755Z by `scripts/generate-field-catalog.js` from `functions/src/types/models.ts` (TypeScript checker) and the raw field census (`census-mwo3ig14`). Do not edit.
+Generated 2026-11-20T17:53:27.588Z by `scripts/generate-field-catalog.js` from `functions/src/types/models.ts` (TypeScript checker) and the raw field census (`census-mwo3ig14`). Do not edit.
 
-63 collections, 1507 typed stored leaf paths, 1093 with a description, 6 collections without a document interface.
+63 collections, 1495 typed stored leaf paths, 1089 with a description, 6 collections without a document interface.
 
 ## `accountTransactions` (`AccountTransactionDoc`)
 
-Typed leaf paths: 47. Documents observed in the census: 96. Stored but untyped paths: 5.
+Typed leaf paths: 45. Documents observed in the census: 96. Stored but untyped paths: 7.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -18,8 +18,6 @@ Typed leaf paths: 47. Documents observed in the census: 96. Stored but untyped p
 | `direction` | `"out" | "in"` | yes | public | yes |  |
 | `amount` | `number` | yes | public | yes | Amount in the currency's major unit. |
 | `balanceAfter` | `number` | yes | public | yes |  |
-| `amountMinor` | `number | undefined` | no | public | yes |  |
-| `balanceAfterMinor` | `number | undefined` | no | public | yes |  |
 | `currency` | `string | undefined` | no | public | yes | ISO 4217 currency code. |
 | `status` | `AccountEntryStatus | undefined` | no | public | yes | Lifecycle status of the record (values: the field's enum). |
 | `sourceDocumentType` | `"return" | "account_transfer" | "bill" | "outflow" | "manual" | "payment" | "reconciliation" | "fee" | "capital" | "cash_count"` | yes | public | yes |  |
@@ -60,6 +58,8 @@ Typed leaf paths: 47. Documents observed in the census: 96. Stored but untyped p
 
 Stored but untyped:
 
+- `amountMinor`
+- `balanceAfterMinor`
 - `notes`
 - `updatedAt`
 - `updatedBy`
@@ -1082,7 +1082,7 @@ Typed leaf paths: 5. Documents observed in the census: 137. Stored but untyped p
 
 ## `financialAccounts` (`FinancialAccountDoc`)
 
-Typed leaf paths: 29. Documents observed in the census: 195. Stored but untyped paths: 0.
+Typed leaf paths: 27. Documents observed in the census: 195. Stored but untyped paths: 2.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1100,8 +1100,6 @@ Typed leaf paths: 29. Documents observed in the census: 195. Stored but untyped 
 | `bankDetails.upiId` | `string | undefined` | no | sensitive | yes | UPI id for payments to this account. |
 | `openingBalance` | `number` | yes | public | yes |  |
 | `currentBalance` | `number` | yes | public | yes |  |
-| `openingBalanceMinor` | `number | undefined` | no | public | yes |  |
-| `currentBalanceMinor` | `number | undefined` | no | public | yes |  |
 | `feeRule.feePercent` | `number | undefined` | no | public | no |  |
 | `feeRule.feeFixed` | `number | undefined` | no | public | no |  |
 | `feeRule.feeTaxPercent` | `number | undefined` | no | public | no |  |
@@ -1115,6 +1113,11 @@ Typed leaf paths: 29. Documents observed in the census: 195. Stored but untyped 
 | `createdBy` | `string` | yes | public | yes | Firebase Auth uid of the user who created the record. |
 | `updatedAt` | `string | undefined` | no | public | yes | Time the record was last changed (ISO-8601). |
 | `updatedBy` | `string | undefined` | no | public | yes | Firebase Auth uid of the user who last changed the record. |
+
+Stored but untyped:
+
+- `currentBalanceMinor`
+- `openingBalanceMinor`
 
 ## `idempotencyRecords` (`IdempotencyRecordDoc`)
 
@@ -1409,7 +1412,7 @@ Typed leaf paths: 9. Documents observed in the census: 10. Stored but untyped pa
 
 ## `journalEntries` (`JournalEntryDoc`)
 
-Typed leaf paths: 22. Documents observed in the census: 0. Stored but untyped paths: 0.
+Typed leaf paths: 18. Documents observed in the census: 0. Stored but untyped paths: 0.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -1424,13 +1427,9 @@ Typed leaf paths: 22. Documents observed in the census: 0. Stored but untyped pa
 | `lines[].accountName` | `string` | yes | public | no |  |
 | `lines[].debit` | `number` | yes | public | no |  |
 | `lines[].credit` | `number` | yes | public | no |  |
-| `lines[].debitMinor` | `number | undefined` | no | public | no |  |
-| `lines[].creditMinor` | `number | undefined` | no | public | no |  |
 | `lines[].description` | `string | undefined` | no | public | no | Free-text description. |
 | `totalDebit` | `number` | yes | public | no |  |
 | `totalCredit` | `number` | yes | public | no |  |
-| `totalDebitMinor` | `number | undefined` | no | public | no |  |
-| `totalCreditMinor` | `number | undefined` | no | public | no |  |
 | `currency` | `string | undefined` | no | public | no | ISO 4217 currency code. |
 | `notes` | `string | undefined` | no | public | no | Free-text notes. |
 | `actorUid` | `string` | yes | public | no | Firebase Auth uid of the user who performed the action. |
@@ -2545,7 +2544,7 @@ Stored but untyped:
 
 ## `organizations` (`OrganizationDoc`)
 
-Typed leaf paths: 129. Documents observed in the census: 66. Stored but untyped paths: 62.
+Typed leaf paths: 125. Documents observed in the census: 66. Stored but untyped paths: 66.
 
 | Path | Type | Required | Sensitivity | Observed | Description |
 |---|---|---|---|---|---|
@@ -2557,10 +2556,6 @@ Typed leaf paths: 129. Documents observed in the census: 66. Stored but untyped 
 | `businessCategory` | `BusinessCategory` | yes | public | yes | Business category (general, grocery, electronics, …). |
 | `country` | `string` | yes | public | yes | ISO 3166-1 alpha-2 |
 | `currency` | `string` | yes | public | yes | ISO 4217 code |
-| `currencyDecimals` | `number | undefined` | no | public | yes | Number of decimals the currency uses for amounts (ISO 4217 exponent). |
-| `minorUnitName` | `string | undefined` | no | public | yes | e.g. "paisa", "fils", "cent" (G8) |
-| `minorUnitNamePlural` | `string | undefined` | no | public | yes | e.g. "paise", "fils", "cents" (G8) |
-| `currencySymbol` | `string | undefined` | no | public | yes | e.g. "₹", "AED", "BD", "$" (G8) |
 | `taxRegimeCode` | `string` | yes | public | yes | Reference to taxRegimes/{taxRegimeCode} |
 | `status` | `EntityStatus` | yes | public | yes | Lifecycle status of the record (values: the field's enum). |
 | `planId` | `string` | yes | public | yes | Reference to subscriptionPlans/{planId} |
@@ -2593,7 +2588,7 @@ Typed leaf paths: 129. Documents observed in the census: 66. Stored but untyped 
 | `subscriptionStartsAt` | `string | undefined` | no | public | yes | Time the subscription starts (ISO-8601). |
 | `subscriptionExpiresAt` | `string | undefined` | no | public | yes | End of expiry date in `timezone` |
 | `graceDays` | `number | undefined` | no | public | yes | Days after expiry during which the organization keeps access. |
-| `timezone` | `string | undefined` | no | public | yes | IANA zone, default "Asia/Kolkata" |
+| `timezone` | `string | undefined` | no | public | yes | IANA zone from country defaults |
 | `salesChannels[]` | `SalesChannel` | yes | public | yes | One business can be e.g. wholesale + retail |
 | `activeEmployeeCount` | `number | undefined` | no | public | yes | Transactional seat counter (excludes Owner) |
 | `displayName` | `string | undefined` | no | public | yes | Short name shown in the app instead of the legal name. |
@@ -2664,13 +2659,13 @@ Typed leaf paths: 129. Documents observed in the census: 66. Stored but untyped 
 | `settings.approvals.enabled` | `boolean` | yes | public | yes | Whether maker-checker approvals are on. |
 | `settings.approvals.modules` | `Partial<Record<"sale" | "purchase" | "expense" | "return" | "stock_adjustment" | "account_transfer" | "stock_transfer", boolean>>` | no | public | no | Which document kinds need approval. |
 | `settings.approvals.amountThreshold` | `number | undefined` | no | public | yes | Only documents at/above this total need approval (0 = all) |
-| `settings.accountingPolicy.minorUnitsThresholds` | `Record<string, number>` | no | public | no |  |
+| `settings.accountingPolicy.moneyConvention` | `"major" | undefined` | no | public | no |  |
 | `settings.accountingPolicy.selfApprovalPolicy` | `"off" | "up_to_limit" | "on" | undefined` | no | public | yes |  |
 | `settings.accountingPolicy.selfApprovalLimits` | `Record<string, number>` | no | public | no |  |
 | `settings.accountingPolicy.roundingMode` | `"half_up" | "half_even" | undefined` | no | public | yes |  |
 | `settings.accountingPolicy.roundToNearestRupee` | `boolean | undefined` | no | public | yes |  |
 | `settings.accountingPolicy.cashRoundingFils` | `boolean | undefined` | no | public | yes |  |
-| `settings.accountingPolicy.cashCountVarianceThresholdMinor` | `number | undefined` | no | public | no |  |
+| `settings.accountingPolicy.cashCountVarianceThreshold` | `number | undefined` | no | public | no |  |
 | `settings.businessConfig.defaultUnits[]` | `string` | yes | public | yes | Units offered by default for new products. |
 | `settings.businessConfig.productFields` | `Partial<Record<"expiry" | "batch" | "serial" | "variants" | "alternateUnits" | "jewellery", boolean>>` | no | public | no | Which optional product fields the business uses. |
 | `settings.businessConfig.salesMode` | `SalesMode | undefined` | no | public | yes | How sales are made by default (POS, invoice, …). |
@@ -2683,6 +2678,10 @@ Stored but untyped:
 
 - `addresses[]`
 - `bankAccounts[]`
+- `currencyDecimals`
+- `currencySymbol`
+- `minorUnitName`
+- `minorUnitNamePlural`
 - `moduleToggles.billing`
 - `moduleToggles.deliveries`
 - `moduleToggles.inventory`
@@ -3115,7 +3114,7 @@ Typed leaf paths: 51. Documents observed in the census: 23. Stored but untyped p
 | `description` | `string` | yes | public | yes | Free-text description. |
 | `details` | `Record<string, unknown>` | yes | public | no | Structured details of the event. |
 | `priority` | `"low" | "high" | "urgent" | RequestPriority | "normal"` | yes | public | yes | Task priority. |
-| `severity` | `RequestSeverity | "minor" | "major" | "critical" | undefined` | no | public | yes |  |
+| `severity` | `"major" | RequestSeverity | "minor" | "critical" | undefined` | no | public | yes |  |
 | `status` | `RequestStatus` | yes | public | yes | Lifecycle status of the record (values: the field's enum). |
 | `statusReason` | `string | null | undefined` | no | public | yes |  |
 | `statusChangedAt` | `string` | yes | public | yes |  |

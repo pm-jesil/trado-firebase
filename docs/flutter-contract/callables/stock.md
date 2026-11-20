@@ -54,7 +54,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `productId` | `string` | No | — | `product_001` |
 | `type` | `enum` | No | Enum: `purchase_in`, `sale_out`, `adjustment_in`, `adjustment_out`, `return_in`, `return_out` | `purchase_in` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "included", "items", "nextCursor" (19 typed leaf paths).
@@ -67,7 +67,7 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "productId": "product_001",
     "type": "purchase_in",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {

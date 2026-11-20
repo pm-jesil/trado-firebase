@@ -125,8 +125,9 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "feeTaxAmount",
@@ -139,8 +140,9 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "settlementTiming",

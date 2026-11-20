@@ -234,7 +234,7 @@
       "path": "docs/audit/run-ledger.md",
       "title": "Trado Engineering Run Ledger (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 48
+      "lineCount": 50
     },
     {
       "path": "docs/audit/test-coverage-matrix.md",
@@ -360,7 +360,7 @@
       "path": "docs/features/payments-and-party-ledgers.md",
       "title": "Feature Guide: Payments & Party Ledgers",
       "classification": "KEEP+UPDATE",
-      "lineCount": 209
+      "lineCount": 275
     },
     {
       "path": "docs/features/platform-usage-and-cost-estimates.md",

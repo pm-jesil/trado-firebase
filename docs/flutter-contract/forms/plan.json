@@ -86,8 +86,9 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "currency",
@@ -114,8 +115,8 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "monthlyDocumentVolumeLimit",
@@ -128,8 +129,8 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "seatLimits.admin",
@@ -143,8 +144,8 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "seatLimits.staff",
@@ -158,8 +159,8 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "branchLimit",
@@ -173,8 +174,8 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "moduleFlags.*",

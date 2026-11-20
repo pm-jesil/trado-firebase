@@ -19,14 +19,14 @@ Back to [Master Index](./INDEX.md).
 | `partyType` | `enum` | **Yes** | Enum: `customer`, `vendor`, `employee`, `other` | `customer` |
 | `partyId` | `string` | No | — | `party_001` |
 | `partyName` | `string` | No | {"minLength":1,"maxLength":100} | `Sample partyName` |
-| `amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
+| `amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `25` |
 | `method` | `enum` | No | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
 | `referenceId` | `string` | No | — | `reference_001` |
 | `referenceModel` | `enum` | No | Enum: `bill`, `outflow` | `bill` |
 | `financialAccountId` | `string` | No | {"minLength":2} | `financialAccount_001` |
 | `allocations[].documentId` | `string` | **Yes** | {"minLength":2} | `allocations___document_001` |
 | `allocations[].documentType` | `enum` | **Yes** | Enum: `bill`, `outflow` | `bill` |
-| `allocations[].amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
+| `allocations[].amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `25` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 | `gateway.externalReference` | `string` | No | {"maxLength":128} | `Sample externalReference` |
 | `gateway.gatewayProvider` | `string` | No | {"maxLength":50} | `Sample gatewayProvider` |
@@ -47,7 +47,7 @@ Back to [Master Index](./INDEX.md).
     "partyType": "customer",
     "partyId": "party_001",
     "partyName": "Sample partyName",
-    "amount": 2500
+    "amount": 25
   },
   "response": {
     "amount": "...",
@@ -75,7 +75,7 @@ Back to [Master Index](./INDEX.md).
 | `direction` | `enum` | No | Enum: `in`, `out` | `in` |
 | `partyId` | `string` | No | — | `party_001` |
 | `referenceId` | `string` | No | — | `reference_001` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "included", "items", "nextCursor" (52 typed leaf paths).
@@ -89,7 +89,7 @@ Back to [Master Index](./INDEX.md).
     "direction": "in",
     "partyId": "party_001",
     "referenceId": "reference_001",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {

@@ -168,8 +168,8 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "limits.maxOpenPerOrg",
@@ -185,8 +185,8 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "limits.maxCreationsPerHourPerUser",
@@ -202,8 +202,8 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "autoCloseDays",

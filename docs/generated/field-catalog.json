@@ -1,10 +1,10 @@
 {
   "version": "3.0.0",
-  "generatedAt": "2026-11-19T22:03:04.755Z",
+  "generatedAt": "2026-11-20T17:53:27.588Z",
   "censusRun": "census-mwo3ig14",
   "totalEntities": 63,
-  "totalFields": 1507,
-  "describedFields": 1093,
+  "totalFields": 1495,
+  "describedFields": 1089,
   "entities": [
     {
       "entity": "accountTransaction",
@@ -83,24 +83,6 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "number",
-          "verdict": "PRESENT",
-          "description": ""
-        },
-        {
-          "path": "amountMinor",
-          "type": "number | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "number | undefined",
-          "verdict": "PRESENT",
-          "description": ""
-        },
-        {
-          "path": "balanceAfterMinor",
-          "type": "number | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "number | undefined",
           "verdict": "PRESENT",
           "description": ""
         },
@@ -439,6 +421,8 @@
         }
       ],
       "untypedStoredPaths": [
+        "amountMinor",
+        "balanceAfterMinor",
         "notes",
         "updatedAt",
         "updatedBy",
@@ -4745,24 +4729,6 @@
           "description": ""
         },
         {
-          "path": "openingBalanceMinor",
-          "type": "number | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "number | undefined",
-          "verdict": "PRESENT",
-          "description": ""
-        },
-        {
-          "path": "currentBalanceMinor",
-          "type": "number | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "number | undefined",
-          "verdict": "PRESENT",
-          "description": ""
-        },
-        {
           "path": "feeRule.feePercent",
           "type": "number | undefined",
           "requiredOnCreate": false,
@@ -4880,7 +4846,10 @@
           "description": "Firebase Auth uid of the user who last changed the record."
         }
       ],
-      "untypedStoredPaths": []
+      "untypedStoredPaths": [
+        "currentBalanceMinor",
+        "openingBalanceMinor"
+      ]
     },
     {
       "entity": "idempotencyRecord",
@@ -5563,24 +5532,6 @@
           "description": ""
         },
         {
-          "path": "lines[].debitMinor",
-          "type": "number | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "number | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
-          "description": ""
-        },
-        {
-          "path": "lines[].creditMinor",
-          "type": "number | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "number | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
-          "description": ""
-        },
-        {
           "path": "lines[].description",
           "type": "string | undefined",
           "requiredOnCreate": false,
@@ -5604,24 +5555,6 @@
           "requiredOnCreate": true,
           "sensitivity": "public",
           "validator": "number",
-          "verdict": "TYPED_NOT_OBSERVED",
-          "description": ""
-        },
-        {
-          "path": "totalDebitMinor",
-          "type": "number | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "number | undefined",
-          "verdict": "TYPED_NOT_OBSERVED",
-          "description": ""
-        },
-        {
-          "path": "totalCreditMinor",
-          "type": "number | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "number | undefined",
           "verdict": "TYPED_NOT_OBSERVED",
           "description": ""
         },
@@ -7834,42 +7767,6 @@
           "description": "ISO 4217 code"
         },
         {
-          "path": "currencyDecimals",
-          "type": "number | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "number | undefined",
-          "verdict": "PRESENT",
-          "description": "Number of decimals the currency uses for amounts (ISO 4217 exponent)."
-        },
-        {
-          "path": "minorUnitName",
-          "type": "string | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "string | undefined",
-          "verdict": "PRESENT",
-          "description": "e.g. \"paisa\", \"fils\", \"cent\" (G8)"
-        },
-        {
-          "path": "minorUnitNamePlural",
-          "type": "string | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "string | undefined",
-          "verdict": "PRESENT",
-          "description": "e.g. \"paise\", \"fils\", \"cents\" (G8)"
-        },
-        {
-          "path": "currencySymbol",
-          "type": "string | undefined",
-          "requiredOnCreate": false,
-          "sensitivity": "public",
-          "validator": "string | undefined",
-          "verdict": "PRESENT",
-          "description": "e.g. \"₹\", \"AED\", \"BD\", \"$\" (G8)"
-        },
-        {
           "path": "taxRegimeCode",
           "type": "string",
           "requiredOnCreate": true,
@@ -8164,7 +8061,7 @@
           "sensitivity": "public",
           "validator": "string | undefined",
           "verdict": "PRESENT",
-          "description": "IANA zone, default \"Asia/Kolkata\""
+          "description": "IANA zone from country defaults"
         },
         {
           "path": "salesChannels[]",
@@ -8797,11 +8694,11 @@
           "description": "Only documents at/above this total need approval (0 = all)"
         },
         {
-          "path": "settings.accountingPolicy.minorUnitsThresholds",
-          "type": "Record<string, number>",
+          "path": "settings.accountingPolicy.moneyConvention",
+          "type": "\"major\" | undefined",
           "requiredOnCreate": false,
           "sensitivity": "public",
-          "validator": "Record<string, number>",
+          "validator": "\"major\" | undefined",
           "verdict": "TYPED_NOT_OBSERVED",
           "description": ""
         },
@@ -8851,7 +8748,7 @@
           "description": ""
         },
         {
-          "path": "settings.accountingPolicy.cashCountVarianceThresholdMinor",
+          "path": "settings.accountingPolicy.cashCountVarianceThreshold",
           "type": "number | undefined",
           "requiredOnCreate": false,
           "sensitivity": "public",
@@ -8926,6 +8823,10 @@
       "untypedStoredPaths": [
         "addresses[]",
         "bankAccounts[]",
+        "currencyDecimals",
+        "currencySymbol",
+        "minorUnitName",
+        "minorUnitNamePlural",
         "moduleToggles.billing",
         "moduleToggles.deliveries",
         "moduleToggles.inventory",
@@ -11721,10 +11622,10 @@
         },
         {
           "path": "severity",
-          "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
+          "type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
           "requiredOnCreate": false,
           "sensitivity": "public",
-          "validator": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
+          "validator": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
           "verdict": "PRESENT",
           "description": ""
         },

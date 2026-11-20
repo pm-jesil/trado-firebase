@@ -63,8 +63,11 @@ function validateFormLint(formJson, callableKindMap) {
 
   // MG-05 / BM-2: uiHint compatibility
   for (const field of formJson.fields) {
-    if (field.uiHint === "money_paise") {
-      assert.ok(field.type === "number", `Contract lint violation (MG-05): ${formJson.entity}.${field.path} has uiHint "money_paise" on non-number type "${field.type}"`);
+    if (field.uiHint === "money_paise" || field.uiHint === "money") {
+      assert.ok(field.type === "number", `Contract lint violation (MG-05): ${formJson.entity}.${field.path} has uiHint "${field.uiHint}" on non-number type "${field.type}"`);
+      if (field.uiHint === "money") {
+        assert.strictEqual(field.currencyExponentFrom, "organization.currencyInfo.exponent", `Contract lint violation: ${formJson.entity}.${field.path} missing currencyExponentFrom`);
+      }
     }
   }
 

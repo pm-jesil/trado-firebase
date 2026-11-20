@@ -206,3 +206,69 @@ node functions/scripts/test-e2e-retail-lifecycle.cjs
 # 2. Reconcile Customer and Vendor Ledgers against Master Balances
 node functions/scripts/test-e2e-business-flow.cjs
 ```
+
+---
+
+## 6. Money and Currency
+
+Trado enforces a single, authoritative monetary architecture across all storage, transactions, reporting, and API contracts.
+
+### 6.1 Core Rules (Rules 1–5)
+
+- **Rule 1 — One Convention:** Every monetary value in the API and in Firestore is a **decimal number in the MAJOR unit** of the organization's currency (e.g. 12.50 AED, 1.250 BHD, 500.00 INR), always rounded with `Money.amount(value, currency)`. There are no integer minor-unit fields (`...Minor` or `...Paise`), and no references to "paise" in stored field names, API contracts, or error messages.
+- **Rule 2 — Single Currency Table:** `functions/src/constants/currencies.ts` (`CURRENCIES`) is the single source of truth for currency definitions: ISO code, symbol, symbol position, decimal exponent (per ISO 4217), major unit names, minor unit names, and conversion multipliers.
+- **Rule 3 — Organization Stores Only ISO Currency Code:** Organizations store only the 3-letter ISO `currency` code (`OrganizationDoc.currency`). The country sets a default currency (`COUNTRY_DEFAULTS` keeps only `currencyCode`). All currency metadata (exponent, symbol, major/minor unit names) is dynamically derived at read time via `getCurrencyInfo(currencyCode)` and returned under `authMe` / `organizationsGet` as `currencyInfo`. Redundant metadata fields are not stored in Firestore.
+- **Rule 4 — No Silent Fallback Currency:** All monetary operations require an explicit currency. Missing or undefined currency throws `CURRENCY_MISSING` (`HttpsError` `failed-precondition`). Silent fallbacks (`|| "INR"`, `?? "INR"`, `.default("INR")`) are strictly forbidden across production source code and guarded by static analysis.
+- **Rule 5 — Precision Validation:** Schemas validate non-negative or positive numbers. The service layer strictly enforces decimal fractional precision via `assertAmountMatchesCurrency(amount, currency)`, rejecting excess fractional digits beyond the currency's ISO 4217 exponent (e.g. 1.2345 BHD rejects with `AMOUNT_DECIMAL_OVERFLOW`).
+
+### 6.2 Supported Currencies Table
+
+The canonical table below represents the active currencies defined in `functions/src/constants/currencies.ts`:
+
+| ISO Code | Symbol | Position | Exponent | Major Unit (Singular / Plural) | Minor Unit (Singular / Plural, Multiplier) | Sub-Minor Unit |
+|---|---|---|---|---|---|---|
+| `INR` | ₹ | before | 2 | Rupee / Rupees | Paisa / Paise (100) | — |
+| `AED` | د.إ | before | 2 | Dirham / Dirhams | Fils / Fils (100) | — |
+| `BHD` | .د.ب | before | 3 | Dinar / Dinars | Fils / Fils (1000) | — |
+| `OMR` | ر.ع. | before | 3 | Rial / Rials | Baisa / Baisas (1000) | — |
+| `KWD` | د.ك | before | 3 | Dinar / Dinars | Fils / Fils (1000) | — |
+| `QAR` | ر.ق | before | 2 | Riyal / Riyals | Dirham / Dirhams (100) | — |
+| `SAR` | ر.س | before | 2 | Riyal / Riyals | Halala / Halalas (100) | — |
+| `JOD` | د.ا | before | 3 | Dinar / Dinars | Piastre / Piastres (100) | Qirsh (10) |
+| `USD` | `$` | before | 2 | Dollar / Dollars | Cent / Cents (100) | Mill (10) |
+| `EUR` | € | before | 2 | Euro / Euros | Cent / Cents (100) | — |
+| `GBP` | £ | before | 2 | Pound / Pounds | Penny / Pence (100) | — |
+| `SGD` | `$` | before | 2 | Dollar / Dollars | Cent / Cents (100) | — |
+| `CAD` | `$` | before | 2 | Dollar / Dollars | Cent / Cents (100) | — |
+| `AUD` | `$` | before | 2 | Dollar / Dollars | Cent / Cents (100) | — |
+| `JPY` | ¥ | before | 0 | Yen / Yen | — | — |
+| `CNY` | ¥ | before | 2 | Yuan / Yuan | Fen / Fen (100) | — |
+| `PKR` | ₨ | before | 2 | Rupee / Rupees | Paisa / Paise (100) | — |
+| `BDT` | ৳ | before | 2 | Taka / Taka | Poisha / Poisha (100) | — |
+| `LKR` | Rs | before | 2 | Rupee / Rupees | Cent / Cents (100) | — |
+| `NPR` | रू | before | 2 | Rupee / Rupees | Paisa / Paise (100) | — |
+| `MYR` | RM | before | 2 | Ringgit / Ringgit | Sen / Sen (100) | — |
+| `THB` | ฿ | before | 2 | Baht / Baht | Satang / Satang (100) | — |
+| `IDR` | Rp | before | 2 | Rupiah / Rupiah | Sen / Sen (100) | — |
+| `ZAR` | R | before | 2 | Rand / Rand | Cent / Cents (100) | — |
+| `EGP` | E£ | before | 2 | Pound / Pounds | Piastre / Piastres (100) | Millime (10) |
+| `TRY` | ₺ | before | 2 | Lira / Lira | Kurus / Kurus (100) | — |
+| `CHF` | CHF | before | 2 | Franc / Francs | Rappen / Rappen (100) | — |
+
+### 6.3 Real-World Calculation Examples
+
+#### 1. Indian Rupee (`INR`, Exponent 2)
+- **Sale & Tax:** A bill with taxable total 500.50 INR. 18% GST = `Money.amount(500.50 * 0.18, "INR")` = 90.09 INR. Total bill amount = 590.59 INR.
+- **Settlement:** Customer pays 590.59 INR via UPI. `paidAmount` = 590.59 INR, `balanceAmount` = 0.00 INR.
+
+#### 2. UAE Dirham (`AED`, Exponent 2, Half-Away Rounding)
+- **Sale & Tax:** A purchase line of 12.50 AED. 5% UAE VAT = `12.50 * 0.05` = 0.625 AED. Rounding half-away-from-zero via `Money.amount(0.625, "AED")` yields 0.63 AED.
+- **Settlement:** Total payable is 13.13 AED. Customer pays 13.13 AED cash. `balanceAmount` = 0.00 AED.
+
+#### 3. Bahraini Dinar (`BHD`, Exponent 3, 3 Decimal Places)
+- **Sale & Tax:** An item priced at 1.250 BHD. 10% Bahrain VAT = `1.250 * 0.10` = 0.125 BHD. `Money.amount(0.125, "BHD")` maintains exact 3 decimal places = 0.125 BHD.
+- **Settlement:** Total bill amount is 1.375 BHD (1 Dinar 375 Fils). Stored as decimal `1.375`, never integer minor units.
+
+#### 4. Japanese Yen (`JPY`, Exponent 0, Zero Decimals)
+- **Sale & Tax:** Items total 1,250 JPY. 10% Japanese consumption tax = `1250 * 0.10` = 125 JPY. `Money.amount(125, "JPY")` produces exact integer `125`.
+- **Settlement:** Total bill amount is 1,375 JPY. No fractional decimal places are permitted (`1375.5` would be rejected by `assertAmountMatchesCurrency`).

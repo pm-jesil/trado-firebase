@@ -207,8 +207,9 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "lines[].discountAmount",
@@ -221,8 +222,8 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "lines[].taxPercent",
@@ -327,8 +328,9 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "paymentMethod",
@@ -403,8 +405,9 @@
         "minInclusive": false
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "splitPayments[].financialAccountId",
@@ -495,8 +498,8 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "billDiscountPercent",
@@ -511,8 +514,8 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "attachmentPaths[]",

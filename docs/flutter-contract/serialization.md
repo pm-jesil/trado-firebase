@@ -5,10 +5,12 @@
 - Server timestamps are serialized as ISO 8601 UTC strings: `"2026-11-18T05:30:00.000Z"`.
 - Calendar dates without time are serialized as YYYY-MM-DD: `"2026-11-18"`.
 
-## 2. Monetary Values (Integer Minor Units)
-All prices, discounts, line totals, taxes, and payments are stored and transferred as **integer minor units** using the organization's `currencyDecimals` (2 decimals for INR/AED/USD → paise/fils/cents; 3 decimals for BHD/OMR/KWD → 1000 fils/baisa = 1.000):
-- ₹25.00 (2 decimals) is serialized as `2500`.
-- BD 1.250 (3 decimals) is serialized as `1250`.
+## 2. Monetary Values (Decimal Major Units)
+All prices, discounts, line totals, taxes, balances, and payments are stored and transferred as **decimal numbers in the major unit** of the organization's currency, rounded strictly via `Money.amount(value, currency)` to the currency's ISO 4217 exponent:
+- ₹25.00 (2 decimals for INR/AED/USD/EUR) is serialized as `25` or `25.5`.
+- BD 1.250 (3 decimals for BHD/OMR/KWD) is serialized as `1.25` or `1.250`.
+- ¥1250 (0 decimals for JPY) is serialized as `1250` (integer major units).
+Form amount fields include `currencyExponentFrom: organization.currencyInfo.exponent` and specify `uiHint: money`.
 
 ## 3. ImageRef Storage (D-5, D-15)
 - Raw image URLs are **never stored** in Firestore.

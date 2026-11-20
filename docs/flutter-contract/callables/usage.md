@@ -55,7 +55,7 @@ Back to [Master Index](./INDEX.md).
 | `startDate` | `string` | No | {"format":"regex"} | `2026-11-18` |
 | `endDate` | `string` | No | {"format":"regex"} | `2026-11-18` |
 | `sortBy` | `enum` | No | Enum: `activity`, `cost`, `name` | `activity` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterOrgId` | `string` | No | — | `startAfterOrg_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "coverage", "items", "organizations", "rateCardVersion", "readCost", "timeframe", "totalCount" (45 typed leaf paths).
@@ -69,7 +69,7 @@ Back to [Master Index](./INDEX.md).
     "startDate": "2026-11-18",
     "endDate": "2026-11-18",
     "sortBy": "activity",
-    "limit": 2500,
+    "limit": 1,
     "startAfterOrgId": "startAfterOrg_001"
   },
   "response": {
@@ -262,11 +262,11 @@ Back to [Master Index](./INDEX.md).
 |---|---|---|---|---|
 | `branchId` | `string` | No | — | `branch_001` |
 | `organizationId` | `string` | **Yes** | {"minLength":2} | `organization_001` |
-| `limits.*.dailyLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
-| `limits.*.weeklyLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
-| `limits.*.monthlyLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
-| `limits.*.warningThresholdPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
-| `limits.*.hardThresholdPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limits.*.dailyLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `1` |
+| `limits.*.weeklyLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `1` |
+| `limits.*.monthlyLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `1` |
+| `limits.*.warningThresholdPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
+| `limits.*.hardThresholdPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `limits.*.enforcementMode` | `enum` | No | Enum: `warn_only`, `hard_block` | `warn_only` |
 | `limits.*.enabled` | `boolean` | No | — | `true` |
 

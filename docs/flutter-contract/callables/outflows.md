@@ -27,8 +27,8 @@ Back to [Master Index](./INDEX.md).
 | `lines[].categoryId` | `string` | No | — | `lines___category_001` |
 | `lines[].quantity` | `number` | **Yes** | {"min":0,"minInclusive":false} | `1` |
 | `lines[].unit` | `string` | No | {"minLength":1,"maxLength":30} | `Sample unit` |
-| `lines[].unitPrice` | `number` | **Yes** | {"min":0,"minInclusive":true} | `2500` |
-| `lines[].discountAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `lines[].unitPrice` | `number` | **Yes** | {"min":0,"minInclusive":true} | `25` |
+| `lines[].discountAmount` | `number` | No | {"min":0,"minInclusive":true} | `1` |
 | `lines[].taxPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `lines[].addToStock` | `boolean` | No | — | `true` |
 | `lines[].batch` | `string` | No | — | `Sample batch` |
@@ -36,12 +36,12 @@ Back to [Master Index](./INDEX.md).
 | `lines[].damagedQuantity` | `number` | No | {"min":0,"minInclusive":true} | `1` |
 | `lines[].damageReason` | `string` | No | {"maxLength":300} | `2026-11-18` |
 | `lines[].serialNumbers[]` | `string` | **Yes** | {"minLength":1,"maxLength":64} | `Sample serialNumbers[]` |
-| `paidAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `paidAmount` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `paymentMethod` | `enum` | No | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
 | `financialAccountId` | `string` | No | {"minLength":2} | `financialAccount_001` |
 | `storageLocationId` | `string` | No | {"minLength":2} | `storageLocation_001` |
 | `splitPayments[].method` | `enum` | **Yes** | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `splitPayments[].amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
+| `splitPayments[].amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `25` |
 | `splitPayments[].financialAccountId` | `string` | **Yes** | {"minLength":2} | `splitPayments___financialAccount_001` |
 | `splitPayments[].notes` | `string` | No | {"maxLength":300} | `Sample notes` |
 | `notes` | `string` | No | {"maxLength":1000} | `Sample notes` |
@@ -94,10 +94,10 @@ Back to [Master Index](./INDEX.md).
 | `payeeMembershipId` | `string` | No | — | `payeeMembership_001` |
 | `startDate` | `string` | No | — | `2026-11-18` |
 | `endDate` | `string` | No | — | `2026-11-18` |
-| `minAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `maxAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `minAmount` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `maxAmount` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `search` | `string` | No | — | `Sample search` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "included", "items", "nextCursor", "scope" (100 typed leaf paths).

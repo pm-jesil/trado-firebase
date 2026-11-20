@@ -12,14 +12,14 @@
 | `partyType` | `enum` | **Yes** | No | `dropdown` | Enum: `customer`, `vendor`, `employee`, `other` | `customer` |
 | `partyId` | `string` | No | No | `text` | — | `party_001` |
 | `partyName` | `string` | No | No | `text` | {"minLength":1,"maxLength":100} | `Sample partyName` |
-| `amount` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":false} | `2500` |
+| `amount` | `number` | **Yes** | No | `money` | {"min":0,"minInclusive":false} | `25` |
 | `method` | `enum` | No | No | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
 | `referenceId` | `string` | No | No | `text` | — | `reference_001` |
 | `referenceModel` | `enum` | No | No | `dropdown` | Enum: `bill`, `outflow` | `bill` |
 | `financialAccountId` | `string` | No | No | `text` | {"minLength":2} | `financialAccount_001` |
 | `allocations[].documentId` | `string` | **Yes** | No | `text` | {"minLength":2} | `allocations___document_001` |
 | `allocations[].documentType` | `enum` | **Yes** | No | `dropdown` | Enum: `bill`, `outflow` | `bill` |
-| `allocations[].amount` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":false} | `2500` |
+| `allocations[].amount` | `number` | **Yes** | No | `money` | {"min":0,"minInclusive":false} | `25` |
 | `notes` | `string` | No | No | `textarea` | {"maxLength":500} | `Sample notes` |
 | `gateway.externalReference` | `string` | No | No | `text` | {"maxLength":128} | `Sample externalReference` |
 | `gateway.gatewayProvider` | `string` | No | No | `text` | {"maxLength":50} | `Sample gatewayProvider` |

@@ -9,12 +9,12 @@
 | `branchId` | `string` | No | Yes | `text` | — | `branch_001` |
 | `idempotencyKey` | `string` | No | No | `text` | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 | `name` | `string` | **Yes** | Yes | `text` | {"minLength":2,"maxLength":100} | `Sample name` |
-| `price` | `number` | **Yes** | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `price` | `number` | **Yes** | Yes | `money` | {"min":0,"minInclusive":true} | `25` |
 | `currency` | `string` | **Yes** | No | `text` | {"maxLength":3,"minLength":3} | `INR` |
-| `storageLimitMb` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":false} | `2500` |
-| `monthlyDocumentVolumeLimit` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":false} | `2500` |
-| `seatLimits.admin` | `number` | **Yes** | No | `money_paise` | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
-| `seatLimits.staff` | `number` | **Yes** | No | `money_paise` | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
-| `branchLimit` | `number` | No | Yes | `money_paise` | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `storageLimitMb` | `number` | **Yes** | No | `numeric` | {"min":0,"minInclusive":false} | `1` |
+| `monthlyDocumentVolumeLimit` | `number` | **Yes** | No | `numeric` | {"min":0,"minInclusive":false} | `1` |
+| `seatLimits.admin` | `number` | **Yes** | No | `numeric` | {"format":"safeint","min":0,"minInclusive":false} | `1` |
+| `seatLimits.staff` | `number` | **Yes** | No | `numeric` | {"format":"safeint","min":0,"minInclusive":false} | `1` |
+| `branchLimit` | `number` | No | Yes | `numeric` | {"format":"safeint","min":0,"minInclusive":false} | `1` |
 | `moduleFlags.*` | `boolean` | **Yes** | Yes | `switch` | — | `true` |
 | `isActive` | `boolean` | No | Yes | `switch` | — | `true` |

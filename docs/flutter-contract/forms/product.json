@@ -115,8 +115,9 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "costPrice",
@@ -129,8 +130,9 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "mrp",
@@ -157,8 +159,9 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "taxInclusive",
@@ -407,8 +410,9 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "alternateUnits[].wholesalePrice",
@@ -421,8 +425,9 @@
         "minInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "money",
+      "example": 25,
+      "currencyExponentFrom": "organization.currencyInfo.exponent"
     },
     {
       "path": "alternateUnits[].barcode",
@@ -507,8 +512,8 @@
         "maxInclusive": true
       },
       "enumValues": [],
-      "uiHint": "money_paise",
-      "example": 2500
+      "uiHint": "numeric",
+      "example": 1
     },
     {
       "path": "isReturnable",

@@ -18010,7 +18010,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "default": "bank_ne76rj6",
+            "default": "bank_kwu000r",
             "type": "string",
             "minLength": 1
           },
@@ -18054,7 +18054,6 @@
             "maxLength": 100
           },
           "currency": {
-            "default": "INR",
             "type": "string",
             "minLength": 3,
             "maxLength": 3
@@ -18095,7 +18094,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "default": "bank_1ury4fg",
+              "default": "bank_6rq3gih",
               "type": "string",
               "minLength": 1
             },
@@ -18139,7 +18138,6 @@
               "maxLength": 100
             },
             "currency": {
-              "default": "INR",
               "type": "string",
               "minLength": 3,
               "maxLength": 3
@@ -21111,9 +21109,8 @@
             ]
           },
           "amount": {
-            "type": "integer",
-            "exclusiveMinimum": 0,
-            "maximum": 9007199254740991
+            "type": "number",
+            "exclusiveMinimum": 0
           },
           "financialAccountId": {
             "type": "string",
@@ -21305,9 +21302,8 @@
                   ]
                 },
                 "amount": {
-                  "type": "integer",
-                  "exclusiveMinimum": 0,
-                  "maximum": 9007199254740991
+                  "type": "number",
+                  "exclusiveMinimum": 0
                 },
                 "financialAccountId": {
                   "type": "string",
@@ -21631,9 +21627,8 @@
                   ]
                 },
                 "amount": {
-                  "type": "integer",
-                  "exclusiveMinimum": 0,
-                  "maximum": 9007199254740991
+                  "type": "number",
+                  "exclusiveMinimum": 0
                 },
                 "financialAccountId": {
                   "type": "string",
@@ -21818,9 +21813,8 @@
                   ]
                 },
                 "amount": {
-                  "type": "integer",
-                  "exclusiveMinimum": 0,
-                  "maximum": 9007199254740991
+                  "type": "number",
+                  "exclusiveMinimum": 0
                 },
                 "financialAccountId": {
                   "type": "string",
@@ -25402,9 +25396,8 @@
             "maxLength": 100
           },
           "amount": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
+            "type": "number",
+            "minimum": 0
           },
           "description": {
             "type": "string",
@@ -26974,9 +26967,8 @@
             "maximum": 100
           },
           "feeFixed": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
+            "type": "number",
+            "minimum": 0
           },
           "feeTaxPercent": {
             "type": "number",
@@ -27023,7 +27015,6 @@
             ]
           },
           "currency": {
-            "default": "INR",
             "type": "string",
             "minLength": 3,
             "maxLength": 3
@@ -27074,9 +27065,8 @@
                 "maximum": 100
               },
               "feeFixed": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 9007199254740991
+                "type": "number",
+                "minimum": 0
               },
               "feeTaxPercent": {
                 "type": "number",
@@ -27181,9 +27171,8 @@
                 "maximum": 100
               },
               "feeFixed": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 9007199254740991
+                "type": "number",
+                "minimum": 0
               },
               "feeTaxPercent": {
                 "type": "number",
@@ -27340,8 +27329,21 @@
               "cash_withdrawal",
               "inter_bank",
               "petty_cash",
-              "cashier_handover"
+              "cashier_handover",
+              "settlement"
             ]
+          },
+          "mode": {
+            "default": "instant",
+            "type": "string",
+            "enum": [
+              "instant",
+              "in_transit"
+            ]
+          },
+          "reference": {
+            "type": "string",
+            "maxLength": 120
           },
           "notes": {
             "type": "string",
@@ -28128,15 +28130,13 @@
             ]
           },
           "feeAmount": {
-            "type": "integer",
-            "exclusiveMinimum": 0,
-            "maximum": 9007199254740991
+            "type": "number",
+            "exclusiveMinimum": 0
           },
           "feeTaxAmount": {
             "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
+            "type": "number",
+            "minimum": 0
           },
           "settlementTiming": {
             "default": "immediate_deduction",
@@ -28386,12 +28386,10 @@
             "minLength": 2
           },
           "amount": {
-            "type": "integer",
-            "exclusiveMinimum": 0,
-            "maximum": 9007199254740991
+            "type": "number",
+            "exclusiveMinimum": 0
           },
           "currency": {
-            "default": "INR",
             "type": "string",
             "minLength": 3,
             "maxLength": 3
@@ -28785,9 +28783,8 @@
             ]
           },
           "amount": {
-            "type": "integer",
-            "exclusiveMinimum": 0,
-            "maximum": 9007199254740991
+            "type": "number",
+            "exclusiveMinimum": 0
           },
           "financialAccountId": {
             "type": "string"
@@ -28800,6 +28797,10 @@
             ]
           },
           "notes": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "description": {
             "type": "string",
             "maxLength": 500
           },
@@ -28831,15 +28832,13 @@
             "minLength": 2
           },
           "feeAmount": {
-            "type": "integer",
-            "exclusiveMinimum": 0,
-            "maximum": 9007199254740991
+            "type": "number",
+            "exclusiveMinimum": 0
           },
           "feeTaxAmount": {
             "default": 0,
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 9007199254740991
+            "type": "number",
+            "minimum": 0
           },
           "notes": {
             "type": "string",
@@ -28880,16 +28879,9 @@
           "branchId": {
             "type": "string"
           },
-          "minorUnitsThresholds": {
-            "type": "object",
-            "propertyNames": {
-              "type": "string"
-            },
-            "additionalProperties": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991
-            }
+          "moneyConvention": {
+            "type": "string",
+            "const": "major"
           },
           "selfApprovalPolicy": {
             "type": "string",
@@ -28905,10 +28897,13 @@
               "type": "string"
             },
             "additionalProperties": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991
+              "type": "number",
+              "minimum": 0
             }
+          },
+          "cashCountVarianceThreshold": {
+            "type": "number",
+            "minimum": 0
           },
           "roundingMode": {
             "type": "string",
@@ -32171,30 +32166,6 @@
                       "description": "ISO 4217 code",
                       "x-ts-type": "string"
                     },
-                    "currencyDecimals": {
-                      "type": "number",
-                      "nullable": true,
-                      "description": "Number of decimals the currency uses for amounts (ISO 4217 exponent).",
-                      "x-ts-type": "number | undefined"
-                    },
-                    "minorUnitName": {
-                      "type": "string",
-                      "nullable": true,
-                      "description": "e.g. \"paisa\", \"fils\", \"cent\" (G8)",
-                      "x-ts-type": "string | undefined"
-                    },
-                    "minorUnitNamePlural": {
-                      "type": "string",
-                      "nullable": true,
-                      "description": "e.g. \"paise\", \"fils\", \"cents\" (G8)",
-                      "x-ts-type": "string | undefined"
-                    },
-                    "currencySymbol": {
-                      "type": "string",
-                      "nullable": true,
-                      "description": "e.g. \"₹\", \"AED\", \"BD\", \"$\" (G8)",
-                      "x-ts-type": "string | undefined"
-                    },
                     "taxRegimeCode": {
                       "type": "string",
                       "description": "Reference to taxRegimes/{taxRegimeCode}",
@@ -32424,7 +32395,7 @@
                     "timezone": {
                       "type": "string",
                       "nullable": true,
-                      "description": "IANA zone, default \"Asia/Kolkata\"",
+                      "description": "IANA zone from country defaults",
                       "x-ts-type": "string | undefined"
                     },
                     "salesChannels": {
@@ -32796,6 +32767,61 @@
                               "type": "number",
                               "nullable": true,
                               "description": "Only documents at/above this total need approval (0 = all)",
+                              "x-ts-type": "number | undefined"
+                            }
+                          }
+                        },
+                        "accountingPolicy": {
+                          "type": "object",
+                          "properties": {
+                            "moneyConvention": {
+                              "type": "string",
+                              "enum": [
+                                "major"
+                              ],
+                              "nullable": true,
+                              "x-ts-type": "\"major\" | undefined"
+                            },
+                            "selfApprovalPolicy": {
+                              "type": "string",
+                              "enum": [
+                                "off",
+                                "up_to_limit",
+                                "on"
+                              ],
+                              "nullable": true,
+                              "x-ts-type": "\"off\" | \"up_to_limit\" | \"on\" | undefined"
+                            },
+                            "selfApprovalLimits": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "number",
+                                "x-ts-type": "number"
+                              },
+                              "x-ts-type": "Record<string, number>"
+                            },
+                            "roundingMode": {
+                              "type": "string",
+                              "enum": [
+                                "half_up",
+                                "half_even"
+                              ],
+                              "nullable": true,
+                              "x-ts-type": "\"half_up\" | \"half_even\" | undefined"
+                            },
+                            "roundToNearestRupee": {
+                              "type": "boolean",
+                              "nullable": true,
+                              "x-ts-type": "boolean | undefined"
+                            },
+                            "cashRoundingFils": {
+                              "type": "boolean",
+                              "nullable": true,
+                              "x-ts-type": "boolean | undefined"
+                            },
+                            "cashCountVarianceThreshold": {
+                              "type": "number",
+                              "nullable": true,
                               "x-ts-type": "number | undefined"
                             }
                           }
@@ -33014,30 +33040,6 @@
                       "description": "ISO 4217 code",
                       "x-ts-type": "string"
                     },
-                    "currencyDecimals": {
-                      "type": "number",
-                      "nullable": true,
-                      "description": "Number of decimals the currency uses for amounts (ISO 4217 exponent).",
-                      "x-ts-type": "number | undefined"
-                    },
-                    "minorUnitName": {
-                      "type": "string",
-                      "nullable": true,
-                      "description": "e.g. \"paisa\", \"fils\", \"cent\" (G8)",
-                      "x-ts-type": "string | undefined"
-                    },
-                    "minorUnitNamePlural": {
-                      "type": "string",
-                      "nullable": true,
-                      "description": "e.g. \"paise\", \"fils\", \"cents\" (G8)",
-                      "x-ts-type": "string | undefined"
-                    },
-                    "currencySymbol": {
-                      "type": "string",
-                      "nullable": true,
-                      "description": "e.g. \"₹\", \"AED\", \"BD\", \"$\" (G8)",
-                      "x-ts-type": "string | undefined"
-                    },
                     "taxRegimeCode": {
                       "type": "string",
                       "description": "Reference to taxRegimes/{taxRegimeCode}",
@@ -33267,7 +33269,7 @@
                     "timezone": {
                       "type": "string",
                       "nullable": true,
-                      "description": "IANA zone, default \"Asia/Kolkata\"",
+                      "description": "IANA zone from country defaults",
                       "x-ts-type": "string | undefined"
                     },
                     "salesChannels": {
@@ -33643,6 +33645,61 @@
                             }
                           }
                         },
+                        "accountingPolicy": {
+                          "type": "object",
+                          "properties": {
+                            "moneyConvention": {
+                              "type": "string",
+                              "enum": [
+                                "major"
+                              ],
+                              "nullable": true,
+                              "x-ts-type": "\"major\" | undefined"
+                            },
+                            "selfApprovalPolicy": {
+                              "type": "string",
+                              "enum": [
+                                "off",
+                                "up_to_limit",
+                                "on"
+                              ],
+                              "nullable": true,
+                              "x-ts-type": "\"off\" | \"up_to_limit\" | \"on\" | undefined"
+                            },
+                            "selfApprovalLimits": {
+                              "type": "object",
+                              "additionalProperties": {
+                                "type": "number",
+                                "x-ts-type": "number"
+                              },
+                              "x-ts-type": "Record<string, number>"
+                            },
+                            "roundingMode": {
+                              "type": "string",
+                              "enum": [
+                                "half_up",
+                                "half_even"
+                              ],
+                              "nullable": true,
+                              "x-ts-type": "\"half_up\" | \"half_even\" | undefined"
+                            },
+                            "roundToNearestRupee": {
+                              "type": "boolean",
+                              "nullable": true,
+                              "x-ts-type": "boolean | undefined"
+                            },
+                            "cashRoundingFils": {
+                              "type": "boolean",
+                              "nullable": true,
+                              "x-ts-type": "boolean | undefined"
+                            },
+                            "cashCountVarianceThreshold": {
+                              "type": "number",
+                              "nullable": true,
+                              "x-ts-type": "number | undefined"
+                            }
+                          }
+                        },
                         "businessConfig": {
                           "type": "object",
                           "properties": {
@@ -33721,7 +33778,7 @@
             }
           }
         },
-        "x-ts-type": "{ items: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 6 more ...; status?: \"active\" | ... 1 more ... | undefined; }[]; ... 49 more ...; organi..."
+        "x-ts-type": "{ items: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 6 more ...; status?: \"active\" | ... 1 more ... | undefined; }[]; ... 45 more ...; organi..."
       },
       "EmployeesCreateResponse": {
         "type": "object",
@@ -43399,6 +43456,11 @@
                       "description": "Id of the organization (tenant) the record belongs to.",
                       "x-ts-type": "string"
                     },
+                    "currency": {
+                      "type": "string",
+                      "description": "ISO 4217 currency code.",
+                      "x-ts-type": "string"
+                    },
                     "billsCount": {
                       "type": "number",
                       "x-ts-type": "number"
@@ -43410,33 +43472,22 @@
                   }
                 }
               },
-              "totalPlatformRevenue": {
-                "type": "number",
-                "x-ts-type": "number"
-              },
-              "totalPlatformOutflows": {
-                "type": "number",
-                "x-ts-type": "number"
-              },
-              "netPlatformCashFlow": {
-                "type": "number",
-                "x-ts-type": "number"
+              "totalsByCurrency": {
+                "type": "object",
+                "additionalProperties": {
+                  "x-ts-type": "{ revenue: number; outflows: number; netCashFlow: number; billsCount: number; outflowsCount: number; }"
+                },
+                "x-ts-type": "Record<string, { revenue: number; outflows: number; netCashFlow: number; billsCount: number; outflowsCount: number; }>"
               },
               "platformFinancials": {
                 "type": "object",
                 "properties": {
-                  "totalRevenue": {
-                    "type": "number",
-                    "description": "Total revenue in the period.",
-                    "x-ts-type": "number"
-                  },
-                  "totalOutflows": {
-                    "type": "number",
-                    "x-ts-type": "number"
-                  },
-                  "netPlatformCashFlow": {
-                    "type": "number",
-                    "x-ts-type": "number"
+                  "totalsByCurrency": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "x-ts-type": "{ revenue: number; outflows: number; netCashFlow: number; billsCount: number; outflowsCount: number; }"
+                    },
+                    "x-ts-type": "Record<string, { revenue: number; outflows: number; netCashFlow: number; billsCount: number; outflowsCount: number; }>"
                   },
                   "billsCount": {
                     "type": "number",
@@ -43456,7 +43507,7 @@
             }
           }
         },
-        "x-ts-type": "{ totalOrganizations: number; activeOrganizations: number; suspendedOrganizations: number; inactiveOrganizations: number; organizationsByStatus: Record<string, number>; organizationsByCountry: Record<...>; ... 10 more ...; generatedAt: string; }"
+        "x-ts-type": "{ totalOrganizations: number; activeOrganizations: number; suspendedOrganizations: number; inactiveOrganizations: number; organizationsByStatus: Record<string, number>; organizationsByCountry: Record<...>; ... 8 more ...; generatedAt: string; }"
       },
       "ReportsExportCsvResponse": {
         "type": "object",
@@ -46341,8 +46392,9 @@
                     },
                     "currency": {
                       "type": "string",
+                      "nullable": true,
                       "description": "ISO 4217 currency code.",
-                      "x-ts-type": "string"
+                      "x-ts-type": "string | null"
                     },
                     "actorUid": {
                       "type": "string",
@@ -47071,30 +47123,6 @@
                     "description": "ISO 4217 code",
                     "x-ts-type": "string"
                   },
-                  "currencyDecimals": {
-                    "type": "number",
-                    "nullable": true,
-                    "description": "Number of decimals the currency uses for amounts (ISO 4217 exponent).",
-                    "x-ts-type": "number | undefined"
-                  },
-                  "minorUnitName": {
-                    "type": "string",
-                    "nullable": true,
-                    "description": "e.g. \"paisa\", \"fils\", \"cent\" (G8)",
-                    "x-ts-type": "string | undefined"
-                  },
-                  "minorUnitNamePlural": {
-                    "type": "string",
-                    "nullable": true,
-                    "description": "e.g. \"paise\", \"fils\", \"cents\" (G8)",
-                    "x-ts-type": "string | undefined"
-                  },
-                  "currencySymbol": {
-                    "type": "string",
-                    "nullable": true,
-                    "description": "e.g. \"₹\", \"AED\", \"BD\", \"$\" (G8)",
-                    "x-ts-type": "string | undefined"
-                  },
                   "taxRegimeCode": {
                     "type": "string",
                     "description": "Reference to taxRegimes/{taxRegimeCode}",
@@ -47328,7 +47356,7 @@
                   "timezone": {
                     "type": "string",
                     "nullable": true,
-                    "description": "IANA zone, default \"Asia/Kolkata\"",
+                    "description": "IANA zone from country defaults",
                     "x-ts-type": "string | undefined"
                   },
                   "salesChannels": {
@@ -47713,6 +47741,67 @@
                           }
                         }
                       },
+                      "accountingPolicy": {
+                        "type": "object",
+                        "properties": {
+                          "moneyConvention": {
+                            "type": "string",
+                            "enum": [
+                              "major",
+                              "major"
+                            ],
+                            "nullable": true,
+                            "x-ts-type": "\"major\" | undefined | \"major\" | undefined"
+                          },
+                          "selfApprovalPolicy": {
+                            "type": "string",
+                            "enum": [
+                              "off",
+                              "up_to_limit",
+                              "on",
+                              "off",
+                              "up_to_limit",
+                              "on"
+                            ],
+                            "nullable": true,
+                            "x-ts-type": "\"off\" | \"up_to_limit\" | \"on\" | undefined | \"off\" | \"up_to_limit\" | \"on\" | undefined"
+                          },
+                          "selfApprovalLimits": {
+                            "type": "object",
+                            "additionalProperties": {
+                              "type": "number",
+                              "x-ts-type": "number"
+                            },
+                            "x-ts-type": "Record<string, number>"
+                          },
+                          "roundingMode": {
+                            "type": "string",
+                            "enum": [
+                              "half_up",
+                              "half_even",
+                              "half_up",
+                              "half_even"
+                            ],
+                            "nullable": true,
+                            "x-ts-type": "\"half_up\" | \"half_even\" | undefined | \"half_up\" | \"half_even\" | undefined"
+                          },
+                          "roundToNearestRupee": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "x-ts-type": "boolean | undefined | boolean | undefined"
+                          },
+                          "cashRoundingFils": {
+                            "type": "boolean",
+                            "nullable": true,
+                            "x-ts-type": "boolean | undefined | boolean | undefined"
+                          },
+                          "cashCountVarianceThreshold": {
+                            "type": "number",
+                            "nullable": true,
+                            "x-ts-type": "number | undefined | number | undefined"
+                          }
+                        }
+                      },
                       "businessConfig": {
                         "type": "object",
                         "properties": {
@@ -47768,6 +47857,87 @@
                     "type": "string",
                     "description": "Id of the organization (tenant) the record belongs to.",
                     "x-ts-type": "string"
+                  },
+                  "currencyInfo": {
+                    "type": "object",
+                    "properties": {
+                      "code": {
+                        "type": "string",
+                        "description": "Short code of the record, as shown in the app.",
+                        "x-ts-type": "string"
+                      },
+                      "numeric": {
+                        "type": "string",
+                        "nullable": true,
+                        "x-ts-type": "string | undefined"
+                      },
+                      "symbol": {
+                        "type": "string",
+                        "x-ts-type": "string"
+                      },
+                      "symbolPosition": {
+                        "type": "string",
+                        "enum": [
+                          "before",
+                          "after"
+                        ],
+                        "x-ts-type": "\"before\" | \"after\""
+                      },
+                      "exponent": {
+                        "type": "number",
+                        "x-ts-type": "0 | 3 | 2 | 4"
+                      },
+                      "major": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Human-readable name of this record.",
+                            "x-ts-type": "string"
+                          },
+                          "plural": {
+                            "type": "string",
+                            "x-ts-type": "string"
+                          }
+                        }
+                      },
+                      "minor": {
+                        "type": "object",
+                        "properties": {
+                          "perMajor": {
+                            "type": "number",
+                            "x-ts-type": "number"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Human-readable name of this record.",
+                            "x-ts-type": "string"
+                          },
+                          "plural": {
+                            "type": "string",
+                            "x-ts-type": "string"
+                          }
+                        }
+                      },
+                      "subMinor": {
+                        "type": "object",
+                        "properties": {
+                          "perMinor": {
+                            "type": "number",
+                            "x-ts-type": "number"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Human-readable name of this record.",
+                            "x-ts-type": "string"
+                          },
+                          "plural": {
+                            "type": "string",
+                            "x-ts-type": "string"
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               },
@@ -47811,7 +47981,7 @@
             }
           }
         },
-        "x-ts-type": "{ organization: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 6 more ...; status?: \"active\" | ... 1 more ... | undefined; }[]; ... 49 more ...;..."
+        "x-ts-type": "{ organization: { bankAccounts: { id: string; accountHolderName: string; bankName: string; accountNumber: string; label?: string | undefined; routingType?: \"ifsc\" | \"iban\" | \"swift\" | \"us_routing\" | \"sg_code\" | \"other\" | undefined; ... 6 more ...; status?: \"active\" | ... 1 more ... | undefined; }[]; ... 45 more ...;..."
       },
       "OrganizationsRevealBankAccountResponse": {
         "type": "object",
@@ -49885,8 +50055,9 @@
                     },
                     "currency": {
                       "type": "string",
+                      "nullable": true,
                       "description": "ISO 4217 currency code.",
-                      "x-ts-type": "string"
+                      "x-ts-type": "string | null"
                     },
                     "category": {
                       "type": "string",
@@ -50633,16 +50804,6 @@
                     "type": "number",
                     "x-ts-type": "number"
                   },
-                  "openingBalanceMinor": {
-                    "type": "number",
-                    "nullable": true,
-                    "x-ts-type": "number | undefined"
-                  },
-                  "currentBalanceMinor": {
-                    "type": "number",
-                    "nullable": true,
-                    "x-ts-type": "number | undefined"
-                  },
                   "feeRule": {
                     "type": "object",
                     "properties": {
@@ -50735,7 +50896,7 @@
             }
           }
         },
-        "x-ts-type": "Record<string, unknown> | { financialAccountId: string; account: { currentBalance: number; organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; ... 18 more ...; financialAccountId: string; }; message: string; } | undefined"
+        "x-ts-type": "Record<string, unknown> | { financialAccountId: string; account: { currentBalance: number; organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; ... 16 more ...; financialAccountId: string; }; message: string; } | undefined"
       },
       "FinancialAccountsUpdateResponse": {
         "type": "object",
@@ -50853,16 +51014,6 @@
                       "type": "number",
                       "x-ts-type": "number"
                     },
-                    "openingBalanceMinor": {
-                      "type": "number",
-                      "nullable": true,
-                      "x-ts-type": "number | undefined"
-                    },
-                    "currentBalanceMinor": {
-                      "type": "number",
-                      "nullable": true,
-                      "x-ts-type": "number | undefined"
-                    },
                     "feeRule": {
                       "type": "object",
                       "properties": {
@@ -50972,7 +51123,7 @@
             }
           }
         },
-        "x-ts-type": "{ items: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 16 more ...; financialAccountId: string; }[]; count: number; totalCount: number; nextCursor: string | null; hasMore: boolean; }"
+        "x-ts-type": "{ items: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 14 more ...; financialAccountId: string; }[]; count: number; totalCount: number; nextCursor: string | null; hasMore: boolean; }"
       },
       "FinancialAccountsGetResponse": {
         "type": "object",
@@ -51064,16 +51215,6 @@
                     "type": "number",
                     "x-ts-type": "number"
                   },
-                  "openingBalanceMinor": {
-                    "type": "number",
-                    "nullable": true,
-                    "x-ts-type": "number | undefined"
-                  },
-                  "currentBalanceMinor": {
-                    "type": "number",
-                    "nullable": true,
-                    "x-ts-type": "number | undefined"
-                  },
                   "feeRule": {
                     "type": "object",
                     "properties": {
@@ -51161,7 +51302,7 @@
             }
           }
         },
-        "x-ts-type": "{ financialAccount: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 16 more ...; financialAccountId: string; }; }"
+        "x-ts-type": "{ financialAccount: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 14 more ...; financialAccountId: string; }; }"
       },
       "FinancialAccountsGetLedgerResponse": {
         "type": "object",
@@ -53636,7 +53777,7 @@
                   },
                   "severity": {
                     "nullable": true,
-                    "x-ts-type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined"
+                    "x-ts-type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined"
                   },
                   "status": {
                     "description": "Lifecycle status of the record (values: the field's enum).",
@@ -53974,7 +54115,7 @@
                   },
                   "severity": {
                     "nullable": true,
-                    "x-ts-type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined"
+                    "x-ts-type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined"
                   },
                   "status": {
                     "description": "Lifecycle status of the record (values: the field's enum).",
@@ -54483,7 +54624,7 @@
                   },
                   "severity": {
                     "nullable": true,
-                    "x-ts-type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined"
+                    "x-ts-type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined"
                   },
                   "status": {
                     "description": "Lifecycle status of the record (values: the field's enum).",
@@ -54771,7 +54912,7 @@
                     },
                     "severity": {
                       "nullable": true,
-                      "x-ts-type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined"
+                      "x-ts-type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined"
                     },
                     "status": {
                       "description": "Lifecycle status of the record (values: the field's enum).",
@@ -55218,7 +55359,7 @@
                   },
                   "severity": {
                     "nullable": true,
-                    "x-ts-type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined | RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined"
+                    "x-ts-type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined | \"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined"
                   },
                   "status": {
                     "description": "Lifecycle status of the record (values: the field's enum).",
@@ -57364,7 +57505,7 @@
           "result": {
             "type": "object",
             "properties": {
-              "entries": {
+              "items": {
                 "type": "array",
                 "items": {
                   "type": "object",
@@ -57407,16 +57548,6 @@
                     "balanceAfter": {
                       "type": "number",
                       "x-ts-type": "number"
-                    },
-                    "amountMinor": {
-                      "type": "number",
-                      "nullable": true,
-                      "x-ts-type": "number | undefined"
-                    },
-                    "balanceAfterMinor": {
-                      "type": "number",
-                      "nullable": true,
-                      "x-ts-type": "number | undefined"
                     },
                     "currency": {
                       "type": "string",
@@ -57511,6 +57642,11 @@
                       "type": "string",
                       "nullable": true,
                       "x-ts-type": "string | null | undefined"
+                    },
+                    "selfApproved": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
                     },
                     "workflow": {
                       "type": "object",
@@ -57616,6 +57752,11 @@
                             }
                           }
                         },
+                        "selfApproved": {
+                          "type": "boolean",
+                          "nullable": true,
+                          "x-ts-type": "boolean | undefined"
+                        },
                         "notes": {
                           "type": "string",
                           "nullable": true,
@@ -57649,6 +57790,11 @@
                       "description": "Time the record was created (ISO-8601).",
                       "x-ts-type": "string"
                     },
+                    "id": {
+                      "type": "string",
+                      "description": "Id of this item, unique within its list.",
+                      "x-ts-type": "string"
+                    },
                     "transactionId": {
                       "type": "string",
                       "x-ts-type": "string"
@@ -57659,6 +57805,312 @@
                     }
                   }
                 }
+              },
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "organizationId": {
+                      "type": "string",
+                      "description": "Id of the organization (tenant) the record belongs to.",
+                      "x-ts-type": "string"
+                    },
+                    "branchId": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Id of the branch the record belongs to or applies to.",
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "financialAccountId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "transactionNumber": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "type": {
+                      "x-ts-type": "AccountTransactionType"
+                    },
+                    "direction": {
+                      "type": "string",
+                      "enum": [
+                        "out",
+                        "in"
+                      ],
+                      "x-ts-type": "\"out\" | \"in\""
+                    },
+                    "amount": {
+                      "type": "number",
+                      "description": "Amount in the currency's major unit.",
+                      "x-ts-type": "number"
+                    },
+                    "balanceAfter": {
+                      "type": "number",
+                      "x-ts-type": "number"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "ISO 4217 currency code.",
+                      "x-ts-type": "string | undefined"
+                    },
+                    "status": {
+                      "nullable": true,
+                      "description": "Lifecycle status of the record (values: the field's enum).",
+                      "x-ts-type": "AccountEntryStatus | undefined"
+                    },
+                    "sourceDocumentType": {
+                      "type": "string",
+                      "enum": [
+                        "return",
+                        "account_transfer",
+                        "bill",
+                        "outflow",
+                        "manual",
+                        "payment",
+                        "reconciliation",
+                        "fee",
+                        "capital",
+                        "cash_count"
+                      ],
+                      "x-ts-type": "\"return\" | \"account_transfer\" | \"bill\" | \"outflow\" | \"manual\" | \"payment\" | \"reconciliation\" | \"fee\" | \"capital\" | \"cash_count\""
+                    },
+                    "sourceDocumentId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "partyType": {
+                      "type": "string",
+                      "enum": [
+                        "vendor",
+                        "customer"
+                      ],
+                      "nullable": true,
+                      "description": "Kind of party.",
+                      "x-ts-type": "\"vendor\" | \"customer\" | null | undefined"
+                    },
+                    "partyId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Free-text description.",
+                      "x-ts-type": "string | undefined"
+                    },
+                    "parentEntryId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "subEntryType": {
+                      "nullable": true,
+                      "x-ts-type": "SubEntryType | null | undefined"
+                    },
+                    "feeStatus": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "disputed",
+                        "recorded",
+                        "waived"
+                      ],
+                      "nullable": true,
+                      "x-ts-type": "\"pending\" | \"disputed\" | \"recorded\" | \"waived\" | null | undefined"
+                    },
+                    "needsReview": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
+                    },
+                    "reviewReasons": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "x-ts-type": "string"
+                      }
+                    },
+                    "reversedTransactionId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "reversalTransactionId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "selfApproved": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
+                    },
+                    "workflow": {
+                      "type": "object",
+                      "properties": {
+                        "createdBy": {
+                          "type": "string",
+                          "description": "Firebase Auth uid of the user who created the record.",
+                          "x-ts-type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "description": "Time the record was created (ISO-8601).",
+                          "x-ts-type": "string"
+                        },
+                        "updatedByUids": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "x-ts-type": "string"
+                          }
+                        },
+                        "verifiedBy": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "uid": {
+                                "type": "string",
+                                "description": "Firebase Auth uid.",
+                                "x-ts-type": "string"
+                              },
+                              "verifiedAt": {
+                                "type": "string",
+                                "x-ts-type": "string"
+                              },
+                              "note": {
+                                "type": "string",
+                                "nullable": true,
+                                "x-ts-type": "string | undefined"
+                              }
+                            }
+                          }
+                        },
+                        "approvedBy": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "uid": {
+                                "type": "string",
+                                "description": "Firebase Auth uid.",
+                                "x-ts-type": "string"
+                              },
+                              "approvedAt": {
+                                "type": "string",
+                                "description": "Time the record was approved (ISO-8601).",
+                                "x-ts-type": "string"
+                              },
+                              "note": {
+                                "type": "string",
+                                "nullable": true,
+                                "x-ts-type": "string | undefined"
+                              }
+                            }
+                          }
+                        },
+                        "rejectedBy": {
+                          "type": "object",
+                          "properties": {
+                            "uid": {
+                              "type": "string",
+                              "description": "Firebase Auth uid.",
+                              "x-ts-type": "string"
+                            },
+                            "rejectedAt": {
+                              "type": "string",
+                              "description": "Time the record was rejected (ISO-8601).",
+                              "x-ts-type": "string"
+                            },
+                            "reason": {
+                              "type": "string",
+                              "description": "Reason code or text explaining the outcome.",
+                              "x-ts-type": "string"
+                            }
+                          }
+                        },
+                        "reversedBy": {
+                          "type": "object",
+                          "properties": {
+                            "uid": {
+                              "type": "string",
+                              "description": "Firebase Auth uid.",
+                              "x-ts-type": "string"
+                            },
+                            "reversedAt": {
+                              "type": "string",
+                              "x-ts-type": "string"
+                            },
+                            "reason": {
+                              "type": "string",
+                              "description": "Reason code or text explaining the outcome.",
+                              "x-ts-type": "string"
+                            }
+                          }
+                        },
+                        "selfApproved": {
+                          "type": "boolean",
+                          "nullable": true,
+                          "x-ts-type": "boolean | undefined"
+                        },
+                        "notes": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Free-text notes.",
+                          "x-ts-type": "string | undefined"
+                        }
+                      }
+                    },
+                    "reconciled": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
+                    },
+                    "reconciledAt": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "reconciliationId": {
+                      "type": "string",
+                      "nullable": true,
+                      "x-ts-type": "string | null | undefined"
+                    },
+                    "actorUid": {
+                      "type": "string",
+                      "description": "Firebase Auth uid of the user who performed the action.",
+                      "x-ts-type": "string"
+                    },
+                    "createdAt": {
+                      "type": "string",
+                      "description": "Time the record was created (ISO-8601).",
+                      "x-ts-type": "string"
+                    },
+                    "id": {
+                      "type": "string",
+                      "description": "Id of this item, unique within its list.",
+                      "x-ts-type": "string"
+                    },
+                    "transactionId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "entryId": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    }
+                  }
+                }
+              },
+              "count": {
+                "type": "number",
+                "description": "Number of records counted.",
+                "x-ts-type": "number"
               },
               "nextCursor": {
                 "type": "string",
@@ -57674,7 +58126,7 @@
             }
           }
         },
-        "x-ts-type": "{ entries: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }[]; nextCursor: string | null; totalCount: number; }"
+        "x-ts-type": "{ items: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }[]; entries: { ...; }[]; count: number; nextCursor: string | null; totalCount: number; }"
       },
       "AccountEntriesGetResponse": {
         "type": "object",
@@ -57726,16 +58178,6 @@
                   "balanceAfter": {
                     "type": "number",
                     "x-ts-type": "number"
-                  },
-                  "amountMinor": {
-                    "type": "number",
-                    "nullable": true,
-                    "x-ts-type": "number | undefined"
-                  },
-                  "balanceAfterMinor": {
-                    "type": "number",
-                    "nullable": true,
-                    "x-ts-type": "number | undefined"
                   },
                   "currency": {
                     "type": "string",
@@ -57830,6 +58272,11 @@
                     "type": "string",
                     "nullable": true,
                     "x-ts-type": "string | null | undefined"
+                  },
+                  "selfApproved": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
                   },
                   "workflow": {
                     "type": "object",
@@ -57935,6 +58382,11 @@
                           }
                         }
                       },
+                      "selfApproved": {
+                        "type": "boolean",
+                        "nullable": true,
+                        "x-ts-type": "boolean | undefined"
+                      },
                       "notes": {
                         "type": "string",
                         "nullable": true,
@@ -57966,6 +58418,11 @@
                   "createdAt": {
                     "type": "string",
                     "description": "Time the record was created (ISO-8601).",
+                    "x-ts-type": "string"
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "Id of this item, unique within its list.",
                     "x-ts-type": "string"
                   },
                   "transactionId": {
@@ -58021,16 +58478,6 @@
                     "balanceAfter": {
                       "type": "number",
                       "x-ts-type": "number"
-                    },
-                    "amountMinor": {
-                      "type": "number",
-                      "nullable": true,
-                      "x-ts-type": "number | undefined"
-                    },
-                    "balanceAfterMinor": {
-                      "type": "number",
-                      "nullable": true,
-                      "x-ts-type": "number | undefined"
                     },
                     "currency": {
                       "type": "string",
@@ -58125,6 +58572,11 @@
                       "type": "string",
                       "nullable": true,
                       "x-ts-type": "string | null | undefined"
+                    },
+                    "selfApproved": {
+                      "type": "boolean",
+                      "nullable": true,
+                      "x-ts-type": "boolean | undefined"
                     },
                     "workflow": {
                       "type": "object",
@@ -58230,6 +58682,11 @@
                             }
                           }
                         },
+                        "selfApproved": {
+                          "type": "boolean",
+                          "nullable": true,
+                          "x-ts-type": "boolean | undefined"
+                        },
                         "notes": {
                           "type": "string",
                           "nullable": true,
@@ -58275,15 +58732,17 @@
                 }
               },
               "reversedEntry": {
-                "x-ts-type": "Partial<AccountTransactionDoc>"
+                "nullable": true,
+                "x-ts-type": "(Partial<AccountTransactionDoc> & { transactionId?: string | undefined; }) | null"
               },
               "reversalEntry": {
-                "x-ts-type": "Partial<AccountTransactionDoc>"
+                "nullable": true,
+                "x-ts-type": "(Partial<AccountTransactionDoc> & { transactionId?: string | undefined; }) | null"
               }
             }
           }
         },
-        "x-ts-type": "{ entry: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }; subEntries: { ...; }[]; reversedEntry: Partial<...> | null; reversalEntry: Partial<...> | null; }"
+        "x-ts-type": "{ entry: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }; subEntries: { ...; }[]; reversedEntry: (Partial<...> & { ...; }) | null; reversalEntry: (Partial<...> & { ...; }) | null; }"
       },
       "AccountEntriesCountsResponse": {
         "type": "object",
@@ -58466,6 +58925,15 @@
                 "type": "string",
                 "x-ts-type": "string"
               },
+              "note": {
+                "type": "string",
+                "x-ts-type": "string"
+              },
+              "notes": {
+                "type": "string",
+                "description": "Free-text notes.",
+                "x-ts-type": "string"
+              },
               "description": {
                 "type": "string",
                 "description": "Free-text description.",
@@ -58479,7 +58947,7 @@
             }
           }
         },
-        "x-ts-type": "{ entryId: string; description: string; updatedAt: string; }"
+        "x-ts-type": "{ entryId: string; note: string; notes: string; description: string; updatedAt: string; }"
       },
       "AccountEntriesCreateSubEntryResponse": {
         "type": "object",
@@ -58543,12 +59011,64 @@
             "type": "object",
             "properties": {
               "policy": {
-                "x-ts-type": "any"
+                "type": "object",
+                "properties": {
+                  "moneyConvention": {
+                    "type": "string",
+                    "enum": [
+                      "major"
+                    ],
+                    "nullable": true,
+                    "x-ts-type": "\"major\" | undefined"
+                  },
+                  "selfApprovalPolicy": {
+                    "type": "string",
+                    "enum": [
+                      "off",
+                      "up_to_limit",
+                      "on"
+                    ],
+                    "nullable": true,
+                    "x-ts-type": "\"off\" | \"up_to_limit\" | \"on\" | undefined"
+                  },
+                  "selfApprovalLimits": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "number",
+                      "x-ts-type": "number"
+                    },
+                    "x-ts-type": "Record<string, number>"
+                  },
+                  "roundingMode": {
+                    "type": "string",
+                    "enum": [
+                      "half_up",
+                      "half_even"
+                    ],
+                    "nullable": true,
+                    "x-ts-type": "\"half_up\" | \"half_even\" | undefined"
+                  },
+                  "roundToNearestRupee": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "cashRoundingFils": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "cashCountVarianceThreshold": {
+                    "type": "number",
+                    "nullable": true,
+                    "x-ts-type": "number | undefined"
+                  }
+                }
               }
             }
           }
         },
-        "x-ts-type": "{ policy: any; }"
+        "x-ts-type": "{ policy: AccountingPolicy; }"
       },
       "AccountingPolicyUpdateResponse": {
         "type": "object",
@@ -58560,12 +59080,74 @@
             "type": "object",
             "properties": {
               "policy": {
-                "x-ts-type": "any"
+                "type": "object",
+                "properties": {
+                  "updatedAt": {
+                    "type": "string",
+                    "description": "Time the record was last changed (ISO-8601).",
+                    "x-ts-type": "string"
+                  },
+                  "updatedBy": {
+                    "type": "string",
+                    "description": "Firebase Auth uid of the user who last changed the record.",
+                    "x-ts-type": "string"
+                  },
+                  "cashRoundingFils": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "roundToNearestRupee": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "roundingMode": {
+                    "type": "string",
+                    "enum": [
+                      "half_up",
+                      "half_even"
+                    ],
+                    "nullable": true,
+                    "x-ts-type": "\"half_up\" | \"half_even\" | undefined"
+                  },
+                  "cashCountVarianceThreshold": {
+                    "type": "number",
+                    "nullable": true,
+                    "x-ts-type": "number | undefined"
+                  },
+                  "selfApprovalLimits": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "number",
+                      "x-ts-type": "number"
+                    },
+                    "x-ts-type": "Record<string, number>"
+                  },
+                  "selfApprovalPolicy": {
+                    "type": "string",
+                    "enum": [
+                      "off",
+                      "up_to_limit",
+                      "on"
+                    ],
+                    "nullable": true,
+                    "x-ts-type": "\"off\" | \"up_to_limit\" | \"on\" | undefined"
+                  },
+                  "moneyConvention": {
+                    "type": "string",
+                    "enum": [
+                      "major"
+                    ],
+                    "nullable": true,
+                    "x-ts-type": "\"major\" | undefined"
+                  }
+                }
               }
             }
           }
         },
-        "x-ts-type": "{ policy: any; }"
+        "x-ts-type": "{ policy: { updatedAt: string; updatedBy: string; cashRoundingFils?: boolean | undefined; roundToNearestRupee?: boolean | undefined; roundingMode?: \"half_up\" | \"half_even\" | undefined; cashCountVarianceThreshold?: number | undefined; selfApprovalLimits?: Record<...> | undefined; selfApprovalPolicy?: \"off\" | ... 2 mo..."
       },
       "AccountTransfersConfirmResponse": {
         "type": "object",
@@ -58792,6 +59374,11 @@
                       "description": "Firebase Auth uid of the user who last changed the record.",
                       "x-ts-type": "string | undefined"
                     },
+                    "id": {
+                      "type": "string",
+                      "description": "Id of this item, unique within its list.",
+                      "x-ts-type": "string"
+                    },
                     "countId": {
                       "type": "string",
                       "x-ts-type": "string"
@@ -58813,7 +59400,7 @@
             }
           }
         },
-        "x-ts-type": "{ items: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 10 more ...; countId: string; }[]; nextCursor: string | null; totalCount: number; }"
+        "x-ts-type": "{ items: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 11 more ...; countId: string; }[]; nextCursor: string | null; totalCount: number; }"
       },
       "CashCountsGetResponse": {
         "type": "object",
@@ -58824,6 +59411,109 @@
           "result": {
             "type": "object",
             "properties": {
+              "cashCount": {
+                "type": "object",
+                "properties": {
+                  "organizationId": {
+                    "type": "string",
+                    "description": "Id of the organization (tenant) the record belongs to.",
+                    "x-ts-type": "string"
+                  },
+                  "branchId": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Id of the branch the record belongs to or applies to.",
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "countNumber": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "financialAccountId": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  },
+                  "countedAmount": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "systemBalance": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "varianceAmount": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "denominations": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "number",
+                      "x-ts-type": "number"
+                    },
+                    "x-ts-type": "Record<string, number>"
+                  },
+                  "varianceTransactionId": {
+                    "type": "string",
+                    "nullable": true,
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "needsApproval": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "approvedBy": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Firebase Auth uid of the approver.",
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "approvedAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Time the record was approved (ISO-8601).",
+                    "x-ts-type": "string | null | undefined"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Free-text notes.",
+                    "x-ts-type": "string | undefined"
+                  },
+                  "createdAt": {
+                    "type": "string",
+                    "description": "Time the record was created (ISO-8601).",
+                    "x-ts-type": "string"
+                  },
+                  "createdBy": {
+                    "type": "string",
+                    "description": "Firebase Auth uid of the user who created the record.",
+                    "x-ts-type": "string"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Time the record was last changed (ISO-8601).",
+                    "x-ts-type": "string | undefined"
+                  },
+                  "updatedBy": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Firebase Auth uid of the user who last changed the record.",
+                    "x-ts-type": "string | undefined"
+                  },
+                  "id": {
+                    "type": "string",
+                    "description": "Id of this item, unique within its list.",
+                    "x-ts-type": "string"
+                  },
+                  "countId": {
+                    "type": "string",
+                    "x-ts-type": "string"
+                  }
+                }
+              },
               "count": {
                 "type": "object",
                 "properties": {
@@ -58916,6 +59606,11 @@
                     "description": "Firebase Auth uid of the user who last changed the record.",
                     "x-ts-type": "string | undefined"
                   },
+                  "id": {
+                    "type": "string",
+                    "description": "Id of this item, unique within its list.",
+                    "x-ts-type": "string"
+                  },
                   "countId": {
                     "type": "string",
                     "x-ts-type": "string"
@@ -58925,7 +59620,7 @@
             }
           }
         },
-        "x-ts-type": "{ count: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 10 more ...; countId: string; }; }"
+        "x-ts-type": "{ cashCount: { organizationId: string; branchId?: string | null | undefined; countNumber: string; financialAccountId: string; countedAmount: number; systemBalance: number; varianceAmount: number; ... 11 more ...; countId: string; }; count: { ...; }; }"
       },
       "AccountEntriesRecordFeeResponse": {
         "type": "object",
@@ -59070,7 +59765,112 @@
                   }
                 }
               },
+              "branches": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "branchId": {
+                      "type": "string",
+                      "description": "Id of the branch the record belongs to or applies to.",
+                      "x-ts-type": "string"
+                    },
+                    "branchName": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "branchCode": {
+                      "type": "string",
+                      "x-ts-type": "string"
+                    },
+                    "sales": {
+                      "type": "object",
+                      "properties": {
+                        "totalRevenue": {
+                          "type": "number",
+                          "description": "Total revenue in the period.",
+                          "x-ts-type": "number"
+                        },
+                        "billCount": {
+                          "type": "number",
+                          "description": "Number of bills.",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    },
+                    "outflows": {
+                      "type": "object",
+                      "properties": {
+                        "totalPurchases": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "totalExpenses": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "outflowCount": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    },
+                    "liquidity": {
+                      "type": "object",
+                      "properties": {
+                        "cashBalance": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "bankBalance": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "totalLiquidity": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        },
+                        "accountCount": {
+                          "type": "number",
+                          "x-ts-type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
               "orgTotals": {
+                "type": "object",
+                "properties": {
+                  "totalRevenue": {
+                    "type": "number",
+                    "description": "Total revenue in the period.",
+                    "x-ts-type": "number"
+                  },
+                  "totalBills": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "totalPurchases": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "totalExpenses": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "totalLiquidity": {
+                    "type": "number",
+                    "x-ts-type": "number"
+                  },
+                  "branchCount": {
+                    "type": "number",
+                    "description": "Number of active branches.",
+                    "x-ts-type": "number"
+                  }
+                }
+              },
+              "totals": {
                 "type": "object",
                 "properties": {
                   "totalRevenue": {
@@ -59104,7 +59904,7 @@
             }
           }
         },
-        "x-ts-type": "{ organizationId: string; scope: \"organization\" | \"branches\" | \"branch\"; branchSummaries: { branchId: string; branchName: string; branchCode: string; sales: { totalRevenue: number; billCount: number; }; outflows: { ...; }; liquidity: { ...; }; }[]; orgTotals: { ...; }; }"
+        "x-ts-type": "{ organizationId: string; scope: \"organization\" | \"branches\" | \"branch\"; branchSummaries: { branchId: string; branchName: string; branchCode: string; sales: { totalRevenue: number; billCount: number; }; outflows: { ...; }; liquidity: { ...; }; }[]; branches: { ...; }[]; orgTotals: { ...; }; totals: { ...; }; }"
       }
     }
   },

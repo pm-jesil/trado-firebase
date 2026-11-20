@@ -131,7 +131,7 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 | `financialAccountId` | `string` | No | — | `financialAccount_001` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "items", "nextCursor", "totalCount" (21 typed leaf paths).
@@ -143,7 +143,7 @@ Back to [Master Index](./INDEX.md).
     "organizationId": "organization_001",
     "branchId": "branch_001",
     "financialAccountId": "financialAccount_001",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {
@@ -196,8 +196,8 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 | `entryId` | `string` | **Yes** | {"minLength":2} | `entry_001` |
-| `feeAmount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
-| `feeTaxAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `feeAmount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `25` |
+| `feeTaxAmount` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
@@ -210,8 +210,8 @@ Back to [Master Index](./INDEX.md).
     "organizationId": "organization_001",
     "branchId": "branch_001",
     "entryId": "entry_001",
-    "feeAmount": 2500,
-    "feeTaxAmount": 2500,
+    "feeAmount": 25,
+    "feeTaxAmount": 25,
     "notes": "Sample notes",
     "idempotencyKey": "idem_20261118_0001"
   },

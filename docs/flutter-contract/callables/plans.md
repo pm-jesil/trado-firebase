@@ -16,13 +16,13 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 | `name` | `string` | **Yes** | {"minLength":2,"maxLength":100} | `Sample name` |
-| `price` | `number` | **Yes** | {"min":0,"minInclusive":true} | `2500` |
+| `price` | `number` | **Yes** | {"min":0,"minInclusive":true} | `25` |
 | `currency` | `string` | **Yes** | {"maxLength":3,"minLength":3} | `INR` |
-| `storageLimitMb` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
-| `monthlyDocumentVolumeLimit` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
-| `seatLimits.admin` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
-| `seatLimits.staff` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
-| `branchLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `storageLimitMb` | `number` | **Yes** | {"min":0,"minInclusive":false} | `1` |
+| `monthlyDocumentVolumeLimit` | `number` | **Yes** | {"min":0,"minInclusive":false} | `1` |
+| `seatLimits.admin` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":false} | `1` |
+| `seatLimits.staff` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":false} | `1` |
+| `branchLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":false} | `1` |
 | `moduleFlags.*` | `boolean` | **Yes** | — | `true` |
 | `isActive` | `boolean` | No | — | `true` |
 
@@ -36,10 +36,10 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "idempotencyKey": "idem_20261118_0001",
     "name": "Sample name",
-    "price": 2500,
+    "price": 25,
     "currency": "INR",
-    "storageLimitMb": 2500,
-    "monthlyDocumentVolumeLimit": 2500
+    "storageLimitMb": 1,
+    "monthlyDocumentVolumeLimit": 1
   },
   "response": {
     "branchLimit": "...",
@@ -67,8 +67,8 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `planId` | `string` | **Yes** | {"minLength":2} | `plan_001` |
 | `name` | `string` | No | {"minLength":2,"maxLength":100} | `Sample name` |
-| `price` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `branchLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `price` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `branchLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":false} | `1` |
 | `moduleFlags.*` | `boolean` | **Yes** | — | `true` |
 | `isActive` | `boolean` | No | — | `true` |
 
@@ -82,8 +82,8 @@ Back to [Master Index](./INDEX.md).
     "branchId": "branch_001",
     "planId": "plan_001",
     "name": "Sample name",
-    "price": 2500,
-    "branchLimit": 2500,
+    "price": 25,
+    "branchLimit": 1,
     "isActive": true
   },
   "response": {
@@ -136,10 +136,10 @@ Back to [Master Index](./INDEX.md).
 | `planId` | `string` | No | {"minLength":2} | `plan_001` |
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `targetPlanId` | `string` | No | {"minLength":2} | `targetPlan_001` |
-| `branchLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
-| `seatLimits.admin` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
-| `seatLimits.staff` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
-| `monthlyDocumentVolumeLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
+| `branchLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":false} | `1` |
+| `seatLimits.admin` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `1` |
+| `seatLimits.staff` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `1` |
+| `monthlyDocumentVolumeLimit` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `1` |
 | `moduleFlags.*` | `boolean` | **Yes** | — | `true` |
 
 **Response:** Envelope `ACTION` · Top-level keys: "affectedCount", "affectedOrganizations", "impact", "impactedCount", "impactedOrganizations", "isDowngradePossible", "planId", "totalOrganizationsOnPlan", "violations" (49 typed leaf paths).
@@ -151,8 +151,8 @@ Back to [Master Index](./INDEX.md).
     "planId": "plan_001",
     "organizationId": "organization_001",
     "targetPlanId": "targetPlan_001",
-    "branchLimit": 2500,
-    "monthlyDocumentVolumeLimit": 2500
+    "branchLimit": 1,
+    "monthlyDocumentVolumeLimit": 1
   },
   "response": {
     "affectedCount": "...",

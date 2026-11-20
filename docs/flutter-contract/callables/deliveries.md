@@ -27,9 +27,9 @@ Back to [Master Index](./INDEX.md).
 | `address.pincode` | `string` | **Yes** | {"minLength":1} | `Sample pincode` |
 | `riderMembershipId` | `string` | No | — | `riderMembership_001` |
 | `partner` | `enum` | No | Enum: `internal`, `swiggy`, `zomato`, `dunzo`, `other` | `internal` |
-| `deliveryFee` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `deliveryFee` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `cod.isCod` | `boolean` | No | — | `true` |
-| `cod.amount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `cod.amount` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 
 **Response:** Envelope `ACTION` · Top-level keys: "billId", "deliveryId", "message", "organizationId", "status" (5 typed leaf paths).
@@ -68,7 +68,7 @@ Back to [Master Index](./INDEX.md).
 | `status` | `enum` | **Yes** | Enum: `pending`, `assigned`, `picked_up`, `out_for_delivery`, `delivered`, `failed` | `pending` |
 | `riderMembershipId` | `string` | No | — | `riderMembership_001` |
 | `codCollected` | `boolean` | No | — | `true` |
-| `collectedAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `collectedAmount` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `paymentMethod` | `enum` | No | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 
@@ -84,7 +84,7 @@ Back to [Master Index](./INDEX.md).
     "status": "pending",
     "riderMembershipId": "riderMembership_001",
     "codCollected": true,
-    "collectedAmount": 2500,
+    "collectedAmount": 25,
     "paymentMethod": "cash"
   },
   "response": {
@@ -108,7 +108,7 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 | `status` | `enum` | No | Enum: `pending`, `assigned`, `picked_up`, `out_for_delivery`, `delivered`, `failed` | `pending` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "included", "items", "nextCursor", "scope" (32 typed leaf paths).
@@ -120,7 +120,7 @@ Back to [Master Index](./INDEX.md).
     "organizationId": "organization_001",
     "branchId": "branch_001",
     "status": "pending",
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {

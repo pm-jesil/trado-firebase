@@ -26,8 +26,8 @@ Back to [Master Index](./INDEX.md).
 | `lines[].categoryId` | `string` | No | — | `lines___category_001` |
 | `lines[].quantity` | `number` | **Yes** | {"min":0,"minInclusive":false} | `1` |
 | `lines[].unit` | `string` | No | {"minLength":1,"maxLength":30} | `Sample unit` |
-| `lines[].unitPrice` | `number` | **Yes** | {"min":0,"minInclusive":true} | `2500` |
-| `lines[].discountAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `lines[].unitPrice` | `number` | **Yes** | {"min":0,"minInclusive":true} | `25` |
+| `lines[].discountAmount` | `number` | No | {"min":0,"minInclusive":true} | `1` |
 | `lines[].taxPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `lines[].addToStock` | `boolean` | No | — | `true` |
 | `lines[].batch` | `string` | No | — | `Sample batch` |
@@ -81,8 +81,8 @@ Back to [Master Index](./INDEX.md).
 | `lines[].categoryId` | `string` | No | — | `lines___category_001` |
 | `lines[].quantity` | `number` | **Yes** | {"min":0,"minInclusive":false} | `1` |
 | `lines[].unit` | `string` | No | {"minLength":1,"maxLength":30} | `Sample unit` |
-| `lines[].unitPrice` | `number` | **Yes** | {"min":0,"minInclusive":true} | `2500` |
-| `lines[].discountAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `lines[].unitPrice` | `number` | **Yes** | {"min":0,"minInclusive":true} | `25` |
+| `lines[].discountAmount` | `number` | No | {"min":0,"minInclusive":true} | `1` |
 | `lines[].taxPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `lines[].addToStock` | `boolean` | No | — | `true` |
 | `lines[].batch` | `string` | No | — | `Sample batch` |
@@ -123,7 +123,7 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 | `isActive` | `boolean` | No | — | `true` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "items", "nextCursor" (3 typed leaf paths).
@@ -135,7 +135,7 @@ Back to [Master Index](./INDEX.md).
     "organizationId": "organization_001",
     "branchId": "branch_001",
     "isActive": true,
-    "limit": 2500,
+    "limit": 1,
     "startAfterId": "startAfter_001"
   },
   "response": {

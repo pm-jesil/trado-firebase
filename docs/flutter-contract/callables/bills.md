@@ -25,17 +25,17 @@ Back to [Master Index](./INDEX.md).
 | `walkInCustomer.billingAddress` | `string` | No | {"maxLength":500} | `Sample billingAddress` |
 | `items[].productId` | `string` | **Yes** | {"minLength":2} | `items___product_001` |
 | `items[].quantity` | `number` | **Yes** | {"min":0,"minInclusive":false} | `1` |
-| `items[].unitPriceOverride` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `items[].discountValue` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `items[].unitPriceOverride` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `items[].discountValue` | `number` | No | {"min":0,"minInclusive":true} | `1` |
 | `items[].unit` | `string` | No | — | `Sample unit` |
 | `items[].serialNumbers[]` | `string` | **Yes** | {"minLength":1,"maxLength":64} | `Sample serialNumbers[]` |
-| `discountTotal` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `paidAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `discountTotal` | `number` | No | {"min":0,"minInclusive":true} | `1` |
+| `paidAmount` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `paymentMethod` | `enum` | No | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
 | `financialAccountId` | `string` | No | {"minLength":2} | `financialAccount_001` |
 | `storageLocationId` | `string` | No | {"minLength":2} | `storageLocation_001` |
 | `splitPayments[].method` | `enum` | **Yes** | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `splitPayments[].amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
+| `splitPayments[].amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `25` |
 | `splitPayments[].financialAccountId` | `string` | **Yes** | {"minLength":2} | `splitPayments___financialAccount_001` |
 | `splitPayments[].notes` | `string` | No | {"maxLength":300} | `Sample notes` |
 | `notes` | `string` | No | {"maxLength":1000} | `Sample notes` |
@@ -122,10 +122,10 @@ Back to [Master Index](./INDEX.md).
 | `createdBy` | `string` | No | — | `Sample createdBy` |
 | `startDate` | `string` | No | — | `2026-11-18` |
 | `endDate` | `string` | No | — | `2026-11-18` |
-| `minAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `maxAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `minAmount` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `maxAmount` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `search` | `string` | No | — | `Sample search` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "included", "items", "nextCursor", "scope" (5 typed leaf paths).
@@ -202,11 +202,11 @@ Back to [Master Index](./INDEX.md).
 | `walkInCustomer.billingAddress` | `string` | No | {"maxLength":500} | `Sample billingAddress` |
 | `items[].productId` | `string` | **Yes** | {"minLength":2} | `items___product_001` |
 | `items[].quantity` | `number` | **Yes** | {"min":0,"minInclusive":false} | `1` |
-| `items[].unitPriceOverride` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `items[].discountValue` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `items[].unitPriceOverride` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `items[].discountValue` | `number` | No | {"min":0,"minInclusive":true} | `1` |
 | `items[].unit` | `string` | No | — | `Sample unit` |
 | `items[].serialNumbers[]` | `string` | **Yes** | {"minLength":1,"maxLength":64} | `Sample serialNumbers[]` |
-| `discountTotal` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `discountTotal` | `number` | No | {"min":0,"minInclusive":true} | `1` |
 | `notes` | `string` | No | {"maxLength":1000} | `Sample notes` |
 
 **Response:** Envelope `ACTION` · Top-level keys: "billId", "status", "totalAmount", "updated" (4 typed leaf paths).
@@ -289,17 +289,17 @@ Back to [Master Index](./INDEX.md).
 | `walkInCustomer.billingAddress` | `string` | No | {"maxLength":500} | `Sample billingAddress` |
 | `items[].productId` | `string` | **Yes** | {"minLength":2} | `items___product_001` |
 | `items[].quantity` | `number` | **Yes** | {"min":0,"minInclusive":false} | `1` |
-| `items[].unitPriceOverride` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `items[].discountValue` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `items[].unitPriceOverride` | `number` | No | {"min":0,"minInclusive":true} | `25` |
+| `items[].discountValue` | `number` | No | {"min":0,"minInclusive":true} | `1` |
 | `items[].unit` | `string` | No | — | `Sample unit` |
 | `items[].serialNumbers[]` | `string` | **Yes** | {"minLength":1,"maxLength":64} | `Sample serialNumbers[]` |
-| `discountTotal` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
-| `paidAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
+| `discountTotal` | `number` | No | {"min":0,"minInclusive":true} | `1` |
+| `paidAmount` | `number` | No | {"min":0,"minInclusive":true} | `25` |
 | `paymentMethod` | `enum` | No | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
 | `financialAccountId` | `string` | No | {"minLength":2} | `financialAccount_001` |
 | `storageLocationId` | `string` | No | {"minLength":2} | `storageLocation_001` |
 | `splitPayments[].method` | `enum` | **Yes** | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `splitPayments[].amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
+| `splitPayments[].amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `25` |
 | `splitPayments[].financialAccountId` | `string` | **Yes** | {"minLength":2} | `splitPayments___financialAccount_001` |
 | `splitPayments[].notes` | `string` | No | {"maxLength":300} | `Sample notes` |
 | `notes` | `string` | No | {"maxLength":1000} | `Sample notes` |

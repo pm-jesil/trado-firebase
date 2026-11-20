@@ -7,10 +7,10 @@
 |---|---|---|---|---|---|---|
 | `branchId` | `string` | No | Yes | `text` | — | `branch_001` |
 | `organizationId` | `string` | **Yes** | Yes | `text` | {"minLength":2} | `organization_001` |
-| `limits.*.dailyLimit` | `number` | No | Yes | `money_paise` | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
-| `limits.*.weeklyLimit` | `number` | No | Yes | `money_paise` | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
-| `limits.*.monthlyLimit` | `number` | No | Yes | `money_paise` | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
-| `limits.*.warningThresholdPercent` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
-| `limits.*.hardThresholdPercent` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limits.*.dailyLimit` | `number` | No | Yes | `numeric` | {"format":"safeint","min":0,"minInclusive":true} | `1` |
+| `limits.*.weeklyLimit` | `number` | No | Yes | `numeric` | {"format":"safeint","min":0,"minInclusive":true} | `1` |
+| `limits.*.monthlyLimit` | `number` | No | Yes | `numeric` | {"format":"safeint","min":0,"minInclusive":true} | `1` |
+| `limits.*.warningThresholdPercent` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
+| `limits.*.hardThresholdPercent` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `limits.*.enforcementMode` | `enum` | No | Yes | `dropdown` | Enum: `warn_only`, `hard_block` | `warn_only` |
 | `limits.*.enabled` | `boolean` | No | Yes | `switch` | — | `true` |

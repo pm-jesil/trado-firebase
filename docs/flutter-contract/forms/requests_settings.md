@@ -14,9 +14,9 @@
 | `sla.normal.resolutionHours` | `number` | No | Yes | `numeric` | {"format":"safeint","min":1,"minInclusive":true,"max":2160,"maxInclusive":true} | `1` |
 | `sla.low.firstResponseHours` | `number` | No | Yes | `numeric` | {"format":"safeint","min":1,"minInclusive":true,"max":720,"maxInclusive":true} | `1` |
 | `sla.low.resolutionHours` | `number` | No | Yes | `numeric` | {"format":"safeint","min":1,"minInclusive":true,"max":2160,"maxInclusive":true} | `1` |
-| `limits.maxOpenPerUser` | `number` | No | Yes | `money_paise` | {"format":"safeint","min":1,"minInclusive":true,"max":1000,"maxInclusive":true} | `2500` |
-| `limits.maxOpenPerOrg` | `number` | No | Yes | `money_paise` | {"format":"safeint","min":1,"minInclusive":true,"max":10000,"maxInclusive":true} | `2500` |
-| `limits.maxCreationsPerHourPerUser` | `number` | No | Yes | `money_paise` | {"format":"safeint","min":1,"minInclusive":true,"max":500,"maxInclusive":true} | `2500` |
+| `limits.maxOpenPerUser` | `number` | No | Yes | `numeric` | {"format":"safeint","min":1,"minInclusive":true,"max":1000,"maxInclusive":true} | `1` |
+| `limits.maxOpenPerOrg` | `number` | No | Yes | `numeric` | {"format":"safeint","min":1,"minInclusive":true,"max":10000,"maxInclusive":true} | `1` |
+| `limits.maxCreationsPerHourPerUser` | `number` | No | Yes | `numeric` | {"format":"safeint","min":1,"minInclusive":true,"max":500,"maxInclusive":true} | `1` |
 | `autoCloseDays` | `number` | No | Yes | `numeric` | {"format":"safeint","min":1,"minInclusive":true,"max":90,"maxInclusive":true} | `1` |
 | `reopenWindowDays` | `number` | No | Yes | `numeric` | {"format":"safeint","min":1,"minInclusive":true,"max":90,"maxInclusive":true} | `1` |
 | `needsInfoReminderDays` | `number` | No | Yes | `numeric` | {"format":"safeint","min":1,"minInclusive":true,"max":30,"maxInclusive":true} | `1` |

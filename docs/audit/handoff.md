@@ -2,8 +2,8 @@
 
 - **Date:** 2026-11-20
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1, S2, S3a, S3b, S3c+S4b, S5b, S6)
-- **Current State:** **STEP S7 COMPLETED. Removed `|| "INR"`, `?? "INR"`, and `.default("INR")` fallbacks [cov:currency-fallbacks 0/0 remaining] from non-test src (enforcing `requireCurrency(value, context)` with `CURRENCY_MISSING` error). Single source of truth for currency: deleted redundant currency metadata fields (`currencyDecimals`, `minorUnitName`, `minorUnitNamePlural`, `currencySymbol`) from `CountryDefaultDefinition` and `OrganizationDoc`. All readers compute `currencyInfo` dynamically via `getCurrencyInfo(currencyCode)` (never written to Firestore). Removed India fallbacks (`|| "Asia/Kolkata"`, `|| "IN"`, `|| "IN_GST"`, `?? 4`) with fail-closed errors on read (`COUNTRY_MISSING`, `TIMEZONE_MISSING`, `TAX_REGIME_MISSING`, `FINANCIAL_YEAR_START_MONTH_MISSING`). Added static guard `check-no-currency-fallback.js` with self-test `--test`. 452/452 unit tests pass across 126 suites. verify:status 0 untraced / 0 unmapped.**
+- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1-S8)
+- **Current State:** **STEPS S7b AND S8 COMPLETED. S7b registered the new static guard `scripts/check-no-currency-fallback.js` in impact units (`untraced 0; unmapped 0`) and wired BM-27 into `functions/scripts/gate/verify-seeded-defects.cjs`. S8 regenerated the Flutter contract pack (`contract:generate`) with `uiHint: money` and `currencyExponentFrom: organization.currencyInfo.exponent` across form schemas; added comprehensive "Money and Currency" feature section (Rules 1-5, currencies table, calculation examples for INR, AED, BHD, JPY) in `docs/features/payments-and-party-ledgers.md`; removed paise wording across docs; 452/452 unit tests pass across 126 suites; test:static passes cleanly with 0 violations.**
 
 ## Summary of Prompt 77 & 77C Deliverables
 
@@ -118,10 +118,10 @@ units 111; stale (would run) 90; untraced 0; unmapped changed files 0; ignore ru
 - **Error Codes:** 81 unique codes documented in `errors.md`
 - **State Machines:** 13 in code, 13 in contract
 - **Flow Guides:** 19 (`FL-01.md`..`FL-19.md` in `docs/flows/`)
-- **Seeded Defects Detected:** 26/26 BM-1..BM-26
-- **Unit Tests:** 447/447 passed (125 suites, 0 failures, 0 skipped)
+- **Seeded Defects Detected:** 27/27 BM-1..BM-27
+- **Unit Tests:** 452/452 passed (126 suites, 0 failures, 0 skipped)
 
-## Next Command (Prompt 77D S7 Entry Command)
+## Next Command (Prompt 77D S9 Entry Command)
 
 ```powershell
 $env:PATH = "C:\Users\jesil.p\node\node--v22.17.0-win-x64;" + $env:PATH; node -v

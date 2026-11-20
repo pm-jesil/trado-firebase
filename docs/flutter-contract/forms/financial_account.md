@@ -17,11 +17,11 @@
 | `bankDetails.ifscOrSwift` | `string` | No | Yes | `text` | {"minLength":4,"maxLength":20} | `Sample ifscOrSwift` |
 | `bankDetails.bankBranchName` | `string` | No | Yes | `text` | {"maxLength":100} | `Sample bankBranchName` |
 | `bankDetails.upiId` | `string` | No | Yes | `text` | {"maxLength":100} | `bankDetails_upi_001` |
-| `feeRule.feePercent` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
-| `feeRule.feeFixed` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
-| `feeRule.feeTaxPercent` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
-| `feeRule.settlementDays` | `number` | No | Yes | `money_paise` | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
-| `openingBalance` | `number` | No | No | `money_paise` | — | `2500` |
+| `feeRule.feePercent` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
+| `feeRule.feeFixed` | `number` | No | Yes | `money` | {"min":0,"minInclusive":true} | `25` |
+| `feeRule.feeTaxPercent` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
+| `feeRule.settlementDays` | `number` | No | Yes | `money` | {"format":"safeint","min":0,"minInclusive":true} | `25` |
+| `openingBalance` | `number` | No | No | `money` | — | `25` |
 | `isDefault` | `boolean` | No | Yes | `switch` | — | `true` |
 | `notes` | `string` | No | Yes | `textarea` | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | No | `text` | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |

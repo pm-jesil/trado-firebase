@@ -9,7 +9,7 @@
 | `branchId` | `string` | No | No | `text` | — | `branch_001` |
 | `sourceAccountId` | `string` | **Yes** | No | `text` | {"minLength":2} | `sourceAccount_001` |
 | `destinationAccountId` | `string` | **Yes** | No | `text` | {"minLength":2} | `destinationAccount_001` |
-| `amount` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":false} | `2500` |
+| `amount` | `number` | **Yes** | No | `money` | {"min":0,"minInclusive":false} | `25` |
 | `transferType` | `enum` | No | No | `dropdown` | Enum: `transfer`, `cash_deposit`, `cash_withdrawal`, `inter_bank`, `petty_cash`, `cashier_handover`, `settlement` | `transfer` |
 | `mode` | `enum` | No | No | `dropdown` | Enum: `instant`, `in_transit` | `instant` |
 | `reference` | `string` | No | No | `text` | {"maxLength":120} | `Sample reference` |

@@ -20,8 +20,8 @@
 | `lines[].categoryId` | `string` | No | No | `text` | — | `lines___category_001` |
 | `lines[].quantity` | `number` | **Yes** | No | `numeric` | {"min":0,"minInclusive":false} | `1` |
 | `lines[].unit` | `string` | No | No | `text` | {"minLength":1,"maxLength":30} | `Sample unit` |
-| `lines[].unitPrice` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
-| `lines[].discountAmount` | `number` | No | No | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `lines[].unitPrice` | `number` | **Yes** | No | `money` | {"min":0,"minInclusive":true} | `25` |
+| `lines[].discountAmount` | `number` | No | No | `numeric` | {"min":0,"minInclusive":true} | `1` |
 | `lines[].taxPercent` | `number` | No | No | `numeric` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `lines[].addToStock` | `boolean` | No | No | `switch` | — | `true` |
 | `lines[].batch` | `string` | No | No | `text` | — | `Sample batch` |
@@ -29,18 +29,18 @@
 | `lines[].damagedQuantity` | `number` | No | No | `numeric` | {"min":0,"minInclusive":true} | `1` |
 | `lines[].damageReason` | `string` | No | No | `textarea` | {"maxLength":300} | `2026-11-18` |
 | `lines[].serialNumbers[]` | `string` | **Yes** | No | `text` | {"minLength":1,"maxLength":64} | `Sample serialNumbers[]` |
-| `paidAmount` | `number` | No | No | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `paidAmount` | `number` | No | No | `money` | {"min":0,"minInclusive":true} | `25` |
 | `paymentMethod` | `enum` | No | No | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
 | `financialAccountId` | `string` | No | No | `text` | {"minLength":2} | `financialAccount_001` |
 | `storageLocationId` | `string` | No | No | `text` | {"minLength":2} | `storageLocation_001` |
 | `splitPayments[].method` | `enum` | **Yes** | No | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `splitPayments[].amount` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":false} | `2500` |
+| `splitPayments[].amount` | `number` | **Yes** | No | `money` | {"min":0,"minInclusive":false} | `25` |
 | `splitPayments[].financialAccountId` | `string` | **Yes** | No | `text` | {"minLength":2} | `splitPayments___financialAccount_001` |
 | `splitPayments[].notes` | `string` | No | No | `textarea` | {"maxLength":300} | `Sample notes` |
 | `notes` | `string` | No | No | `textarea` | {"maxLength":1000} | `Sample notes` |
 | `payeeType` | `enum` | No | No | `dropdown` | Enum: `vendor`, `employee`, `other` | `vendor` |
 | `payeeMembershipId` | `string` | No | No | `text` | {"minLength":2} | `payeeMembership_001` |
 | `expenseCategoryId` | `string` | No | No | `text` | — | `expenseCategory_001` |
-| `billDiscountAmount` | `number` | No | No | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
-| `billDiscountPercent` | `number` | No | No | `money_paise` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `billDiscountAmount` | `number` | No | No | `numeric` | {"min":0,"minInclusive":true} | `1` |
+| `billDiscountPercent` | `number` | No | No | `numeric` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `attachmentPaths[]` | `string` | **Yes** | No | `text` | {"maxLength":500} | `Sample attachmentPaths[]` |

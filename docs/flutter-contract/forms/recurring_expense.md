@@ -19,8 +19,8 @@
 | `lines[].categoryId` | `string` | No | Yes | `text` | — | `lines___category_001` |
 | `lines[].quantity` | `number` | **Yes** | Yes | `numeric` | {"min":0,"minInclusive":false} | `1` |
 | `lines[].unit` | `string` | No | Yes | `text` | {"minLength":1,"maxLength":30} | `Sample unit` |
-| `lines[].unitPrice` | `number` | **Yes** | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
-| `lines[].discountAmount` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `lines[].unitPrice` | `number` | **Yes** | Yes | `money` | {"min":0,"minInclusive":true} | `25` |
+| `lines[].discountAmount` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true} | `1` |
 | `lines[].taxPercent` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `lines[].addToStock` | `boolean` | No | Yes | `switch` | — | `true` |
 | `lines[].batch` | `string` | No | Yes | `text` | — | `Sample batch` |

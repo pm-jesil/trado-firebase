@@ -12,10 +12,10 @@
 | `description` | `string` | No | Yes | `textarea` | {"maxLength":1000} | `2026-11-18` |
 | `categoryId` | `string` | No | Yes | `text` | — | `category_001` |
 | `baseUnit` | `string` | No | Yes | `text` | {"minLength":1,"maxLength":30} | `Sample baseUnit` |
-| `sellingPrice` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
-| `costPrice` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `sellingPrice` | `number` | No | Yes | `money` | {"min":0,"minInclusive":true} | `25` |
+| `costPrice` | `number` | No | Yes | `money` | {"min":0,"minInclusive":true} | `25` |
 | `mrp` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true} | `1` |
-| `wholesalePrice` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `wholesalePrice` | `number` | No | Yes | `money` | {"min":0,"minInclusive":true} | `25` |
 | `taxInclusive` | `boolean` | No | Yes | `switch` | — | `true` |
 | `taxRatePercent` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `taxCode` | `string` | No | Yes | `text` | {"maxLength":50} | `Sample taxCode` |
@@ -35,15 +35,15 @@
 | `brand` | `string` | No | Yes | `text` | {"maxLength":100} | `Sample brand` |
 | `alternateUnits[].unit` | `string` | **Yes** | Yes | `text` | {"minLength":1,"maxLength":30} | `Sample unit` |
 | `alternateUnits[].factor` | `number` | **Yes** | Yes | `numeric` | {"min":0,"minInclusive":false} | `1` |
-| `alternateUnits[].sellingPrice` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
-| `alternateUnits[].wholesalePrice` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
+| `alternateUnits[].sellingPrice` | `number` | No | Yes | `money` | {"min":0,"minInclusive":true} | `25` |
+| `alternateUnits[].wholesalePrice` | `number` | No | Yes | `money` | {"min":0,"minInclusive":true} | `25` |
 | `alternateUnits[].barcode` | `string` | No | Yes | `text` | {"maxLength":100} | `Sample barcode` |
 | `alternateUnits[].isPurchaseUnit` | `boolean` | No | Yes | `switch` | — | `true` |
 | `alternateUnits[].isSaleUnit` | `boolean` | No | Yes | `switch` | — | `true` |
 | `isTaxable` | `boolean` | No | Yes | `switch` | — | `true` |
 | `taxExemptionReason` | `string` | No | Yes | `textarea` | {"maxLength":200} | `2026-11-18` |
 | `isDiscountable` | `boolean` | No | Yes | `switch` | — | `true` |
-| `maxDiscountPercent` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `maxDiscountPercent` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `isReturnable` | `boolean` | No | Yes | `switch` | — | `true` |
 | `returnWindowDays` | `number` | No | Yes | `numeric` | {"format":"safeint","min":0,"minInclusive":true,"max":3650,"maxInclusive":true} | `1` |
 | `reorderLevel` | `number` | No | Yes | `numeric` | {"min":0,"minInclusive":true} | `1` |

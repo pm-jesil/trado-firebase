@@ -18,7 +18,7 @@ Back to [Master Index](./INDEX.md).
 | `status` | `string` | No | — | `Sample status` |
 | `branchId` | `string` | No | — | `branch_001` |
 | `q` | `string` | No | {"maxLength":100} | `Sample q` |
-| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
+| `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `1` |
 | `cursor` | `string` | No | — | `Sample cursor` |
 
 **Response:** Envelope `LIST` · Top-level keys: "count", "included", "items", "nextCursor", "totalCount", "users" (27 typed leaf paths).
@@ -33,7 +33,7 @@ Back to [Master Index](./INDEX.md).
     "status": "Sample status",
     "branchId": "branch_001",
     "q": "Sample q",
-    "limit": 2500,
+    "limit": 1,
     "cursor": "Sample cursor"
   },
   "response": {

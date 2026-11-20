@@ -3565,8 +3565,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "settings.approvals.allowSelfApproval",
@@ -3902,8 +3902,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -4897,8 +4897,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         }
       ],
       "response": {
@@ -5909,8 +5909,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -8354,8 +8354,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -10481,8 +10481,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "currency",
@@ -10507,8 +10507,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "monthlyDocumentVolumeLimit",
@@ -10520,8 +10520,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "seatLimits.admin",
@@ -10534,8 +10534,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "seatLimits.staff",
@@ -10548,8 +10548,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "branchLimit",
@@ -10562,8 +10562,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "moduleFlags.*",
@@ -10805,8 +10805,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "branchLimit",
@@ -10819,8 +10819,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "moduleFlags.*",
@@ -11221,8 +11221,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "seatLimits.admin",
@@ -11235,8 +11235,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "seatLimits.staff",
@@ -11249,8 +11249,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "monthlyDocumentVolumeLimit",
@@ -11263,8 +11263,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "moduleFlags.*",
@@ -12500,8 +12500,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "costPrice",
@@ -12513,8 +12513,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "mrp",
@@ -12539,8 +12539,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "taxInclusive",
@@ -12769,8 +12769,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "alternateUnits[].wholesalePrice",
@@ -12782,8 +12782,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "alternateUnits[].barcode",
@@ -12861,8 +12861,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "isReturnable",
@@ -13344,8 +13344,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "costPrice",
@@ -13357,8 +13357,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "mrp",
@@ -13383,8 +13383,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "taxInclusive",
@@ -13558,8 +13558,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "alternateUnits[].wholesalePrice",
@@ -13571,8 +13571,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "alternateUnits[].barcode",
@@ -13650,8 +13650,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "isReturnable",
@@ -14080,8 +14080,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -14743,8 +14743,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         }
       ],
       "response": {
@@ -16301,8 +16301,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "creditPeriodDays",
@@ -17110,8 +17110,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "creditPeriodDays",
@@ -17264,8 +17264,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -18520,8 +18520,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "visibilityScope",
@@ -19319,8 +19319,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "visibilityScope",
@@ -19459,8 +19459,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -20214,8 +20214,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "lines[].discountAmount",
@@ -20227,8 +20227,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "lines[].taxPercent",
@@ -20325,8 +20325,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "paymentMethod",
@@ -20396,8 +20396,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "splitPayments[].financialAccountId",
@@ -20481,8 +20481,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "billDiscountPercent",
@@ -20496,8 +20496,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "attachmentPaths[]",
@@ -20726,8 +20726,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "maxAmount",
@@ -20739,8 +20739,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "search",
@@ -20765,8 +20765,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -21706,8 +21706,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "items[].discountValue",
@@ -21719,8 +21719,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "items[].unit",
@@ -21755,8 +21755,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "paidAmount",
@@ -21768,8 +21768,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "paymentMethod",
@@ -21839,8 +21839,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "splitPayments[].financialAccountId",
@@ -22413,8 +22413,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "maxAmount",
@@ -22426,8 +22426,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "search",
@@ -22452,8 +22452,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -22953,8 +22953,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "items[].discountValue",
@@ -22966,8 +22966,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "items[].unit",
@@ -23002,8 +23002,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "notes",
@@ -23394,8 +23394,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "items[].discountValue",
@@ -23407,8 +23407,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "items[].unit",
@@ -23443,8 +23443,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "paidAmount",
@@ -23456,8 +23456,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "paymentMethod",
@@ -23527,8 +23527,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "splitPayments[].financialAccountId",
@@ -24008,8 +24008,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "lines[].discountAmount",
@@ -24021,8 +24021,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "lines[].taxPercent",
@@ -24351,8 +24351,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "lines[].discountAmount",
@@ -24364,8 +24364,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "lines[].taxPercent",
@@ -24575,8 +24575,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -24908,8 +24908,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -25304,8 +25304,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "feeRule.feeFixed",
@@ -25317,8 +25317,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "feeRule.feeTaxPercent",
@@ -25332,8 +25332,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "feeRule.settlementDays",
@@ -25346,8 +25346,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "openingBalance",
@@ -25356,8 +25356,8 @@
           "nullable": false,
           "bounds": {},
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "isDefault",
@@ -25727,8 +25727,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "feeRule.feeFixed",
@@ -25740,8 +25740,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "feeRule.feeTaxPercent",
@@ -25755,8 +25755,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "feeRule.settlementDays",
@@ -25769,8 +25769,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "isDefault",
@@ -25921,8 +25921,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -26444,8 +26444,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -26616,8 +26616,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "transferType",
@@ -26971,8 +26971,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -27502,8 +27502,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "currency",
@@ -27709,8 +27709,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -28003,8 +28003,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -29378,8 +29378,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "financialAccountId",
@@ -29686,8 +29686,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "cashCountVarianceThreshold",
@@ -30324,8 +30324,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -30804,8 +30804,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "feeTaxAmount",
@@ -30817,8 +30817,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "notes",
@@ -31041,8 +31041,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "feeTaxAmount",
@@ -31054,8 +31054,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "settlementTiming",
@@ -31730,8 +31730,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -33228,8 +33228,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -33873,8 +33873,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "handlingFeeFinancialAccountId",
@@ -35175,8 +35175,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -36062,8 +36062,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "cod.isCod",
@@ -36085,8 +36085,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "notes",
@@ -36265,8 +36265,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "paymentMethod",
@@ -36426,8 +36426,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -37026,8 +37026,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "items[].reason",
@@ -37191,8 +37191,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -37549,8 +37549,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "method",
@@ -37639,8 +37639,8 @@
             "minInclusive": false
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "money",
+          "example": 25
         },
         {
           "path": "notes",
@@ -37880,8 +37880,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -38502,8 +38502,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -39727,8 +39727,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "from",
@@ -41826,8 +41826,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "cursor",
@@ -42275,8 +42275,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         }
       ],
       "response": {
@@ -42628,8 +42628,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "cursor",
@@ -43818,8 +43818,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterId",
@@ -44478,8 +44478,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         }
       ],
       "response": {
@@ -44644,8 +44644,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "unreadOnly",
@@ -47111,8 +47111,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "cursor",
@@ -47254,8 +47254,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "cursor",
@@ -47686,8 +47686,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "cursor",
@@ -49176,8 +49176,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "limits.maxOpenPerOrg",
@@ -49192,8 +49192,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "limits.maxCreationsPerHourPerUser",
@@ -49208,8 +49208,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "autoCloseDays",
@@ -49838,8 +49838,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "startAfterOrgId",
@@ -51255,8 +51255,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "limits.*.weeklyLimit",
@@ -51269,8 +51269,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "limits.*.monthlyLimit",
@@ -51283,8 +51283,8 @@
             "minInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "limits.*.warningThresholdPercent",
@@ -51298,8 +51298,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "limits.*.hardThresholdPercent",
@@ -51313,8 +51313,8 @@
             "maxInclusive": true
           },
           "enumValues": [],
-          "uiHint": "money_paise",
-          "example": 2500
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "limits.*.enforcementMode",

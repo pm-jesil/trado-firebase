@@ -1,6 +1,6 @@
 {
-  "runId": "cov-1812080c",
-  "timestamp": "2026-11-19T22:03:16.700Z",
+  "runId": "cov-87b07f9e",
+  "timestamp": "2026-11-20T17:53:43.338Z",
   "allPassed": false,
   "sources": {
     "exports": 215,
@@ -64,13 +64,15 @@
     "C-1": {
       "id": "C-1",
       "name": "Catalog: stored leaf paths (types ∪ census) catalogued, system-managed or deferred",
-      "numerator": 1507,
-      "denominator": 1571,
-      "ratio": "1507/1571",
-      "coveredByEvidence": 1507,
+      "numerator": 1495,
+      "denominator": 1569,
+      "ratio": "1495/1569",
+      "coveredByEvidence": 1495,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [
+        "accountTransactions:amountMinor (stored in emulator data but in no document type)",
+        "accountTransactions:balanceAfterMinor (stored in emulator data but in no document type)",
         "accountTransactions:updatedAt (stored in emulator data but in no document type)",
         "accountTransactions:notes (stored in emulator data but in no document type)",
         "accountTransactions:updatedBy (stored in emulator data but in no document type)",
@@ -114,15 +116,23 @@
         "counters:year (stored in emulator data but in no document type)",
         "counters:currentSequence (stored in emulator data but in no document type)",
         "counters:updatedAt (stored in emulator data but in no document type)",
+        "financialAccounts:openingBalanceMinor (stored in emulator data but in no document type)",
+        "financialAccounts:currentBalanceMinor (stored in emulator data but in no document type)",
         "organizationUsageDaily:clientReported.storageOperations (stored in emulator data but in no document type)",
         "organizationUsageDaily:clientReported.locationPings (stored in emulator data but in no document type)",
         "organizationUsageMonthly:clientReported.storageOperations (stored in emulator data but in no document type)",
         "organizationUsageMonthly:clientReported.locationPings (stored in emulator data but in no document type)",
+        "organizations:currencyDecimals (stored in emulator data but in no document type)",
+        "organizations:minorUnitName (stored in emulator data but in no document type)",
+        "organizations:minorUnitNamePlural (stored in emulator data but in no document type)",
+        "organizations:currencySymbol (stored in emulator data but in no document type)",
         "organizations:settings.approvals.allowSelfApproval (stored in emulator data but in no document type)",
         "organizations:settings.approvals.thresholds.k1 (stored in emulator data but in no document type)",
         "organizations:settings.numbering.k1 (stored in emulator data but in no document type)",
+        "organizations:settings.accountingPolicy.minorUnitsThresholds.k1 (stored in emulator data but in no document type)",
         "organizations:settings.accountingPolicy.updatedAt (stored in emulator data but in no document type)",
         "organizations:settings.accountingPolicy.updatedBy (stored in emulator data but in no document type)",
+        "organizations:settings.accountingPolicy.minorUnitsThresholds.INR (stored in emulator data but in no document type)",
         "platformSettings:requestsEnabled (stored in emulator data but in no document type)",
         "platformSettings:reopenWindowDays (stored in emulator data but in no document type)",
         "platformSettings:autoCloseDays (stored in emulator data but in no document type)",
@@ -142,12 +152,12 @@
           "collection": "accountTransactions",
           "docType": "AccountTransactionDoc",
           "storedLeafPaths": 50,
-          "typed": 47,
-          "censusOnly": 3,
-          "inCatalog": 47,
+          "typed": 45,
+          "censusOnly": 5,
+          "inCatalog": 45,
           "systemManaged": 0,
           "deferred": 0,
-          "missing": 3,
+          "missing": 5,
           "censusDocs": 96
         },
         {
@@ -382,12 +392,12 @@
           "collection": "financialAccounts",
           "docType": "FinancialAccountDoc",
           "storedLeafPaths": 29,
-          "typed": 29,
-          "censusOnly": 0,
-          "inCatalog": 29,
+          "typed": 27,
+          "censusOnly": 2,
+          "inCatalog": 27,
           "systemManaged": 0,
           "deferred": 0,
-          "missing": 0,
+          "missing": 2,
           "censusDocs": 195
         },
         {
@@ -429,10 +439,10 @@
         {
           "collection": "journalEntries",
           "docType": "JournalEntryDoc",
-          "storedLeafPaths": 22,
-          "typed": 22,
+          "storedLeafPaths": 18,
+          "typed": 18,
           "censusOnly": 0,
-          "inCatalog": 22,
+          "inCatalog": 18,
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
@@ -561,13 +571,13 @@
         {
           "collection": "organizations",
           "docType": "OrganizationDoc",
-          "storedLeafPaths": 134,
-          "typed": 129,
-          "censusOnly": 5,
-          "inCatalog": 129,
+          "storedLeafPaths": 136,
+          "typed": 125,
+          "censusOnly": 11,
+          "inCatalog": 125,
           "systemManaged": 0,
           "deferred": 0,
-          "missing": 5,
+          "missing": 11,
           "censusDocs": 66
         },
         {
@@ -903,15 +913,15 @@
         "platformCostReconciliation",
         "platformSettings"
       ],
-      "descriptions": "1093/1507",
+      "descriptions": "1089/1495",
       "censusRun": "census-mwo3ig14"
     },
     "C-2": {
       "id": "C-2",
       "name": "Input persistence: request leaf paths of create/update callables proven persisted (raw read-back)",
       "numerator": 614,
-      "denominator": 1353,
-      "ratio": "614/1353",
+      "denominator": 1350,
+      "ratio": "614/1350",
       "coveredByEvidence": 576,
       "coveredByRegister": 38,
       "registerEntries": [
@@ -978,10 +988,6 @@
         "imagesAttach:clientRequestId",
         "organizationsCreate:organizationId",
         "organizationsCreate:branchId",
-        "organizationsCreate:currencyDecimals",
-        "organizationsCreate:minorUnitName",
-        "organizationsCreate:minorUnitNamePlural",
-        "organizationsCreate:currencySymbol",
         "organizationsCreate:createOwner",
         "organizationsCreate:confirmLinkExistingUser",
         "organizationsCreate:ownerEmail",
@@ -1413,9 +1419,10 @@
         "accountEntriesCreateSubEntry:description",
         "accountingPolicyUpdate:organizationId",
         "accountingPolicyUpdate:branchId",
-        "accountingPolicyUpdate:minorUnitsThresholds.*",
+        "accountingPolicyUpdate:moneyConvention",
         "accountingPolicyUpdate:selfApprovalPolicy",
         "accountingPolicyUpdate:selfApprovalLimits.*",
+        "accountingPolicyUpdate:cashCountVarianceThreshold",
         "accountingPolicyUpdate:roundingMode",
         "accountingPolicyUpdate:roundToNearestRupee",
         "accountingPolicyUpdate:cashRoundingFils",
@@ -1727,11 +1734,11 @@
         {
           "callable": "organizationsCreate",
           "kind": "create",
-          "inputLeafPaths": 87,
+          "inputLeafPaths": 83,
           "proven": 58,
           "notPersisted": 1,
           "deferred": 0,
-          "unproven": 28
+          "unproven": 24
         },
         {
           "callable": "organizationsUpdate",
@@ -2150,11 +2157,11 @@
         {
           "callable": "accountingPolicyUpdate",
           "kind": "update",
-          "inputLeafPaths": 8,
+          "inputLeafPaths": 9,
           "proven": 0,
           "notPersisted": 0,
           "deferred": 0,
-          "unproven": 8
+          "unproven": 9
         },
         {
           "callable": "accountTransfersConfirm",
@@ -2450,14 +2457,18 @@
     "C-4": {
       "id": "C-4",
       "name": "Bounds and enums: max / max+1 / min / min−1 per bounded leaf, every enum value and one invalid value",
-      "numerator": 4428,
-      "denominator": 4429,
-      "ratio": "4428/4429",
-      "coveredByEvidence": 4428,
+      "numerator": 4416,
+      "denominator": 4421,
+      "ratio": "4416/4421",
+      "coveredByEvidence": 4416,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [
-        "productsList:ids[length]:max"
+        "productsList:ids[length]:max",
+        "accountingPolicyUpdate:moneyConvention:enum=major",
+        "accountingPolicyUpdate:moneyConvention:enum-invalid",
+        "accountingPolicyUpdate:cashCountVarianceThreshold:min",
+        "accountingPolicyUpdate:cashCountVarianceThreshold:min-1"
       ],
       "passed": false,
       "sweepRun": "sweep-mwo2u3os"
@@ -4770,13 +4781,14 @@
       "id": "C-7",
       "name": "Guard scope: every guard declares its scope; per-collection guards scan every collection or list the exclusion",
       "numerator": 213,
-      "denominator": 217,
-      "ratio": "213/217",
+      "denominator": 218,
+      "ratio": "213/218",
       "coveredByEvidence": 213,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [
         "scripts/check-gate-integrity.js:scope-declared (no `@guard-scope:` declaration)",
+        "scripts/check-no-currency-fallback.js:scope-declared (no `@guard-scope:` declaration)",
         "scripts/check-posting-writer.js:scope-declared (no `@guard-scope:` declaration)",
         "scripts/check-rules-sync.js:scope-declared (no `@guard-scope:` declaration)",
         "scripts/check-test-quality.js:scope-declared (no `@guard-scope:` declaration)"
@@ -4790,7 +4802,7 @@
           "scanned": 63,
           "excluded": 0,
           "exclusions": [],
-          "scopeRun": "check-data-duplication-mwo3ibrb"
+          "scopeRun": "check-data-duplication-mwp0vwox"
         },
         {
           "guard": "functions/scripts/check-no-any-writes.js",
@@ -4888,6 +4900,10 @@
           "detail": "docs/generated/naming-registry.json against functions/src/**\\/*.ts"
         },
         {
+          "guard": "scripts/check-no-currency-fallback.js",
+          "scope": "undeclared"
+        },
+        {
           "guard": "scripts/check-openapi-drift.js",
           "scope": "artifacts",
           "detail": "docs/openapi.json against scripts/generate-openapi.js output"
@@ -4934,10 +4950,10 @@
     "C-8": {
       "id": "C-8",
       "name": "Write-path typing: production source files with zero `any` (annotation, cast or catch variable)",
-      "numerator": 117,
-      "denominator": 117,
-      "ratio": "117/117",
-      "coveredByEvidence": 117,
+      "numerator": 118,
+      "denominator": 118,
+      "ratio": "118/118",
+      "coveredByEvidence": 118,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [],
