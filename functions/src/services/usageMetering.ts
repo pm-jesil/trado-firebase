@@ -25,6 +25,11 @@ import {
 } from "../types/models.js";
 
 /**
+ * Platform infrastructure cost metering currency.
+ */
+export const PLATFORM_COST_CURRENCY = "INR";
+
+/**
  * Standard Default Rate Card (v1)
  * Reflects baseline Google Cloud Firebase published rates.
  */
@@ -34,7 +39,7 @@ export const DEFAULT_RATE_CARD_V1: UsageRateCardDoc = {
   // verified: false and listed on the cloud checklist; the free allowance below was verified.
   version: "v1.1.0",
   effectiveDate: "2026-11-13",
-  currency: "INR",
+  currency: PLATFORM_COST_CURRENCY,
   rates: {
     firestoreReadPer100k: 5.0, // ~Rs 5.00 per 100,000 reads ($0.06 USD)
     firestoreWritePer100k: 15.0, // ~Rs 15.00 per 100,000 writes ($0.18 USD)

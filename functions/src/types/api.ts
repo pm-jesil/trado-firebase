@@ -794,6 +794,36 @@ export interface GetStaffReportRequest {
   to?: string;
 }
 
+export interface PlatformCurrencyTotals {
+  revenue: number;
+  outflows: number;
+  netCashFlow: number;
+  billsCount: number;
+  outflowsCount: number;
+}
+
+export interface PlatformOverviewReportResponse {
+  totalOrganizations: number;
+  activeOrganizations: number;
+  suspendedOrganizations: number;
+  inactiveOrganizations: number;
+  organizationsByStatus: Record<string, number>;
+  organizationsByCountry: Record<string, number>;
+  organizationsByPlan: Record<string, number>;
+  availablePlansCount: number;
+  totalUsers: number;
+  subscriptionsExpiring: Array<{ organizationId: string; name: string; expiresAt: string; daysLeft: number }>;
+  atRiskOrganizations: string[];
+  topOrganizationsByUsage: Array<{ organizationId: string; currency: string; billsCount: number; revenue: number }>;
+  totalsByCurrency: Record<string, PlatformCurrencyTotals>;
+  platformFinancials: {
+    totalsByCurrency: Record<string, PlatformCurrencyTotals>;
+    billsCount: number;
+    outflowsCount: number;
+  };
+  generatedAt: string;
+}
+
 export interface GetPlatformOverviewReportRequest {
   from?: string;
   to?: string;

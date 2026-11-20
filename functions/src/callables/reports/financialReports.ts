@@ -20,7 +20,7 @@ import {
   GetBranchSummarySchema,
 } from "../../validation/schemas.js";
 import { parseInput } from "../../validation/parseInput.js";
-import { Money, roundTo } from "../../services/money.js";
+import { Money, roundTo, getCurrencyDecimals } from "../../services/money.js";
 import {
   BillDoc,
   OutflowDoc,
@@ -51,8 +51,8 @@ export async function computeProfitLoss(orgId: string, validated: {
   const orgData = (orgDoc.exists ? orgDoc.data() : {}) as OrganizationDoc;
   const tz = orgData.timezone || DEFAULT_ORG_TIMEZONE;
   const fyStartMonth = (orgData as unknown as { financialYearStartMonth?: number }).financialYearStartMonth || 4;
-  const decimals = orgData.currencyDecimals ?? 2;
   const currency = orgData.currency || "INR";
+  const decimals = getCurrencyDecimals(currency);
 
   let effectiveFrom = validated.from;
   let effectiveTo = validated.to;
@@ -165,13 +165,13 @@ export async function computeProfitLoss(orgId: string, validated: {
     }
   });
 
-  grossRevenue = roundTo(grossRevenue, decimals);
-  salesReturns = roundTo(salesReturns, decimals);
-  const netRevenue = roundTo(Math.max(0, grossRevenue - salesReturns), decimals);
+  grossRevenue = Money.amount(grossRevenue, currency);
+  salesReturns = Money.amount(salesReturns, currency);
+  const netRevenue = Money.amount(Math.max(0, grossRevenue - salesReturns), currency);
 
-  grossCogs = roundTo(grossCogs, decimals);
-  cogsReversals = roundTo(cogsReversals, decimals);
-  const netCogs = roundTo(Math.max(0, grossCogs - cogsReversals), decimals);
+  grossCogs = Money.amount(grossCogs, currency);
+  cogsReversals = Money.amount(cogsReversals, currency);
+  const netCogs = Money.amount(Math.max(0, grossCogs - cogsReversals), currency);
 
   let totalExpenses = 0;
   let outflowCount = 0;
@@ -183,7 +183,7 @@ export async function computeProfitLoss(orgId: string, validated: {
       const amt = outflow.totalAmount || 0;
       totalExpenses += amt;
       const cat = outflow.expenseCategoryId || "general";
-      expensesByCategory[cat] = roundTo((expensesByCategory[cat] || 0) + amt, decimals);
+      expensesByCategory[cat] = Money.amount((expensesByCategory[cat] || 0) + amt, currency);
       outflowCount++;
     } else if (outflow.kind === "purchase") {
       outflowCount++;
@@ -195,16 +195,16 @@ export async function computeProfitLoss(orgId: string, validated: {
     const fee = doc.data() as PaymentProcessingFeeDoc;
     paymentFeesTotal += (fee.feeAmount || 0) + (fee.feeTaxAmount || 0);
   });
-  paymentFeesTotal = roundTo(paymentFeesTotal, decimals);
+  paymentFeesTotal = Money.amount(paymentFeesTotal, currency);
   if (paymentFeesTotal > 0) {
     totalExpenses += paymentFeesTotal;
-    expensesByCategory["payment_processing_fees"] = roundTo(
+    expensesByCategory["payment_processing_fees"] = Money.amount(
       (expensesByCategory["payment_processing_fees"] || 0) + paymentFeesTotal,
-      decimals
+      currency
     );
   }
 
-  totalExpenses = roundTo(totalExpenses, decimals);
+  totalExpenses = Money.amount(totalExpenses, currency);
 
   let inventoryWriteOff = 0;
   let writeOffCount = 0;
@@ -217,7 +217,7 @@ export async function computeProfitLoss(orgId: string, validated: {
     inventoryWriteOff += Math.abs(mv.quantity || 0) * unitCost;
     writeOffCount++;
   });
-  inventoryWriteOff = roundTo(inventoryWriteOff, decimals);
+  inventoryWriteOff = Money.amount(inventoryWriteOff, currency);
 
   const grossProfit = Money.amount(netRevenue - netCogs, currency);
   const grossMarginPercent = netRevenue > 0 ? roundTo((grossProfit / netRevenue) * 100, 2) : 0;
@@ -233,8 +233,8 @@ export async function computeProfitLoss(orgId: string, validated: {
     currencyDecimals: decimals,
     financialYearStartMonth: fyStartMonth,
     grossRevenue,
-    discounts: roundTo(totalDiscounts, decimals),
-    tax: roundTo(totalTax, decimals),
+    discounts: Money.amount(totalDiscounts, currency),
+    tax: Money.amount(totalTax, currency),
     salesReturns,
     netRevenue,
     totalRevenue: netRevenue,

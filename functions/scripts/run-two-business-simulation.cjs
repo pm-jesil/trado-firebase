@@ -26,7 +26,8 @@
  */
 
 const http = require('http');
-const { AccountingOracle, round2, round4 } = require('./accounting-oracle.cjs');
+const { AccountingOracle } = require('./accounting-oracle.cjs');
+const { Money } = require('../lib/services/money.js');
 const { verifyEmulatorHealth } = require('./helpers/emulator-helper.cjs');
 
 // Ensure emulator hosts
@@ -954,7 +955,7 @@ async function runSimulation() {
   console.log(`  Valuation at main-branch: Rs ${mainStockVal} (80 bags)`);
   console.log(`  Valuation at WH01:        Rs ${whStockVal} (150 bags)`);
   console.log(`  Valuation at Org Scope:   Rs ${orgStockVal} (230 bags)`);
-  if (round2(mainStockVal + whStockVal) !== orgStockVal) {
+  if (Money.amount(mainStockVal + whStockVal, "INR") !== orgStockVal) {
     throw new Error(`Aggregation invariant failed: ${mainStockVal} + ${whStockVal} != ${orgStockVal}`);
   }
   console.log('✓ Consolidated reporting invariant confirmed: Org Total == sum(Eligible Branches)');

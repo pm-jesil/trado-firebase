@@ -3,6 +3,9 @@ import assert from "node:assert/strict";
 import { roundTo, Money, assertAmountMatchesCurrency, getCurrencyDecimals } from "../../services/money.js";
 import { CURRENCIES, getCurrencyInfo, getExponent } from "../../constants/currencies.js";
 import { calculateTax } from "../../services/taxCalculation.js";
+import { computeProfitLoss } from "../../callables/reports/financialReports.js";
+import { reportsGetPlatformOverview } from "../../callables/reports/analyticsReports.js";
+import { db } from "../../services/firebase.js";
 
 describe("Commercial Money Rounding (Half Away From Zero)", () => {
   it("rounds exact ties and floating-point boundary cases correctly (2 decimals)", () => {
@@ -283,6 +286,184 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
       assert.deepEqual(normalized, [0.1, 0.2, 10.05, 20.66, 30.13]);
       const total = Money.sum(normalized, "AED");
       assert.equal(total, 61.14);
+    });
+  });
+
+  describe("Prompt 77D S3c — Multi-currency Platform & Financial Report Invariants", () => {
+    it("reportsGetPlatformOverview separates totalsByCurrency buckets for BHD and AED and keeps 3 decimals (S3c-1)", async () => {
+      const origCollection = (db as any).collection.bind(db);
+      (db as any).collection = (collName: string) => {
+        if (collName === "organizations") {
+          return {
+            _queryOptions: { collectionId: collName },
+            get: async () => ({
+              size: 2,
+              docs: [
+                { ref: { path: "organizations/org_bhd" }, id: "org_bhd", data: () => ({ status: "active", currency: "BHD", planId: "standard", country: "BH" }) },
+                { ref: { path: "organizations/org_aed" }, id: "org_aed", data: () => ({ status: "active", currency: "AED", planId: "standard", country: "AE" }) },
+              ],
+            }),
+          };
+        }
+        if (collName === "subscriptionPlans" || collName === "users") {
+          return {
+            _queryOptions: { collectionId: collName },
+            get: async () => ({ size: 1, docs: [] }),
+          };
+        }
+        if (collName === "bills") {
+          return {
+            _queryOptions: { collectionId: collName },
+            where: function(field: string, op: string, val: string) {
+              const org = val;
+              return {
+                _queryOptions: { collectionId: collName },
+                where: function() {
+                  return {
+                    _queryOptions: { collectionId: collName },
+                    get: async () => {
+                      if (org === "org_bhd") {
+                        return { size: 1, docs: [{ ref: { path: "bills/b1" }, data: () => ({ totalAmount: 15.125, createdAt: "2026-06-01T10:00:00Z" }) }] };
+                      } else {
+                        return { size: 1, docs: [{ ref: { path: "bills/b2" }, data: () => ({ totalAmount: 100.5, createdAt: "2026-06-01T10:00:00Z" }) }] };
+                      }
+                    },
+                  };
+                },
+              };
+            },
+          };
+        }
+        if (collName === "outflows") {
+          return {
+            _queryOptions: { collectionId: collName },
+            where: function(field: string, op: string, val: string) {
+              const org = val;
+              return {
+                _queryOptions: { collectionId: collName },
+                where: function() {
+                  return {
+                    _queryOptions: { collectionId: collName },
+                    get: async () => {
+                      if (org === "org_bhd") {
+                        return { size: 1, docs: [{ ref: { path: "outflows/o1" }, data: () => ({ totalAmount: 5.125, createdAt: "2026-06-01T10:00:00Z" }) }] };
+                      } else {
+                        return { size: 1, docs: [{ ref: { path: "outflows/o2" }, data: () => ({ totalAmount: 40.25, createdAt: "2026-06-01T10:00:00Z" }) }] };
+                      }
+                    },
+                  };
+                },
+              };
+            },
+          };
+        }
+        return {
+          _queryOptions: { collectionId: collName },
+          where: function() { return this; },
+          get: async () => ({ size: 0, docs: [] }),
+        };
+      };
+
+      try {
+        const res = await (reportsGetPlatformOverview as any).run({
+          auth: { uid: "superadmin_1", token: { isSuperAdmin: true } },
+          data: {},
+        });
+
+        assert.ok(res.totalsByCurrency, "totalsByCurrency must exist");
+        assert.ok(res.totalsByCurrency.BHD, "BHD bucket must exist");
+        assert.ok(res.totalsByCurrency.AED, "AED bucket must exist");
+
+        // Verify BHD preserves 3 decimals exactly
+        assert.equal(res.totalsByCurrency.BHD.revenue, 15.125);
+        assert.equal(res.totalsByCurrency.BHD.outflows, 5.125);
+        assert.equal(res.totalsByCurrency.BHD.netCashFlow, 10.000);
+
+        // Verify AED preserves 2 decimals
+        assert.equal(res.totalsByCurrency.AED.revenue, 100.50);
+        assert.equal(res.totalsByCurrency.AED.outflows, 40.25);
+        assert.equal(res.totalsByCurrency.AED.netCashFlow, 60.25);
+
+        // Verify buckets stay separate (never summed into a single mixed currency number)
+        assert.notEqual(res.totalsByCurrency.BHD.revenue, res.totalsByCurrency.AED.revenue);
+        assert.equal(res.topOrganizationsByUsage[0].currency, "BHD");
+        assert.equal(res.topOrganizationsByUsage[0].revenue, 15.125);
+        assert.equal(res.topOrganizationsByUsage[1].currency, "AED");
+        assert.equal(res.topOrganizationsByUsage[1].revenue, 100.50);
+      } finally {
+        (db as any).collection = origCollection;
+      }
+    });
+
+    it("calls real computeProfitLoss with a BHD org and proves output keeps 3 decimals (S3c-2)", async () => {
+      const origCollection = (db as any).collection.bind(db);
+      (db as any).collection = (collName: string) => {
+        if (collName === "organizations") {
+          return {
+            _queryOptions: { collectionId: collName },
+            doc: () => ({
+              get: async () => ({
+                exists: true,
+                data: () => ({ currency: "BHD", timezone: "Asia/Bahrain" }),
+              }),
+            }),
+          };
+        }
+        if (collName === "bills") {
+          return {
+            _queryOptions: { collectionId: collName },
+            where: function() { return this; },
+            get: async () => ({
+              docs: [{
+                ref: { path: "bills/b_bhd" },
+                data: () => ({
+                  totalAmount: 12.125,
+                  taxTotal: 1.125,
+                  discountTotal: 0.250,
+                  items: [{ quantity: 2, costSnapshot: 4.500 }],
+                }),
+              }],
+            }),
+          };
+        }
+        if (collName === "outflows") {
+          return {
+            _queryOptions: { collectionId: collName },
+            where: function() { return this; },
+            get: async () => ({
+              docs: [{
+                ref: { path: "outflows/o_bhd" },
+                data: () => ({ kind: "expense", totalAmount: 2.125, expenseCategoryId: "office" }),
+              }],
+            }),
+          };
+        }
+        return {
+          _queryOptions: { collectionId: collName },
+          where: function() { return this; },
+          get: async () => ({ docs: [] }),
+        };
+      };
+
+      try {
+        const res = await computeProfitLoss("org_bhd_test", {
+          periodType: "custom",
+          from: "2026-01-01",
+          to: "2026-01-31",
+        });
+
+        assert.equal(res.currencyDecimals, 3);
+        assert.equal(res.grossRevenue, 12.125);
+        assert.equal(res.netRevenue, 12.125);
+        assert.equal(res.grossCogs, 9.000);
+        assert.equal(res.grossProfit, 3.125);
+        assert.equal(res.operatingExpenses, 2.125);
+        assert.equal(res.netProfit, 1.000);
+        assert.equal(res.tax, 1.125);
+        assert.equal(res.discounts, 0.250);
+      } finally {
+        (db as any).collection = origCollection;
+      }
     });
   });
 });

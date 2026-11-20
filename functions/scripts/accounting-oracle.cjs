@@ -10,13 +10,7 @@
  * 5. Inventory Stock Valuation
  */
 
-function round2(num) {
-  return Math.round((num + Number.EPSILON) * 100) / 100;
-}
-
-function round4(num) {
-  return Math.round((num + Number.EPSILON) * 10000) / 10000;
-}
+const { Money, round4, roundTo } = require("../lib/services/money.js");
 
 class AccountingOracle {
   constructor() {
@@ -94,13 +88,13 @@ class AccountingOracle {
       });
     }
 
-    const totalAmount = round2(subtotal);
-    const balanceAmount = round2(Math.max(0, totalAmount - paidAmount));
+    const totalAmount = Money.amount(subtotal, "INR");
+    const balanceAmount = Money.amount(Math.max(0, totalAmount - paidAmount), "INR");
 
     if (vendorId && this.vendors.has(vendorId)) {
       const v = this.vendors.get(vendorId);
-      v.totalPurchases = round2(v.totalPurchases + totalAmount);
-      v.outstandingPayable = round2(v.outstandingPayable + balanceAmount);
+      v.totalPurchases = Money.amount(v.totalPurchases + totalAmount, "INR");
+      v.outstandingPayable = Money.amount(v.outstandingPayable + balanceAmount, "INR");
     }
 
     this.outflows.set(outflowId, {
@@ -116,15 +110,15 @@ class AccountingOracle {
     this.outflows.set(outflowId, {
       kind: "expense",
       branchId,
-      totalAmount: round2(totalAmount),
-      paidAmount: round2(paidAmount),
-      balanceAmount: round2(Math.max(0, totalAmount - paidAmount)),
+      totalAmount: Money.amount(totalAmount, "INR"),
+      paidAmount: Money.amount(paidAmount, "INR"),
+      balanceAmount: Money.amount(Math.max(0, totalAmount - paidAmount), "INR"),
     });
     this.events.push({
       type: "EXPENSE",
       outflowId,
       branchId,
-      totalAmount: round2(totalAmount),
+      totalAmount: Money.amount(totalAmount, "INR"),
     });
   }
 
@@ -139,7 +133,7 @@ class AccountingOracle {
       const prevBranchStock = prod.currentStockByBranch.get(branchId) || 0;
       prod.currentStockByBranch.set(branchId, prevBranchStock - item.quantity);
 
-      const lineTotal = round2(item.quantity * item.unitPrice);
+      const lineTotal = Money.amount(item.quantity * item.unitPrice, "INR");
       subtotal += lineTotal;
 
       itemRecords.push({
@@ -156,19 +150,19 @@ class AccountingOracle {
         productId: item.productId,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
-        cogs: round2(item.quantity * prod.wac),
+        cogs: Money.amount(item.quantity * prod.wac, "INR"),
         prevBranchStock,
         newBranchStock: prevBranchStock - item.quantity,
       });
     }
 
-    const totalAmount = round2(subtotal);
-    const balanceAmount = round2(Math.max(0, totalAmount - paidAmount));
+    const totalAmount = Money.amount(subtotal, "INR");
+    const balanceAmount = Money.amount(Math.max(0, totalAmount - paidAmount), "INR");
 
     if (customerId && this.customers.has(customerId)) {
       const c = this.customers.get(customerId);
-      c.totalSales = round2(c.totalSales + totalAmount);
-      c.currentBalance = round2(c.currentBalance + balanceAmount);
+      c.totalSales = Money.amount(c.totalSales + totalAmount, "INR");
+      c.currentBalance = Money.amount(c.currentBalance + balanceAmount, "INR");
     }
 
     this.bills.set(billId, {
@@ -183,12 +177,12 @@ class AccountingOracle {
   recordCustomerPayment({ customerId, amount, billId }) {
     const c = this.customers.get(customerId);
     if (c) {
-      c.currentBalance = round2(Math.max(0, c.currentBalance - amount));
+      c.currentBalance = Money.amount(Math.max(0, c.currentBalance - amount), "INR");
     }
     if (billId && this.bills.has(billId)) {
       const b = this.bills.get(billId);
-      b.paidAmount = round2(b.paidAmount + amount);
-      b.balanceAmount = round2(Math.max(0, b.totalAmount - b.paidAmount));
+      b.paidAmount = Money.amount(b.paidAmount + amount, "INR");
+      b.balanceAmount = Money.amount(Math.max(0, b.totalAmount - b.paidAmount), "INR");
     }
     this.events.push({ type: "CUSTOMER_PAYMENT", customerId, amount, billId });
   }
@@ -196,12 +190,12 @@ class AccountingOracle {
   recordVendorPayment({ vendorId, amount, outflowId }) {
     const v = this.vendors.get(vendorId);
     if (v) {
-      v.outstandingPayable = round2(Math.max(0, v.outstandingPayable - amount));
+      v.outstandingPayable = Money.amount(Math.max(0, v.outstandingPayable - amount), "INR");
     }
     if (outflowId && this.outflows.has(outflowId)) {
       const o = this.outflows.get(outflowId);
-      o.paidAmount = round2(o.paidAmount + amount);
-      o.balanceAmount = round2(Math.max(0, o.totalAmount - o.paidAmount));
+      o.paidAmount = Money.amount(o.paidAmount + amount, "INR");
+      o.balanceAmount = Money.amount(Math.max(0, o.totalAmount - o.paidAmount), "INR");
     }
     this.events.push({ type: "VENDOR_PAYMENT", vendorId, amount, outflowId });
   }
@@ -254,7 +248,7 @@ class AccountingOracle {
 
     if (customerId && refundMethod === "credit_note" && this.customers.has(customerId)) {
       const c = this.customers.get(customerId);
-      c.currentBalance = round2(Math.max(0, c.currentBalance - refundTotal));
+      c.currentBalance = Money.amount(Math.max(0, c.currentBalance - refundTotal), "INR");
     }
   }
 
@@ -292,13 +286,13 @@ class AccountingOracle {
       }
     }
 
-    grossRevenue = round2(grossRevenue);
-    salesReturns = round2(salesReturns);
-    const netRevenue = round2(Math.max(0, grossRevenue - salesReturns));
+    grossRevenue = Money.amount(grossRevenue, "INR");
+    salesReturns = Money.amount(salesReturns, "INR");
+    const netRevenue = Money.amount(Math.max(0, grossRevenue - salesReturns), "INR");
 
-    grossCogs = round2(grossCogs);
-    cogsReversals = round2(cogsReversals);
-    const netCogs = round2(Math.max(0, grossCogs - cogsReversals));
+    grossCogs = Money.amount(grossCogs, "INR");
+    cogsReversals = Money.amount(cogsReversals, "INR");
+    const netCogs = Money.amount(Math.max(0, grossCogs - cogsReversals), "INR");
 
     let totalExpenses = 0;
     let outflowCount = 0;
@@ -311,17 +305,17 @@ class AccountingOracle {
       }
     }
 
-    totalExpenses = round2(totalExpenses);
+    totalExpenses = Money.amount(totalExpenses, "INR");
     let inventoryWriteOff = 0;
     for (const w of this.writeOffs) {
       if (branchId && w.branchId !== branchId) continue;
       inventoryWriteOff += w.quantity * w.unitCost;
     }
-    inventoryWriteOff = round2(inventoryWriteOff);
-    const grossProfit = round2(netRevenue - netCogs);
-    const grossMarginPercent = netRevenue > 0 ? round2((grossProfit / netRevenue) * 100) : 0;
-    const netProfit = round2(grossProfit - totalExpenses - inventoryWriteOff);
-    const netMarginPercent = netRevenue > 0 ? round2((netProfit / netRevenue) * 100) : 0;
+    inventoryWriteOff = Money.amount(inventoryWriteOff, "INR");
+    const grossProfit = Money.amount(netRevenue - netCogs, "INR");
+    const grossMarginPercent = netRevenue > 0 ? roundTo((grossProfit / netRevenue) * 100, 2) : 0;
+    const netProfit = Money.amount(grossProfit - totalExpenses - inventoryWriteOff, "INR");
+    const netMarginPercent = netRevenue > 0 ? roundTo((netProfit / netRevenue) * 100, 2) : 0;
 
     return {
       grossRevenue,
@@ -357,7 +351,7 @@ class AccountingOracle {
       } else {
         stock = Array.from(prod.currentStockByBranch.values()).reduce((a, b) => a + b, 0);
       }
-      const valuation = round2(stock * prod.wac);
+      const valuation = Money.amount(stock * prod.wac, "INR");
       totalStockValuation += valuation;
       totalItemsCount++;
       items.push({
@@ -370,7 +364,7 @@ class AccountingOracle {
     }
 
     return {
-      totalStockValuation: round2(totalStockValuation),
+      totalStockValuation: Money.amount(totalStockValuation, "INR"),
       totalItemsCount,
       items,
     };
@@ -401,5 +395,5 @@ class AccountingOracle {
   }
 }
 
-module.exports = { AccountingOracle, round2, round4 };
+module.exports = { AccountingOracle };
 
