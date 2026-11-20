@@ -1,7 +1,7 @@
-# Trado Architectural Decision Register (D-1 .. D-61)
+# Trado Architectural Decision Register (D-1 .. D-71)
 
-Generated at: 2026-11-18T17:30:00.000Z  
-Total decisions: **61** (All Active)  
+Generated at: 2026-11-20T23:59:00.000Z  
+Total decisions: **71** (All Active)  
 
 | ID | Title | Prompt | Status | Enforced By | Description |
 |---|---|---|---|---|---|
@@ -75,6 +75,7 @@ Total decisions: **61** (All Active)
 | **D-68** | **Stock Transfer In-Transit Valuation & Damaged Write-off (U-6, Q-F9, Q-F10, D-F7)** | Hybrid-77 | `active` | `functions/src/callables/stockTransfers.ts` | In-transit stock tracked at source branch WAC. Damaged goods rejected at destination generate write-off expense on source branch or carrier receivable claim. |
 | **D-69** | **Intra-Branch Location Moves & Cancel-After-Dispatch (Q-F11, D-F8)** | Hybrid-77 | `active` | `functions/src/callables/stockTransfers.ts` | Transfers between distinct storage locations within the same branch are marked `internal: true`. Transfers cancelled after dispatch re-credit source branch physical stock and decrement in-transit stock atomically. |
 | **D-70** | **Scope Convention & Cross-Branch Comparative Reporting (U-5, Q-F12, D-F9)** | Hybrid-77 | `active` | `functions/src/callables/reports/financialReports.ts` | Reports support `branchId`, `branchIds[]`, or `scope: 'organization'`. Non-org-scoped callers querying outside their assigned branch fail with `BRANCH_ACCESS_DENIED`. `reportsGetBranchSummary` aggregates cross-branch comparative metrics. |
+| **D-71** | **Decimal Money in Major Units & Single Currency Table** | 77D | `active` | `functions/src/services/money.ts` | Money is a decimal number in major units; one rounding entry Money.amount; one currency table (constants/currencies.ts); zero integer minor/paise duplicate fields; no silent currency fallbacks. Supersedes D-19 / A-41 minor-unit rule. |
 
 ## Answered Business Decisions (A-n)
 
@@ -120,5 +121,5 @@ Total decisions: **61** (All Active)
 | **A-38** | Q-F5: Branch and warehouse stock transfers with double-entry stock ledger entries, in-transit stock isolation, and source-branch WAC valuation carry. | 2026-11-19 | `stockTransfers.ts`, `postingService.ts` |
 | **A-39** | Q-F6: Cash-count variance exceeding org threshold requires approval; shift handover requires receiver confirmation with dispute audit. | 2026-11-19 | `cashFlows.ts` |
 | **A-40** | Q-F7: Bank account `printOnInvoice` flag (default false); accounts marked true print full unmasked account numbers on invoices and print snapshots (`buildBillPrintSnapshot`), while remaining masked in API and audit responses. | 2026-11-19 | `bills.ts`, `organizations.ts` |
-| **A-41** | Q-M1: Canonical money storage: Integer minor units everywhere across all monetary collections and ledger lines to eliminate float drift. | 2026-11-19 | `models.ts`, `postingService.ts` |
+| **A-41** | Q-M1: Canonical money storage: Integer minor units everywhere across all monetary collections and ledger lines to eliminate float drift. (SUPERSEDED by D-71: Decimal major units per ISO 4217 exponent) | 2026-11-19 | `models.ts`, `postingService.ts` |
 | **A-42** | Q-M2: One canonical fee path: Account entry sub-entries (`accountTransactions` with `parentEntryId` and `kind: "sub_entry"`) and linked `outflows` expense. Legacy payments fee callables preserved as thin wrappers for one release, then deprecated. | 2026-11-19 | `accountEntries.ts`, `payments.ts` |

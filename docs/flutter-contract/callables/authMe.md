@@ -14,7 +14,7 @@ Back to [Master Index](./INDEX.md).
 |---|---|---|---|---|
 | `deviceId` | `string` | No | {"minLength":4,"maxLength":128} | `device_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "context", "credentials" (57 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "context", "credentials" (69 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json

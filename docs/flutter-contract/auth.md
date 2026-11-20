@@ -51,7 +51,19 @@ Derived directly from `AuthMeSchema`, `AuthLoginSchema`, and `functions/src/serv
 | `context.primaryOrganization.organizationId` | `string` | No |
 | `context.primaryOrganization.name` | `string | undefined` | Yes |
 | `context.primaryOrganization.currency` | `string | undefined` | Yes |
-| `context.primaryOrganization.currencyDecimals` | `number | undefined` | Yes |
+| `context.primaryOrganization.currencyInfo.code` | `string` | No |
+| `context.primaryOrganization.currencyInfo.numeric` | `string | undefined` | Yes |
+| `context.primaryOrganization.currencyInfo.symbol` | `string` | No |
+| `context.primaryOrganization.currencyInfo.symbolPosition` | `"before" | "after"` | No |
+| `context.primaryOrganization.currencyInfo.exponent` | `0 | 2 | 3 | 4` | No |
+| `context.primaryOrganization.currencyInfo.major.name` | `string` | No |
+| `context.primaryOrganization.currencyInfo.major.plural` | `string` | No |
+| `context.primaryOrganization.currencyInfo.minor.perMajor` | `number` | No |
+| `context.primaryOrganization.currencyInfo.minor.name` | `string` | No |
+| `context.primaryOrganization.currencyInfo.minor.plural` | `string` | No |
+| `context.primaryOrganization.currencyInfo.subMinor.perMinor` | `number` | No |
+| `context.primaryOrganization.currencyInfo.subMinor.name` | `string` | No |
+| `context.primaryOrganization.currencyInfo.subMinor.plural` | `string` | No |
 | `context.primaryOrganization.timezone` | `string | undefined` | Yes |
 | `context.primaryOrganization.country` | `string | undefined` | Yes |
 | `context.primaryOrganization.taxRegimeCode` | `string | undefined` | Yes |

@@ -7,7 +7,7 @@ Questions raised when business semantics require owner clarification. Answered q
 | **Q-1** | Update concurrency precondition policy | `OPEN` | U-7, R-03 | Mutation Callables | Option A: version / `updatedAt` precondition on all shared docs |
 | **Q-2** | Status state machines and allowed transitions | `OPEN` | U-6, R-06 | State Transitions | Confirm derived status transition matrix |
 | **Q-3** | Closed financial periods & backdating locks | `OPEN` | R-20, R-21 | Invoicing & Reporting | Option A now (unlocked), Option B later (lock date) |
-| **Q-4** | Money storage minor units & tax regimes | `OPEN` | R-22, B.7 | Money Engine | Integer paise/cents, single-currency per org, India GST |
+| **Q-4** | Money storage minor units & tax regimes | `SUPERSEDED` | R-22, B.7 | Money Engine | SUPERSEDED by D-71: Decimal major units per ISO 4217 exponent |
 | **Q-5** | Mutation testing score threshold | `OPEN` | T.1, Z5 | Pure-Logic Testing | Threshold ≥ 80% on pure-logic modules |
 | **Q-6** | Verification enforcement outside agent turns | `OPEN` | Z4 | Tooling & CI | Both Claude hook and pre-commit step |
 | **Q-7** | External rules consolidation | `OPEN` | C.1 | Rules Sync | Request owner to paste any external instructions |
@@ -83,14 +83,10 @@ Questions raised when business semantics require owner clarification. Answered q
 ---
 
 ### Q-4 · Money Storage Precision & Tax Regimes · blocks: R-22, B.7 | affects: Pricing & Tax
-- **Found:** The codebase stores monetary values in integer paise / cents (minor units, D-19). Tax calculations in `reportsGetTax` and `billsCreate` support Indian GST (CGST, SGST, IGST).
-- **Question:** Confirm that money is strictly stored as integer minor units (paise/cents), single-currency per organization, with India GST regime as primary in scope.
-- **Options:**
-  - **A)** Confirm: Integer paise, single-currency per org, India GST in scope.
-  - **B)** Multi-currency support required immediately.
-- **Recommended:** **A**, consistent with D-19 and existing models.
-- **If wrong:** Migration needed if decimal floats are desired (highly discouraged for billing).
-- **Meanwhile:** All tests and assertions use integer paise.
+- **Status:** **SUPERSEDED by D-71** (Prompt 77D).
+- **Found:** The codebase originally stored monetary values in integer paise / cents (minor units, D-19).
+- **Resolution:** Under D-71, all monetary values across Firestore and API contracts are decimal numbers in major units, rounded with `Money.amount(value, currency)`. Zero integer minor unit / paise fields. Single currency table in `constants/currencies.ts`. Multiple currencies supported across organizations.
+- **Meanwhile:** All tests, callables, reports, and schemas use decimal major units.
 
 ---
 

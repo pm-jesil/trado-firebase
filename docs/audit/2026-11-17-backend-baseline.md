@@ -52,9 +52,9 @@ Every gap listed in the Master Gap Report was audited directly against the sourc
 - **Finding:** Pure unit tests only inspect Zod schemas and math helpers. Scenario tests query `financialAccountsGetLedger` API, but no test directly queries the raw `accountTransactions` collection or verifies sum(ledger) == balance. `accounting-oracle.cjs` models customers, vendors, stock, and P&L, but completely ignores cash/bank accounts, transfers, capital, and fees.
 
 ### G5 — Money calculations use rounded floats rather than integer minor units (P0)
-- **Status:** `CONFIRMED`
+- **Status:** `RESOLVED` (Superseded by D-71: Decimal major units per ISO 4217 exponent with Money.amount rounding)
 - **File:Line Evidence:** `functions/src/services/money.ts:20-60`, `functions/src/services/money.ts:93-138`, `functions/src/services/ledgerService.ts:60-65`
-- **Finding:** `services/money.ts` relies on JavaScript `Number` floating-point math with `roundTo(value, 2)` exponential commercial rounding. In `ledgerService.ts`, running balance calculations use `currentBalance + amount` and `currentBalance - amount`. While amounts are conventionally paise, floating-point accumulation across high-volume ledgers risks fractional drift.
+- **Finding:** `services/money.ts` relies on JavaScript `Number` floating-point math with `roundTo(value, 2)` exponential commercial rounding. In `ledgerService.ts`, running balance calculations use `currentBalance + amount` and `currentBalance - amount`. While amounts are conventionally paise, floating-point accumulation across high-volume ledgers risks fractional drift. *(Resolved in 77D by D-71: single rounding entry `Money.amount(value, currency)` enforcing currency ISO 4217 exponents).*
 
 ### G6 — Stock transfer ignores conversionFactor, cost carry, in-transit, and serials; bypasses stockEngine (P0)
 - **Status:** `CONFIRMED`
@@ -76,7 +76,7 @@ Every gap listed in the Master Gap Report was audited directly against the sourc
   3. In `bills.ts:217`, `calculateTax` is invoked once on the bill subtotal; it does not support per-line tax category slabs, HSN codes, or interstate IGST calculation per line.
 
 ### G8 — Currency minor-unit name is not stored (P1)
-- **Status:** `CONFIRMED`
+- **Status:** `RESOLVED` (D-71: Single currency table `constants/currencies.ts` defines canonical currency major and minor unit names [cov:C-1]; derived via `getCurrencyInfo(currencyCode)` on read, never stored in org document)
 - **File:Line Evidence:** `functions/src/constants/countryDefaults.ts:14-26`, `functions/src/types/models.ts:110-150`
 - **Finding:** `CountryDefaultDefinition` and `OrganizationDoc` store `currencyCode` and `currencyDecimals`, but do not store `minorUnitName` (e.g. "paisa", "fils", "cent") or `minorUnitNamePlural`.
 
@@ -125,4 +125,4 @@ Every gap listed in the Master Gap Report was audited directly against the sourc
    - Wire `returns.ts` to `postingRules` (closing G1).
    - Extend `PaymentProcessingFeeDoc` with full verification lifecycle, auto-create linked `expense` outflows, and wire clearing accounts with `pending_settlement` (closing G2).
    - Implement `ledgerVerify` invariant callable and double-entry journal / Chart of Accounts (closing G3, G4).
-   - Establish integer minor unit helpers with property drift tests (closing G5).
+   - Establish single decimal money architecture with ISO 4217 exponents and half-away-from-zero rounding (D-71, closing G5).

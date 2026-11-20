@@ -275,7 +275,7 @@ export const Money = {
   },
 
   /**
-   * Convert a major decimal amount into integer minor units (cents, paise, fils).
+   * Convert a major decimal amount into integer minor units.
    */
   fromDecimal(amount: number, currency: string): number {
     const decimals = getExponent(currency);
@@ -337,7 +337,7 @@ export const Money = {
       remainder -= share;
     }
 
-    // Distribute remaining cents/paise one by one to parts with highest remainder
+    // Distribute remaining minor units one by one to parts with highest remainder
     if (remainder > 0) {
       const remaindersWithIndex = ratios.map((r, idx) => ({
         idx,

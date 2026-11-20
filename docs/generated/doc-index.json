@@ -202,7 +202,7 @@
     },
     {
       "path": "docs/audit/open-items.md",
-      "title": "Trado Open Items & Cloud Checklist (Prompt 68 Z-8)",
+      "title": "Open-items register",
       "classification": "GENERATED",
       "lineCount": null
     },
@@ -210,7 +210,7 @@
       "path": "docs/audit/open-questions.md",
       "title": "Open Questions & Business Decision Register (Appendix B)",
       "classification": "ARCHIVE",
-      "lineCount": 135
+      "lineCount": 131
     },
     {
       "path": "docs/audit/phase-reports-archive.md",
@@ -234,7 +234,7 @@
       "path": "docs/audit/run-ledger.md",
       "title": "Trado Engineering Run Ledger (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 50
+      "lineCount": 51
     },
     {
       "path": "docs/audit/test-coverage-matrix.md",
@@ -292,9 +292,9 @@
     },
     {
       "path": "docs/decisions/decision-register.md",
-      "title": "Trado Architectural Decision Register (D-1 .. D-61)",
+      "title": "Trado Architectural Decision Register (D-1 .. D-71)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 125
+      "lineCount": 126
     },
     {
       "path": "docs/decisions-log.md",
@@ -360,7 +360,7 @@
       "path": "docs/features/payments-and-party-ledgers.md",
       "title": "Feature Guide: Payments & Party Ledgers",
       "classification": "KEEP+UPDATE",
-      "lineCount": 275
+      "lineCount": 247
     },
     {
       "path": "docs/features/platform-usage-and-cost-estimates.md",

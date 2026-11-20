@@ -874,9 +874,9 @@ async function run() {
   const bhOrg = bhOrgGet.organization || bhOrgGet;
   assert.equal(bhOrg.country, "BH", "Country must be BH");
   assert.equal(bhOrg.currency, "BHD", "Currency must be BHD");
-  assert.equal(bhOrg.currencyDecimals, 3, "BHD must have 3 decimals");
-  assert.equal(bhOrg.minorUnitName, "fils", "Minor unit name must be fils (G8)");
-  assert.equal(bhOrg.currencySymbol, "BD", "Currency symbol must be BD (G8)");
+  assert.equal(bhOrg.currencyInfo.exponent, 3, "BHD must have 3 decimals");
+  assert.equal(bhOrg.currencyInfo.minor.name.toLowerCase(), "fils", "Minor unit name must be fils (G8)");
+  assert.equal(bhOrg.currencyInfo.symbol, "BD", "Currency symbol must be BD (G8)");
   assert.equal(bhOrg.taxRegimeCode, "BH_VAT", "Tax regime must be BH_VAT (G7)");
   ok("Bahrain organization created with 3-decimal currency (BHD) and minor unit 'fils' (G8)");
 

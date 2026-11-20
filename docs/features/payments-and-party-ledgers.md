@@ -219,41 +219,13 @@ Trado enforces a single, authoritative monetary architecture across all storage,
 - **Rule 2 — Single Currency Table:** `functions/src/constants/currencies.ts` (`CURRENCIES`) is the single source of truth for currency definitions: ISO code, symbol, symbol position, decimal exponent (per ISO 4217), major unit names, minor unit names, and conversion multipliers.
 - **Rule 3 — Organization Stores Only ISO Currency Code:** Organizations store only the 3-letter ISO `currency` code (`OrganizationDoc.currency`). The country sets a default currency (`COUNTRY_DEFAULTS` keeps only `currencyCode`). All currency metadata (exponent, symbol, major/minor unit names) is dynamically derived at read time via `getCurrencyInfo(currencyCode)` and returned under `authMe` / `organizationsGet` as `currencyInfo`. Redundant metadata fields are not stored in Firestore.
 - **Rule 4 — No Silent Fallback Currency:** All monetary operations require an explicit currency. Missing or undefined currency throws `CURRENCY_MISSING` (`HttpsError` `failed-precondition`). Silent fallbacks (`|| "INR"`, `?? "INR"`, `.default("INR")`) are strictly forbidden across production source code and guarded by static analysis.
-- **Rule 5 — Precision Validation:** Schemas validate non-negative or positive numbers. The service layer strictly enforces decimal fractional precision via `assertAmountMatchesCurrency(amount, currency)`, rejecting excess fractional digits beyond the currency's ISO 4217 exponent (e.g. 1.2345 BHD rejects with `AMOUNT_DECIMAL_OVERFLOW`).
+- **Rule 5 — Precision Validation:** Schemas validate non-negative or positive numbers. The service layer strictly enforces decimal fractional precision via `assertAmountMatchesCurrency(amount, currency)`, rejecting excess fractional digits beyond the currency's ISO 4217 exponent (e.g. 1.2345 BHD rejects with `AMOUNT_PRECISION_INVALID`).
 
-### 6.2 Supported Currencies Table
+### 6.2 Supported Currencies Registry
 
-The canonical table below represents the active currencies defined in `functions/src/constants/currencies.ts`:
+All active currencies, ISO 4217 exponents, symbols, display placement, and unit names are centrally defined in `functions/src/constants/currencies.ts` and generated to [docs/generated/currencies.json](../generated/currencies.json).
 
-| ISO Code | Symbol | Position | Exponent | Major Unit (Singular / Plural) | Minor Unit (Singular / Plural, Multiplier) | Sub-Minor Unit |
-|---|---|---|---|---|---|---|
-| `INR` | ₹ | before | 2 | Rupee / Rupees | Paisa / Paise (100) | — |
-| `AED` | د.إ | before | 2 | Dirham / Dirhams | Fils / Fils (100) | — |
-| `BHD` | .د.ب | before | 3 | Dinar / Dinars | Fils / Fils (1000) | — |
-| `OMR` | ر.ع. | before | 3 | Rial / Rials | Baisa / Baisas (1000) | — |
-| `KWD` | د.ك | before | 3 | Dinar / Dinars | Fils / Fils (1000) | — |
-| `QAR` | ر.ق | before | 2 | Riyal / Riyals | Dirham / Dirhams (100) | — |
-| `SAR` | ر.س | before | 2 | Riyal / Riyals | Halala / Halalas (100) | — |
-| `JOD` | د.ا | before | 3 | Dinar / Dinars | Piastre / Piastres (100) | Qirsh (10) |
-| `USD` | `$` | before | 2 | Dollar / Dollars | Cent / Cents (100) | Mill (10) |
-| `EUR` | € | before | 2 | Euro / Euros | Cent / Cents (100) | — |
-| `GBP` | £ | before | 2 | Pound / Pounds | Penny / Pence (100) | — |
-| `SGD` | `$` | before | 2 | Dollar / Dollars | Cent / Cents (100) | — |
-| `CAD` | `$` | before | 2 | Dollar / Dollars | Cent / Cents (100) | — |
-| `AUD` | `$` | before | 2 | Dollar / Dollars | Cent / Cents (100) | — |
-| `JPY` | ¥ | before | 0 | Yen / Yen | — | — |
-| `CNY` | ¥ | before | 2 | Yuan / Yuan | Fen / Fen (100) | — |
-| `PKR` | ₨ | before | 2 | Rupee / Rupees | Paisa / Paise (100) | — |
-| `BDT` | ৳ | before | 2 | Taka / Taka | Poisha / Poisha (100) | — |
-| `LKR` | Rs | before | 2 | Rupee / Rupees | Cent / Cents (100) | — |
-| `NPR` | रू | before | 2 | Rupee / Rupees | Paisa / Paise (100) | — |
-| `MYR` | RM | before | 2 | Ringgit / Ringgit | Sen / Sen (100) | — |
-| `THB` | ฿ | before | 2 | Baht / Baht | Satang / Satang (100) | — |
-| `IDR` | Rp | before | 2 | Rupiah / Rupiah | Sen / Sen (100) | — |
-| `ZAR` | R | before | 2 | Rand / Rand | Cent / Cents (100) | — |
-| `EGP` | E£ | before | 2 | Pound / Pounds | Piastre / Piastres (100) | Millime (10) |
-| `TRY` | ₺ | before | 2 | Lira / Lira | Kurus / Kurus (100) | — |
-| `CHF` | CHF | before | 2 | Franc / Francs | Rappen / Rappen (100) | — |
+Zero currency definitions or exponent tables exist outside this canonical registry.
 
 ### 6.3 Real-World Calculation Examples
 

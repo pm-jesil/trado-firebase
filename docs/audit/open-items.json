@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-11-12T22:34:46.353Z",
-  "total": 177,
+  "generatedAt": "2026-11-20T18:36:12.799Z",
+  "total": 178,
   "counts": {
     "PARTIAL": 96,
-    "DONE": 8,
+    "DONE": 9,
     "DEFERRED": 6,
     "HANDED TO 66": 4,
     "NOT DONE": 63
@@ -141,8 +141,8 @@
       "title": "Single stored field image: ImageRef (no URL inside)",
       "status": "DONE",
       "evidence": [
-        "removed field names still stored — functions/scripts/check-raw-field-census.cjs:74",
-        "removedFieldNames — functions/scripts/test-schema-contract-sweep.cjs:333"
+        "removed field names still stored — functions/scripts/check-raw-field-census.cjs:87",
+        "removedFieldNames — functions/scripts/test-schema-contract-sweep.cjs:177"
       ],
       "owner": "prompt 64",
       "next": ""
@@ -164,7 +164,7 @@
       "title": "Guards never narrowed; explicit documented exclusions",
       "status": "DONE",
       "evidence": [
-        "writeGuardScope(__filename — functions/scripts/check-same-doc-duplicates.cjs:365",
+        "writeGuardScope(__filename — functions/scripts/check-same-doc-duplicates.cjs:448",
         "seeded violations detected by the guard — functions/scripts/test-same-doc-duplicates-defects.cjs:41"
       ],
       "owner": "prompt 64",
@@ -200,6 +200,17 @@
         "Seeded defects detected — scripts/test-coverage-engine-defects.cjs:131"
       ],
       "owner": "prompt 65",
+      "next": ""
+    },
+    {
+      "id": "D-71",
+      "source": "P-77D",
+      "title": "Decimal Money in Major Units & Single Currency Table",
+      "status": "DONE",
+      "evidence": [
+        "Money.amount — functions/src/test/unit/moneyRounding.test.ts:75"
+      ],
+      "owner": "prompt 77D",
       "next": ""
     },
     {

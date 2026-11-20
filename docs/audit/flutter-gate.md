@@ -31,7 +31,7 @@ The backend is **CLOSED & SEALED** for backend modifications. The generated Flut
   - `action`: e.g. `purchase.create`, `bill.create`, `delivery.update_status`
   - `humanLabel`: Document number or natural name (e.g. `INV-2026-0042`)
   - `statusBefore` & `statusAfter`: Transparent lifecycle state tracking
-  - `amount` & `currency`: Monetary values in integer paise
+  - `amount` & `currency`: Monetary values in decimal major units (D-71, superseding integer paise)
   - `branchId`: Branch attribution
   - `actorUid`, `actorName`, `actorRole`: Full actor attribution
 - **Access Control & Privacy:**
@@ -73,7 +73,7 @@ Suite 1: Real-World Business Scenarios (test-real-world-scenarios.cjs)
   ✓ [R-05] Concurrent Oversell Prevention (10 parallel callers on stock=1: 1 won, 9 rejected)
   ✓ [R-08] Failure Midway Atomic Rollback (0 partial documents left)
   ✓ [R-20] Organization Timezone Rollover (Asia/Kolkata date transition)
-  ✓ [R-22+R-25] Money Calculations & Excessive Refund Safeguards (integer paise)
+  ✓ [R-22+R-25] Money Calculations & Excessive Refund Safeguards (decimal major units, D-71)
   ✓ [R-02] Idempotency Key Replay & Conflict Detection
   ✓ [R-28] Mid-Session User Revocation Gate Rejection
   ✓ [R-33] Cross-Tenant Isolation Enforcement

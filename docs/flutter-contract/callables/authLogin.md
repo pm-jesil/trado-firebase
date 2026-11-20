@@ -16,7 +16,7 @@ Back to [Master Index](./INDEX.md).
 | `password` | `string` | **Yes** | {"minLength":1,"maxLength":512} | `Sample password` |
 | `deviceId` | `string` | No | {"minLength":4,"maxLength":128} | `device_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "accessToken", "context", "credentials", "idToken", "refreshToken" (63 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "accessToken", "context", "credentials", "idToken", "refreshToken" (75 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json

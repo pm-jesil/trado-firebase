@@ -4,7 +4,7 @@
  * Provides:
  * - Single source of truth for all financial posting rules across business events (1..20)
  * - Atomic two-phase Firestore transaction execution (preparePostingInTxn / applyPostingInTxn)
- * - Exact integer minor units tracking with backward-compatible decimal amounts
+ * - Double-entry ledger tracking with decimal major amounts (D-71)
  * - Automatic balanced double-entry journal creation (JournalEntryDoc in `journalEntries/{id}`)
  * - Idempotency guaranteed on (sourceDocumentType, sourceDocumentId, eventKey)
  */

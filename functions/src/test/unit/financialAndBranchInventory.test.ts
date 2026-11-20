@@ -3,7 +3,7 @@
  *
  * Covers:
  * - Schema validation and D-11 strictness (unknown field rejection)
- * - Financial ledger math & integer paise precision (R4, D-47)
+ * - Financial ledger math & decimal major units precision (R4, D-71)
  * - Stock transfer invariants and zero-loss dispatch/receive mechanics (D-49)
  * - Maker-checker permissions and self-approval assertion (FB-7, D-50)
  * - Organization field policy for Admin persona (FB-2, FB-4)
@@ -211,7 +211,7 @@ describe("Master Financial, Branch & Inventory Unit Tests", () => {
         paymentMethod: "card",
         feeAmount: -100,
       });
-      assert.strictEqual(negativeFee.success, false, "Fee must be positive paise");
+      assert.strictEqual(negativeFee.success, false, "Fee must be positive amount");
     });
 
     it("CreateCapitalTransactionSchema validates contributions and drawings, rejecting unknown fields", () => {

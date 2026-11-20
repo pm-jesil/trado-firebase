@@ -4,6 +4,7 @@
 
 import type { EffectiveBusinessConfig } from "../constants/businessDefaults.js";
 import { BusinessType, BusinessCategory, EntityStatus } from "../constants/enums.js";
+import type { CurrencyDefinition } from "../constants/currencies.js";
 
 // Canonical Session Context DTOs
 export type AuthContextStatus =
@@ -62,7 +63,7 @@ export interface AuthPrimaryOrganizationContext {
   organizationId: string;
   name?: string;
   currency?: string;
-  currencyDecimals?: number;
+  currencyInfo?: CurrencyDefinition;
   timezone?: string;
   country?: string;
   taxRegimeCode?: string;

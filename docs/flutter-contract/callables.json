@@ -165,7 +165,7 @@
           "context",
           "credentials"
         ],
-        "leafCount": 63,
+        "leafCount": 75,
         "sampleLeaves": [
           {
             "path": "context.user.uid",
@@ -343,29 +343,29 @@
             "optional": true
           },
           {
-            "path": "context.primaryOrganization.currencyDecimals",
-            "type": "number | undefined",
-            "optional": true
+            "path": "context.primaryOrganization.currencyInfo.code",
+            "type": "string",
+            "optional": false
           },
           {
-            "path": "context.primaryOrganization.timezone",
+            "path": "context.primaryOrganization.currencyInfo.numeric",
             "type": "string | undefined",
             "optional": true
           },
           {
-            "path": "context.primaryOrganization.country",
-            "type": "string | undefined",
-            "optional": true
+            "path": "context.primaryOrganization.currencyInfo.symbol",
+            "type": "string",
+            "optional": false
           },
           {
-            "path": "context.primaryOrganization.taxRegimeCode",
-            "type": "string | undefined",
-            "optional": true
+            "path": "context.primaryOrganization.currencyInfo.symbolPosition",
+            "type": "\"before\" | \"after\"",
+            "optional": false
           },
           {
-            "path": "context.primaryOrganization.businessType",
-            "type": "string | undefined",
-            "optional": true
+            "path": "context.primaryOrganization.currencyInfo.exponent",
+            "type": "0 | 2 | 3 | 4",
+            "optional": false
           }
         ]
       },
@@ -420,7 +420,7 @@
           "context",
           "credentials"
         ],
-        "leafCount": 57,
+        "leafCount": 69,
         "sampleLeaves": [
           {
             "path": "context.user.uid",
@@ -598,29 +598,29 @@
             "optional": true
           },
           {
-            "path": "context.primaryOrganization.currencyDecimals",
-            "type": "number | undefined",
-            "optional": true
+            "path": "context.primaryOrganization.currencyInfo.code",
+            "type": "string",
+            "optional": false
           },
           {
-            "path": "context.primaryOrganization.timezone",
+            "path": "context.primaryOrganization.currencyInfo.numeric",
             "type": "string | undefined",
             "optional": true
           },
           {
-            "path": "context.primaryOrganization.country",
-            "type": "string | undefined",
-            "optional": true
+            "path": "context.primaryOrganization.currencyInfo.symbol",
+            "type": "string",
+            "optional": false
           },
           {
-            "path": "context.primaryOrganization.taxRegimeCode",
-            "type": "string | undefined",
-            "optional": true
+            "path": "context.primaryOrganization.currencyInfo.symbolPosition",
+            "type": "\"before\" | \"after\"",
+            "optional": false
           },
           {
-            "path": "context.primaryOrganization.businessType",
-            "type": "string | undefined",
-            "optional": true
+            "path": "context.primaryOrganization.currencyInfo.exponent",
+            "type": "0 | 2 | 3 | 4",
+            "optional": false
           }
         ]
       },

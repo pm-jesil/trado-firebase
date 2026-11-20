@@ -159,7 +159,7 @@ export interface RequestActivityDoc {
 3. `module_request` (Audience: platform, Kind: approval, Creator: Org Owner):
    `moduleKey` (required, from catalog), `action` (required: enable/disable), `reason` (required).
 4. `billing_query` (Audience: platform, Kind: work, Creator: Owner, billing roles):
-   `subject` (required: invoice/payment/charge/other), `reference` (optional), `amount` (optional, minor paise), `description` (required).
+   `subject` (required: invoice/payment/charge/other), `reference` (optional), `amount` (optional, decimal major units), `description` (required).
 5. `org_profile_change` (Audience: platform, Kind: approval, Creator: Org Owner):
    `field` (required, in Super-Admin-only set), `proposedValue` (required, typed), `reason` (required).
 6. `ownership_transfer` (Audience: platform, Kind: approval, Creator: Org Owner):

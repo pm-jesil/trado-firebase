@@ -191,7 +191,7 @@ async function runRealWorldScenarios() {
   // ---------------------------------------------------------------------------
   console.log("\n[Scenario R-22 + R-25] Money Calculations & Refund Safeguards...");
   
-  // Create product with exact paise pricing
+  // Create product with exact 2-decimal pricing
   const precisionProd = await callFunction("productsCreate", buildProductPayload(orgId, {
     name: `Precision Item ${runTag}`,
     initialStock: 10,

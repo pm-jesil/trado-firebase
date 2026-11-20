@@ -8,7 +8,7 @@
  *   2. SUMMARY.md stays <= 250 lines and includes contract changes section.
  *   3. All required entity/action forms (.md + .json) exist, have > 0 fields (no empty forms like MG-15).
  *   4. Contract Lints:
- *      - uiHint: "money_paise" is ONLY allowed on numeric fields (MG-05, BM-2).
+ *      - uiHint: "money" is ONLY allowed on numeric fields (MG-05, BM-2).
  *      - callables.update points ONLY to a callable with declared kind === "update" (MG-06, BM-3).
  *      - Every callable referenced in forms/<entity>.json exists in functions/src/index.ts (MG-38).
  *      - Every exported callable in functions/src/index.ts appears in callables.json (BM-11).
@@ -63,11 +63,9 @@ function validateFormLint(formJson, callableKindMap) {
 
   // MG-05 / BM-2: uiHint compatibility
   for (const field of formJson.fields) {
-    if (field.uiHint === "money_paise" || field.uiHint === "money") {
+    if (field.uiHint === "money") {
       assert.ok(field.type === "number", `Contract lint violation (MG-05): ${formJson.entity}.${field.path} has uiHint "${field.uiHint}" on non-number type "${field.type}"`);
-      if (field.uiHint === "money") {
-        assert.strictEqual(field.currencyExponentFrom, "organization.currencyInfo.exponent", `Contract lint violation: ${formJson.entity}.${field.path} missing currencyExponentFrom`);
-      }
+      assert.strictEqual(field.currencyExponentFrom, "organization.currencyInfo.exponent", `Contract lint violation: ${formJson.entity}.${field.path} missing currencyExponentFrom`);
     }
   }
 
@@ -141,12 +139,12 @@ function runSelfTests() {
   // Seeded defect 1: Oversized SUMMARY.md (> 250 lines)
   assert.throws(() => assert.ok(new Array(251).fill("line").length <= 250), "Seeded defect: oversized SUMMARY.md must fail");
 
-  // Seeded defect 2 (BM-2): money_paise on string
+  // Seeded defect 2 (BM-2): money uiHint on a string field
   assert.throws(() => validateFormLint({
     entity: "customer",
     callables: { create: "thingsCreate", update: "thingsUpdate", actions: [] },
-    fields: [{ path: "priceGroup", type: "string", uiHint: "money_paise" }],
-  }, fakeKinds), /money_paise/);
+    fields: [{ path: "priceGroup", type: "string", uiHint: "money" }],
+  }, fakeKinds), /uiHint "money" on non-number type "string"/);
 
   // Seeded defect 3 (BM-3): update pointing to delete callable
   assert.throws(() => validateFormLint({
@@ -171,7 +169,7 @@ function runSelfTests() {
 function runCheck(isTestMode = false) {
   runSelfTests();
   if (isTestMode) {
-    console.log("✓ check:flutter-contract --test self-tests passed (5/5 seeded defects caught: oversize summary, BM-2 money_paise on string, BM-3 update->delete, MG-15 0-field form, BM-14 empty permission description).");
+    console.log("✓ check:flutter-contract --test self-tests passed (5/5 seeded defects caught: oversize summary, BM-2 money uiHint on a string field, BM-3 update->delete, MG-15 0-field form, BM-14 empty permission description).");
     return;
   }
 

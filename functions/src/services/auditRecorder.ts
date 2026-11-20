@@ -204,7 +204,7 @@ export function recordCommitEvent(writes: PendingWrite[], append: (path: string,
   const humanLabel = ((pData.requestNumber || pData.billNumber || pData.invoiceNumber || pData.number || pData.name || pData.sku || pData.code || bData.requestNumber || bData.billNumber || bData.invoiceNumber || bData.name || null) as string | null);
 
   // Derive amount and currency (A-2)
-  const amount = ((pData.totalAmount ?? pData.amount ?? pData.totalPaise ?? bData.totalAmount ?? bData.amount ?? null) as number | null);
+  const amount = ((pData.totalAmount ?? pData.amount ?? bData.totalAmount ?? bData.amount ?? null) as number | null);
   const currency = ((pData.currency || bData.currency || null) as string | null);
   const branchId = ((pData.branchId || bData.branchId || ctx.actor.branchId || null) as string | null);
 

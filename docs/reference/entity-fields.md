@@ -1,6 +1,6 @@
 # Stored field catalog
 
-Generated 2026-11-20T17:53:27.588Z by `scripts/generate-field-catalog.js` from `functions/src/types/models.ts` (TypeScript checker) and the raw field census (`census-mwo3ig14`). Do not edit.
+Generated 2026-11-20T18:45:06.359Z by `scripts/generate-field-catalog.js` from `functions/src/types/models.ts` (TypeScript checker) and the raw field census (`census-mwo3ig14`). Do not edit.
 
 63 collections, 1495 typed stored leaf paths, 1089 with a description, 6 collections without a document interface.
 

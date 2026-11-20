@@ -38,7 +38,7 @@ describe("BX1 Contract Pack, Permissions Catalog & Response Shape Validator (BS-
     assert.strictEqual(allCodes.has("inventory:view_cost"), false, "inventory:view_cost alias must not exist");
   });
 
-  it("BS-04 & MG-05 & MG-15: callables.json covers all callables, customer.priceGroup is not money_paise, and approval_request has > 0 fields", () => {
+  it("BS-04 & MG-05 & MG-15: callables.json covers all callables, customer.priceGroup is not money, and approval_request has > 0 fields", () => {
     const catalog = JSON.parse(fs.readFileSync(path.join(CONTRACT_DIR, "callables.json"), "utf8")) as {
       totalCallables: number;
       responseDocumented: number;
@@ -53,7 +53,7 @@ describe("BX1 Contract Pack, Permissions Catalog & Response Shape Validator (BS-
     const priceGroup = customerForm.fields.find((f) => f.path === "priceGroup");
     assert.ok(priceGroup, "customer.priceGroup field must exist");
     assert.strictEqual(priceGroup.type, "string");
-    assert.notStrictEqual(priceGroup.uiHint, "money_paise", "priceGroup must not have money_paise hint");
+    assert.notStrictEqual(priceGroup.uiHint, "money", "priceGroup must not have money hint");
     assert.strictEqual(priceGroup.example, "retail");
 
     const approvalForm = JSON.parse(fs.readFileSync(path.join(CONTRACT_DIR, "forms", "approval_request.json"), "utf8")) as {

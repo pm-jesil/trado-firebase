@@ -18010,7 +18010,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "default": "bank_kwu000r",
+            "default": "bank_1yrrf6x",
             "type": "string",
             "minLength": 1
           },
@@ -18094,7 +18094,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "default": "bank_6rq3gih",
+              "default": "bank_cwvwwr1",
               "type": "string",
               "minLength": 1
             },
@@ -30232,11 +30232,86 @@
                         "description": "ISO 4217 currency code.",
                         "x-ts-type": "string | undefined"
                       },
-                      "currencyDecimals": {
-                        "type": "number",
-                        "nullable": true,
-                        "description": "Number of decimals the currency uses for amounts (ISO 4217 exponent).",
-                        "x-ts-type": "number | undefined"
+                      "currencyInfo": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "description": "Short code of the record, as shown in the app.",
+                            "x-ts-type": "string"
+                          },
+                          "numeric": {
+                            "type": "string",
+                            "nullable": true,
+                            "x-ts-type": "string | undefined"
+                          },
+                          "symbol": {
+                            "type": "string",
+                            "x-ts-type": "string"
+                          },
+                          "symbolPosition": {
+                            "type": "string",
+                            "enum": [
+                              "before",
+                              "after"
+                            ],
+                            "x-ts-type": "\"before\" | \"after\""
+                          },
+                          "exponent": {
+                            "type": "number",
+                            "x-ts-type": "0 | 2 | 3 | 4"
+                          },
+                          "major": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Human-readable name of this record.",
+                                "x-ts-type": "string"
+                              },
+                              "plural": {
+                                "type": "string",
+                                "x-ts-type": "string"
+                              }
+                            }
+                          },
+                          "minor": {
+                            "type": "object",
+                            "properties": {
+                              "perMajor": {
+                                "type": "number",
+                                "x-ts-type": "number"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "Human-readable name of this record.",
+                                "x-ts-type": "string"
+                              },
+                              "plural": {
+                                "type": "string",
+                                "x-ts-type": "string"
+                              }
+                            }
+                          },
+                          "subMinor": {
+                            "type": "object",
+                            "properties": {
+                              "perMinor": {
+                                "type": "number",
+                                "x-ts-type": "number"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "Human-readable name of this record.",
+                                "x-ts-type": "string"
+                              },
+                              "plural": {
+                                "type": "string",
+                                "x-ts-type": "string"
+                              }
+                            }
+                          }
+                        }
                       },
                       "timezone": {
                         "type": "string",
@@ -30671,11 +30746,86 @@
                         "description": "ISO 4217 currency code.",
                         "x-ts-type": "string | undefined"
                       },
-                      "currencyDecimals": {
-                        "type": "number",
-                        "nullable": true,
-                        "description": "Number of decimals the currency uses for amounts (ISO 4217 exponent).",
-                        "x-ts-type": "number | undefined"
+                      "currencyInfo": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "description": "Short code of the record, as shown in the app.",
+                            "x-ts-type": "string"
+                          },
+                          "numeric": {
+                            "type": "string",
+                            "nullable": true,
+                            "x-ts-type": "string | undefined"
+                          },
+                          "symbol": {
+                            "type": "string",
+                            "x-ts-type": "string"
+                          },
+                          "symbolPosition": {
+                            "type": "string",
+                            "enum": [
+                              "before",
+                              "after"
+                            ],
+                            "x-ts-type": "\"before\" | \"after\""
+                          },
+                          "exponent": {
+                            "type": "number",
+                            "x-ts-type": "0 | 2 | 3 | 4"
+                          },
+                          "major": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string",
+                                "description": "Human-readable name of this record.",
+                                "x-ts-type": "string"
+                              },
+                              "plural": {
+                                "type": "string",
+                                "x-ts-type": "string"
+                              }
+                            }
+                          },
+                          "minor": {
+                            "type": "object",
+                            "properties": {
+                              "perMajor": {
+                                "type": "number",
+                                "x-ts-type": "number"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "Human-readable name of this record.",
+                                "x-ts-type": "string"
+                              },
+                              "plural": {
+                                "type": "string",
+                                "x-ts-type": "string"
+                              }
+                            }
+                          },
+                          "subMinor": {
+                            "type": "object",
+                            "properties": {
+                              "perMinor": {
+                                "type": "number",
+                                "x-ts-type": "number"
+                              },
+                              "name": {
+                                "type": "string",
+                                "description": "Human-readable name of this record.",
+                                "x-ts-type": "string"
+                              },
+                              "plural": {
+                                "type": "string",
+                                "x-ts-type": "string"
+                              }
+                            }
+                          }
+                        }
                       },
                       "timezone": {
                         "type": "string",
@@ -47885,7 +48035,7 @@
                       },
                       "exponent": {
                         "type": "number",
-                        "x-ts-type": "0 | 3 | 2 | 4"
+                        "x-ts-type": "0 | 2 | 3 | 4"
                       },
                       "major": {
                         "type": "object",

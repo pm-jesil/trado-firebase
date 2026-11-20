@@ -48,6 +48,7 @@ const DECISIONS = [
   { id: "D-31", title: "Generated Contract Suites & Hand-Written Scenarios", prompt: "67", status: "active", enforcedBy: "docs/process/testing-standard.md", desc: "Contract tests generated from schemas and registry; complex domain scenarios hand-written." },
   { id: "D-32", title: "Ask, Don't Guess Protocol", prompt: "67", status: "active", enforcedBy: "docs/process/ask-protocol.md", desc: "Unclear business semantics asked interactively; answers recorded in register and never re-asked." },
   { id: "D-33", title: "Single Canonical Rule File", prompt: "67", status: "active", enforcedBy: "scripts/check-rules-sync.js", desc: "AGENTS.md is the single authoritative rule file; CLAUDE.md is a thin adapter referencing it." },
+  { id: "D-71", title: "Decimal Money in Major Units & Single Currency Table", prompt: "77D", status: "active", enforcedBy: "functions/src/services/money.ts", desc: "Money is a decimal number in major units; one rounding entry Money.amount; one currency table (constants/currencies.ts); zero integer minor/paise duplicate fields; no silent currency fallbacks. Supersedes D-19 / A-41 minor-unit rule." },
 ];
 
 function main() {

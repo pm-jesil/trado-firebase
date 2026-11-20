@@ -30,7 +30,7 @@ describe("Posting Rules & Financial Engine Unit Tests (Phase 1)", () => {
     });
 
     it("allocates minor units with zero remainder drift", () => {
-      // Divide ₹100.00 (10000 paise) across 3 ratios (1:1:1)
+      // Divide 100.00 (10000 minor units) across 3 ratios (1:1:1)
       const allocated = Money.allocateMinor(10000, [1, 1, 1]);
       assert.strictEqual(allocated.length, 3);
       assert.strictEqual(allocated.reduce((s, x) => s + x, 0), 10000);

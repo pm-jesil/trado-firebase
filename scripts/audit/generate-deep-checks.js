@@ -72,7 +72,7 @@ Scope: All 48 concrete collections, 134 Callables, 6 Triggers, TypeScript models
 
 | Concept Family | Canonical Implementation File | Canonical Symbol(s) | Clone Detection Threshold | Proof File |
 |---|---|---|---|---|
-| **Rounding & Money** | \`functions/src/utils/money.ts\` | \`roundTo\`, \`toPaise\`, \`calculateItemTotals\` | Exact match (0 ad-hoc \`Math.round\` in business paths) | \`functions/src/test/unit/moneyRounding.test.ts\` |
+| **Rounding & Money** | \`functions/src/services/money.ts\` | \`Money.amount\`, \`Money.sum\`, \`assertAmountMatchesCurrency\` | Exact match (0 ad-hoc \`Math.round\` in business paths) | \`functions/src/test/unit/moneyRounding.test.ts\` |
 | **Date & Time** | \`functions/src/utils/date.ts\` | \`getOccurredLocalDate\`, \`formatIsoDate\` | Central Asia/Kolkata timezone standard | \`functions/src/test/unit/boundsAndEnums.test.ts\` |
 | **ID & Key Generation** | \`functions/src/utils/id.ts\` | \`generateEntityId\`, \`reserveNaturalKey\` | Central UUIDv4 + atomic lock table | \`functions/src/test/unit/idempotency.test.ts\` |
 | **Pagination** | \`functions/src/callables/helpers/pagination.ts\` | Standard cursor \`lastDocId\` + \`pageSize\` | Cap 100 items/page enforced globally | \`tests/api/api-manifest.json\` |
@@ -305,12 +305,12 @@ Generated at: ${new Date().toISOString()}
 
 ## 1. D-34 Compliance Summary
 
-- **Examined Numeric Functions:** \`roundTo\`, \`toPaise\`, \`calculateItemTotals\`, \`recalculateWAC\`
+- **Examined Numeric Functions:** \`Money.amount\`, \`Money.sum\`, \`assertAmountMatchesCurrency\`, \`recalculateWAC\`
 - **Exclusions:** 0
 - **Regression Proof (Prompt 60 C-1 Defect):**
-  \`functions/src/test/unit/moneyRounding.test.ts\` (proves \`roundTo\` handles half-up rounding, precision boundary, and Σ lines = total).
+  \`functions/src/test/unit/moneyRounding.test.ts\` (proves \`Money.amount\` handles half-away-from-zero rounding, precision boundary, and Σ lines = total).
 - **Money Field Storage Census:**
-  All currency stored in integer minor units (paise/cents, D-19).
+  All currency stored in decimal major units per ISO 4217 exponent (D-71, superseding D-19).
 `;
 fs.writeFileSync(path.join(ROOT, "docs/audit/numeric-audit.md"), numericMd, "utf8");
 console.log("✓ Generated docs/audit/numeric-audit.md");

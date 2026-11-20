@@ -1390,7 +1390,7 @@ export interface BranchUsageMonthlyDoc {
 }
 
 // warn_only: warnings only; hard_block: the breached metric class is refused. (soft_throttle was removed:
-// it only warned, i.e. duplicated warn_only — decision D-19.)
+// it only warned, i.e. duplicated warn_only — decision A-01.)
 export type EnforcementMode = "warn_only" | "hard_block";
 
 export interface MetricLimitConfig {

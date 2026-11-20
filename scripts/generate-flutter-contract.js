@@ -51,7 +51,7 @@ function uiHint(fieldPath, type) {
     if (type === "number") return "numeric";
   }
   // MG-05: money ONLY on numeric fields (never on strings like priceGroup!)
-  if (type === "number" && (p.includes("price") || p.includes("amount") || p.includes("cost") || p.includes("creditlimit") || p.includes("requestedlimit") || p.includes("balance") || p.includes("fee") || p.includes("discount") || p.includes("paise"))) {
+  if (type === "number" && (p.includes("price") || p.includes("amount") || p.includes("cost") || p.includes("creditlimit") || p.includes("requestedlimit") || p.includes("balance") || p.includes("fee") || p.includes("discount"))) {
     return "money";
   }
   if (p.includes("notes") || p.includes("description") || p.includes("address") || p.includes("reason")) return "textarea";
@@ -66,8 +66,8 @@ function syntheticExample(fieldPath, type, hint, enumValues, bounds) {
   if (type === "boolean") return true;
   if (type === "enum") return (enumValues && enumValues[0]) || "active";
   if (type === "number") {
-    if (bounds && typeof bounds.min === "number") return Math.max(bounds.min, (hint === "money" || hint === "money_paise") ? 25 : 1);
-    return (hint === "money" || hint === "money_paise") ? 25 : 1;
+    if (bounds && typeof bounds.min === "number") return Math.max(bounds.min, hint === "money" ? 25 : 1);
+    return hint === "money" ? 25 : 1;
   }
   if (p.endsWith("pricegroup")) return "retail";
   if (p.includes("email")) return "owner@example.com";
@@ -166,7 +166,7 @@ for (const ent of ENTITY_CONFIG) {
       uiHint: hint,
       example,
     };
-    if (hint === "money" || hint === "money_paise") {
+    if (hint === "money") {
       fieldObj.currencyExponentFrom = "organization.currencyInfo.exponent";
     }
     if (ent.name === "organization") {
@@ -271,7 +271,7 @@ for (const [category, schemaName] of Object.entries(CATEGORY_SCHEMAS)) {
       uiHint: hint,
       example: syntheticExample(leaf.path, leaf.type, hint, leaf.enumValues, leaf.bounds),
     };
-    if (hint === "money" || hint === "money_paise") {
+    if (hint === "money") {
       fieldObj.currencyExponentFrom = "organization.currencyInfo.exponent";
     }
     return fieldObj;

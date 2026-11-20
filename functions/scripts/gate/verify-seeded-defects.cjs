@@ -35,9 +35,9 @@ async function main() {
     assert.notStrictEqual(actual, manifest.files["SUMMARY.md"]);
   });
 
-  // BM-2, BM-3, BM-14: check-flutter-contract.js --test catches money_paise on string, update->delete, permission without description
+  // BM-2, BM-3, BM-14: check-flutter-contract.js --test catches money uiHint on a string field, update->delete, permission without description
   const contractSelfTest = spawnSync(process.execPath, [path.join(REPO, "scripts", "check-flutter-contract.js"), "--test"], { encoding: "utf8" });
-  prove("BM-2", "money_paise on string caught by check-flutter-contract --test", () => {
+  prove("BM-2", "money uiHint on a string field caught by check-flutter-contract --test", () => {
     assert.strictEqual(contractSelfTest.status, 0);
     assert.ok(contractSelfTest.stdout.includes("BM-2"));
   });

@@ -3,7 +3,7 @@
 - **Date:** 2026-11-20
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
 - **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1-S8)
-- **Current State:** **STEPS S7b AND S8 COMPLETED. S7b registered the new static guard `scripts/check-no-currency-fallback.js` in impact units (`untraced 0; unmapped 0`) and wired BM-27 into `functions/scripts/gate/verify-seeded-defects.cjs`. S8 regenerated the Flutter contract pack (`contract:generate`) with `uiHint: money` and `currencyExponentFrom: organization.currencyInfo.exponent` across form schemas; added comprehensive "Money and Currency" feature section (Rules 1-5, currencies table, calculation examples for INR, AED, BHD, JPY) in `docs/features/payments-and-party-ledgers.md`; removed paise wording across docs; 452/452 unit tests pass across 126 suites; test:static passes cleanly with 0 violations.**
+- **Current State:** **STEP S8b COMPLETED. Generated `docs/generated/currencies.json` via `scripts/generate-policy-artifacts.js` with `--check` wired to `test:static`; replaced hand-written table in `payments-and-party-ledgers.md` with link to canonical JSON; updated `authMe` / `sessionContext.ts` to return derived `currencyInfo` (dropped `currencyDecimals`); registered decision `D-71` and marked `D-19`/`A-41` superseded across decision register, generators, and audit registers; removed `money_paise` `uiHint` alias completely (retained `money` with `currencyExponentFrom`), updated seeded defect `BM-2` to `money uiHint on a string field`; 452/452 unit tests pass across 126 suites; `test:static` passes cleanly across 35+ checks (0 violations). Ready for S9.**
 
 ## Summary of Prompt 77 & 77C Deliverables
 

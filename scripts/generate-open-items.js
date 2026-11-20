@@ -40,6 +40,7 @@ const ITEMS = [
   { id: "D-18", prompt: "64", category: "Decision", title: "One uniform response convention", status: "CLOSED", resolution: "Single entity under its name, lists as { items, count, nextCursor }." },
   { id: "D-19", prompt: "65", category: "Decision", title: "Skipped is not passed (Change-impact testing)", status: "CLOSED", resolution: "verify-impact.js tracks baseline and outputs explicit Verification Scope Block." },
   { id: "D-20", prompt: "65", category: "Decision", title: "Coverage is a computed ratio citing [cov:C-n]", status: "CLOSED", resolution: "coverage-engine.js computes ratios C-1 through C-10 from source of truth." },
+  { id: "D-71", prompt: "77D", category: "Decision", title: "Decimal Money in Major Units & Single Currency Table", status: "CLOSED", resolution: "Money stored as decimal major units, single rounding entry Money.amount, single currency table CURRENCIES. Supersedes D-19 / A-41 minor-unit rule." },
 
   // Findings X-1 .. X-8 (Prompt 64)
   { id: "X-01", prompt: "64", category: "Audit Finding", title: "Image triple stored three times in users document", status: "CLOSED", resolution: "Eliminated photoUrl and avatarUrl; stored only image: ImageRef." },
@@ -93,6 +94,7 @@ const EVIDENCE = {
   "D-17": [{ file: "functions/scripts/check-same-doc-duplicates.cjs", test: "writeGuardScope(__filename" }, { file: "functions/scripts/test-same-doc-duplicates-defects.cjs", test: "seeded violations detected by the guard" }],
   "D-19": [{ file: "scripts/test-verify-selftest.cjs", test: "FAIL is not carried forward" }],
   "D-20": [{ file: "scripts/check-doc-banned-words.js", test: "[cov:(C-" }, { file: "scripts/test-coverage-engine-defects.cjs", test: "Seeded defects detected" }],
+  "D-71": [{ file: "functions/src/test/unit/moneyRounding.test.ts", test: "Money.amount" }],
   "Y-02": [{ file: "functions/scripts/test-same-doc-duplicates-defects.cjs", test: "seeded violations detected by the guard" }],
   "Y-03": [{ file: "functions/scripts/check-no-any-writes.js", test: "check:no-any-writes" }],
   "Y-11": [{ file: "scripts/coverage-engine.js", test: "function computeC1" }],
