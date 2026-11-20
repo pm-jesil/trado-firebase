@@ -19,7 +19,7 @@ import {
   JournalEntryDoc,
   JournalLineItem,
 } from "../types/models.js";
-import { Money } from "./money.js";
+import { Money, requireCurrency } from "./money.js";
 import {
   readNextDocumentNumberInTxn,
   commitDocumentNumberInTxn,
@@ -133,7 +133,7 @@ export async function preparePostingInTxn(
   const orgId = input.organizationId;
   const now = input.now || new Date().toISOString();
   const eventKey = input.eventKey || `${input.eventCode}_${input.sourceDocumentId}`;
-  const currency = input.currency || "INR";
+  const currency = requireCurrency(input.currency, `posting event "${input.eventCode}"`);
 
   const preparedLegs: PreparedPosting["legs"] = [];
   const legs = input.legs || [];

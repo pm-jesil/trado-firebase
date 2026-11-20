@@ -44,7 +44,9 @@ import {
   evaluateUsageLimits,
   mergeUsageLimits,
   type MeteredMetric,
+  PLATFORM_COST_CURRENCY,
 } from "./usageMetering.js";
+import { requireCurrency } from "./money.js";
 import { withCategory, currentContext } from "./requestContext.js";
 import { AppPermissions } from "../constants/permissions.js";
 
@@ -138,7 +140,7 @@ function cachedPlan(planId: string): SubscriptionPlanDoc | null | undefined {
 const FALLBACK_PLAN: SubscriptionPlanDoc = {
   name: "Standard Plan",
   price: 0,
-  currency: "INR",
+  currency: PLATFORM_COST_CURRENCY,
   storageLimitMb: 1024,
   monthlyDocumentVolumeLimit: 5000,
   seatLimits: { admin: 5, staff: 20 },
@@ -152,7 +154,7 @@ const PLATFORM_ORG: OrganizationDoc = {
   businessType: "retail_only" as OrganizationDoc["businessType"],
   businessCategory: "general" as OrganizationDoc["businessCategory"],
   country: "IN",
-  currency: "INR",
+  currency: PLATFORM_COST_CURRENCY,
   taxRegimeCode: "IN_GST",
   status: EntityStatus.ACTIVE,
   planId: "plan_enterprise",
@@ -378,7 +380,7 @@ async function resolveGate(
     planData = secondSnaps[planIdx].exists ? (secondSnaps[planIdx].data() as SubscriptionPlanDoc) : null;
     planCache.set(planId, { plan: planData, expiresAt: Date.now() + PLAN_CACHE_TTL_MS });
   }
-  const plan = planData || { ...FALLBACK_PLAN, currency: orgData.currency || "INR" };
+  const plan = planData || { ...FALLBACK_PLAN, currency: requireCurrency(orgData.currency, `organization "${targetOrgId}"`) };
   if (branchIdx >= 0) branchSnap = secondSnaps[branchIdx];
   if (mbIdx >= 0) mbSnap = secondSnaps[mbIdx];
 

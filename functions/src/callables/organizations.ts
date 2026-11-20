@@ -25,6 +25,8 @@ import {
   RevealBankAccountSchema,
 } from "../validation/schemas.js";
 import { getCountryDefaults } from "../constants/countryDefaults.js";
+import { getCurrencyInfo } from "../constants/currencies.js";
+import { requireCurrency } from "../services/money.js";
 import { nameKey } from "../services/naturalKeys.js";
 import { provisionMembershipInternal, OWNER_ROLE_ID, ADMIN_ROLE_ID } from "../services/membershipProvisioning.js";
 import { attachUploadedImage, hydrateImageUrl } from "../services/imageEngine.js";
@@ -252,7 +254,7 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
 
     // 4. Derive Country Defaults (C-4, N-01)
     const countryDef = getCountryDefaults(input.country);
-    const currency = input.currency || countryDef.currencyCode;
+    const currency = requireCurrency(input.currency || countryDef.currencyCode, `new organization "${input.name}"`);
     const taxRegimeCode = input.taxRegimeCode || countryDef.taxRegimeCode;
     const timezone = input.timezone || countryDef.timezone;
     const financialYearStartMonth = input.financialYearStartMonth || countryDef.financialYearStartMonth;
@@ -312,10 +314,6 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
       businessCategory: input.businessCategory,
       country: input.country,
       currency,
-      currencyDecimals: countryDef.currencyDecimals,
-      minorUnitName: countryDef.minorUnitName,
-      minorUnitNamePlural: countryDef.minorUnitNamePlural,
-      currencySymbol: countryDef.currencySymbol,
       taxRegimeCode,
       financialYearStartMonth,
       status: EntityStatus.ACTIVE,
@@ -883,11 +881,8 @@ export const organizationsGet = onCall({ region: "asia-south1" }, async (request
     displayName: data.displayName || data.name,
     businessType: data.businessType,
     businessCategory: data.businessCategory,
-    currency: data.currency || "INR",
-    currencyDecimals: data.currencyDecimals ?? 2,
-    minorUnitName: data.minorUnitName || getCountryDefaults(data.country || "IN").minorUnitName,
-    minorUnitNamePlural: data.minorUnitNamePlural || getCountryDefaults(data.country || "IN").minorUnitNamePlural,
-    currencySymbol: data.currencySymbol || getCountryDefaults(data.country || "IN").currencySymbol,
+    currency: requireCurrency(data.currency, `organization "${snap.id}"`),
+    currencyInfo: getCurrencyInfo(data.currency),
     timezone: data.timezone || "Asia/Kolkata",
     country: data.country || "IN",
     financialYearStartMonth: data.financialYearStartMonth ?? 4,

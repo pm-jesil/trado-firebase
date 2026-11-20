@@ -7,7 +7,7 @@
  *   - Removes `totalDebitMinor`, `totalCreditMinor`, and line-level `debitMinor`/`creditMinor` from `journalEntries`
  *     (NOTE: line items are rewritten by replacing the whole `lines` array, NEVER using FieldValue.delete inside arrays)
  *   - Renames `settings.accountingPolicy.cashCountVarianceThresholdMinor` to `cashCountVarianceThreshold` (major units) in `organizations`
- *   - Converts `minorUnitsThresholds` and `selfApprovalLimits` in `organizations` to decimal major units
+ *   - Converts `selfApprovalLimits` in organizations to decimal major units
  *   - Doc currency resolution: comes from document, or derived from parent organization doc. Docs without currency are skipped and listed.
  *   - Walks both root and nested paths via collection groups (e.g. `organizations/{orgId}/...`).
  *   - Safety guard: `--apply` refuses to run unless `FIRESTORE_EMULATOR_HOST` is set or `--project <id>` is explicitly passed.
@@ -166,65 +166,63 @@ function transformJournalEntryDoc(data, orgCurrency) {
  */
 function transformOrganizationDoc(data) {
   const updates = {};
-  const policy = data.settings?.accountingPolicy;
-  if (!policy) {
-    return { updates, isChanged: false, noCurrency: false };
-  }
-
-  if (policy.moneyConvention === "major") {
-    return { updates, isChanged: false, noCurrency: false };
-  }
-
-  const currency = data.currency || "INR";
-  const exp = getExponent(currency);
   let changed = false;
 
-  // 1. Rename cashCountVarianceThresholdMinor -> cashCountVarianceThreshold
-  if (policy.cashCountVarianceThresholdMinor !== undefined) {
-    if (policy.cashCountVarianceThreshold === undefined) {
-      updates["settings.accountingPolicy.cashCountVarianceThreshold"] =
-        Number((policy.cashCountVarianceThresholdMinor / (10 ** exp)).toFixed(exp));
-    }
-    updates["settings.accountingPolicy.cashCountVarianceThresholdMinor"] = FieldValue.delete();
+  // 1. Delete redundant copied currency metadata fields (derived dynamically from currencies.ts)
+  if (data.currencyDecimals !== undefined) {
+    updates.currencyDecimals = FieldValue.delete();
+    changed = true;
+  }
+  if (data.minorUnitName !== undefined) {
+    updates.minorUnitName = FieldValue.delete();
+    changed = true;
+  }
+  if (data.minorUnitNamePlural !== undefined) {
+    updates.minorUnitNamePlural = FieldValue.delete();
+    changed = true;
+  }
+  if (data.currencySymbol !== undefined) {
+    updates.currencySymbol = FieldValue.delete();
     changed = true;
   }
 
-  // 2. Convert minorUnitsThresholds values from minor to major
-  if (policy.minorUnitsThresholds && typeof policy.minorUnitsThresholds === "object") {
-    const converted = { ...policy.minorUnitsThresholds };
-    let thresholdsChanged = false;
-    for (const [currKey, val] of Object.entries(converted)) {
-      if (typeof val === "number" && val >= 10000) {
-        const cExp = getExponent(currKey);
-        converted[currKey] = Number((val / (10 ** cExp)).toFixed(cExp));
-        thresholdsChanged = true;
+  const policy = data.settings?.accountingPolicy;
+  if (policy) {
+    if (policy.moneyConvention !== "major") {
+      // Rename cashCountVarianceThresholdMinor -> cashCountVarianceThreshold
+      if (policy.cashCountVarianceThresholdMinor !== undefined) {
+        if (!data.currency) {
+          return { updates: {}, isChanged: false, noCurrency: true };
+        }
+        const exp = getExponent(data.currency);
+        if (policy.cashCountVarianceThreshold === undefined) {
+          updates["settings.accountingPolicy.cashCountVarianceThreshold"] =
+            Number((policy.cashCountVarianceThresholdMinor / (10 ** exp)).toFixed(exp));
+        }
+        updates["settings.accountingPolicy.cashCountVarianceThresholdMinor"] = FieldValue.delete();
+        changed = true;
       }
-    }
-    if (thresholdsChanged) {
-      updates["settings.accountingPolicy.minorUnitsThresholds"] = converted;
+
+      // 4. Convert selfApprovalLimits values from minor to major
+      if (policy.selfApprovalLimits && typeof policy.selfApprovalLimits === "object") {
+        const converted = { ...policy.selfApprovalLimits };
+        let limitsChanged = false;
+        for (const [currKey, val] of Object.entries(converted)) {
+          if (typeof val === "number" && val >= 10000) {
+            const cExp = getExponent(currKey);
+            converted[currKey] = Number((val / (10 ** cExp)).toFixed(cExp));
+            limitsChanged = true;
+          }
+        }
+        if (limitsChanged) {
+          updates["settings.accountingPolicy.selfApprovalLimits"] = converted;
+          changed = true;
+        }
+      }
+
+      updates["settings.accountingPolicy.moneyConvention"] = "major";
       changed = true;
     }
-  }
-
-  // 3. Convert selfApprovalLimits values from minor to major
-  if (policy.selfApprovalLimits && typeof policy.selfApprovalLimits === "object") {
-    const converted = { ...policy.selfApprovalLimits };
-    let limitsChanged = false;
-    for (const [currKey, val] of Object.entries(converted)) {
-      if (typeof val === "number" && val >= 10000) {
-        const cExp = getExponent(currKey);
-        converted[currKey] = Number((val / (10 ** cExp)).toFixed(cExp));
-        limitsChanged = true;
-      }
-    }
-    if (limitsChanged) {
-      updates["settings.accountingPolicy.selfApprovalLimits"] = converted;
-      changed = true;
-    }
-  }
-
-  if (changed) {
-    updates["settings.accountingPolicy.moneyConvention"] = "major";
   }
 
   return {
@@ -330,7 +328,9 @@ async function runMigration(options = {}) {
   const orgCurrencyMap = new Map();
   orgsSnap.docs.forEach((d) => {
     const data = d.data();
-    orgCurrencyMap.set(d.id, data.currency || "INR");
+    if (data.currency) {
+      orgCurrencyMap.set(d.id, data.currency);
+    }
   });
   console.log(`Loaded ${orgCurrencyMap.size} organizations for currency lookup.`);
 
@@ -351,9 +351,15 @@ async function runMigration(options = {}) {
   let orgBatch = db.batch();
   let orgBatchCount = 0;
 
+  let orgNoCurrencyCount = 0;
   for (const doc of orgsSnap.docs) {
     orgExamined++;
-    const { updates, isChanged } = transformOrganizationDoc(doc.data());
+    const { updates, isChanged, noCurrency } = transformOrganizationDoc(doc.data());
+    if (noCurrency) {
+      orgNoCurrencyCount++;
+      orgSkipped++;
+      continue;
+    }
     if (isChanged) {
       orgUpdated++;
       if (isApply) {
@@ -372,12 +378,12 @@ async function runMigration(options = {}) {
   if (isApply && orgBatchCount > 0) {
     await orgBatch.commit();
   }
-  console.log(`organizations summary: examined=${orgExamined}, wouldChange=${orgUpdated}, skipped=${orgSkipped}, noCurrency=0`);
+  console.log(`organizations summary: examined=${orgExamined}, wouldChange=${orgUpdated}, skipped=${orgSkipped}, noCurrency=${orgNoCurrencyCount}`);
 
   const totalExamined = r1.examined + r2.examined + r3.examined + orgExamined;
   const totalWouldChange = r1.updated + r2.updated + r3.updated + orgUpdated;
   const totalSkipped = r1.skipped + r2.skipped + r3.skipped + orgSkipped;
-  const totalNoCurrency = r1.noCurrencyCount + r2.noCurrencyCount + r3.noCurrencyCount;
+  const totalNoCurrency = r1.noCurrencyCount + r2.noCurrencyCount + r3.noCurrencyCount + orgNoCurrencyCount;
 
   console.log("\n=================================================================");
   console.log(`TOTALS: examined=${totalExamined}, wouldChange=${totalWouldChange}, skipped=${totalSkipped}, noCurrency=${totalNoCurrency} (mode: ${isApply ? "APPLIED" : "DRY-RUN"})`);

@@ -13,7 +13,7 @@ import {
   StockBalanceDoc,
   CashCountDoc,
 } from "../types/models.js";
-import { Money } from "./money.js";
+import { Money, requireCurrency } from "./money.js";
 
 export interface InvariantViolation {
   code: string;
@@ -64,7 +64,7 @@ export async function assertLedgerInvariants(orgId: string): Promise<InvariantsC
   // INV-1, INV-2, INV-3, INV-4: Account Transaction Invariants
   for (const [accId, acc] of accounts.entries()) {
     const list = (txnsByAccount.get(accId) || []).sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
-    const currency = acc.currency || "INR";
+    const currency = requireCurrency(acc.currency, `financial account "${accId}"`);
     let runningBalance = list[0]?.type === "opening_balance" ? 0 : (acc.openingBalance || 0);
 
     for (const t of list) {

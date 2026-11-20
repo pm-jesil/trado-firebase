@@ -7,8 +7,26 @@
  */
 
 import { getExponent, getCurrencyInfo } from "../constants/currencies.js";
+import { HttpsError } from "firebase-functions/v2/https";
 
 export { getExponent, getCurrencyInfo };
+
+/**
+ * Validates that a currency code is present and non-empty.
+ * Throws HttpsError with status failed-precondition and reason CURRENCY_MISSING if missing.
+ */
+export function requireCurrency(value: string | null | undefined, contextDescription: string): string {
+  if (!value || typeof value !== "string" || value.trim() === "") {
+    const err = new HttpsError(
+      "failed-precondition",
+      `[CURRENCY_MISSING] Currency is missing for ${contextDescription}. Documents and accounts must have a valid currency.`,
+      { reason: "CURRENCY_MISSING" }
+    );
+    (err as any).reason = "CURRENCY_MISSING";
+    throw err;
+  }
+  return value.trim().toUpperCase();
+}
 
 /**
  * Round a number to N decimal places using standard commercial rounding (round half away from zero).
@@ -263,16 +281,3 @@ export const fromMinor = Money.fromMinor.bind(Money);
 export const addMinor = Money.addMinor.bind(Money);
 export const subtractMinor = Money.subtractMinor.bind(Money);
 export const allocateMinor = Money.allocateMinor.bind(Money);
-
-/**
- * Derives default cash count variance threshold from currency exponent.
- * 3 decimals (BHD, KWD, OMR): 100
- * 0 decimals (JPY, KRW): 10,000
- * 2 decimals (INR, AED, USD, EUR, etc.): 1,000
- */
-export function getDefaultCashCountVarianceThreshold(currency: string): number {
-  const exp = getExponent(currency);
-  if (exp === 3) return 100;
-  if (exp === 0) return 10000;
-  return 1000;
-}

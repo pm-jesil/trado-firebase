@@ -40,6 +40,7 @@ import {
   CLIENT_METRIC_KEYS,
   getEffectiveUsageLimits,
   updateOrganizationUsageLimits,
+  PLATFORM_COST_CURRENCY,
 } from "../services/usageMetering.js";
 import {
   OrganizationDoc,
@@ -396,7 +397,7 @@ export const usageCalculateDryRunStatement = onCall({ region: "asia-south1" }, a
     organizationName: org.name || input.organizationId,
     status: "draft_estimate",
     legalDisclaimer: "This statement is an internal diagnostic estimate of infrastructure resource consumption. It is NOT an invoice and no automated charge has occurred.",
-    rateCardVersion: statement.currency === "INR" ? "v1.0.0" : "v1.0.0",
+    rateCardVersion: statement.currency === PLATFORM_COST_CURRENCY ? "v1.0.0" : "v1.0.0",
     generatedAt: new Date().toISOString(),
   };
 });

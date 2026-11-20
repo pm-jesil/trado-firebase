@@ -9,7 +9,7 @@
 
 import { db } from "./firebase.js";
 import { ProductDoc, StockMovementDoc, CustomerDoc, VendorDoc, BillDoc, OutflowDoc, PaymentDoc, ReturnDoc, OrganizationDoc, StockBalanceDoc } from "../types/models.js";
-import { Money } from "./money.js";
+import { Money, requireCurrency } from "./money.js";
 import { PaymentDirection, PartyType } from "../constants/enums.js";
 
 export interface StockReconciliationItem {
@@ -161,7 +161,7 @@ export async function reconcilePartyBalances(
 ): Promise<PartyReconciliationReport> {
   const now = new Date().toISOString();
   const orgSnap = await db.collection("organizations").doc(organizationId).get();
-  const currency = (orgSnap.data() as OrganizationDoc | undefined)?.currency || "INR";
+  const currency = requireCurrency((orgSnap.data() as OrganizationDoc | undefined)?.currency, `organization "${organizationId}"`);
   const collectionName = partyType === "customer" ? "customers" : "vendors";
   let partyDocs: FirebaseFirestore.QueryDocumentSnapshot[] = [];
 

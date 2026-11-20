@@ -31,7 +31,7 @@ import {
   OutflowDoc,
 } from "../types/models.js";
 import { OutflowKind, OutflowStatus, PaymentStatus } from "../constants/enums.js";
-import { Money, assertAmountMatchesCurrency } from "../services/money.js";
+import { Money, assertAmountMatchesCurrency, requireCurrency } from "../services/money.js";
 import { reserveIdempotency } from "../services/idempotency.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
@@ -123,7 +123,7 @@ export const paymentsRecordFee = onCall({ region: "asia-south1" }, async (reques
       throw new HttpsError("permission-denied", "Cross-tenant financial account reference rejected.");
     }
 
-    const currency = account.currency || "INR";
+    const currency = requireCurrency(account.currency, `financial account "${input.financialAccountId}"`);
     assertAmountMatchesCurrency(input.feeAmount, currency);
     if (input.feeTaxAmount) {
       assertAmountMatchesCurrency(input.feeTaxAmount, currency);

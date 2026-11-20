@@ -42,7 +42,7 @@ import {
   applyEntriesInTxn,
   updateEntryWorkflowInTxn,
 } from "../services/postingService.js";
-import { assertAmountMatchesCurrency } from "../services/money.js";
+import { assertAmountMatchesCurrency, requireCurrency } from "../services/money.js";
 
 // ============================================================================
 // 1. accountEntriesList
@@ -329,7 +329,7 @@ export const accountEntriesApprove = onCall({ region: "asia-south1" }, async (re
         if (selfPolicy === "on") {
           // Self-approval allowed
         } else if (selfPolicy === "up_to_limit") {
-          const currency = entry.currency || orgData?.currency || "INR";
+          const currency = requireCurrency(entry.currency || orgData?.currency, `entry "${input.entryId}"`);
           const limit = policy?.selfApprovalLimits?.[currency];
           // Fail-closed: if currency has no limit, self-approval is blocked
           if (typeof limit !== "number" || entry.amount > limit) {
@@ -605,7 +605,7 @@ export const accountEntriesCreateSubEntry = onCall({ region: "asia-south1" }, as
       const parent = snap.data() as AccountTransactionDoc;
       if (parent.organizationId !== orgId) throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
 
-      const currency = parent.currency || "INR";
+      const currency = requireCurrency(parent.currency, `parent transaction "${input.parentEntryId}"`);
       assertAmountMatchesCurrency(input.amount, currency);
 
       // Strict Depth Limit: Depth 1 only! (Q-F22)
@@ -725,7 +725,6 @@ export const accountingPolicyUpdate = onCall({ region: "asia-south1" }, async (r
 
   const updatedPolicy = {
     ...currentPolicy,
-    ...(input.minorUnitsThresholds !== undefined ? { minorUnitsThresholds: input.minorUnitsThresholds } : {}),
     ...(input.selfApprovalPolicy !== undefined ? { selfApprovalPolicy: input.selfApprovalPolicy } : {}),
     ...(input.selfApprovalLimits !== undefined ? { selfApprovalLimits: input.selfApprovalLimits } : {}),
     ...(input.cashCountVarianceThreshold !== undefined ? { cashCountVarianceThreshold: input.cashCountVarianceThreshold } : {}),

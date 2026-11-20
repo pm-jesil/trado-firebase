@@ -20,7 +20,7 @@ import {
   GetBranchSummarySchema,
 } from "../../validation/schemas.js";
 import { parseInput } from "../../validation/parseInput.js";
-import { Money, roundTo, getCurrencyDecimals } from "../../services/money.js";
+import { Money, roundTo, getCurrencyDecimals, requireCurrency } from "../../services/money.js";
 import {
   BillDoc,
   OutflowDoc,
@@ -51,7 +51,7 @@ export async function computeProfitLoss(orgId: string, validated: {
   const orgData = (orgDoc.exists ? orgDoc.data() : {}) as OrganizationDoc;
   const tz = orgData.timezone || DEFAULT_ORG_TIMEZONE;
   const fyStartMonth = (orgData as unknown as { financialYearStartMonth?: number }).financialYearStartMonth || 4;
-  const currency = orgData.currency || "INR";
+  const currency = requireCurrency(orgData.currency, `organization "${orgId}"`);
   const decimals = getCurrencyDecimals(currency);
 
   let effectiveFrom = validated.from;

@@ -57,7 +57,7 @@ import {
   StockAdjustmentReason,
 } from "../constants/enums.js";
 import { AppPermissions } from "../constants/permissions.js";
-import { Money, assertAmountMatchesCurrency } from "../services/money.js";
+import { Money, assertAmountMatchesCurrency, requireCurrency } from "../services/money.js";
 import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 import {
   readNextDocumentNumberInTxn,
@@ -336,7 +336,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
     const docDate = input.docDate || now;
     const isPurchase = input.kind === OutflowKind.PURCHASE;
     const prefix = isPurchase ? "PUR" : "EXP";
-    const currency = orgData.currency || "INR";
+    const currency = requireCurrency(orgData.currency, `organization "${ctx.organizationId}"`);
     if (input.splitPayments) {
       for (const split of input.splitPayments) {
         assertAmountMatchesCurrency(split.amount, currency);

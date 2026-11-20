@@ -29,7 +29,7 @@ import {
   CapitalTransactionDoc,
   OrganizationDoc,
 } from "../types/models.js";
-import { Money, assertAmountMatchesCurrency } from "../services/money.js";
+import { Money, assertAmountMatchesCurrency, requireCurrency } from "../services/money.js";
 import { reserveIdempotency } from "../services/idempotency.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
@@ -60,9 +60,9 @@ export const financialAccountsCreate = onCall({ region: "asia-south1" }, async (
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
   const now = new Date().toISOString();
+  const currency = requireCurrency(input.currency || ctx.organization.currency, `financial account "${input.name}" in organization "${orgId}"`);
   if (typeof input.openingBalance === "number" && input.openingBalance > 0) {
-    const accCurrency = input.currency || ctx.organization.currency || "INR";
-    assertAmountMatchesCurrency(input.openingBalance, accCurrency);
+    assertAmountMatchesCurrency(input.openingBalance, currency);
   }
 
   const idempotency = await reserveIdempotency({
@@ -82,7 +82,6 @@ export const financialAccountsCreate = onCall({ region: "asia-south1" }, async (
 
   const accountRef = db.collection("financialAccounts").doc();
   const accountId = accountRef.id;
-  const currency = input.currency || "INR";
   const openingBalance = Money.amount(input.openingBalance || 0, currency);
 
   const accountDoc: FinancialAccountDoc = {
@@ -380,7 +379,7 @@ export const accountTransfersCreate = onCall({ region: "asia-south1" }, async (r
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
   const now = new Date().toISOString();
-  assertAmountMatchesCurrency(input.amount, ctx.organization.currency || "INR");
+  assertAmountMatchesCurrency(input.amount, requireCurrency(ctx.organization.currency, `organization "${orgId}"`));
 
   if (input.sourceAccountId === input.destinationAccountId) {
     throw new HttpsError("invalid-argument", "Source and destination financial accounts must be different.");
@@ -442,7 +441,8 @@ export const accountTransfersCreate = onCall({ region: "asia-south1" }, async (r
       now,
     });
 
-    const transferAmount = Money.amount(input.amount, sourcePrep.accountData.currency || "INR");
+    const transferCurrency = requireCurrency(sourcePrep.accountData.currency || ctx.organization.currency, `source account "${input.sourceAccountId}"`);
+    const transferAmount = Money.amount(input.amount, transferCurrency);
 
     // Check balance for immediate transfers
     if (!needsApproval && (sourcePrep.accountData.currentBalance || 0) < transferAmount) {
@@ -649,7 +649,7 @@ export const capitalTransactionsCreate = onCall({ region: "asia-south1" }, async
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
   const now = new Date().toISOString();
-  const currency = input.currency || ctx.organization.currency || "INR";
+  const currency = requireCurrency(input.currency || ctx.organization.currency, `capital transaction in organization "${orgId}"`);
   assertAmountMatchesCurrency(input.amount, currency);
 
   const idempotency = await reserveIdempotency({
@@ -679,7 +679,7 @@ export const capitalTransactionsCreate = onCall({ region: "asia-south1" }, async
     const isDrawings = input.type === "drawings";
     const direction: "in" | "out" = isDrawings ? "out" : "in";
     const txnType = isDrawings ? "capital_drawings" : "capital_contribution";
-    const normalizedAmount = Money.amount(input.amount, input.currency || "INR");
+    const normalizedAmount = Money.amount(input.amount, currency);
 
     const prep = await prepareAccountTransactionInTxn(txn, {
       organizationId: orgId,
@@ -726,7 +726,7 @@ export const capitalTransactionsCreate = onCall({ region: "asia-south1" }, async
       type: input.type,
       financialAccountId: input.financialAccountId,
       amount: normalizedAmount,
-      currency: input.currency || "INR",
+      currency,
       sourceReference: input.sourceReference || undefined,
       description: input.description || undefined,
       supportingDocumentPath: input.supportingDocumentPath || undefined,

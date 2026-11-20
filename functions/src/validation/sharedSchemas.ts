@@ -71,7 +71,7 @@ export const BankAccountSchema = z.strictObject({
   routingType: z.enum(["ifsc", "iban", "swift", "us_routing", "sg_code", "other"]).default("other").optional(),
   routingCode: z.string().trim().max(50).optional(),
   upiId: z.string().trim().max(100).optional(),
-  currency: z.string().trim().length(3).default("INR").optional(),
+  currency: z.string().trim().length(3).toUpperCase().optional(),
   isDefault: z.boolean().default(false).optional(),
   showOnInvoice: z.boolean().default(true).optional(),
   printOnInvoice: z.boolean().default(false).optional(),

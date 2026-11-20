@@ -54,7 +54,7 @@ During this audit and cleanup, the codebase was inspected to ensure single canon
 
 1. **Precision & Money Utility**:
    - Single source of truth: `functions/src/utils/money.ts`.
-   - All arithmetic uses `roundMoney`, `round2`, and integer-safe rounding. Duplicate inline rounding implementations were replaced.
+   - All arithmetic uses `Money.amount` / `roundTo` / `round4` / `roundQty`. Duplicate inline rounding implementations were replaced.
 2. **Context & Tenant Resolution**:
    - Single source of truth: `functions/src/services/contextResolver.ts`.
    - Standardizes target organization resolution, branch validation, and membership checks across all callables.

@@ -925,7 +925,6 @@ async function run() {
     organizationId: orgId,
     selfApprovalPolicy: "up_to_limit",
     selfApprovalLimits: { INR: 50000.00 },
-    minorUnitsThresholds: { INR: 10000.00 },
     roundingMode: "half_up",
   });
   assert.equal(policyUpd.policy.selfApprovalPolicy, "up_to_limit");

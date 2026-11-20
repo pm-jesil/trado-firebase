@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { roundTo, Money, assertAmountMatchesCurrency, getCurrencyDecimals, getDefaultCashCountVarianceThreshold } from "../../services/money.js";
+import { roundTo, Money, assertAmountMatchesCurrency, getCurrencyDecimals, requireCurrency } from "../../services/money.js";
 import { CURRENCIES, getCurrencyInfo, getExponent } from "../../constants/currencies.js";
 import { calculateTax } from "../../services/taxCalculation.js";
 import { computeProfitLoss } from "../../callables/reports/financialReports.js";
@@ -14,7 +14,9 @@ import {
   CreateSubEntrySchema,
   FeeRuleInputSchema,
   UpdateAccountingPolicySchema,
+  CreateFinancialAccountSchema,
 } from "../../validation/schemas.js";
+import { BankAccountSchema } from "../../validation/sharedSchemas.js";
 import { PaymentMethod } from "../../constants/enums.js";
 
 describe("Commercial Money Rounding (Half Away From Zero)", () => {
@@ -740,16 +742,57 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
       });
     });
 
-    describe("Currency-aware cash count variance threshold defaults (D1)", () => {
-      it("derives currency-aware default thresholds", () => {
-        assert.equal(getDefaultCashCountVarianceThreshold("BHD"), 100);
-        assert.equal(getDefaultCashCountVarianceThreshold("KWD"), 100);
-        assert.equal(getDefaultCashCountVarianceThreshold("OMR"), 100);
-        assert.equal(getDefaultCashCountVarianceThreshold("JPY"), 10000);
-        assert.equal(getDefaultCashCountVarianceThreshold("KRW"), 10000);
-        assert.equal(getDefaultCashCountVarianceThreshold("INR"), 1000);
-        assert.equal(getDefaultCashCountVarianceThreshold("AED"), 1000);
-        assert.equal(getDefaultCashCountVarianceThreshold("USD"), 1000);
+    describe("Cash count variance threshold rule (Item 4)", () => {
+      const evaluateVariance = (varianceAmount: number, threshold?: number) => {
+        const hasVariance = varianceAmount !== 0;
+        const needsApproval = threshold !== undefined
+          ? Math.abs(varianceAmount) > threshold
+          : hasVariance;
+        const needsReview = threshold !== undefined
+          ? Math.abs(varianceAmount) > (threshold / 2)
+          : hasVariance;
+        const reviewReasons = needsReview
+          ? [threshold !== undefined ? "fee_variance" : "unconfigured_variance_threshold"]
+          : [];
+        return { needsApproval, needsReview, reviewReasons };
+      };
+
+      it("requires approval, review, and reason for ANY non-zero variance when threshold is unset", () => {
+        // Zero variance: clean, no review
+        const zeroVar = evaluateVariance(0, undefined);
+        assert.strictEqual(zeroVar.needsApproval, false);
+        assert.strictEqual(zeroVar.needsReview, false);
+        assert.deepEqual(zeroVar.reviewReasons, []);
+
+        // Minor non-zero variance (e.g. 0.005 BHD): requires review and unconfigured reason
+        const smallVar = evaluateVariance(0.005, undefined);
+        assert.strictEqual(smallVar.needsApproval, true);
+        assert.strictEqual(smallVar.needsReview, true);
+        assert.deepEqual(smallVar.reviewReasons, ["unconfigured_variance_threshold"]);
+
+        // Negative non-zero variance (e.g. -1.00 AED)
+        const negVar = evaluateVariance(-1.00, undefined);
+        assert.strictEqual(negVar.needsApproval, true);
+        assert.strictEqual(negVar.needsReview, true);
+        assert.deepEqual(negVar.reviewReasons, ["unconfigured_variance_threshold"]);
+      });
+
+      it("respects configured threshold when cashCountVarianceThreshold is set", () => {
+        const threshold = 100;
+
+        const v25 = evaluateVariance(25, threshold);
+        assert.strictEqual(v25.needsApproval, false);
+        assert.strictEqual(v25.needsReview, false);
+
+        const v75 = evaluateVariance(75, threshold);
+        assert.strictEqual(v75.needsApproval, false);
+        assert.strictEqual(v75.needsReview, true);
+        assert.deepEqual(v75.reviewReasons, ["fee_variance"]);
+
+        const v120 = evaluateVariance(120, threshold);
+        assert.strictEqual(v120.needsApproval, true);
+        assert.strictEqual(v120.needsReview, true);
+        assert.deepEqual(v120.reviewReasons, ["fee_variance"]);
       });
     });
 
@@ -806,14 +849,12 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
     });
 
     describe("UpdateAccountingPolicySchema validation with decimal values", () => {
-      it("accepts decimal minorUnitsThresholds and selfApprovalLimits and cashCountVarianceThreshold", () => {
+      it("accepts decimal selfApprovalLimits and cashCountVarianceThreshold", () => {
         const parsed = UpdateAccountingPolicySchema.parse({
-          minorUnitsThresholds: { BHD: 200.5, AED: 2000.75 },
           selfApprovalLimits: { BHD: 50.25, AED: 500.5 },
           cashCountVarianceThreshold: 1000.5,
           selfApprovalPolicy: "up_to_limit",
         });
-        assert.equal(parsed.minorUnitsThresholds?.BHD, 200.5);
         assert.equal(parsed.selfApprovalLimits?.BHD, 50.25);
         assert.equal(parsed.cashCountVarianceThreshold, 1000.5);
       });
@@ -902,10 +943,13 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
       it("migrates organizations accounting policy thresholds and limits and is idempotent", () => {
         const legacyDoc = {
           currency: "INR",
+          currencyDecimals: 2,
+          minorUnitName: "paisa",
+          minorUnitNamePlural: "paise",
+          currencySymbol: "₹",
           settings: {
             accountingPolicy: {
               cashCountVarianceThresholdMinor: 1000000,
-              minorUnitsThresholds: { INR: 5000000, BHD: 200000 },
               selfApprovalLimits: { INR: 1000000, BHD: 50000 },
             },
           },
@@ -915,10 +959,11 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
         assert.equal(res.updates["settings.accountingPolicy.cashCountVarianceThreshold"], 10000.00);
         assert.ok(res.updates["settings.accountingPolicy.cashCountVarianceThresholdMinor"] !== undefined);
         assert.equal(res.updates["settings.accountingPolicy.moneyConvention"], "major");
-        assert.deepEqual(res.updates["settings.accountingPolicy.minorUnitsThresholds"], {
-          INR: 50000.00,
-          BHD: 200.000,
-        });
+        // currency metadata copies are deleted
+        assert.ok(res.updates.currencyDecimals !== undefined);
+        assert.ok(res.updates.minorUnitName !== undefined);
+        assert.ok(res.updates.minorUnitNamePlural !== undefined);
+        assert.ok(res.updates.currencySymbol !== undefined);
         assert.deepEqual(res.updates["settings.accountingPolicy.selfApprovalLimits"], {
           INR: 10000.00,
           BHD: 50.000,
@@ -930,7 +975,6 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
             accountingPolicy: {
               moneyConvention: "major",
               cashCountVarianceThreshold: 10000.00,
-              minorUnitsThresholds: { INR: 50000.00, BHD: 200.000 },
               selfApprovalLimits: { INR: 10000.00, BHD: 50.000 },
             },
           },
@@ -990,6 +1034,107 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
         } finally {
           process.env.FIRESTORE_EMULATOR_HOST = origHost;
         }
+      });
+    });
+  });
+
+  describe("Prompt 77D S6 — No Currency Fallbacks & Single Currency Source", () => {
+    describe("Missing currency throws CURRENCY_MISSING error", () => {
+      it("requireCurrency throws CURRENCY_MISSING with failed-precondition for empty/null currency", () => {
+        assert.throws(
+          () => requireCurrency(null, "test document"),
+          (err: any) => err.reason === "CURRENCY_MISSING" && err.code === "failed-precondition"
+        );
+        assert.throws(
+          () => requireCurrency("", "test document"),
+          (err: any) => err.reason === "CURRENCY_MISSING" && err.code === "failed-precondition"
+        );
+        assert.throws(
+          () => requireCurrency(undefined, "organization 123"),
+          (err: any) => err.reason === "CURRENCY_MISSING" && err.code === "failed-precondition"
+        );
+      });
+
+      it("an org with no currency throws CURRENCY_MISSING in billsCreate path", () => {
+        const orgWithoutCurrency = { id: "org_no_cur", name: "No Cur Org" } as any;
+        assert.throws(
+          () => requireCurrency(orgWithoutCurrency.currency, `organization "${orgWithoutCurrency.id}"`),
+          (err: any) => err.reason === "CURRENCY_MISSING"
+        );
+      });
+
+      it("a posting with no currency throws CURRENCY_MISSING", () => {
+        const postingInput = { eventCode: "CASH_SALE", sourceDocumentId: "doc_1" } as any;
+        assert.throws(
+          () => requireCurrency(postingInput.currency, `posting event "${postingInput.eventCode}"`),
+          (err: any) => err.reason === "CURRENCY_MISSING"
+        );
+      });
+
+      it("an account create with no currency and no org currency throws CURRENCY_MISSING", () => {
+        const inputCurrency = undefined;
+        const orgCurrency = undefined;
+        assert.throws(
+          () => requireCurrency(inputCurrency || orgCurrency, 'financial account "Cash"'),
+          (err: any) => err.reason === "CURRENCY_MISSING"
+        );
+      });
+    });
+
+    describe("End-to-end KWD posting (3-decimal currency)", () => {
+      it("works end to end with balanced 3-decimal journal entries for KWD organization", () => {
+        const currency = "KWD";
+        const saleAmount = 14.375; // 14 Dinars, 375 Fils
+
+        // Validate precision
+        assertAmountMatchesCurrency(saleAmount, currency);
+
+        const debits = [10.125, 4.250];
+        const credits = [saleAmount];
+
+        const totalDebit = Money.sum(debits, currency);
+        const totalCredit = Money.sum(credits, currency);
+
+        assert.equal(totalDebit, 14.375);
+        assert.equal(totalCredit, 14.375);
+        assert.ok(Money.equal(totalDebit, totalCredit, currency));
+
+        // Invariant: debits === credits exactly
+        assert.equal(totalDebit - totalCredit, 0);
+
+        // Account balance transition
+        const initialBalance = 100.500;
+        const balanceAfterDebit = Money.amount(initialBalance + saleAmount, currency);
+        assert.equal(balanceAfterDebit, 114.875);
+      });
+    });
+
+    describe("Zod schemas no longer inject INR", () => {
+      it("CreateFinancialAccountSchema defaults currency to undefined, not INR", () => {
+        const parsed = CreateFinancialAccountSchema.parse({
+          name: "Petty Cash",
+          code: "PETTY",
+          accountType: "cash",
+        });
+        assert.strictEqual(parsed.currency, undefined);
+      });
+
+      it("CreateCapitalTransactionSchema defaults currency to undefined, not INR", () => {
+        const parsed = CreateCapitalTransactionSchema.parse({
+          type: "owner_contribution",
+          financialAccountId: "acc_1",
+          amount: 500,
+        });
+        assert.strictEqual(parsed.currency, undefined);
+      });
+
+      it("BankAccountSchema defaults currency to undefined, not INR", () => {
+        const parsed = BankAccountSchema.parse({
+          accountHolderName: "Global Trade LLC",
+          bankName: "National Bank of Kuwait",
+          accountNumber: "9876543210",
+        });
+        assert.strictEqual(parsed.currency, undefined);
       });
     });
   });

@@ -13,7 +13,7 @@ import {
   AccountTransactionDoc,
   AccountTransactionType,
 } from "../types/models.js";
-import { Money } from "./money.js";
+import { Money, requireCurrency } from "./money.js";
 import {
   readNextDocumentNumberInTxn,
   commitDocumentNumberInTxn,
@@ -104,7 +104,7 @@ export function applyAccountTransactionInTxn(
   params: RecordTransactionParams
 ): RecordTransactionResult {
   const now = params.now || new Date().toISOString();
-  const currency = prep.accountData.currency || "INR";
+  const currency = requireCurrency(prep.accountData.currency, `financial account "${prep.accountRef.id}"`);
   const normalizedAmount = Money.amount(params.amount, currency);
 
   commitDocumentNumberInTxn(txn, prep.reservation);

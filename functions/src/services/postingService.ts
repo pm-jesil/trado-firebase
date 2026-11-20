@@ -16,7 +16,7 @@ import {
   SubEntryType,
   AccountEntryStatus,
 } from "../types/models.js";
-import { Money } from "./money.js";
+import { Money, requireCurrency } from "./money.js";
 import {
   readNextDocumentNumberInTxn,
   commitDocumentNumberInTxn,
@@ -46,16 +46,16 @@ export interface PostingLegInput {
 export interface PostEntriesParams {
   organizationId: string;
   sourceDocumentType:
-    | "bill"
-    | "outflow"
-    | "payment"
-    | "account_transfer"
-    | "reconciliation"
-    | "manual"
-    | "fee"
-    | "capital"
-    | "return"
-    | "cash_count";
+  | "bill"
+  | "outflow"
+  | "payment"
+  | "account_transfer"
+  | "reconciliation"
+  | "manual"
+  | "fee"
+  | "capital"
+  | "return"
+  | "cash_count";
   sourceDocumentId: string;
   origin?: string;
   legs: PostingLegInput[];
@@ -169,7 +169,7 @@ export function applyEntriesInTxn(
 
   for (const item of prep.preparedLegs) {
     const { leg, accountRef, accountData, reservation } = item;
-    const currency = leg.currency || accountData.currency || "INR";
+    const currency = requireCurrency(leg.currency || accountData.currency, `financial account "${accountRef.id}"`);
     const normalizedAmount = Money.amount(leg.amount, currency);
 
     commitDocumentNumberInTxn(txn, reservation);
@@ -296,7 +296,7 @@ export function applyReversalInTxn(
 ): PostedLegResult {
   const { params, accountRef, accountData, reservation, originalTxnRef } = prep;
   const now = params.now || new Date().toISOString();
-  const currency = params.currency || accountData.currency || "INR";
+  const currency = requireCurrency(params.currency || accountData.currency, `financial account "${accountRef.id}"`);
   const normalizedAmount = Money.amount(params.amount, currency);
 
   commitDocumentNumberInTxn(txn, reservation);

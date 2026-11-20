@@ -25,7 +25,7 @@ import {
   BillDoc,
   OutflowDoc,
 } from "../types/models.js";
-import { Money } from "../services/money.js";
+import { Money, requireCurrency } from "../services/money.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { AppPermissions } from "../constants/permissions.js";
 import { STANDARD_ACCOUNTS } from "../services/postingRules.js";
@@ -74,7 +74,7 @@ export const ledgerVerify = onCall({ region: "asia-south1" }, async (request) =>
   for (const accDoc of accountsSnap.docs) {
     const account = accDoc.data() as FinancialAccountDoc;
     const accountId = accDoc.id;
-    const currency = account.currency || "INR";
+    const currency = requireCurrency(account.currency, `financial account "${accountId}"`);
 
     let txQuery = db
       .collection("accountTransactions")
@@ -212,7 +212,8 @@ export const ledgerVerify = onCall({ region: "asia-south1" }, async (request) =>
       totalCredit += line.credit || 0;
     }
 
-    if (!Money.equal(totalDebit, totalCredit, jrn.currency || "INR")) {
+    const jrnCurrency = requireCurrency(jrn.currency, `journal entry "${jrnId}"`);
+    if (!Money.equal(totalDebit, totalCredit, jrnCurrency)) {
       discrepancies.push({
         entity: "journalEntry",
         id: jrnId,
@@ -222,7 +223,7 @@ export const ledgerVerify = onCall({ region: "asia-south1" }, async (request) =>
       });
     }
 
-    if (jrn.totalDebit !== undefined && !Money.equal(jrn.totalDebit, totalDebit, jrn.currency || "INR")) {
+    if (jrn.totalDebit !== undefined && !Money.equal(jrn.totalDebit, totalDebit, jrnCurrency)) {
       discrepancies.push({
         entity: "journalEntry",
         id: jrnId,
@@ -335,7 +336,7 @@ export const reportsGetTrialBalance = onCall({ region: "asia-south1" }, async (r
 
   const orgId = ctx.organizationId;
   const asOfDate = input.asOfDate || new Date().toISOString().substring(0, 10);
-  const currency = "INR";
+  const currency = requireCurrency(ctx.organization.currency, `organization "${orgId}"`);
 
   // Aggregate debits & credits from all journal entries up to asOfDate
   const nextDay = new Date(`${asOfDate}T23:59:59.999Z`).toISOString();

@@ -205,7 +205,7 @@ export function recordCommitEvent(writes: PendingWrite[], append: (path: string,
 
   // Derive amount and currency (A-2)
   const amount = ((pData.totalAmount ?? pData.amount ?? pData.totalPaise ?? bData.totalAmount ?? bData.amount ?? null) as number | null);
-  const currency = ((pData.currency || bData.currency || "INR") as string);
+  const currency = ((pData.currency || bData.currency || null) as string | null);
   const branchId = ((pData.branchId || bData.branchId || ctx.actor.branchId || null) as string | null);
 
   const event = {

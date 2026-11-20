@@ -140,10 +140,6 @@ export interface OrganizationDoc {
   businessCategory: BusinessCategory;
   country: string; // ISO 3166-1 alpha-2
   currency: string; // ISO 4217 code
-  currencyDecimals?: number;
-  minorUnitName?: string; // e.g. "paisa", "fils", "cent" (G8)
-  minorUnitNamePlural?: string; // e.g. "paise", "fils", "cents" (G8)
-  currencySymbol?: string; // e.g. "₹", "AED", "BD", "$" (G8)
   taxRegimeCode: string; // Reference to taxRegimes/{taxRegimeCode}
   status: EntityStatus;
   planId: string; // Reference to subscriptionPlans/{planId}
@@ -216,7 +212,6 @@ export interface OrganizationContact {
 
 export interface AccountingPolicy {
   moneyConvention?: "major";
-  minorUnitsThresholds?: Record<string, number>;
   selfApprovalPolicy?: "off" | "up_to_limit" | "on";
   selfApprovalLimits?: Record<string, number>;
   roundingMode?: "half_up" | "half_even";

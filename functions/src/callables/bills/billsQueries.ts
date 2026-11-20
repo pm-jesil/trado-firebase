@@ -21,7 +21,7 @@ import {
   StockBalanceDoc,
 } from "../../types/models.js";
 import { AppPermissions } from "../../constants/permissions.js";
-import { Money } from "../../services/money.js";
+import { Money, requireCurrency } from "../../services/money.js";
 import {
   resolveRequestContext,
   resolveDataScope,
@@ -122,7 +122,7 @@ export const billsPreview = onCall({ region: "asia-south1" }, async (request) =>
     ],
   });
 
-  const currency = ctx.organization.currency || "INR";
+  const currency = requireCurrency(ctx.organization.currency, `organization "${ctx.organizationId}"`);
   const priced = await priceBillLines(ctx, input.items, currency, { allowWarnings: true });
   const totals = billTotals(ctx, priced, input.discountTotal, currency);
 

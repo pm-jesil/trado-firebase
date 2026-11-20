@@ -41,7 +41,7 @@ import {
   DocumentType,
 } from "../../constants/enums.js";
 import { AppPermissions } from "../../constants/permissions.js";
-import { Money, assertAmountMatchesCurrency } from "../../services/money.js";
+import { Money, assertAmountMatchesCurrency, requireCurrency } from "../../services/money.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../../services/idempotency.js";
 import {
   readNextDocumentNumberInTxn,
@@ -122,7 +122,7 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
 
   try {
     const orgData = ctx.organization;
-    const currency = orgData.currency || "INR";
+    const currency = requireCurrency(orgData.currency, `organization "${ctx.organizationId}"`);
     if (input.splitPayments) {
       for (const split of input.splitPayments) {
         assertAmountMatchesCurrency(split.amount, currency);
@@ -335,7 +335,7 @@ export const billsUpdateDraft = onCall({ region: "asia-south1" }, async (request
   if (input.customerId && input.walkInCustomer) {
     throw new HttpsError("invalid-argument", "[REFERENCE_ATTRIBUTE_COPY] Pass customerId or walkInCustomer, not both.", { reason: "REFERENCE_ATTRIBUTE_COPY" });
   }
-  const currency = ctx.organization.currency || "INR";
+  const currency = requireCurrency(ctx.organization.currency, `organization "${ctx.organizationId}"`);
   const updates: Partial<BillDoc> = {};
   if (input.items || input.discountTotal !== undefined) {
     const priced = await priceBillLines(ctx, input.items || bill.items.map((i) => ({ productId: i.productId, quantity: i.quantity, unit: i.unit, unitPriceOverride: i.priceSnapshot, discountValue: i.discountValue })), currency);

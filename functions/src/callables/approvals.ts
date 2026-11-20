@@ -20,6 +20,7 @@ import { parseInput } from "../validation/parseInput.js";
 import { resolveRequestContext, RequestContext } from "../services/contextResolver.js";
 import { APPROVE_PERMISSION, assertCanDecide } from "../services/approvals.js";
 import { AppPermissions } from "../constants/permissions.js";
+import { requireCurrency } from "../services/money.js";
 import { decideBill } from "./bills.js";
 import { decideOutflow } from "./outflows.js";
 import { decideReturn } from "./returns.js";
@@ -204,7 +205,7 @@ async function decideAccountEntry(ctx: RequestContext, input: DocumentDecisionIn
         if (selfPolicy === "on") {
           // Self-approval allowed
         } else if (selfPolicy === "up_to_limit") {
-          const currency = entry.currency || orgData?.currency || "INR";
+          const currency = requireCurrency(entry.currency || orgData?.currency, `entry "${input.documentId}"`);
           const limit = policy?.selfApprovalLimits?.[currency];
           // Fail-closed: if currency has no limit, self-approval is blocked
           if (typeof limit !== "number" || entry.amount > limit) {

@@ -22,7 +22,7 @@ import {
 } from "../../validation/schemas.js";
 import { parseInput } from "../../validation/parseInput.js";
 import { calculateStockValuation } from "../../services/costingEngine.js";
-import { Money } from "../../services/money.js";
+import { Money, requireCurrency } from "../../services/money.js";
 import { hydrate } from "../../services/hydration.js";
 import {
   ProductDoc,
@@ -335,7 +335,7 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
     statusCounts[st] = (statusCounts[st] || 0) + 1;
     const c = data.country || "IN";
     countryCounts[c] = (countryCounts[c] || 0) + 1;
-    orgCurrencyMap.set(doc.id, data.currency || "INR");
+    if (data.currency) orgCurrencyMap.set(doc.id, data.currency);
 
     if (data.status === "active") {
       activeOrgIds.push(doc.id);
@@ -367,7 +367,7 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
   }> = {};
 
   const orgQueries = activeOrgIds.map(async (orgId) => {
-    const orgCurrency = orgCurrencyMap.get(orgId) || "INR";
+    const orgCurrency = requireCurrency(orgCurrencyMap.get(orgId), `organization "${orgId}"`);
     const [bSnap, oSnap] = await Promise.all([
       db.collection("bills").where("organizationId", "==", orgId).where("status", "in", ["active", "partial", "paid"]).get(),
       db.collection("outflows").where("organizationId", "==", orgId).where("status", "in", ["active", "partial", "paid"]).get(),

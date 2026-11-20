@@ -9,6 +9,8 @@
 import { HttpsError } from "firebase-functions/v2/https";
 import { db, auth } from "./firebase.js";
 import { effectiveBusinessConfig } from "../constants/businessDefaults.js";
+import { requireCurrency } from "./money.js";
+import { getExponent } from "../constants/currencies.js";
 import {
   UserDoc,
   MembershipDoc,
@@ -268,8 +270,8 @@ export async function buildAuthSessionContext(
     ? {
       organizationId: primaryMembership.organizationId,
       name: primaryOrgData.name,
-      currency: primaryOrgData.currency || "INR",
-      currencyDecimals: primaryOrgData.currencyDecimals ?? 2,
+      currency: requireCurrency(primaryOrgData.currency, `organization "${primaryMembership.organizationId}"`),
+      currencyDecimals: getExponent(primaryOrgData.currency),
       timezone: primaryOrgData.timezone || "Asia/Kolkata",
       country: primaryOrgData.country || "IN",
       taxRegimeCode: primaryOrgData.taxRegimeCode || "IN_GST",

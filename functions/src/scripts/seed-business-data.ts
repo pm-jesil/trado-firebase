@@ -35,6 +35,7 @@ import {
   EntityStatus,
   UnitGroup,
 } from "../constants/enums.js";
+import { requireCurrency } from "../services/money.js";
 import { buildSubscriptionFields } from "../services/subscription.js";
 import { nameKey, uniqueKeyId, phoneKey, taxIdKey } from "../services/naturalKeys.js";
 import { getCountryDefaults } from "../constants/countryDefaults.js";
@@ -107,10 +108,6 @@ export interface SeedOrgSpec {
   businessCategory: BusinessCategory;
   country?: string;
   currency?: string;
-  currencyDecimals?: number;
-  minorUnitName?: string;
-  minorUnitNamePlural?: string;
-  currencySymbol?: string;
   timezone?: string;
   taxRegimeCode?: string;
   planId: string;
@@ -200,10 +197,6 @@ export async function seedOrganizationFromSpec(db: Firestore, auth: Auth, spec: 
     businessCategory: spec.businessCategory,
     country: spec.country || "IN",
     currency: spec.currency || countryDef.currencyCode,
-    currencyDecimals: spec.currencyDecimals ?? countryDef.currencyDecimals,
-    minorUnitName: spec.minorUnitName || countryDef.minorUnitName,
-    minorUnitNamePlural: spec.minorUnitNamePlural || countryDef.minorUnitNamePlural,
-    currencySymbol: spec.currencySymbol || countryDef.currencySymbol,
     timezone: spec.timezone || countryDef.timezone,
     taxRegimeCode: spec.taxRegimeCode || countryDef.taxRegimeCode,
     status: EntityStatus.ACTIVE,
@@ -338,7 +331,7 @@ export async function seedBusinessData(db: Firestore, spec: SeedOrgSpec, uids: R
       name: fa.name,
       code: fa.code,
       accountType: fa.type || "cash",
-      currency: fa.currency || spec.currency || "INR",
+      currency: requireCurrency(fa.currency || spec.currency, `financial account "${fa.name}" in seed spec`),
       bankDetails: fa.bankDetails,
       openingBalance: fa.openingBalance || 0,
       currentBalance: fa.openingBalance || 0,
@@ -552,10 +545,6 @@ export const BAHRAIN_BICYCLE_SPEC: SeedOrgSpec = {
   businessCategory: BusinessCategory.BICYCLE,
   country: "BH",
   currency: "BHD",
-  currencyDecimals: 3,
-  minorUnitName: "fils",
-  minorUnitNamePlural: "fils",
-  currencySymbol: "BD",
   timezone: "Asia/Bahrain",
   taxRegimeCode: "BH_VAT",
   planId: "plan_growth",
@@ -797,10 +786,6 @@ export const UAE_KITCHENWARE_SPEC: SeedOrgSpec = {
   businessCategory: BusinessCategory.KITCHENWARE_HOUSEHOLD,
   country: "AE",
   currency: "AED",
-  currencyDecimals: 2,
-  minorUnitName: "fils",
-  minorUnitNamePlural: "fils",
-  currencySymbol: "AED",
   timezone: "Asia/Dubai",
   taxRegimeCode: "AE_VAT",
   planId: "plan_growth",

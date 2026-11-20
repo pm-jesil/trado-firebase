@@ -41,7 +41,7 @@ import {
   applyEntriesInTxn,
   updateEntryWorkflowInTxn,
 } from "../services/postingService.js";
-import { Money, assertAmountMatchesCurrency, getDefaultCashCountVarianceThreshold } from "../services/money.js";
+import { Money, assertAmountMatchesCurrency, requireCurrency } from "../services/money.js";
 
 // ============================================================================
 // 1. accountTransfersConfirm
@@ -250,7 +250,7 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
       }
 
       const orgData = (orgSnap.exists ? orgSnap.data() : null) as OrganizationDoc | null;
-      const currency = account.currency || orgData?.currency || "INR";
+      const currency = requireCurrency(account.currency || orgData?.currency, `cash account "${input.financialAccountId}"`);
 
       // Calculate total counted amount from denominations
       const lineTotals: number[] = [];
@@ -276,8 +276,22 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
       const countNumber = reservation.formattedNumber;
 
       const policy = orgData?.settings?.accountingPolicy;
-      const thresholdMajor = policy?.cashCountVarianceThreshold ?? getDefaultCashCountVarianceThreshold(currency);
-      const reviewThresholdMajor = thresholdMajor / 2;
+      const configuredThreshold = typeof policy?.cashCountVarianceThreshold === "number"
+        ? policy.cashCountVarianceThreshold
+        : undefined;
+
+      const hasVariance = varianceAmount !== 0;
+      const needsApproval = configuredThreshold !== undefined
+        ? Math.abs(varianceAmount) > configuredThreshold
+        : hasVariance;
+
+      const needsReview = configuredThreshold !== undefined
+        ? Math.abs(varianceAmount) > (configuredThreshold / 2)
+        : hasVariance;
+
+      const reviewReasons: string[] = needsReview
+        ? [configuredThreshold !== undefined ? "fee_variance" : "unconfigured_variance_threshold"]
+        : [];
 
       let varianceTransactionId: string | null = null;
       if (varianceAmount !== 0) {
@@ -299,8 +313,8 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
               currency,
               description: `Cash count ${countNumber} variance adjustment (${varianceAmount > 0 ? "overage" : "shortage"})`,
               status: "added",
-              needsReview: Math.abs(varianceAmount) > reviewThresholdMajor,
-              reviewReasons: Math.abs(varianceAmount) > reviewThresholdMajor ? ["fee_variance"] : [],
+              needsReview,
+              reviewReasons,
             },
           ],
         });
@@ -321,7 +335,7 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
         varianceAmount,
         denominations: input.denominations,
         varianceTransactionId,
-        needsApproval: Math.abs(varianceAmount) > thresholdMajor,
+        needsApproval,
         notes: input.notes,
         createdAt: now,
         createdBy: ctx.callerUid,
@@ -447,7 +461,7 @@ export const accountEntriesRecordFee = onCall({ region: "asia-south1" }, async (
       const accSnap = await txn.get(accRef);
       const account = accSnap.exists ? (accSnap.data() as FinancialAccountDoc) : null;
 
-      const currency = parent.currency || account?.currency || "INR";
+      const currency = requireCurrency(parent.currency || account?.currency, `transaction "${input.entryId}"`);
       assertAmountMatchesCurrency(input.feeAmount, currency);
       if (input.feeTaxAmount) {
         assertAmountMatchesCurrency(input.feeTaxAmount, currency);

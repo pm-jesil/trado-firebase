@@ -85,7 +85,7 @@ async function queryAudit(q: AuditQuery) {
       statusBefore: e.statusBefore ?? null,
       statusAfter: e.statusAfter ?? null,
       amount: e.amount ?? null,
-      currency: e.currency ?? "INR",
+      currency: e.currency ?? null,
       category: e.category,
       outcome: e.outcome,
       reason: e.reason ?? null,

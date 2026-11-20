@@ -2,8 +2,8 @@
 
 - **Date:** 2026-11-20
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1, S2, S3a, S3b, S3c+S4b, S5b)
-- **Current State:** **STEPS S1, S2, S3a, S3b, S3c+S4b, S5b COMPLETED. Derived cashCountVarianceThreshold from currency exponent; fail-closed self-approval if limit unconfigured; removed legacy Minor fallbacks; migration script rewritten with lines array rewrite, parent org currency lookup, --apply safety guard, collectionGroup; emulator seed dry-run verified; zero Minor fields in src; self-approval verified by permission code. 438/438 unit tests pass across 121 suites. verify:status 0 untraced / 0 unmapped.**
+- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1, S2, S3a, S3b, S3c+S4b, S5b, S6)
+- **Current State:** **STEP S6 COMPLETED. Removed all `|| "INR"`, `?? "INR"`, and `.default("INR")` fallbacks from non-test src (enforcing `requireCurrency(value, context)` with `CURRENCY_MISSING` error). Org currency single source: deleted redundant copied currency fields (`currencyDecimals`, `minorUnitName`, `minorUnitNamePlural`, `currencySymbol`) from OrganizationDoc, creation, seed, and readers. Deleted `minorUnitsThresholds` everywhere. Cash count variance with unset threshold flags any non-zero variance as `unconfigured_variance_threshold` requiring approval and review. Corrected cleanup manifest line 57. 447/447 unit tests pass across 125 suites. verify:status 0 untraced / 0 unmapped.**
 
 ## Summary of Prompt 77 & 77C Deliverables
 
@@ -106,9 +106,9 @@
 ## Verification Scope Block (from `npm --prefix functions run verify:status`)
 
 ```
-baseline base-94d17b6b (trusted, trusted: true) from 2026-11-19T21:18:31.434Z, 10.4 h old; last run run-fbe653d2
+baseline base-94d17b6b (trusted, trusted: true) from 2026-11-19T21:18:31.434Z, 16.4 h old; last run run-fbe653d2
 environment match: yes; node v22.17.0, firebase-tools 15.10.0
-units 111; stale (would run) 79; untraced 0; unmapped changed files 0; ignore rules 32
+units 111; stale (would run) 90; untraced 0; unmapped changed files 0; ignore rules 32
 ```
 
 ## Source Numbers (Derived from Code & Scripts)
@@ -119,9 +119,9 @@ units 111; stale (would run) 79; untraced 0; unmapped changed files 0; ignore ru
 - **State Machines:** 13 in code, 13 in contract
 - **Flow Guides:** 19 (`FL-01.md`..`FL-19.md` in `docs/flows/`)
 - **Seeded Defects Detected:** 26/26 BM-1..BM-26
-- **Unit Tests:** 408/408 passed (110 suites, 0 failures)
+- **Unit Tests:** 447/447 passed (125 suites, 0 failures, 0 skipped)
 
-## Next Command (Prompt 77D S4 Entry Command)
+## Next Command (Prompt 77D S7 Entry Command)
 
 ```powershell
 $env:PATH = "C:\Users\jesil.p\node\node--v22.17.0-win-x64;" + $env:PATH; node -v
