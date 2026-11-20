@@ -263,3 +263,16 @@ export const fromMinor = Money.fromMinor.bind(Money);
 export const addMinor = Money.addMinor.bind(Money);
 export const subtractMinor = Money.subtractMinor.bind(Money);
 export const allocateMinor = Money.allocateMinor.bind(Money);
+
+/**
+ * Derives default cash count variance threshold from currency exponent.
+ * 3 decimals (BHD, KWD, OMR): 100
+ * 0 decimals (JPY, KRW): 10,000
+ * 2 decimals (INR, AED, USD, EUR, etc.): 1,000
+ */
+export function getDefaultCashCountVarianceThreshold(currency: string): number {
+  const exp = getExponent(currency);
+  if (exp === 3) return 100;
+  if (exp === 0) return 10000;
+  return 1000;
+}

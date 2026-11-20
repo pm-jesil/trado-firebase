@@ -312,20 +312,40 @@ export const accountEntriesApprove = onCall({ region: "asia-south1" }, async (re
 
   try {
     const entryRef = db.collection("accountTransactions").doc(input.entryId);
+    const orgRef = db.collection("organizations").doc(orgId);
     const result = await db.runTransaction(async (txn) => {
-      const snap = await txn.get(entryRef);
+      const [snap, orgSnap] = await Promise.all([txn.get(entryRef), txn.get(orgRef)]);
       if (!snap.exists) throw new HttpsError("not-found", `Entry "${input.entryId}" not found.`);
       const entry = snap.data() as AccountTransactionDoc;
       if (entry.organizationId !== orgId) throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
 
+      const orgData = orgSnap.data() as OrganizationDoc | undefined;
+      const policy = orgData?.settings?.accountingPolicy;
+
       // Four-eyes maker-checker check (Q-F3)
       const creatorUid = entry.workflow?.createdBy || entry.actorUid;
       if (creatorUid === ctx.callerUid && !ctx.can(AppPermissions.APPROVALS_SELF_APPROVE)) {
-        throw new HttpsError(
-          "permission-denied",
-          "Makers cannot approve their own entries.",
-          { reason: "SELF_REVIEW_FORBIDDEN" }
-        );
+        const selfPolicy = policy?.selfApprovalPolicy || "off";
+        if (selfPolicy === "on") {
+          // Self-approval allowed
+        } else if (selfPolicy === "up_to_limit") {
+          const currency = entry.currency || orgData?.currency || "INR";
+          const limit = policy?.selfApprovalLimits?.[currency];
+          // Fail-closed: if currency has no limit, self-approval is blocked
+          if (typeof limit !== "number" || entry.amount > limit) {
+            throw new HttpsError(
+              "permission-denied",
+              `Self-approval blocked for currency ${currency}: ${typeof limit !== "number" ? "no limit configured" : `entry amount (${entry.amount}) exceeds limit (${limit})`}.`,
+              { reason: "SELF_REVIEW_FORBIDDEN" }
+            );
+          }
+        } else {
+          throw new HttpsError(
+            "permission-denied",
+            "Makers cannot approve their own entries.",
+            { reason: "SELF_REVIEW_FORBIDDEN" }
+          );
+        }
       }
 
       // Verifier and approver must differ by default (Q-F3)
@@ -671,9 +691,7 @@ export const accountingPolicyGet = onCall({ region: "asia-south1" }, async (requ
 
   const orgDoc = (await db.collection("organizations").doc(orgId).get()).data() as OrganizationDoc | undefined;
   const policy: AccountingPolicy = orgDoc?.settings?.accountingPolicy || {
-    minorUnitsThresholds: { BHD: 200000, AED: 200000, INR: 5000000 },
     selfApprovalPolicy: "off",
-    selfApprovalLimits: { BHD: 50000, AED: 50000, INR: 1000000 },
     roundingMode: "half_up",
     roundToNearestRupee: false,
     cashRoundingFils: true,
@@ -699,9 +717,7 @@ export const accountingPolicyUpdate = onCall({ region: "asia-south1" }, async (r
 
   const orgData = orgSnap.data() as OrganizationDoc | undefined;
   const currentPolicy: AccountingPolicy = orgData?.settings?.accountingPolicy || {
-    minorUnitsThresholds: { BHD: 200000, AED: 200000, INR: 5000000 },
     selfApprovalPolicy: "off",
-    selfApprovalLimits: { BHD: 50000, AED: 50000, INR: 1000000 },
     roundingMode: "half_up",
     roundToNearestRupee: false,
     cashRoundingFils: true,
@@ -712,6 +728,7 @@ export const accountingPolicyUpdate = onCall({ region: "asia-south1" }, async (r
     ...(input.minorUnitsThresholds !== undefined ? { minorUnitsThresholds: input.minorUnitsThresholds } : {}),
     ...(input.selfApprovalPolicy !== undefined ? { selfApprovalPolicy: input.selfApprovalPolicy } : {}),
     ...(input.selfApprovalLimits !== undefined ? { selfApprovalLimits: input.selfApprovalLimits } : {}),
+    ...(input.cashCountVarianceThreshold !== undefined ? { cashCountVarianceThreshold: input.cashCountVarianceThreshold } : {}),
     ...(input.roundingMode !== undefined ? { roundingMode: input.roundingMode } : {}),
     ...(input.roundToNearestRupee !== undefined ? { roundToNearestRupee: input.roundToNearestRupee } : {}),
     ...(input.cashRoundingFils !== undefined ? { cashRoundingFils: input.cashRoundingFils } : {}),

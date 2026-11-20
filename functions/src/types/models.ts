@@ -215,13 +215,14 @@ export interface OrganizationContact {
 
 
 export interface AccountingPolicy {
+  moneyConvention?: "major";
   minorUnitsThresholds?: Record<string, number>;
   selfApprovalPolicy?: "off" | "up_to_limit" | "on";
   selfApprovalLimits?: Record<string, number>;
   roundingMode?: "half_up" | "half_even";
   roundToNearestRupee?: boolean;
   cashRoundingFils?: boolean;
-  cashCountVarianceThresholdMinor?: number;
+  cashCountVarianceThreshold?: number;
 }
 
 export interface OrganizationSettings {
@@ -1681,8 +1682,6 @@ export interface FinancialAccountDoc {
   };
   openingBalance: number;
   currentBalance: number;
-  openingBalanceMinor?: number;
-  currentBalanceMinor?: number;
   feeRule?: {
     feePercent?: number;
     feeFixed?: number;
@@ -1758,8 +1757,6 @@ export interface AccountTransactionDoc {
   direction: "in" | "out";
   amount: number;
   balanceAfter: number;
-  amountMinor?: number;
-  balanceAfterMinor?: number;
   currency?: string;
   status?: AccountEntryStatus;
   sourceDocumentType:
@@ -2056,8 +2053,6 @@ export interface JournalLineItem {
   accountName: string;
   debit: number;
   credit: number;
-  debitMinor?: number;
-  creditMinor?: number;
   description?: string;
 }
 
@@ -2076,8 +2071,6 @@ export interface JournalEntryDoc {
   lines: JournalLineItem[];
   totalDebit: number;
   totalCredit: number;
-  totalDebitMinor?: number;
-  totalCreditMinor?: number;
   currency?: string;
   notes?: string;
   actorUid: string;

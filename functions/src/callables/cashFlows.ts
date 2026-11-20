@@ -41,8 +41,7 @@ import {
   applyEntriesInTxn,
   updateEntryWorkflowInTxn,
 } from "../services/postingService.js";
-import { Money, assertAmountMatchesCurrency } from "../services/money.js";
-import { getExponent } from "../constants/currencies.js";
+import { Money, assertAmountMatchesCurrency, getDefaultCashCountVarianceThreshold } from "../services/money.js";
 
 // ============================================================================
 // 1. accountTransfersConfirm
@@ -276,8 +275,8 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
       });
       const countNumber = reservation.formattedNumber;
 
-      const policy = orgData?.settings?.accountingPolicy as (Record<string, any>) | undefined;
-      const thresholdMajor = policy?.cashCountVarianceThreshold ?? ((policy?.cashCountVarianceThresholdMinor ?? 100000) / (10 ** getExponent(currency)));
+      const policy = orgData?.settings?.accountingPolicy;
+      const thresholdMajor = policy?.cashCountVarianceThreshold ?? getDefaultCashCountVarianceThreshold(currency);
       const reviewThresholdMajor = thresholdMajor / 2;
 
       let varianceTransactionId: string | null = null;

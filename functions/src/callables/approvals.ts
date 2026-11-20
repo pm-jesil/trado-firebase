@@ -32,6 +32,7 @@ import {
   ReturnDoc,
   StockAdjustmentRequestDoc,
   AccountTransactionDoc,
+  OrganizationDoc,
 } from "../types/models.js";
 import {
   prepareAccountTransactionInTxn,
@@ -184,17 +185,41 @@ async function decideStockTransfer(ctx: RequestContext, input: DocumentDecisionI
 
 async function decideAccountEntry(ctx: RequestContext, input: DocumentDecisionInput) {
   const entryRef = db.collection("accountTransactions").doc(input.documentId);
+  const orgRef = db.collection("organizations").doc(ctx.organizationId);
   const now = new Date().toISOString();
   return db.runTransaction(async (txn) => {
-    const snap = await txn.get(entryRef);
+    const [snap, orgSnap] = await Promise.all([txn.get(entryRef), txn.get(orgRef)]);
     if (!snap.exists) throw new HttpsError("not-found", "Account entry not found.");
     const entry = snap.data() as AccountTransactionDoc;
     if (entry.organizationId !== ctx.organizationId) {
       throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
     }
+    const orgData = orgSnap.data() as OrganizationDoc | undefined;
+    const policy = orgData?.settings?.accountingPolicy;
+
     const creatorUid = entry.workflow?.createdBy || entry.actorUid;
     if (creatorUid === ctx.callerUid && !ctx.can(AppPermissions.APPROVALS_SELF_APPROVE)) {
-      throw new HttpsError("permission-denied", "Makers cannot decide their own entries.", { reason: "SELF_REVIEW_FORBIDDEN" });
+      if (input.decision === "approve") {
+        const selfPolicy = policy?.selfApprovalPolicy || "off";
+        if (selfPolicy === "on") {
+          // Self-approval allowed
+        } else if (selfPolicy === "up_to_limit") {
+          const currency = entry.currency || orgData?.currency || "INR";
+          const limit = policy?.selfApprovalLimits?.[currency];
+          // Fail-closed: if currency has no limit, self-approval is blocked
+          if (typeof limit !== "number" || entry.amount > limit) {
+            throw new HttpsError(
+              "permission-denied",
+              `Self-approval blocked for currency ${currency}: ${typeof limit !== "number" ? "no limit configured" : `entry amount (${entry.amount}) exceeds limit (${limit})`}.`,
+              { reason: "SELF_REVIEW_FORBIDDEN" }
+            );
+          }
+        } else {
+          throw new HttpsError("permission-denied", "Makers cannot decide their own entries.", { reason: "SELF_REVIEW_FORBIDDEN" });
+        }
+      } else {
+        throw new HttpsError("permission-denied", "Makers cannot decide their own entries.", { reason: "SELF_REVIEW_FORBIDDEN" });
+      }
     }
 
     if (input.decision === "reject") {

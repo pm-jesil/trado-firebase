@@ -2,8 +2,8 @@
 
 - **Date:** 2026-11-20
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1, S2, S3a, S3b, S3c+S4b)
-- **Current State:** **STEPS S1, S2, S3a, S3b, S3c+S4b COMPLETED. reportsGetPlatformOverview separated into per-currency buckets (totalsByCurrency); PLATFORM_COST_CURRENCY constant in usageMetering; deleted round2/round4 aliases; assertAmountMatchesCurrency float noise tests passing; converted minor-unit callers across seed, scenarios, scripts, and tests to decimal major units. 421/421 unit tests pass across 115 suites.**
+- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1, S2, S3a, S3b, S3c+S4b, S5b)
+- **Current State:** **STEPS S1, S2, S3a, S3b, S3c+S4b, S5b COMPLETED. Derived cashCountVarianceThreshold from currency exponent; fail-closed self-approval if limit unconfigured; removed legacy Minor fallbacks; migration script rewritten with lines array rewrite, parent org currency lookup, --apply safety guard, collectionGroup; emulator seed dry-run verified; zero Minor fields in src; self-approval verified by permission code. 438/438 unit tests pass across 121 suites. verify:status 0 untraced / 0 unmapped.**
 
 ## Summary of Prompt 77 & 77C Deliverables
 
