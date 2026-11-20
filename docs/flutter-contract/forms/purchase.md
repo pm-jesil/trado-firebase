@@ -34,7 +34,7 @@
 | `financialAccountId` | `string` | No | No | `text` | {"minLength":2} | `financialAccount_001` |
 | `storageLocationId` | `string` | No | No | `text` | {"minLength":2} | `storageLocation_001` |
 | `splitPayments[].method` | `enum` | **Yes** | No | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `splitPayments[].amount` | `number` | **Yes** | No | `money_paise` | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `splitPayments[].amount` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":false} | `2500` |
 | `splitPayments[].financialAccountId` | `string` | **Yes** | No | `text` | {"minLength":2} | `splitPayments___financialAccount_001` |
 | `splitPayments[].notes` | `string` | No | No | `textarea` | {"maxLength":300} | `Sample notes` |
 | `notes` | `string` | No | No | `textarea` | {"maxLength":1000} | `Sample notes` |

@@ -17,7 +17,7 @@ import { onCall } from "../services/callable.js";
 import { parseInput } from "../validation/parseInput.js";
 import { db } from "../services/firebase.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
-import { DEFAULT_ORG_TIMEZONE } from "../services/subscription.js";
+import { requireTimezone } from "../services/money.js";
 import { AppPermissions } from "../constants/permissions.js";
 import {
   GetPlatformUsageSummarySchema,
@@ -467,7 +467,7 @@ export const usageGetLimits = onCall({ region: "asia-south1" }, async (request) 
   }
 
   const limitsInfo = await getEffectiveUsageLimits(targetOrgId);
-  const tz = context.organization.timezone || DEFAULT_ORG_TIMEZONE;
+  const tz = requireTimezone(context.organization.timezone, `organization "${targetOrgId}"`);
   const serverObserved = await getServerUsageSnapshot(targetOrgId, tz, true);
   const verdict = evaluateUsageLimits(limitsInfo.effectiveLimits, serverObserved);
   return {

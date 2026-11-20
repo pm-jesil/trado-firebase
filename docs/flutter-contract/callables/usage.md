@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `usageGetPlatformSummary`
-- **Domain:** `usage` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/usage.ts:79`
+- **Domain:** `usage` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/usage.ts:80`
 - **Permission(s):** `platform:finance:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `usage.get_platform_summary` (`admin`) · **State Machine:** —
 
@@ -42,7 +42,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `usageGetOrganizations`
-- **Domain:** `usage` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/usage.ts:153`
+- **Domain:** `usage` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/usage.ts:154`
 - **Permission(s):** `platform:finance:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `usage.get_organizations` (`admin`) · **State Machine:** —
 
@@ -81,7 +81,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `usageGetBranches`
-- **Domain:** `usage` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/usage.ts:216`
+- **Domain:** `usage` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/usage.ts:217`
 - **Permission(s):** `platform:finance:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `usage.get_branches` (`admin`) · **State Machine:** —
 
@@ -115,7 +115,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `usageGetDetail`
-- **Domain:** `usage` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/usage.ts:312`
+- **Domain:** `usage` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/usage.ts:313`
 - **Permission(s):** `platform:finance:view`, `usage:read`, `usage:read_users` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `usage.get_detail` (`none`) · **State Machine:** —
 
@@ -152,7 +152,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `usageCalculateDryRunStatement`
-- **Domain:** `usage` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/usage.ts:369`
+- **Domain:** `usage` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/usage.ts:370`
 - **Permission(s):** `platform:finance:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `usage.calculate_dry_run_statement` (`export`) · **State Machine:** —
 
@@ -190,7 +190,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `usageRecordClientMetric`
-- **Domain:** `usage` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/usage.ts:408`
+- **Domain:** `usage` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/usage.ts:409`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `usage.record_client_metric` (`mutation`) · **State Machine:** —
 
@@ -218,7 +218,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `usageGetLimits`
-- **Domain:** `usage` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/usage.ts:441`
+- **Domain:** `usage` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/usage.ts:442`
 - **Permission(s):** `org:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `usage.get_limits` (`none`) · **State Machine:** —
 
@@ -252,7 +252,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `usageUpdateLimits`
-- **Domain:** `usage` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/usage.ts:496`
+- **Domain:** `usage` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/usage.ts:497`
 - **Permission(s):** `platform:subscriptions:manage` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `usage.update_limits` (`admin`) · **State Machine:** —
 

@@ -35,7 +35,7 @@ Back to [Master Index](./INDEX.md).
 | `financialAccountId` | `string` | No | {"minLength":2} | `financialAccount_001` |
 | `storageLocationId` | `string` | No | {"minLength":2} | `storageLocation_001` |
 | `splitPayments[].method` | `enum` | **Yes** | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `splitPayments[].amount` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `splitPayments[].amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
 | `splitPayments[].financialAccountId` | `string` | **Yes** | {"minLength":2} | `splitPayments___financialAccount_001` |
 | `splitPayments[].notes` | `string` | No | {"maxLength":300} | `Sample notes` |
 | `notes` | `string` | No | {"maxLength":1000} | `Sample notes` |
@@ -68,7 +68,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `billsFinalize`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/bills/billsMutations.ts:350`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/bills/billsMutations.ts:358`
 - **Permission(s):** `bill:create`, `bill:update`, `delivery:update` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `bill.finalize` (`mutation`) · **State Machine:** [bill](../state-machines.md)
 
@@ -184,7 +184,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `billsUpdateDraft`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/bills/billsMutations.ts:312`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/bills/billsMutations.ts:320`
 - **Permission(s):** `bill:view_all` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `bill.update_draft` (`mutation`) · **State Machine:** [bill](../state-machines.md)
 
@@ -230,7 +230,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `billsVoid`
-- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/bills/billsMutations.ts:582`
+- **Domain:** `bills` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/bills/billsMutations.ts:590`
 - **Permission(s):** `bill:void` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `bill.void` (`mutation`) · **State Machine:** [bill](../state-machines.md)
 
@@ -299,7 +299,7 @@ Back to [Master Index](./INDEX.md).
 | `financialAccountId` | `string` | No | {"minLength":2} | `financialAccount_001` |
 | `storageLocationId` | `string` | No | {"minLength":2} | `storageLocation_001` |
 | `splitPayments[].method` | `enum` | **Yes** | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `splitPayments[].amount` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `splitPayments[].amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
 | `splitPayments[].financialAccountId` | `string` | **Yes** | {"minLength":2} | `splitPayments___financialAccount_001` |
 | `splitPayments[].notes` | `string` | No | {"maxLength":300} | `Sample notes` |
 | `notes` | `string` | No | {"maxLength":1000} | `Sample notes` |

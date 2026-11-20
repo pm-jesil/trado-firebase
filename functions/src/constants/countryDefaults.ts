@@ -15,10 +15,6 @@ export interface CountryDefaultDefinition {
   countryCode: string;
   countryName: string;
   currencyCode: string;
-  currencyDecimals: number;
-  minorUnitName: string;
-  minorUnitNamePlural: string;
-  currencySymbol: string;
   timezone: string;
   taxRegimeCode: string;
   financialYearStartMonth: number; // 1-12
@@ -33,10 +29,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
     countryCode: "IN",
     countryName: "India",
     currencyCode: "INR",
-    currencyDecimals: 2,
-    minorUnitName: "paisa",
-    minorUnitNamePlural: "paise",
-    currencySymbol: "₹",
     timezone: "Asia/Kolkata",
     taxRegimeCode: "IN_GST",
     financialYearStartMonth: 4, // April
@@ -85,10 +77,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
     countryCode: "AE",
     countryName: "United Arab Emirates",
     currencyCode: "AED",
-    currencyDecimals: 2,
-    minorUnitName: "fils",
-    minorUnitNamePlural: "fils",
-    currencySymbol: "AED",
     timezone: "Asia/Dubai",
     taxRegimeCode: "AE_VAT",
     financialYearStartMonth: 1, // January
@@ -109,10 +97,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
     countryCode: "OM",
     countryName: "Oman",
     currencyCode: "OMR",
-    currencyDecimals: 3,
-    minorUnitName: "baisa",
-    minorUnitNamePlural: "baisa",
-    currencySymbol: "OMR",
     timezone: "Asia/Muscat",
     taxRegimeCode: "OM_VAT",
     financialYearStartMonth: 1, // January
@@ -137,10 +121,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
     countryCode: "BH",
     countryName: "Bahrain",
     currencyCode: "BHD",
-    currencyDecimals: 3,
-    minorUnitName: "fils",
-    minorUnitNamePlural: "fils",
-    currencySymbol: "BD",
     timezone: "Asia/Bahrain",
     taxRegimeCode: "BH_VAT",
     financialYearStartMonth: 1, // January
@@ -158,10 +138,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
     countryCode: "SG",
     countryName: "Singapore",
     currencyCode: "SGD",
-    currencyDecimals: 2,
-    minorUnitName: "cent",
-    minorUnitNamePlural: "cents",
-    currencySymbol: "S$",
     timezone: "Asia/Singapore",
     taxRegimeCode: "SG_GST",
     financialYearStartMonth: 1, // January
@@ -173,10 +149,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
     countryCode: "US",
     countryName: "United States",
     currencyCode: "USD",
-    currencyDecimals: 2,
-    minorUnitName: "cent",
-    minorUnitNamePlural: "cents",
-    currencySymbol: "$",
     timezone: "America/New_York",
     taxRegimeCode: "US_SALES_TAX",
     financialYearStartMonth: 1, // January
@@ -200,10 +172,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
     countryCode: "SA",
     countryName: "Saudi Arabia",
     currencyCode: "SAR",
-    currencyDecimals: 2,
-    minorUnitName: "halala",
-    minorUnitNamePlural: "halalas",
-    currencySymbol: "SAR",
     timezone: "Asia/Riyadh",
     taxRegimeCode: "SA_VAT",
     financialYearStartMonth: 1,
@@ -224,10 +192,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
     countryCode: "GB",
     countryName: "United Kingdom",
     currencyCode: "GBP",
-    currencyDecimals: 2,
-    minorUnitName: "penny",
-    minorUnitNamePlural: "pence",
-    currencySymbol: "£",
     timezone: "Europe/London",
     taxRegimeCode: "GB_VAT",
     financialYearStartMonth: 4, // April
@@ -245,10 +209,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
     countryCode: "DE",
     countryName: "Germany",
     currencyCode: "EUR",
-    currencyDecimals: 2,
-    minorUnitName: "cent",
-    minorUnitNamePlural: "cents",
-    currencySymbol: "€",
     timezone: "Europe/Berlin",
     taxRegimeCode: "EU_VAT",
     financialYearStartMonth: 1,
@@ -267,10 +227,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
     countryCode: "QA",
     countryName: "Qatar",
     currencyCode: "QAR",
-    currencyDecimals: 2,
-    minorUnitName: "dirham",
-    minorUnitNamePlural: "dirhams",
-    currencySymbol: "QR",
     timezone: "Asia/Qatar",
     taxRegimeCode: "NONE",
     financialYearStartMonth: 1,
@@ -282,10 +238,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
     countryCode: "KW",
     countryName: "Kuwait",
     currencyCode: "KWD",
-    currencyDecimals: 3,
-    minorUnitName: "fils",
-    minorUnitNamePlural: "fils",
-    currencySymbol: "KD",
     timezone: "Asia/Kuwait",
     taxRegimeCode: "NONE",
     financialYearStartMonth: 1,
@@ -300,6 +252,6 @@ export const COUNTRY_DEFAULTS: Record<string, CountryDefaultDefinition> = {
  * Falls back to India (IN) if unknown.
  */
 export function getCountryDefaults(countryCode: string = "IN"): CountryDefaultDefinition {
-  const code = (countryCode || "IN").toUpperCase().trim();
+  const code = (countryCode ? countryCode.trim() : "IN").toUpperCase();
   return COUNTRY_DEFAULTS[code] || COUNTRY_DEFAULTS.IN;
 }

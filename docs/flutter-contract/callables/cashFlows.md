@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `accountTransfersConfirm`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/cashFlows.ts:48`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/cashFlows.ts:49`
 - **Permission(s):** `accounts:transfer` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account_transfer.confirm` (`mutation`) · **State Machine:** —
 
@@ -42,7 +42,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountTransfersDispute`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/cashFlows.ts:147`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/cashFlows.ts:148`
 - **Permission(s):** `accounts:transfer` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account_transfer.dispute` (`mutation`) · **State Machine:** —
 
@@ -80,7 +80,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `cashCountsCreate`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/cashFlows.ts:214`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/cashFlows.ts:215`
 - **Permission(s):** `accounts:manage` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `cash_count.create` (`mutation`) · **State Machine:** —
 
@@ -120,7 +120,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `cashCountsList`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/cashFlows.ts:344`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/cashFlows.ts:366`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `cash_count.list` (`none`) · **State Machine:** —
 
@@ -155,7 +155,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `cashCountsGet`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/cashFlows.ts:378`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/cashFlows.ts:400`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `cash_count.get` (`none`) · **State Machine:** —
 
@@ -185,7 +185,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesRecordFee`
-- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/cashFlows.ts:402`
+- **Domain:** `cashFlows` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/cashFlows.ts:424`
 - **Permission(s):** `accounts:entry_create`, `accounts:manage` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_record_fee` (`mutation`) · **State Machine:** —
 
@@ -196,8 +196,8 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 | `entryId` | `string` | **Yes** | {"minLength":2} | `entry_001` |
-| `feeAmount` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
-| `feeTaxAmount` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
+| `feeAmount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
+| `feeTaxAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 

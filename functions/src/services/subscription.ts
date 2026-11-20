@@ -10,7 +10,7 @@
 import { GateReason, SubscriptionStatus } from "../constants/enums.js";
 import type { OrganizationDoc } from "../types/models.js";
 
-export const DEFAULT_ORG_TIMEZONE = "Asia/Kolkata";
+export const DEFAULT_ORG_TIMEZONE = "UTC";
 export const DEFAULT_TRIAL_DAYS = 30;
 const DAY_MS = 24 * 60 * 60 * 1000;
 

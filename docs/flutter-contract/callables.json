@@ -1400,7 +1400,7 @@
       "name": "organizationsCreate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 192,
+      "line": 199,
       "gate": "platform",
       "kind": "create",
       "permissions": [],
@@ -1553,58 +1553,6 @@
           "enumValues": [],
           "uiHint": "text",
           "example": "INR"
-        },
-        {
-          "path": "currencyDecimals",
-          "type": "number",
-          "required": false,
-          "nullable": false,
-          "bounds": {
-            "format": "safeint",
-            "min": 0,
-            "minInclusive": true,
-            "max": 4,
-            "maxInclusive": true
-          },
-          "enumValues": [],
-          "uiHint": "numeric",
-          "example": 1
-        },
-        {
-          "path": "minorUnitName",
-          "type": "string",
-          "required": false,
-          "nullable": false,
-          "bounds": {
-            "maxLength": 30
-          },
-          "enumValues": [],
-          "uiHint": "text",
-          "example": "Sample minorUnitName"
-        },
-        {
-          "path": "minorUnitNamePlural",
-          "type": "string",
-          "required": false,
-          "nullable": false,
-          "bounds": {
-            "maxLength": 30
-          },
-          "enumValues": [],
-          "uiHint": "text",
-          "example": "Sample minorUnitNamePlural"
-        },
-        {
-          "path": "currencySymbol",
-          "type": "string",
-          "required": false,
-          "nullable": false,
-          "bounds": {
-            "maxLength": 10
-          },
-          "enumValues": [],
-          "uiHint": "text",
-          "example": "Sample currencySymbol"
         },
         {
           "path": "taxRegimeCode",
@@ -2620,7 +2568,7 @@
       "name": "organizationsUpdate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 482,
+      "line": 486,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -3729,7 +3677,7 @@
       "name": "organizationsDeactivate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 583,
+      "line": 587,
       "gate": "platform",
       "kind": "delete",
       "permissions": [],
@@ -3818,7 +3766,7 @@
       "name": "organizationsReactivate",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 654,
+      "line": 658,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -3903,7 +3851,7 @@
       "name": "organizationsList",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 606,
+      "line": 610,
       "gate": "platform",
       "kind": "list",
       "permissions": [],
@@ -4010,7 +3958,7 @@
           "organizations",
           "totalCount"
         ],
-        "leafCount": 268,
+        "leafCount": 260,
         "sampleLeaves": [
           {
             "path": "items[].bankAccounts[].id",
@@ -4138,26 +4086,6 @@
             "optional": false
           },
           {
-            "path": "items[].currencyDecimals",
-            "type": "number | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].minorUnitName",
-            "type": "string | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].minorUnitNamePlural",
-            "type": "string | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].currencySymbol",
-            "type": "string | undefined",
-            "optional": true
-          },
-          {
             "path": "items[].taxRegimeCode",
             "type": "string",
             "optional": false
@@ -4211,6 +4139,26 @@
             "path": "items[].image.thumbnailPath",
             "type": "string | undefined",
             "optional": true
+          },
+          {
+            "path": "items[].ownerStatus",
+            "type": "\"pending\" | \"active\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].ownerUserId",
+            "type": "string | null | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].financialYearStartMonth",
+            "type": "number | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].defaultBranchId",
+            "type": "string | undefined",
+            "optional": true
           }
         ]
       },
@@ -4226,7 +4174,7 @@
       "name": "organizationsSetSubscription",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 760,
+      "line": 764,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -4499,7 +4447,7 @@
       "name": "organizationsGet",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 848,
+      "line": 852,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -4541,7 +4489,7 @@
           "evaluation",
           "organization"
         ],
-        "leafCount": 139,
+        "leafCount": 148,
         "sampleLeaves": [
           {
             "path": "organization.bankAccounts[].id",
@@ -4659,26 +4607,6 @@
             "optional": false
           },
           {
-            "path": "organization.currencyDecimals",
-            "type": "number | undefined",
-            "optional": true
-          },
-          {
-            "path": "organization.minorUnitName",
-            "type": "string | undefined",
-            "optional": true
-          },
-          {
-            "path": "organization.minorUnitNamePlural",
-            "type": "string | undefined",
-            "optional": true
-          },
-          {
-            "path": "organization.currencySymbol",
-            "type": "string | undefined",
-            "optional": true
-          },
-          {
             "path": "organization.taxRegimeCode",
             "type": "string",
             "optional": false
@@ -4742,6 +4670,26 @@
             "path": "organization.financialYearStartMonth",
             "type": "number | undefined",
             "optional": true
+          },
+          {
+            "path": "organization.defaultBranchId",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "organization.branchCount",
+            "type": "number | undefined",
+            "optional": true
+          },
+          {
+            "path": "organization.sharingPolicies.products",
+            "type": "\"organization_shared\" | \"branch_scoped\" | undefined",
+            "optional": true
+          },
+          {
+            "path": "organization.sharingPolicies.categories",
+            "type": "\"organization_shared\" | \"branch_scoped\" | undefined",
+            "optional": true
           }
         ]
       },
@@ -4757,7 +4705,7 @@
       "name": "organizationsPreviewDeactivationImpact",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 671,
+      "line": 675,
       "gate": "platform",
       "kind": "read",
       "permissions": [],
@@ -4906,7 +4854,7 @@
       "name": "organizationsGetSubscriptionHistory",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 716,
+      "line": 720,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -5067,7 +5015,7 @@
       "name": "organizationsProvisionUser",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 948,
+      "line": 949,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -5391,7 +5339,7 @@
       "name": "organizationsTransferOwnership",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 1011,
+      "line": 1012,
       "gate": "platform",
       "kind": "update",
       "permissions": [],
@@ -5535,7 +5483,7 @@
       "name": "organizationsRevealBankAccount",
       "domain": "organizations",
       "file": "functions/src/callables/organizations.ts",
-      "line": 1111,
+      "line": 1112,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -20068,7 +20016,7 @@
       "name": "outflowsCreate",
       "domain": "outflows",
       "file": "functions/src/callables/outflows.ts",
-      "line": 304,
+      "line": 305,
       "gate": "tenant",
       "kind": "create",
       "permissions": [],
@@ -20444,7 +20392,6 @@
           "required": true,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": false
           },
@@ -20666,7 +20613,7 @@
       "name": "outflowsList",
       "domain": "outflows",
       "file": "functions/src/callables/outflows.ts",
-      "line": 561,
+      "line": 571,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -21064,7 +21011,7 @@
       "name": "outflowsGet",
       "domain": "outflows",
       "file": "functions/src/callables/outflows.ts",
-      "line": 604,
+      "line": 614,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -21423,7 +21370,7 @@
       "name": "outflowsVoid",
       "domain": "outflows",
       "file": "functions/src/callables/outflows.ts",
-      "line": 702,
+      "line": 712,
       "gate": "tenant",
       "kind": "delete",
       "permissions": [
@@ -21888,7 +21835,6 @@
           "required": true,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": false
           },
@@ -22042,7 +21988,7 @@
       "name": "billsFinalize",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsMutations.ts",
-      "line": 350,
+      "line": 358,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -22861,7 +22807,7 @@
       "name": "billsUpdateDraft",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsMutations.ts",
-      "line": 312,
+      "line": 320,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -23125,7 +23071,7 @@
       "name": "billsVoid",
       "domain": "bills",
       "file": "functions/src/callables/bills/billsMutations.ts",
-      "line": 582,
+      "line": 590,
       "gate": "tenant",
       "kind": "delete",
       "permissions": [
@@ -23577,7 +23523,6 @@
           "required": true,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": false
           },
@@ -23865,7 +23810,7 @@
       "name": "recurringExpensesCreate",
       "domain": "recurringExpenses",
       "file": "functions/src/callables/recurringExpenses.ts",
-      "line": 47,
+      "line": 48,
       "gate": "tenant",
       "kind": "create",
       "permissions": [
@@ -24272,7 +24217,7 @@
       "name": "recurringExpensesUpdate",
       "domain": "recurringExpenses",
       "file": "functions/src/callables/recurringExpenses.ts",
-      "line": 91,
+      "line": 92,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -24567,7 +24512,7 @@
       "name": "recurringExpensesList",
       "domain": "recurringExpenses",
       "file": "functions/src/callables/recurringExpenses.ts",
-      "line": 104,
+      "line": 105,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -24687,7 +24632,7 @@
       "name": "documentsDecide",
       "domain": "approvals",
       "file": "functions/src/callables/approvals.ts",
-      "line": 240,
+      "line": 266,
       "gate": "tenant",
       "kind": "action",
       "permissions": [],
@@ -24892,7 +24837,7 @@
       "name": "approvalsList",
       "domain": "approvals",
       "file": "functions/src/callables/approvals.ts",
-      "line": 257,
+      "line": 283,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -25056,7 +25001,7 @@
       "name": "approvalsCounts",
       "domain": "approvals",
       "file": "functions/src/callables/approvals.ts",
-      "line": 431,
+      "line": 457,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -25368,7 +25313,6 @@
           "required": false,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": true
           },
@@ -25453,7 +25397,7 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "Record<string, unknown> | { financialAccountId: string; account: { currentBalance: number; organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; ... 18 more ...; financialAccountId: string; ",
+        "tsType": "Record<string, unknown> | { financialAccountId: string; account: { currentBalance: number; organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; ... 16 more ...; financialAccountId: string; ",
         "topLevelKeys": [
           "account",
           "financialAccountId",
@@ -25464,7 +25408,7 @@
           "financialAccountId",
           "message"
         ],
-        "leafCount": 32,
+        "leafCount": 30,
         "sampleLeaves": [
           {
             "path": "financialAccountId",
@@ -25540,16 +25484,6 @@
             "path": "account.openingBalance",
             "type": "number",
             "optional": false
-          },
-          {
-            "path": "account.openingBalanceMinor",
-            "type": "number | undefined",
-            "optional": true
-          },
-          {
-            "path": "account.currentBalanceMinor",
-            "type": "number | undefined",
-            "optional": true
           },
           {
             "path": "account.feeRule.feePercent",
@@ -25641,7 +25575,7 @@
       "name": "financialAccountsUpdate",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 152,
+      "line": 155,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -25802,7 +25736,6 @@
           "required": false,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": true
           },
@@ -25909,7 +25842,7 @@
       "name": "financialAccountsList",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 200,
+      "line": 203,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -26004,7 +25937,7 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 16 more ...; financialAccountId: string; }[]; count: numbe",
+        "tsType": "{ items: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 14 more ...; financialAccountId: string; }[]; count: numbe",
         "topLevelKeys": [
           "count",
           "hasMore",
@@ -26018,7 +25951,7 @@
           "items",
           "totalCount"
         ],
-        "leafCount": 34,
+        "leafCount": 32,
         "sampleLeaves": [
           {
             "path": "items[].organizationId",
@@ -26089,16 +26022,6 @@
             "path": "items[].currentBalance",
             "type": "number",
             "optional": false
-          },
-          {
-            "path": "items[].openingBalanceMinor",
-            "type": "number | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].currentBalanceMinor",
-            "type": "number | undefined",
-            "optional": true
           },
           {
             "path": "items[].feeRule.feePercent",
@@ -26204,7 +26127,7 @@
       "name": "financialAccountsGet",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 254,
+      "line": 257,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -26259,14 +26182,14 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "{ financialAccount: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 16 more ...; financialAccountId: string; }; }",
+        "tsType": "{ financialAccount: { organizationId: string; branchId?: string | null | undefined; assignedBranchIds?: string[] | undefined; name: string; code: string; accountType: FinancialAccountType; ... 14 more ...; financialAccountId: string; }; }",
         "topLevelKeys": [
           "financialAccount"
         ],
         "requiredTopKeys": [
           "financialAccount"
         ],
-        "leafCount": 30,
+        "leafCount": 28,
         "sampleLeaves": [
           {
             "path": "financialAccount.organizationId",
@@ -26337,16 +26260,6 @@
             "path": "financialAccount.currentBalance",
             "type": "number",
             "optional": false
-          },
-          {
-            "path": "financialAccount.openingBalanceMinor",
-            "type": "number | undefined",
-            "optional": true
-          },
-          {
-            "path": "financialAccount.currentBalanceMinor",
-            "type": "number | undefined",
-            "optional": true
           },
           {
             "path": "financialAccount.feeRule.feePercent",
@@ -26432,7 +26345,7 @@
       "name": "financialAccountsGetLedger",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 288,
+      "line": 291,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -26629,7 +26542,7 @@
       "name": "accountTransfersCreate",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 362,
+      "line": 365,
       "gate": "tenant",
       "kind": "create",
       "permissions": [
@@ -26970,7 +26883,7 @@
       "name": "accountTransfersList",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 542,
+      "line": 547,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -27279,7 +27192,7 @@
       "name": "accountTransfersGet",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 596,
+      "line": 601,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -27512,7 +27425,7 @@
       "name": "capitalTransactionsCreate",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 630,
+      "line": 635,
       "gate": "tenant",
       "kind": "create",
       "permissions": [
@@ -27585,7 +27498,6 @@
           "required": true,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": false
           },
@@ -27729,7 +27641,7 @@
       "name": "capitalTransactionsList",
       "domain": "financialAccounts",
       "file": "functions/src/callables/financialAccounts.ts",
-      "line": 747,
+      "line": 754,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -27933,7 +27845,7 @@
       "name": "accountEntriesList",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 49,
+      "line": 50,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -28107,7 +28019,7 @@
       ],
       "response": {
         "envelope": "LIST",
-        "tsType": "{ items: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 28 more ...; entryId: string; }[]; entries: { ...; }[]; count: number; nextCur",
+        "tsType": "{ items: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }[]; entries: { ...; }[]; count: number; nextCur",
         "topLevelKeys": [
           "count",
           "entries",
@@ -28121,7 +28033,7 @@
           "items",
           "totalCount"
         ],
-        "leafCount": 103,
+        "leafCount": 99,
         "sampleLeaves": [
           {
             "path": "items[].organizationId",
@@ -28162,16 +28074,6 @@
             "path": "items[].balanceAfter",
             "type": "number",
             "optional": false
-          },
-          {
-            "path": "items[].amountMinor",
-            "type": "number | undefined",
-            "optional": true
-          },
-          {
-            "path": "items[].balanceAfterMinor",
-            "type": "number | undefined",
-            "optional": true
           },
           {
             "path": "items[].currency",
@@ -28322,6 +28224,16 @@
             "path": "items[].workflow.reversedBy.reason",
             "type": "string",
             "optional": false
+          },
+          {
+            "path": "items[].workflow.selfApproved",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "items[].workflow.notes",
+            "type": "string | undefined",
+            "optional": true
           }
         ]
       },
@@ -28337,7 +28249,7 @@
       "name": "accountEntriesGet",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 116,
+      "line": 117,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -28393,7 +28305,7 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "{ entry: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 28 more ...; entryId: string; }; subEntries: { ...; }[]; reversedEntry: (Parti",
+        "tsType": "{ entry: { organizationId: string; branchId?: string | null | undefined; financialAccountId: string; transactionNumber: string; type: AccountTransactionType; ... 26 more ...; entryId: string; }; subEntries: { ...; }[]; reversedEntry: (Parti",
         "topLevelKeys": [
           "entry",
           "reversalEntry",
@@ -28404,7 +28316,7 @@
           "entry",
           "subEntries"
         ],
-        "leafCount": 101,
+        "leafCount": 97,
         "sampleLeaves": [
           {
             "path": "entry.organizationId",
@@ -28445,16 +28357,6 @@
             "path": "entry.balanceAfter",
             "type": "number",
             "optional": false
-          },
-          {
-            "path": "entry.amountMinor",
-            "type": "number | undefined",
-            "optional": true
-          },
-          {
-            "path": "entry.balanceAfterMinor",
-            "type": "number | undefined",
-            "optional": true
           },
           {
             "path": "entry.currency",
@@ -28605,6 +28507,16 @@
             "path": "entry.workflow.reversedBy.reason",
             "type": "string",
             "optional": false
+          },
+          {
+            "path": "entry.workflow.selfApproved",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "entry.workflow.notes",
+            "type": "string | undefined",
+            "optional": true
           }
         ]
       },
@@ -28620,7 +28532,7 @@
       "name": "accountEntriesCounts",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 173,
+      "line": 174,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -28748,7 +28660,7 @@
       "name": "accountEntriesVerify",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 226,
+      "line": 227,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -28874,7 +28786,7 @@
       "name": "accountEntriesApprove",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 289,
+      "line": 290,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -29001,7 +28913,7 @@
       "name": "accountEntriesReject",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 364,
+      "line": 385,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -29127,7 +29039,7 @@
       "name": "accountEntriesReverse",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 447,
+      "line": 468,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -29261,7 +29173,7 @@
       "name": "accountEntriesUpdateNote",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 524,
+      "line": 545,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -29385,7 +29297,7 @@
       "name": "accountEntriesCreateSubEntry",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 556,
+      "line": 577,
       "gate": "tenant",
       "kind": "create",
       "permissions": [
@@ -29462,7 +29374,6 @@
           "required": true,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": false
           },
@@ -29599,7 +29510,7 @@
       "name": "accountingPolicyGet",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 658,
+      "line": 682,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -29651,8 +29562,8 @@
         "leafCount": 7,
         "sampleLeaves": [
           {
-            "path": "policy.minorUnitsThresholds",
-            "type": "Record<string, number>",
+            "path": "policy.moneyConvention",
+            "type": "\"major\" | undefined",
             "optional": true
           },
           {
@@ -29681,7 +29592,7 @@
             "optional": true
           },
           {
-            "path": "policy.cashCountVarianceThresholdMinor",
+            "path": "policy.cashCountVarianceThreshold",
             "type": "number | undefined",
             "optional": true
           }
@@ -29699,7 +29610,7 @@
       "name": "accountingPolicyUpdate",
       "domain": "accountEntries",
       "file": "functions/src/callables/accountEntries.ts",
-      "line": 681,
+      "line": 703,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -29740,18 +29651,16 @@
           "example": "branch_001"
         },
         {
-          "path": "minorUnitsThresholds.*",
-          "type": "number",
-          "required": true,
+          "path": "moneyConvention",
+          "type": "literal",
+          "required": false,
           "nullable": false,
-          "bounds": {
-            "format": "safeint",
-            "min": 0,
-            "minInclusive": true
-          },
-          "enumValues": [],
-          "uiHint": "numeric",
-          "example": 1
+          "bounds": {},
+          "enumValues": [
+            "major"
+          ],
+          "uiHint": "text",
+          "example": "2026-11-18"
         },
         {
           "path": "selfApprovalPolicy",
@@ -29773,13 +29682,25 @@
           "required": true,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": true
           },
           "enumValues": [],
           "uiHint": "money_paise",
           "example": 2500
+        },
+        {
+          "path": "cashCountVarianceThreshold",
+          "type": "number",
+          "required": false,
+          "nullable": false,
+          "bounds": {
+            "min": 0,
+            "minInclusive": true
+          },
+          "enumValues": [],
+          "uiHint": "numeric",
+          "example": 1
         },
         {
           "path": "roundingMode",
@@ -29817,7 +29738,7 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "{ policy: { updatedAt: string; updatedBy: string; cashRoundingFils?: boolean | undefined; roundToNearestRupee?: boolean | undefined; roundingMode?: \"half_up\" | \"half_even\" | undefined; selfApprovalLimits?: Record<...> | undefined; selfAppro",
+        "tsType": "{ policy: { updatedAt: string; updatedBy: string; cashRoundingFils?: boolean | undefined; roundToNearestRupee?: boolean | undefined; roundingMode?: \"half_up\" | \"half_even\" | undefined; cashCountVarianceThreshold?: number | undefined; selfAp",
         "topLevelKeys": [
           "policy"
         ],
@@ -29852,6 +29773,11 @@
             "optional": true
           },
           {
+            "path": "policy.cashCountVarianceThreshold",
+            "type": "number | undefined",
+            "optional": true
+          },
+          {
             "path": "policy.selfApprovalLimits",
             "type": "Record<string, number>",
             "optional": true
@@ -29862,13 +29788,8 @@
             "optional": true
           },
           {
-            "path": "policy.minorUnitsThresholds",
-            "type": "Record<string, number>",
-            "optional": true
-          },
-          {
-            "path": "policy.cashCountVarianceThresholdMinor",
-            "type": "number | undefined",
+            "path": "policy.moneyConvention",
+            "type": "\"major\" | undefined",
             "optional": true
           }
         ]
@@ -29885,7 +29806,7 @@
       "name": "accountTransfersConfirm",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 48,
+      "line": 49,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -30031,7 +29952,7 @@
       "name": "accountTransfersDispute",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 147,
+      "line": 148,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -30177,7 +30098,7 @@
       "name": "cashCountsCreate",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 214,
+      "line": 215,
       "gate": "tenant",
       "kind": "create",
       "permissions": [
@@ -30340,7 +30261,7 @@
       "name": "cashCountsList",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 344,
+      "line": 366,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -30550,7 +30471,7 @@
       "name": "cashCountsGet",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 378,
+      "line": 400,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -30820,7 +30741,7 @@
       "name": "accountEntriesRecordFee",
       "domain": "cashFlows",
       "file": "functions/src/callables/cashFlows.ts",
-      "line": 402,
+      "line": 424,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -30879,7 +30800,6 @@
           "required": true,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": false
           },
@@ -30893,7 +30813,6 @@
           "required": false,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": true
           },
@@ -31118,7 +31037,6 @@
           "required": true,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": false
           },
@@ -31132,7 +31050,6 @@
           "required": false,
           "nullable": false,
           "bounds": {
-            "format": "safeint",
             "min": 0,
             "minInclusive": true
           },
@@ -31323,7 +31240,7 @@
       "name": "paymentsVerifyFee",
       "domain": "paymentFees",
       "file": "functions/src/callables/paymentFees.ts",
-      "line": 298,
+      "line": 302,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -31468,7 +31385,7 @@
       "name": "paymentsDisputeFee",
       "domain": "paymentFees",
       "file": "functions/src/callables/paymentFees.ts",
-      "line": 366,
+      "line": 370,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -31585,7 +31502,7 @@
       "name": "paymentsReverseFee",
       "domain": "paymentFees",
       "file": "functions/src/callables/paymentFees.ts",
-      "line": 418,
+      "line": 422,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -31702,7 +31619,7 @@
       "name": "paymentsListFees",
       "domain": "paymentFees",
       "file": "functions/src/callables/paymentFees.ts",
-      "line": 521,
+      "line": 525,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -32049,7 +31966,7 @@
       "name": "paymentsGetFee",
       "domain": "paymentFees",
       "file": "functions/src/callables/paymentFees.ts",
-      "line": 585,
+      "line": 589,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -32452,7 +32369,7 @@
       "name": "reportsGetTrialBalance",
       "domain": "ledgerVerify",
       "file": "functions/src/callables/ledgerVerify.ts",
-      "line": 322,
+      "line": 323,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -34227,7 +34144,7 @@
       "name": "stockTransfersSubmit",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 260,
+      "line": 261,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -34358,7 +34275,7 @@
       "name": "stockTransfersCancel",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 316,
+      "line": 317,
       "gate": "tenant",
       "kind": "delete",
       "permissions": [
@@ -34501,7 +34418,7 @@
       "name": "stockTransfersDispatch",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 431,
+      "line": 432,
       "gate": "tenant",
       "kind": "update",
       "permissions": [
@@ -34737,7 +34654,7 @@
       "name": "stockTransfersReceive",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 733,
+      "line": 735,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -34982,7 +34899,7 @@
       "name": "stockTransfersResolveDiscrepancy",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 1028,
+      "line": 1030,
       "gate": "tenant",
       "kind": "action",
       "permissions": [
@@ -35166,7 +35083,7 @@
       "name": "stockTransfersList",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 1235,
+      "line": 1238,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -35504,7 +35421,7 @@
       "name": "stockTransfersGet",
       "domain": "stockTransfers",
       "file": "functions/src/callables/stockTransfers.ts",
-      "line": 1289,
+      "line": 1292,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -36970,7 +36887,7 @@
       "name": "returnsCreate",
       "domain": "returns",
       "file": "functions/src/callables/returns.ts",
-      "line": 445,
+      "line": 446,
       "gate": "tenant",
       "kind": "create",
       "permissions": [
@@ -37198,7 +37115,7 @@
       "name": "returnsList",
       "domain": "returns",
       "file": "functions/src/callables/returns.ts",
-      "line": 513,
+      "line": 514,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -37877,7 +37794,7 @@
       "name": "paymentsList",
       "domain": "payments",
       "file": "functions/src/callables/payments.ts",
-      "line": 518,
+      "line": 536,
       "gate": "tenant",
       "kind": "list",
       "permissions": [
@@ -38207,7 +38124,7 @@
       "name": "paymentsVoid",
       "domain": "payments",
       "file": "functions/src/callables/payments.ts",
-      "line": 348,
+      "line": 364,
       "gate": "tenant",
       "kind": "delete",
       "permissions": [
@@ -39146,7 +39063,7 @@
       "name": "reportsGetRevenue",
       "domain": "reports",
       "file": "functions/src/callables/reports/financialReports.ts",
-      "line": 264,
+      "line": 272,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -39284,7 +39201,7 @@
       "name": "reportsGetProfitLoss",
       "domain": "reports",
       "file": "functions/src/callables/reports/financialReports.ts",
-      "line": 340,
+      "line": 353,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -39745,7 +39662,7 @@
       "name": "reportsGetTopEntities",
       "domain": "reports",
       "file": "functions/src/callables/reports/analyticsReports.ts",
-      "line": 94,
+      "line": 95,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -39932,7 +39849,7 @@
       "name": "reportsGetStaffActivity",
       "domain": "reports",
       "file": "functions/src/callables/reports/analyticsReports.ts",
-      "line": 168,
+      "line": 170,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -40130,7 +40047,7 @@
       "name": "reportsGetPlatformOverview",
       "domain": "reports",
       "file": "functions/src/callables/reports/analyticsReports.ts",
-      "line": 302,
+      "line": 305,
       "gate": "platform",
       "kind": "read",
       "permissions": [
@@ -40197,14 +40114,13 @@
       ],
       "response": {
         "envelope": "ACTION",
-        "tsType": "{ totalOrganizations: number; activeOrganizations: number; suspendedOrganizations: number; inactiveOrganizations: number; organizationsByStatus: Record<string, number>; organizationsByCountry: Record<...>; ... 10 more ...; generatedAt: stri",
+        "tsType": "{ totalOrganizations: number; activeOrganizations: number; suspendedOrganizations: number; inactiveOrganizations: number; organizationsByStatus: Record<string, number>; organizationsByCountry: Record<...>; ... 8 more ...; generatedAt: strin",
         "topLevelKeys": [
           "activeOrganizations",
           "atRiskOrganizations",
           "availablePlansCount",
           "generatedAt",
           "inactiveOrganizations",
-          "netPlatformCashFlow",
           "organizationsByCountry",
           "organizationsByPlan",
           "organizationsByStatus",
@@ -40213,9 +40129,8 @@
           "suspendedOrganizations",
           "topOrganizationsByUsage",
           "totalOrganizations",
-          "totalPlatformOutflows",
-          "totalPlatformRevenue",
-          "totalUsers"
+          "totalUsers",
+          "totalsByCurrency"
         ],
         "requiredTopKeys": [
           "activeOrganizations",
@@ -40223,7 +40138,6 @@
           "availablePlansCount",
           "generatedAt",
           "inactiveOrganizations",
-          "netPlatformCashFlow",
           "organizationsByCountry",
           "organizationsByPlan",
           "organizationsByStatus",
@@ -40232,11 +40146,10 @@
           "suspendedOrganizations",
           "topOrganizationsByUsage",
           "totalOrganizations",
-          "totalPlatformOutflows",
-          "totalPlatformRevenue",
-          "totalUsers"
+          "totalUsers",
+          "totalsByCurrency"
         ],
-        "leafCount": 26,
+        "leafCount": 23,
         "sampleLeaves": [
           {
             "path": "totalOrganizations",
@@ -40314,6 +40227,11 @@
             "optional": false
           },
           {
+            "path": "topOrganizationsByUsage[].currency",
+            "type": "string",
+            "optional": false
+          },
+          {
             "path": "topOrganizationsByUsage[].billsCount",
             "type": "number",
             "optional": false
@@ -40324,33 +40242,13 @@
             "optional": false
           },
           {
-            "path": "totalPlatformRevenue",
-            "type": "number",
+            "path": "totalsByCurrency",
+            "type": "Record<string, { revenue: number; outflows: number; netCashFlow: number; billsCount: number; outflowsCount: number; }>",
             "optional": false
           },
           {
-            "path": "totalPlatformOutflows",
-            "type": "number",
-            "optional": false
-          },
-          {
-            "path": "netPlatformCashFlow",
-            "type": "number",
-            "optional": false
-          },
-          {
-            "path": "platformFinancials.totalRevenue",
-            "type": "number",
-            "optional": false
-          },
-          {
-            "path": "platformFinancials.totalOutflows",
-            "type": "number",
-            "optional": false
-          },
-          {
-            "path": "platformFinancials.netPlatformCashFlow",
-            "type": "number",
+            "path": "platformFinancials.totalsByCurrency",
+            "type": "Record<string, { revenue: number; outflows: number; netCashFlow: number; billsCount: number; outflowsCount: number; }>",
             "optional": false
           },
           {
@@ -40382,7 +40280,7 @@
       "name": "reportsExportCsv",
       "domain": "reports",
       "file": "functions/src/callables/reports/analyticsReports.ts",
-      "line": 423,
+      "line": 456,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -40775,7 +40673,7 @@
       "name": "reportsGetOutflowSummary",
       "domain": "reports",
       "file": "functions/src/callables/reports/operationalReports.ts",
-      "line": 196,
+      "line": 197,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -40983,7 +40881,7 @@
       "name": "reportsGetReceivablesAgeing",
       "domain": "reports",
       "file": "functions/src/callables/reports/operationalReports.ts",
-      "line": 282,
+      "line": 284,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -41168,7 +41066,7 @@
       "name": "reportsGetPayablesAgeing",
       "domain": "reports",
       "file": "functions/src/callables/reports/operationalReports.ts",
-      "line": 395,
+      "line": 398,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -41353,7 +41251,7 @@
       "name": "reportsGetCashBankSummary",
       "domain": "reports",
       "file": "functions/src/callables/reports/financialReports.ts",
-      "line": 359,
+      "line": 372,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -41521,7 +41419,7 @@
       "name": "reportsGetBranchSummary",
       "domain": "reports",
       "file": "functions/src/callables/reports/financialReports.ts",
-      "line": 440,
+      "line": 454,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -42447,8 +42345,8 @@
           },
           {
             "path": "items[].currency",
-            "type": "string",
-            "optional": false
+            "type": "string | null",
+            "optional": true
           },
           {
             "path": "items[].actorUid",
@@ -42812,8 +42710,8 @@
           },
           {
             "path": "items[].currency",
-            "type": "string",
-            "optional": false
+            "type": "string | null",
+            "optional": true
           },
           {
             "path": "items[].category",
@@ -45725,7 +45623,7 @@
           },
           {
             "path": "request.severity",
-            "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
+            "type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
             "optional": true
           },
           {
@@ -46614,7 +46512,7 @@
           },
           {
             "path": "request.severity",
-            "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
+            "type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
             "optional": true
           },
           {
@@ -46890,7 +46788,7 @@
           },
           {
             "path": "request.severity",
-            "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
+            "type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
             "optional": true
           },
           {
@@ -47873,7 +47771,7 @@
           },
           {
             "path": "items[].severity",
-            "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
+            "type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
             "optional": true
           },
           {
@@ -48805,7 +48703,7 @@
           },
           {
             "path": "request.severity",
-            "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined | RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
+            "type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined | \"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
             "optional": true
           },
           {
@@ -49525,7 +49423,7 @@
       "name": "usageGetPlatformSummary",
       "domain": "usage",
       "file": "functions/src/callables/usage.ts",
-      "line": 79,
+      "line": 80,
       "gate": "platform",
       "kind": "read",
       "permissions": [
@@ -49849,7 +49747,7 @@
       "name": "usageGetOrganizations",
       "domain": "usage",
       "file": "functions/src/callables/usage.ts",
-      "line": 153,
+      "line": 154,
       "gate": "platform",
       "kind": "read",
       "permissions": [
@@ -50191,7 +50089,7 @@
       "name": "usageGetBranches",
       "domain": "usage",
       "file": "functions/src/callables/usage.ts",
-      "line": 216,
+      "line": 217,
       "gate": "platform",
       "kind": "read",
       "permissions": [
@@ -50382,7 +50280,7 @@
       "name": "usageGetDetail",
       "domain": "usage",
       "file": "functions/src/callables/usage.ts",
-      "line": 312,
+      "line": 313,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -50734,7 +50632,7 @@
       "name": "usageCalculateDryRunStatement",
       "domain": "usage",
       "file": "functions/src/callables/usage.ts",
-      "line": 369,
+      "line": 370,
       "gate": "platform",
       "kind": "update",
       "permissions": [
@@ -50941,7 +50839,7 @@
       "name": "usageRecordClientMetric",
       "domain": "usage",
       "file": "functions/src/callables/usage.ts",
-      "line": 408,
+      "line": 409,
       "gate": "tenant",
       "kind": "update",
       "permissions": [],
@@ -51020,7 +50918,7 @@
       "name": "usageGetLimits",
       "domain": "usage",
       "file": "functions/src/callables/usage.ts",
-      "line": 441,
+      "line": 442,
       "gate": "tenant",
       "kind": "read",
       "permissions": [
@@ -51306,7 +51204,7 @@
       "name": "usageUpdateLimits",
       "domain": "usage",
       "file": "functions/src/callables/usage.ts",
-      "line": 496,
+      "line": 497,
       "gate": "platform",
       "kind": "update",
       "permissions": [

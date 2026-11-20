@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `outflowsCreate`
-- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/outflows.ts:304`
+- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/outflows.ts:305`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `outflow.create` (`mutation`) · **State Machine:** [outflow](../state-machines.md)
 
@@ -41,7 +41,7 @@ Back to [Master Index](./INDEX.md).
 | `financialAccountId` | `string` | No | {"minLength":2} | `financialAccount_001` |
 | `storageLocationId` | `string` | No | {"minLength":2} | `storageLocation_001` |
 | `splitPayments[].method` | `enum` | **Yes** | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `splitPayments[].amount` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `splitPayments[].amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
 | `splitPayments[].financialAccountId` | `string` | **Yes** | {"minLength":2} | `splitPayments___financialAccount_001` |
 | `splitPayments[].notes` | `string` | No | {"maxLength":300} | `Sample notes` |
 | `notes` | `string` | No | {"maxLength":1000} | `Sample notes` |
@@ -78,7 +78,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `outflowsList`
-- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/outflows.ts:561`
+- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/outflows.ts:571`
 - **Permission(s):** `outflow:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `outflow.list` (`none`) · **State Machine:** [outflow](../state-machines.md)
 
@@ -124,7 +124,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `outflowsGet`
-- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/outflows.ts:604`
+- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/outflows.ts:614`
 - **Permission(s):** `outflow:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `outflow.get` (`none`) · **State Machine:** [outflow](../state-machines.md)
 
@@ -160,7 +160,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `outflowsVoid`
-- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/outflows.ts:702`
+- **Domain:** `outflows` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/outflows.ts:712`
 - **Permission(s):** `expense:void`, `outflow:void`, `purchase:void` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `outflow.void` (`mutation`) · **State Machine:** [outflow](../state-machines.md)
 

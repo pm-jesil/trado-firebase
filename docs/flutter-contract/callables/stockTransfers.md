@@ -56,7 +56,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersSubmit`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:260`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:261`
 - **Permission(s):** `stock:transfer_create` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.submit` (`mutation`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -92,7 +92,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersCancel`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/stockTransfers.ts:316`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/stockTransfers.ts:317`
 - **Permission(s):** `stock:transfer_create` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.cancel` (`mutation`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -130,7 +130,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersDispatch`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/stockTransfers.ts:431`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/stockTransfers.ts:432`
 - **Permission(s):** `stock:transfer_dispatch` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.dispatch` (`mutation`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -173,7 +173,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersReceive`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:733`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:735`
 - **Permission(s):** `stock:transfer_receive` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.receive` (`mutation`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -218,7 +218,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersResolveDiscrepancy`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:1028`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/stockTransfers.ts:1030`
 - **Permission(s):** `stock:transfer_receive` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.resolve_discrepancy` (`mutation`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -262,7 +262,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersList`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/stockTransfers.ts:1235`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/stockTransfers.ts:1238`
 - **Permission(s):** `stock:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.list` (`none`) · **State Machine:** [stock-transfer](../state-machines.md)
 
@@ -301,7 +301,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `stockTransfersGet`
-- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/stockTransfers.ts:1289`
+- **Domain:** `stockTransfers` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/stockTransfers.ts:1292`
 - **Permission(s):** `stock:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `stock_transfer.get` (`none`) · **State Machine:** [stock-transfer](../state-machines.md)
 

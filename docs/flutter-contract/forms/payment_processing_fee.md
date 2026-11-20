@@ -12,8 +12,8 @@
 | `paymentId` | `string` | No | No | `text` | — | `payment_001` |
 | `financialAccountId` | `string` | **Yes** | No | `text` | {"minLength":2} | `financialAccount_001` |
 | `paymentMethod` | `enum` | **Yes** | No | `dropdown` | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `feeAmount` | `number` | **Yes** | No | `money_paise` | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
-| `feeTaxAmount` | `number` | No | No | `money_paise` | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
+| `feeAmount` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":false} | `2500` |
+| `feeTaxAmount` | `number` | No | No | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
 | `settlementTiming` | `enum` | No | No | `dropdown` | Enum: `immediate_deduction`, `billed_later` | `immediate_deduction` |
 | `settlementReference` | `string` | No | No | `text` | {"maxLength":100} | `Sample settlementReference` |
 | `feeExpenseCategoryId` | `string` | No | No | `text` | — | `feeExpenseCategory_001` |

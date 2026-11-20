@@ -26,7 +26,13 @@ import {
 } from "../validation/schemas.js";
 import { getCountryDefaults } from "../constants/countryDefaults.js";
 import { getCurrencyInfo } from "../constants/currencies.js";
-import { requireCurrency } from "../services/money.js";
+import {
+  requireCurrency,
+  requireCountry,
+  requireTimezone,
+  requireTaxRegime,
+  requireFinancialYearStartMonth,
+} from "../services/money.js";
 import { nameKey } from "../services/naturalKeys.js";
 import { provisionMembershipInternal, OWNER_ROLE_ID, ADMIN_ROLE_ID } from "../services/membershipProvisioning.js";
 import { attachUploadedImage, hydrateImageUrl } from "../services/imageEngine.js";
@@ -50,7 +56,6 @@ import {
   addDaysYmd,
   localDateInTimezone,
   endOfDayInTimezone,
-  DEFAULT_ORG_TIMEZONE,
 } from "../services/subscription.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { AppPermissions } from "../constants/permissions.js";
@@ -316,6 +321,7 @@ export const organizationsCreate = onCall({ region: "asia-south1" }, async (requ
       currency,
       taxRegimeCode,
       financialYearStartMonth,
+      timezone,
       status: EntityStatus.ACTIVE,
       ownerStatus: willCreateOwner ? "active" : "pending",
       planId: input.planId,
@@ -770,7 +776,7 @@ export const organizationsSetSubscription = onCall({ region: "asia-south1" }, as
     const snap = await txn.get(orgRef);
     if (!snap.exists) throw new HttpsError("not-found", "Organization not found.");
     const org = snap.data() as OrganizationDoc;
-    const tz = org.timezone || DEFAULT_ORG_TIMEZONE;
+    const tz = requireTimezone(org.timezone, `organization "${input.organizationId}"`);
     const updates: Record<string, unknown> = {};
 
     let planDoc: FirebaseFirestore.DocumentSnapshot | null = null;
@@ -883,10 +889,10 @@ export const organizationsGet = onCall({ region: "asia-south1" }, async (request
     businessCategory: data.businessCategory,
     currency: requireCurrency(data.currency, `organization "${snap.id}"`),
     currencyInfo: getCurrencyInfo(data.currency),
-    timezone: data.timezone || "Asia/Kolkata",
-    country: data.country || "IN",
-    financialYearStartMonth: data.financialYearStartMonth ?? 4,
-    taxRegimeCode: data.taxRegimeCode || "IN_GST",
+    timezone: requireTimezone(data.timezone, `organization "${snap.id}"`),
+    country: requireCountry(data.country, `organization "${snap.id}"`),
+    financialYearStartMonth: requireFinancialYearStartMonth(data.financialYearStartMonth, `organization "${snap.id}"`),
+    taxRegimeCode: requireTaxRegime(data.taxRegimeCode, `organization "${snap.id}"`),
     taxId: data.taxId ?? null,
     contactEmail: data.contactEmail,
     contactPhone: data.contactPhone,

@@ -7,4 +7,4 @@
 3. **Approval Request & Action Forms (MG-04, MG-15):** Fixed `forms/approval_request.json` (`DocumentDecisionSchema` / `documentsDecide`, non-zero fields) and added `user_profile`, `ownership_transfer`, `sharing_policy`, `usage_limits`.
 4. **UI Hint & ImageRef Fixes (MG-01, MG-05):** Restricted `uiHint: "money_paise"` strictly to numeric fields (`customer.priceGroup` is now `text` with example `"retail"`); added `images.md` and fixed `storagePath` → `path`/`uploadId` docs.
 5. **Auth & Permissions Machine Catalogs (MG-02, MG-03, MG-07):** Added `auth.md` (including `primaryOrganization.timezone`) and `permissions.json` (155 concrete keys with descriptions, default roles, and scope notes).
-6. **Complete Errors & State Machines (TB-4, TB-5):** Expanded `errors.md` to all 81 thrown reason codes (reopen window default 14 days) and `state-machines.md` to all 13 code state machines.
+6. **Complete Errors & State Machines (TB-4, TB-5):** Expanded `errors.md` to all 86 thrown reason codes (reopen window default 14 days) and `state-machines.md` to all 13 code state machines.

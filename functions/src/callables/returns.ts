@@ -205,7 +205,7 @@ export async function executeReturn(
         );
       }
       // Refund ceiling: the source line's net value per unit (price/discount/tax frozen on that line)
-      const docCurr = (billData as any)?.currency || (outflowData as any)?.currency || ctx.organization.currency;
+      const docCurr = ctx.organization.currency;
       const maxRefund = Money.amount((originalLine.netAmount / originalLine.quantity) * item.quantity, docCurr);
       if (item.refundAmount > maxRefund + 0.005) {
         throw new HttpsError("invalid-argument", `Refund ${item.refundAmount} exceeds the line value ${maxRefund} for ${item.quantity} ${originalLine.unit} of line ${originalLine.lineId}.`);

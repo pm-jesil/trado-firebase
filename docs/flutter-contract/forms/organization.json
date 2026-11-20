@@ -223,62 +223,6 @@
       "example": "INR"
     },
     {
-      "path": "currencyDecimals",
-      "type": "number",
-      "requiredCreate": false,
-      "updatable": false,
-      "nullable": false,
-      "bounds": {
-        "format": "safeint",
-        "min": 0,
-        "minInclusive": true,
-        "max": 4,
-        "maxInclusive": true
-      },
-      "enumValues": [],
-      "uiHint": "numeric",
-      "example": 1
-    },
-    {
-      "path": "minorUnitName",
-      "type": "string",
-      "requiredCreate": false,
-      "updatable": false,
-      "nullable": false,
-      "bounds": {
-        "maxLength": 30
-      },
-      "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample minorUnitName"
-    },
-    {
-      "path": "minorUnitNamePlural",
-      "type": "string",
-      "requiredCreate": false,
-      "updatable": false,
-      "nullable": false,
-      "bounds": {
-        "maxLength": 30
-      },
-      "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample minorUnitNamePlural"
-    },
-    {
-      "path": "currencySymbol",
-      "type": "string",
-      "requiredCreate": false,
-      "updatable": false,
-      "nullable": false,
-      "bounds": {
-        "maxLength": 10
-      },
-      "enumValues": [],
-      "uiHint": "text",
-      "example": "Sample currencySymbol"
-    },
-    {
       "path": "taxRegimeCode",
       "type": "string",
       "requiredCreate": true,

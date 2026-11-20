@@ -62,7 +62,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `paymentsList`
-- **Domain:** `payments` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/payments.ts:518`
+- **Domain:** `payments` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/payments.ts:536`
 - **Permission(s):** `payment:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `payment.list` (`none`) · **State Machine:** —
 
@@ -101,7 +101,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `paymentsVoid`
-- **Domain:** `payments` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/payments.ts:348`
+- **Domain:** `payments` · **Gate:** `tenant` · **Kind:** `delete` · **Source:** `functions/src/callables/payments.ts:364`
 - **Permission(s):** `payment:void` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `payment.void` (`mutation`) · **State Machine:** —
 

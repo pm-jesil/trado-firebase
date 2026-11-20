@@ -3,7 +3,6 @@
     "countryCode": "IN",
     "countryName": "India",
     "currencyCode": "INR",
-    "currencyDecimals": 2,
     "timezone": "Asia/Kolkata",
     "taxRegimeCode": "IN_GST",
     "financialYearStartMonth": 4,
@@ -157,7 +156,6 @@
     "countryCode": "AE",
     "countryName": "United Arab Emirates",
     "currencyCode": "AED",
-    "currencyDecimals": 2,
     "timezone": "Asia/Dubai",
     "taxRegimeCode": "AE_VAT",
     "financialYearStartMonth": 1,
@@ -199,31 +197,92 @@
     "countryCode": "OM",
     "countryName": "Oman",
     "currencyCode": "OMR",
-    "currencyDecimals": 3,
     "timezone": "Asia/Muscat",
     "taxRegimeCode": "OM_VAT",
     "financialYearStartMonth": 1,
     "phoneRegion": "OM",
     "postalCodePattern": "^[0-9]{3}$",
-    "postalCodePlaceholder": "100"
+    "postalCodePlaceholder": "100",
+    "states": [
+      {
+        "code": "MC",
+        "name": "Muscat"
+      },
+      {
+        "code": "DH",
+        "name": "Dhofar"
+      },
+      {
+        "code": "MU",
+        "name": "Musandam"
+      },
+      {
+        "code": "BU",
+        "name": "Al Buraimi"
+      },
+      {
+        "code": "DA",
+        "name": "Al Dakhiliyah"
+      },
+      {
+        "code": "BN",
+        "name": "Al Batinah North"
+      },
+      {
+        "code": "BS",
+        "name": "Al Batinah South"
+      },
+      {
+        "code": "SN",
+        "name": "Al Sharqiyah North"
+      },
+      {
+        "code": "SS",
+        "name": "Al Sharqiyah South"
+      },
+      {
+        "code": "ZH",
+        "name": "Al Dhahirah"
+      },
+      {
+        "code": "WU",
+        "name": "Al Wusta"
+      }
+    ]
   },
   "BH": {
     "countryCode": "BH",
     "countryName": "Bahrain",
     "currencyCode": "BHD",
-    "currencyDecimals": 3,
     "timezone": "Asia/Bahrain",
     "taxRegimeCode": "BH_VAT",
     "financialYearStartMonth": 1,
     "phoneRegion": "BH",
     "postalCodePattern": "^[0-9]{3,4}$",
-    "postalCodePlaceholder": "317"
+    "postalCodePlaceholder": "317",
+    "states": [
+      {
+        "code": "CAP",
+        "name": "Capital Governorate"
+      },
+      {
+        "code": "MUH",
+        "name": "Muharraq Governorate"
+      },
+      {
+        "code": "NOR",
+        "name": "Northern Governorate"
+      },
+      {
+        "code": "SOU",
+        "name": "Southern Governorate"
+      }
+    ]
   },
   "SG": {
     "countryCode": "SG",
     "countryName": "Singapore",
     "currencyCode": "SGD",
-    "currencyDecimals": 2,
     "timezone": "Asia/Singapore",
     "taxRegimeCode": "SG_GST",
     "financialYearStartMonth": 1,
@@ -235,12 +294,178 @@
     "countryCode": "US",
     "countryName": "United States",
     "currencyCode": "USD",
-    "currencyDecimals": 2,
     "timezone": "America/New_York",
     "taxRegimeCode": "US_SALES_TAX",
     "financialYearStartMonth": 1,
     "phoneRegion": "US",
     "postalCodePattern": "^[0-9]{5}(-[0-9]{4})?$",
-    "postalCodePlaceholder": "10001"
+    "postalCodePlaceholder": "10001",
+    "states": [
+      {
+        "code": "CA",
+        "name": "California"
+      },
+      {
+        "code": "NY",
+        "name": "New York"
+      },
+      {
+        "code": "TX",
+        "name": "Texas"
+      },
+      {
+        "code": "FL",
+        "name": "Florida"
+      },
+      {
+        "code": "IL",
+        "name": "Illinois"
+      },
+      {
+        "code": "WA",
+        "name": "Washington"
+      },
+      {
+        "code": "MA",
+        "name": "Massachusetts"
+      },
+      {
+        "code": "CO",
+        "name": "Colorado"
+      },
+      {
+        "code": "GA",
+        "name": "Georgia"
+      },
+      {
+        "code": "NC",
+        "name": "North Carolina"
+      }
+    ]
+  },
+  "SA": {
+    "countryCode": "SA",
+    "countryName": "Saudi Arabia",
+    "currencyCode": "SAR",
+    "timezone": "Asia/Riyadh",
+    "taxRegimeCode": "SA_VAT",
+    "financialYearStartMonth": 1,
+    "phoneRegion": "SA",
+    "postalCodePattern": "^[0-9]{5}$",
+    "postalCodePlaceholder": "12211",
+    "states": [
+      {
+        "code": "RIY",
+        "name": "Riyadh"
+      },
+      {
+        "code": "MAK",
+        "name": "Makkah"
+      },
+      {
+        "code": "EAS",
+        "name": "Eastern Province"
+      },
+      {
+        "code": "MAD",
+        "name": "Madinah"
+      },
+      {
+        "code": "ASI",
+        "name": "Asir"
+      },
+      {
+        "code": "TAB",
+        "name": "Tabuk"
+      },
+      {
+        "code": "QAS",
+        "name": "Al-Qassim"
+      }
+    ]
+  },
+  "GB": {
+    "countryCode": "GB",
+    "countryName": "United Kingdom",
+    "currencyCode": "GBP",
+    "timezone": "Europe/London",
+    "taxRegimeCode": "GB_VAT",
+    "financialYearStartMonth": 4,
+    "phoneRegion": "GB",
+    "postalCodePattern": "^[A-Z]{1,2}[0-9][A-Z0-9]? [0-9][A-Z]{2}$",
+    "postalCodePlaceholder": "EC1A 1BB",
+    "states": [
+      {
+        "code": "ENG",
+        "name": "England"
+      },
+      {
+        "code": "SCT",
+        "name": "Scotland"
+      },
+      {
+        "code": "WLS",
+        "name": "Wales"
+      },
+      {
+        "code": "NIR",
+        "name": "Northern Ireland"
+      }
+    ]
+  },
+  "DE": {
+    "countryCode": "DE",
+    "countryName": "Germany",
+    "currencyCode": "EUR",
+    "timezone": "Europe/Berlin",
+    "taxRegimeCode": "EU_VAT",
+    "financialYearStartMonth": 1,
+    "phoneRegion": "DE",
+    "postalCodePattern": "^[0-9]{5}$",
+    "postalCodePlaceholder": "10115",
+    "states": [
+      {
+        "code": "BER",
+        "name": "Berlin"
+      },
+      {
+        "code": "BAY",
+        "name": "Bavaria"
+      },
+      {
+        "code": "NRW",
+        "name": "North Rhine-Westphalia"
+      },
+      {
+        "code": "BW",
+        "name": "Baden-Württemberg"
+      },
+      {
+        "code": "HES",
+        "name": "Hesse"
+      }
+    ]
+  },
+  "QA": {
+    "countryCode": "QA",
+    "countryName": "Qatar",
+    "currencyCode": "QAR",
+    "timezone": "Asia/Qatar",
+    "taxRegimeCode": "NONE",
+    "financialYearStartMonth": 1,
+    "phoneRegion": "QA",
+    "postalCodePattern": "^[0-9]{4,5}$",
+    "postalCodePlaceholder": "0000"
+  },
+  "KW": {
+    "countryCode": "KW",
+    "countryName": "Kuwait",
+    "currencyCode": "KWD",
+    "timezone": "Asia/Kuwait",
+    "taxRegimeCode": "NONE",
+    "financialYearStartMonth": 1,
+    "phoneRegion": "KW",
+    "postalCodePattern": "^[0-9]{5}$",
+    "postalCodePlaceholder": "13001"
   }
 }

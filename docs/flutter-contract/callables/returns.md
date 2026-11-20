@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `returnsCreate`
-- **Domain:** `returns` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/returns.ts:445`
+- **Domain:** `returns` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/returns.ts:446`
 - **Permission(s):** `return:create` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `return.create` (`mutation`) · **State Machine:** [return](../state-machines.md)
 
@@ -45,7 +45,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `returnsList`
-- **Domain:** `returns` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/returns.ts:513`
+- **Domain:** `returns` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/returns.ts:514`
 - **Permission(s):** `return:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `return.list` (`none`) · **State Machine:** [return](../state-machines.md)
 

@@ -13,7 +13,7 @@ import { onObjectFinalized } from "firebase-functions/v2/storage";
 import { getStorage } from "firebase-admin/storage";
 import { db, adminApp } from "../services/firebase.js";
 import { OrganizationDoc, SubscriptionPlanDoc } from "../types/models.js";
-import { DEFAULT_ORG_TIMEZONE } from "../services/subscription.js";
+import { requireTimezone } from "../services/money.js";
 import { withTriggerContext } from "../services/systemContext.js";
 import { incrementServerUsage, getServerUsageSnapshot, evaluateUsageLimits, mergeUsageLimits } from "../services/usageMetering.js";
 
@@ -29,7 +29,7 @@ export async function handleStorageObjectFinalized(data: { name?: string; size?:
   const orgSnap = await db.collection("organizations").doc(organizationId).get();
   if (!orgSnap.exists) return;
   const org = orgSnap.data() as OrganizationDoc;
-  const timeZone = org.timezone || DEFAULT_ORG_TIMEZONE;
+  const timeZone = requireTimezone(org.timezone, `organization "${organizationId}"`);
   const shard = await incrementServerUsage({ organizationId, timeZone, metrics: { storageUploadBytes: bytes } });
 
   const plan = org.planId ? (await db.collection("subscriptionPlans").doc(org.planId).get()).data() as SubscriptionPlanDoc | undefined : undefined;

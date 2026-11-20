@@ -171,7 +171,7 @@ export const CreateOrganizationSchema = z.strictObject({
   defaultBranchName: z.string().trim().min(2).max(100).optional(),
   defaultBranchCode: z.string().trim().min(2).max(20).regex(/^[A-Za-z0-9_-]+$/).optional(),
   salesChannels: z.array(z.nativeEnum(SalesChannel)).min(1).max(4).optional(),
-  timezone: z.string().trim().min(3).max(64).optional(), // IANA, default Asia/Kolkata
+  timezone: z.string().trim().min(3).max(64).optional(), // IANA timezone, defaults from country
   contact: ContactSchema.optional(),
   contacts: z.array(OrganizationContactSchema).max(20).optional(),
   subscription: z.strictObject({

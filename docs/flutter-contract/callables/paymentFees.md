@@ -19,8 +19,8 @@ Back to [Master Index](./INDEX.md).
 | `paymentId` | `string` | No | — | `payment_001` |
 | `financialAccountId` | `string` | **Yes** | {"minLength":2} | `financialAccount_001` |
 | `paymentMethod` | `enum` | **Yes** | Enum: `cash`, `card`, `upi`, `bank_transfer`, `cheque`, `other` | `cash` |
-| `feeAmount` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
-| `feeTaxAmount` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
+| `feeAmount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
+| `feeTaxAmount` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
 | `settlementTiming` | `enum` | No | Enum: `immediate_deduction`, `billed_later` | `immediate_deduction` |
 | `settlementReference` | `string` | No | {"maxLength":100} | `Sample settlementReference` |
 | `feeExpenseCategoryId` | `string` | No | — | `feeExpenseCategory_001` |
@@ -56,7 +56,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `paymentsVerifyFee`
-- **Domain:** `paymentFees` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/paymentFees.ts:298`
+- **Domain:** `paymentFees` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/paymentFees.ts:302`
 - **Permission(s):** `payment:fee_verify` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `payment.verify_fee` (`mutation`) · **State Machine:** [payment-processing-fee](../state-machines.md)
 
@@ -95,7 +95,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `paymentsDisputeFee`
-- **Domain:** `paymentFees` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/paymentFees.ts:366`
+- **Domain:** `paymentFees` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/paymentFees.ts:370`
 - **Permission(s):** `payment:fee_manage` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `payment.dispute_fee` (`mutation`) · **State Machine:** [payment-processing-fee](../state-machines.md)
 
@@ -129,7 +129,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `paymentsReverseFee`
-- **Domain:** `paymentFees` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/paymentFees.ts:418`
+- **Domain:** `paymentFees` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/paymentFees.ts:422`
 - **Permission(s):** `payment:fee_manage` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `payment.reverse_fee` (`mutation`) · **State Machine:** [payment-processing-fee](../state-machines.md)
 
@@ -163,7 +163,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `paymentsListFees`
-- **Domain:** `paymentFees` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/paymentFees.ts:521`
+- **Domain:** `paymentFees` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/paymentFees.ts:525`
 - **Permission(s):** `payment:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `payment.list_fees` (`none`) · **State Machine:** [payment-processing-fee](../state-machines.md)
 
@@ -205,7 +205,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `paymentsGetFee`
-- **Domain:** `paymentFees` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/paymentFees.ts:585`
+- **Domain:** `paymentFees` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/paymentFees.ts:589`
 - **Permission(s):** `payment:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `payment.get_fee` (`none`) · **State Machine:** [payment-processing-fee](../state-machines.md)
 

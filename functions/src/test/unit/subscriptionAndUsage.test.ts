@@ -53,7 +53,7 @@ describe("Subscription expiry", () => {
 
   it("default subscription is a 30-day trial ending at local end of day", () => {
     const now = Date.parse("2026-11-07T20:00:00Z"); // 2026-11-08 01:30 IST
-    const f = buildSubscriptionFields({ nowMs: now });
+    const f = buildSubscriptionFields({ nowMs: now, timezone: "Asia/Kolkata" });
     assert.equal(f.subscriptionStatus, SubscriptionStatus.TRIAL);
     assert.equal(localDateInTimezone(now, "Asia/Kolkata"), "2026-11-08");
     assert.equal(f.subscriptionExpiresAt, endOfDayInTimezone("2026-12-08", "Asia/Kolkata"));

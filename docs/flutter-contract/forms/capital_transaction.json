@@ -67,7 +67,6 @@
       "updatable": false,
       "nullable": false,
       "bounds": {
-        "format": "safeint",
         "min": 0,
         "minInclusive": false
       },

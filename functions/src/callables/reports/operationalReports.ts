@@ -11,7 +11,7 @@ import { HttpsError } from "firebase-functions/v2/https";
 import { onCall } from "../../services/callable.js";
 import { db } from "../../services/firebase.js";
 import { resolveRequestContext } from "../../services/contextResolver.js";
-import { DEFAULT_ORG_TIMEZONE, localDateInTimezone } from "../../services/subscription.js";
+import { localDateInTimezone } from "../../services/subscription.js";
 import { AppPermissions } from "../../constants/permissions.js";
 import {
   PartyStatementSchema,
@@ -20,7 +20,7 @@ import {
   GetPayablesAgeingReportSchema,
 } from "../../validation/schemas.js";
 import { parseInput } from "../../validation/parseInput.js";
-import { Money } from "../../services/money.js";
+import { Money, requireTimezone } from "../../services/money.js";
 import {
   BillDoc,
   OutflowDoc,
@@ -79,7 +79,7 @@ export const reportsGetPartyStatement = onCall({ region: "asia-south1" }, async 
       .where("returnType", "==", isVendor ? ReturnType.PURCHASE_RETURN : ReturnType.SALES_RETURN).get(),
   ]);
 
-  const tz = ctx.organization.timezone || DEFAULT_ORG_TIMEZONE;
+  const tz = requireTimezone(ctx.organization.timezone, `organization "${orgId}"`);
   const dayOf = (iso: string) => localDateInTimezone(Date.parse(iso), tz);
   const fromIso = input.from ? (input.from.length === 10 ? `${input.from}T00:00:00.000Z` : input.from) : null;
   const toIso = input.to ? (input.to.length === 10 ? `${input.to}T23:59:59.999Z` : input.to) : null;
@@ -201,7 +201,7 @@ export const reportsGetOutflowSummary = onCall({ region: "asia-south1" }, async 
   });
   const orgId = ctx.organizationId;
   const currency = ctx.organization.currency;
-  const tz = ctx.organization.timezone || DEFAULT_ORG_TIMEZONE;
+  const tz = requireTimezone(ctx.organization.timezone, `organization "${orgId}"`);
   const fromIso = input.from ? (input.from.length === 10 ? `${input.from}T00:00:00.000Z` : input.from) : "0000";
   const toIso = input.to ? (input.to.length === 10 ? `${input.to}T23:59:59.999Z` : input.to) : "9999";
   const branchOk = (b?: string) => !input.branchId || b === input.branchId;

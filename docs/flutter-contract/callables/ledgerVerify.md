@@ -41,7 +41,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetTrialBalance`
-- **Domain:** `ledgerVerify` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/ledgerVerify.ts:322`
+- **Domain:** `ledgerVerify` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/ledgerVerify.ts:323`
 - **Permission(s):** `report:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_trial_balance` (`none`) · **State Machine:** —
 

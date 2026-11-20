@@ -11,7 +11,7 @@ import { HttpsError } from "firebase-functions/v2/https";
 import { onCall } from "../../services/callable.js";
 import { db } from "../../services/firebase.js";
 import { resolveRequestContext } from "../../services/contextResolver.js";
-import { DEFAULT_ORG_TIMEZONE, localDateInTimezone } from "../../services/subscription.js";
+import { localDateInTimezone } from "../../services/subscription.js";
 import { AppPermissions } from "../../constants/permissions.js";
 import {
   GetRevenueReportSchema,
@@ -20,7 +20,14 @@ import {
   GetBranchSummarySchema,
 } from "../../validation/schemas.js";
 import { parseInput } from "../../validation/parseInput.js";
-import { Money, roundTo, getCurrencyDecimals, requireCurrency } from "../../services/money.js";
+import {
+  Money,
+  roundTo,
+  getCurrencyDecimals,
+  requireCurrency,
+  requireTimezone,
+  requireFinancialYearStartMonth,
+} from "../../services/money.js";
 import {
   BillDoc,
   OutflowDoc,
@@ -49,8 +56,8 @@ export async function computeProfitLoss(orgId: string, validated: {
   // Load organization configuration (timezone, financial year start, currency decimals)
   const orgDoc = await db.collection("organizations").doc(orgId).get();
   const orgData = (orgDoc.exists ? orgDoc.data() : {}) as OrganizationDoc;
-  const tz = orgData.timezone || DEFAULT_ORG_TIMEZONE;
-  const fyStartMonth = (orgData as unknown as { financialYearStartMonth?: number }).financialYearStartMonth || 4;
+  const tz = requireTimezone(orgData.timezone, `organization "${orgId}"`);
+  const fyStartMonth = requireFinancialYearStartMonth(orgData.financialYearStartMonth, `organization "${orgId}"`);
   const currency = requireCurrency(orgData.currency, `organization "${orgId}"`);
   const decimals = getCurrencyDecimals(currency);
 

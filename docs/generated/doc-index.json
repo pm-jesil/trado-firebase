@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
-  "totalDocuments": 235,
+  "totalDocuments": 236,
   "countsByClassification": {
     "KEEP+UPDATE": 79,
     "REWRITE": 2,
-    "ARCHIVE": 20,
+    "ARCHIVE": 21,
     "GENERATED": 134
   },
   "documents": [
@@ -162,7 +162,7 @@
       "path": "docs/audit/handoff.md",
       "title": "Trado Engineering Handoff (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 129
+      "lineCount": 130
     },
     {
       "path": "docs/audit/implementation-status.md",
@@ -181,6 +181,12 @@
       "title": "Metering, audit and request-context inventory (prompt 66, Part 1)",
       "classification": "GENERATED",
       "lineCount": null
+    },
+    {
+      "path": "docs/audit/money-field-inventory.md",
+      "title": "Money and Currency Field Mechanical Inventory (Prompt 77D S0)",
+      "classification": "ARCHIVE",
+      "lineCount": 305
     },
     {
       "path": "docs/audit/numeric-audit.md",
@@ -228,7 +234,7 @@
       "path": "docs/audit/run-ledger.md",
       "title": "Trado Engineering Run Ledger (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 38
+      "lineCount": 48
     },
     {
       "path": "docs/audit/test-coverage-matrix.md",

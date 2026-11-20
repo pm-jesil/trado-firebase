@@ -8,7 +8,7 @@
 - **Money:** Integer minor units per org `currencyDecimals` (2 for INR/AED/USD, 3 for BHD/OMR/KWD).
 - **Timestamps:** ISO 8601 UTC strings; local dates `YYYY-MM-DD`; org timezone from `authMe` → `context.primaryOrganization.timezone` ([auth.md](./auth.md)).
 - **Images:** Upload to `uploadPath` via `imagesCreateUploadSession`, pass `uploadId`; stored as `ImageRef { path, contentType, width, height, sizeBytes, updatedAt, thumbnailPath? }`; read as hydrated `imageUrl` ([images.md](./images.md)).
-- **Permissions (155 concrete):** [permissions.json](./permissions.json) · **Errors (81 codes):** [errors.md](./errors.md) · **State Machines (13):** [state-machines.md](./state-machines.md)
+- **Permissions (155 concrete):** [permissions.json](./permissions.json) · **Errors (86 codes):** [errors.md](./errors.md) · **State Machines (13):** [state-machines.md](./state-machines.md)
 
 ## 2. Contract Changes Since Last Pack (Read First for Flutter Prompt 80)
 - `forms/*.json` `callables` shape changed from `{ create, update }` to `{ create?, get?, list?, update?, delete?, void?, actions: [{ name, kind }] }` (MG-06).
@@ -18,13 +18,13 @@
 - `forms/organization.json` now includes per-field `editableBy` and `operations.update` actor map (MG-12).
 - `customer.priceGroup` fixed from `uiHint: money_paise` to `uiHint: text` with example `"retail"` (MG-05).
 - Added machine-readable `callables.json`, `permissions.json`, `images.md`, and `auth.md`.
-- `errors.md` expanded from 24 to 81 thrown reason codes; `REQUEST_REOPEN_WINDOW_CLOSED` now reflects configurable `reopenWindowDays` (default 14 days).
+- `errors.md` expanded from 24 to 86 thrown reason codes; `REQUEST_REOPEN_WINDOW_CLOSED` now reflects configurable `reopenWindowDays` (default 14 days).
 - `state-machines.md` expanded from 9 to 13 machines (DeliveryStatus fixed to `picked_up`/`out_for_delivery`/`returned`; added `subscription`, `stock-transfer`, `payment-processing-fee`, `approval-decision`).
 
 ## 3. Entity & Action Forms Matrix (35 forms)
 | Entity | Primary Callable | Req | Opt | Updatable |
 |---|---|---|---|---|
-| `organization` | `organizationsCreate` | 17 | 70 | 64 |
+| `organization` | `organizationsCreate` | 17 | 66 | 64 |
 | `branch` | `branchesCreate` | 3 | 26 | 27 |
 | `employee` | `employeesCreate` | 6 | 17 | 18 |
 | `customer` | `customersCreate` | 11 | 48 | 57 |

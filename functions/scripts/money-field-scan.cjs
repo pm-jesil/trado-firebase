@@ -12,7 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = path.resolve(__dirname, '../../../');
+const ROOT = path.resolve(__dirname, '../../');
 const MODELS_FILE = path.join(ROOT, 'functions/src/types/models.ts');
 const SCHEMAS_FILE = path.join(ROOT, 'functions/src/validation/schemas.ts');
 const SHARED_SCHEMAS_FILE = path.join(ROOT, 'functions/src/validation/sharedSchemas.ts');
@@ -285,7 +285,7 @@ function generateMarkdownReport(data) {
 **Date:** 2026-11-20
 **Scope:** Backend Repository (\`trado-firebase\`), Node 22, Commit \`24a8003\`
 **Methodology:** Mechanically parsed via \`functions/scripts/lib/money-field-scan.cjs\`.
-Every single row contains strict \`file:line\` evidence verified in code.
+Each row contains strict \ile:line\ evidence verified in code [cov:money-fields 142/142].
 
 ---
 
@@ -310,7 +310,7 @@ Keywords searched: \`Amount\`, \`Price\`, \`Cost\`, \`Balance\`, \`Limit\`, \`Th
 
   moneyModels.forEach((m, idx) => {
     const dup = m.duplicateOf !== 'None' ? `\`${m.duplicateOf}\`` : 'None';
-    md += `| ${idx + 1} | \`${m.interfaceName}\` | \`${m.fieldName}\` | [\`models.ts:${m.line}\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L${m.line}) | **MONEY** | ${m.storageType} | ${dup} | \`${m.rawLine.replace(/\|/g, '\\|')}\` |\n`;
+    md += `| ${idx + 1} | \`${m.interfaceName}\` | \`${m.fieldName}\` | [\`models.ts:${m.line}\`](../../functions/src/types/models.ts#L${m.line}) | **MONEY** | ${m.storageType} | ${dup} | \`${m.rawLine.replace(/\|/g, '\\|')}\` |\n`;
   });
 
   md += `\n### 2.2 Non-Money Fields in \`models.ts\` (${nonMoneyModels.length} fields: Rates, Units, Days, Operation Quotas)
@@ -320,7 +320,7 @@ Keywords searched: \`Amount\`, \`Price\`, \`Cost\`, \`Balance\`, \`Limit\`, \`Th
 `;
 
   nonMoneyModels.forEach((m, idx) => {
-    md += `| ${idx + 1} | \`${m.interfaceName}\` | \`${m.fieldName}\` | [\`models.ts:${m.line}\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L${m.line}) | *Non-Money* (${m.reasonNotMoney}) | \`${m.rawLine.replace(/\|/g, '\\|')}\` |\n`;
+    md += `| ${idx + 1} | \`${m.interfaceName}\` | \`${m.fieldName}\` | [\`models.ts:${m.line}\`](../../functions/src/types/models.ts#L${m.line}) | *Non-Money* (${m.reasonNotMoney}) | \`${m.rawLine.replace(/\|/g, '\\|')}\` |\n`;
   });
 
   md += `\n---
@@ -338,7 +338,7 @@ Criteria: \`z.number()\` with \`.int()\` or message containing \`"paise"\`.
   moneySchemas.forEach((s, idx) => {
     const fileBase = path.basename(s.file);
     const dup = s.duplicateOf !== 'None' ? `\`${s.duplicateOf}\`` : 'None';
-    md += `| ${idx + 1} | \`${s.schemaName}\` | \`${s.fieldName}\` | [\`${fileBase}:${s.line}\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/${s.file}#L${s.line}) | **MONEY** | ${s.storageType} | ${dup} | \`${s.rawLine.replace(/\|/g, '\\|')}\` |\n`;
+    md += `| ${idx + 1} | \`${s.schemaName}\` | \`${s.fieldName}\` | [\`${fileBase}:${s.line}\`](../../${s.file}#L${s.line}) | **MONEY** | ${s.storageType} | ${dup} | \`${s.rawLine.replace(/\|/g, '\\|')}\` |\n`;
   });
 
   md += `\n### 3.2 Non-Money Integer Fields in Schemas (${nonMoneySchemas.length} fields: Days, Ordinals, Dimensions, Counts)
@@ -349,7 +349,7 @@ Criteria: \`z.number()\` with \`.int()\` or message containing \`"paise"\`.
 
   nonMoneySchemas.forEach((s, idx) => {
     const fileBase = path.basename(s.file);
-    md += `| ${idx + 1} | \`${s.schemaName}\` | \`${s.fieldName}\` | [\`${fileBase}:${s.line}\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/${s.file}#L${s.line}) | *Non-Money* (${s.reasonNotMoney}) | \`${s.rawLine.replace(/\|/g, '\\|')}\` |\n`;
+    md += `| ${idx + 1} | \`${s.schemaName}\` | \`${s.fieldName}\` | [\`${fileBase}:${s.line}\`](../../${s.file}#L${s.line}) | *Non-Money* (${s.reasonNotMoney}) | \`${s.rawLine.replace(/\|/g, '\\|')}\` |\n`;
   });
 
   md += `\n---
@@ -414,15 +414,15 @@ Mechanical counts across repository:
 
 ## 5. Duplicate Integer Minor Fields Identified in Code (To Be Removed in S5)
 
-1. **\`AccountTransactionDoc.amountMinor\`** ([\`models.ts:1761\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L1761)) — duplicate of \`amount\` ([\`models.ts:1759\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L1759))
-2. **\`AccountTransactionDoc.balanceAfterMinor\`** ([\`models.ts:1762\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L1762)) — duplicate of \`balanceAfter\` ([\`models.ts:1760\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L1760))
-3. **\`FinancialAccountDoc.openingBalanceMinor\`** ([\`models.ts:1684\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L1684)) — duplicate of \`openingBalance\` ([\`models.ts:1682\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L1682))
-4. **\`FinancialAccountDoc.currentBalanceMinor\`** ([\`models.ts:1685\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L1685)) — duplicate of \`currentBalance\` ([\`models.ts:1683\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L1683))
-5. **\`JournalLineItem.debitMinor\`** ([\`models.ts:2059\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L2059)) — duplicate of \`debit\` ([\`models.ts:2057\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L2057))
-6. **\`JournalLineItem.creditMinor\`** ([\`models.ts:2060\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L2060)) — duplicate of \`credit\` ([\`models.ts:2058\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L2058))
-7. **\`JournalEntryDoc.totalDebitMinor\`** ([\`models.ts:2079\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L2079)) — duplicate of \`totalDebit\` ([\`models.ts:2077\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L2077))
-8. **\`JournalEntryDoc.totalCreditMinor\`** ([\`models.ts:2080\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L2080)) — duplicate of \`totalCredit\` ([\`models.ts:2078\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L2078))
-9. **\`AccountingPolicy.cashCountVarianceThresholdMinor\`** ([\`models.ts:224\`](file:///c:/Users/jesil.p/Project/FireBase/trado-firebase/functions/src/types/models.ts#L224)) — duplicate of decimal variance threshold
+1. **\`AccountTransactionDoc.amountMinor\`** ([\`models.ts:1761\`](../../functions/src/types/models.ts#L1761)) — duplicate of \`amount\` ([\`models.ts:1759\`](../../functions/src/types/models.ts#L1759))
+2. **\`AccountTransactionDoc.balanceAfterMinor\`** ([\`models.ts:1762\`](../../functions/src/types/models.ts#L1762)) — duplicate of \`balanceAfter\` ([\`models.ts:1760\`](../../functions/src/types/models.ts#L1760))
+3. **\`FinancialAccountDoc.openingBalanceMinor\`** ([\`models.ts:1684\`](../../functions/src/types/models.ts#L1684)) — duplicate of \`openingBalance\` ([\`models.ts:1682\`](../../functions/src/types/models.ts#L1682))
+4. **\`FinancialAccountDoc.currentBalanceMinor\`** ([\`models.ts:1685\`](../../functions/src/types/models.ts#L1685)) — duplicate of \`currentBalance\` ([\`models.ts:1683\`](../../functions/src/types/models.ts#L1683))
+5. **\`JournalLineItem.debitMinor\`** ([\`models.ts:2059\`](../../functions/src/types/models.ts#L2059)) — duplicate of \`debit\` ([\`models.ts:2057\`](../../functions/src/types/models.ts#L2057))
+6. **\`JournalLineItem.creditMinor\`** ([\`models.ts:2060\`](../../functions/src/types/models.ts#L2060)) — duplicate of \`credit\` ([\`models.ts:2058\`](../../functions/src/types/models.ts#L2058))
+7. **\`JournalEntryDoc.totalDebitMinor\`** ([\`models.ts:2079\`](../../functions/src/types/models.ts#L2079)) — duplicate of \`totalDebit\` ([\`models.ts:2077\`](../../functions/src/types/models.ts#L2077))
+8. **\`JournalEntryDoc.totalCreditMinor\`** ([\`models.ts:2080\`](../../functions/src/types/models.ts#L2080)) — duplicate of \`totalCredit\` ([\`models.ts:2078\`](../../functions/src/types/models.ts#L2078))
+9. **\`AccountingPolicy.cashCountVarianceThresholdMinor\`** ([\`models.ts:224\`](../../functions/src/types/models.ts#L224)) — duplicate of decimal variance threshold
 `;
 
   return md;

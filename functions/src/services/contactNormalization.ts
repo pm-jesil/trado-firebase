@@ -41,7 +41,7 @@ export function normalizePhone(phone: string, defaultCountry: string = "IN"): st
   }
 
   const trimmed = phone.trim();
-  const region = (defaultCountry || "IN").toUpperCase().trim() as CountryCode;
+  const region = (defaultCountry ? defaultCountry : "IN").toUpperCase().trim() as CountryCode;
 
   try {
     const parsed = parsePhoneNumber(trimmed, region);

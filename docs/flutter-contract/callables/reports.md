@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `reportsGetRevenue`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:264`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:272`
 - **Permission(s):** `report:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_revenue` (`none`) · **State Machine:** —
 
@@ -40,7 +40,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetProfitLoss`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:340`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:353`
 - **Permission(s):** `report:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_profit_loss` (`none`) · **State Machine:** —
 
@@ -115,7 +115,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetTopEntities`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/analyticsReports.ts:94`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/analyticsReports.ts:95`
 - **Permission(s):** `report:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_top_entities` (`none`) · **State Machine:** —
 
@@ -152,7 +152,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetStaffActivity`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/analyticsReports.ts:168`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/analyticsReports.ts:170`
 - **Permission(s):** `employee:view`, `report:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_staff_activity` (`none`) · **State Machine:** —
 
@@ -187,7 +187,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetPlatformOverview`
-- **Domain:** `reports` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/reports/analyticsReports.ts:302`
+- **Domain:** `reports` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/reports/analyticsReports.ts:305`
 - **Permission(s):** `platform:dashboard` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_platform_overview` (`admin`) · **State Machine:** —
 
@@ -200,7 +200,7 @@ Back to [Master Index](./INDEX.md).
 | `from` | `string` | No | {"format":"regex"} | `Sample from` |
 | `to` | `string` | No | {"format":"regex"} | `Sample to` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "activeOrganizations", "atRiskOrganizations", "availablePlansCount", "generatedAt", "inactiveOrganizations", "netPlatformCashFlow", "organizationsByCountry", "organizationsByPlan", "organizationsByStatus", "platformFinancials", "subscriptionsExpiring", "suspendedOrganizations", "topOrganizationsByUsage", "totalOrganizations", "totalPlatformOutflows", "totalPlatformRevenue", "totalUsers" (26 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "activeOrganizations", "atRiskOrganizations", "availablePlansCount", "generatedAt", "inactiveOrganizations", "organizationsByCountry", "organizationsByPlan", "organizationsByStatus", "platformFinancials", "subscriptionsExpiring", "suspendedOrganizations", "topOrganizationsByUsage", "totalOrganizations", "totalUsers", "totalsByCurrency" (23 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -217,15 +217,15 @@ Back to [Master Index](./INDEX.md).
     "availablePlansCount": "...",
     "generatedAt": "...",
     "inactiveOrganizations": "...",
-    "netPlatformCashFlow": "...",
     "organizationsByCountry": "...",
-    "organizationsByPlan": "..."
+    "organizationsByPlan": "...",
+    "organizationsByStatus": "..."
   }
 }
 ```
 
 ## `reportsExportCsv`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/analyticsReports.ts:423`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/analyticsReports.ts:456`
 - **Permission(s):** `report:export` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.export_csv` (`export`) · **State Machine:** —
 
@@ -304,7 +304,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetOutflowSummary`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/operationalReports.ts:196`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/operationalReports.ts:197`
 - **Permission(s):** `expense:view_sensitive`, `outflow:view`, `report:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_outflow_summary` (`read_sensitive`) · **State Machine:** —
 
@@ -344,7 +344,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetReceivablesAgeing`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/operationalReports.ts:282`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/operationalReports.ts:284`
 - **Permission(s):** `receivables:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_receivables_ageing` (`none`) · **State Machine:** —
 
@@ -379,7 +379,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetPayablesAgeing`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/operationalReports.ts:395`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/operationalReports.ts:398`
 - **Permission(s):** `payables:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_payables_ageing` (`none`) · **State Machine:** —
 
@@ -414,7 +414,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetCashBankSummary`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:359`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:372`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_cash_bank_summary` (`none`) · **State Machine:** —
 
@@ -447,7 +447,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `reportsGetBranchSummary`
-- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:440`
+- **Domain:** `reports` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/reports/financialReports.ts:454`
 - **Permission(s):** `branch:manage`, `report:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `report.get_branch_summary` (`none`) · **State Machine:** —
 

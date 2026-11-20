@@ -12,10 +12,20 @@
 
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { getCountryDefaults } from "../../constants/countryDefaults.js";
+import { getCountryDefaults, COUNTRY_DEFAULTS } from "../../constants/countryDefaults.js";
 import { DEFAULT_TAX_REGIMES } from "../../constants/catalogs.js";
 import { calculateTax, getTaxRegime } from "../../services/taxCalculation.js";
-import { toMinor, fromMinor, getCurrencyDecimals, Money } from "../../services/money.js";
+import {
+  toMinor,
+  fromMinor,
+  getCurrencyDecimals,
+  Money,
+  requireCountry,
+  requireTimezone,
+  requireTaxRegime,
+  requireFinancialYearStartMonth,
+} from "../../services/money.js";
+import { getCurrencyInfo } from "../../constants/currencies.js";
 
 describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
   describe("1. Country Defaults & Minor Unit Naming (Gap G8)", () => {
@@ -38,11 +48,71 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
         const def = getCountryDefaults(code);
         assert.ok(def, `Country definition for ${code} must exist`);
         assert.equal(def.currencyCode, exp.currency, `${code} currencyCode mismatch`);
-        assert.equal(def.currencyDecimals, exp.decimals, `${code} currencyDecimals mismatch`);
-        assert.equal(def.minorUnitName, exp.minor, `${code} minorUnitName mismatch`);
-        assert.equal(def.minorUnitNamePlural, exp.minorPlural, `${code} minorUnitNamePlural mismatch`);
-        assert.equal(def.currencySymbol, exp.symbol, `${code} currencySymbol mismatch`);
+        const info = getCurrencyInfo(def.currencyCode);
+        assert.equal(info.exponent, exp.decimals, `${code} currencyDecimals mismatch`);
+        assert.equal(info.minor?.name.toLowerCase(), exp.minor.toLowerCase(), `${code} minorUnitName mismatch`);
+        assert.equal(info.minor?.plural.toLowerCase(), exp.minorPlural.toLowerCase(), `${code} minorUnitNamePlural mismatch`);
+        assert.equal(info.symbol, exp.symbol, `${code} currencySymbol mismatch`);
       }
+    });
+
+    it("every countryDefaults currencyCode exists in the CURRENCIES table", () => {
+      for (const [code, def] of Object.entries(COUNTRY_DEFAULTS)) {
+        const info = getCurrencyInfo(def.currencyCode);
+        assert.ok(info, `Currency definition for ${def.currencyCode} (${code}) must exist in CURRENCIES`);
+        assert.equal(info.code, def.currencyCode);
+      }
+    });
+
+    describe("Missing organization fields throw failed-precondition errors", () => {
+      it("requireCountry throws COUNTRY_MISSING for empty/null country", () => {
+        assert.throws(
+          () => requireCountry(null, 'organization "org_1"'),
+          (err: any) => err.reason === "COUNTRY_MISSING" && err.code === "failed-precondition"
+        );
+        assert.throws(
+          () => requireCountry("", 'organization "org_1"'),
+          (err: any) => err.reason === "COUNTRY_MISSING" && err.code === "failed-precondition"
+        );
+      });
+
+      it("requireTimezone throws TIMEZONE_MISSING for empty/null timezone", () => {
+        assert.throws(
+          () => requireTimezone(null, 'organization "org_1"'),
+          (err: any) => err.reason === "TIMEZONE_MISSING" && err.code === "failed-precondition"
+        );
+        assert.throws(
+          () => requireTimezone("", 'organization "org_1"'),
+          (err: any) => err.reason === "TIMEZONE_MISSING" && err.code === "failed-precondition"
+        );
+      });
+
+      it("requireTaxRegime throws TAX_REGIME_MISSING for empty/null taxRegimeCode", () => {
+        assert.throws(
+          () => requireTaxRegime(null, 'organization "org_1"'),
+          (err: any) => err.reason === "TAX_REGIME_MISSING" && err.code === "failed-precondition"
+        );
+        assert.throws(
+          () => requireTaxRegime("", 'organization "org_1"'),
+          (err: any) => err.reason === "TAX_REGIME_MISSING" && err.code === "failed-precondition"
+        );
+      });
+
+      it("requireFinancialYearStartMonth throws FINANCIAL_YEAR_START_MONTH_MISSING for invalid month", () => {
+        assert.throws(
+          () => requireFinancialYearStartMonth(null as any, 'organization "org_1"'),
+          (err: any) => err.reason === "FINANCIAL_YEAR_START_MONTH_MISSING" && err.code === "failed-precondition"
+        );
+        assert.throws(
+          () => requireFinancialYearStartMonth(0, 'organization "org_1"'),
+          (err: any) => err.reason === "FINANCIAL_YEAR_START_MONTH_MISSING" && err.code === "failed-precondition"
+        );
+        assert.throws(
+          () => requireFinancialYearStartMonth(13, 'organization "org_1"'),
+          (err: any) => err.reason === "FINANCIAL_YEAR_START_MONTH_MISSING" && err.code === "failed-precondition"
+        );
+        assert.equal(requireFinancialYearStartMonth(4, 'organization "org_1"'), 4);
+      });
     });
 
     it("includes sub-national administrative divisions for multi-region countries", () => {
@@ -71,7 +141,7 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
       const def = getCountryDefaults("XX");
       assert.equal(def.countryCode, "IN");
       assert.equal(def.currencyCode, "INR");
-      assert.equal(def.minorUnitName, "paisa");
+      assert.equal(getCurrencyInfo(def.currencyCode).minor?.name.toLowerCase(), "paisa");
     });
   });
 

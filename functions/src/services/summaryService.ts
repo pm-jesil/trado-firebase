@@ -34,7 +34,7 @@ export async function recordBillSummary(
     const dailySnap = await tx.get(dailyRef);
     const monthlySnap = await tx.get(monthlyRef);
     const orgSnap = await tx.get(db.collection("organizations").doc(orgId));
-    const currency = requireCurrency((bill as any).currency || (orgSnap.data() as OrganizationDoc | undefined)?.currency, `bill "${(bill as any).id || bill.billNumber || ""}" in organization "${orgId}"`);
+    const currency = requireCurrency((orgSnap.data() as OrganizationDoc | undefined)?.currency, `bill "${bill.billNumber || ""}" in organization "${orgId}"`);
 
     // 2. Prepare daily summary
     const existingDaily: DailySummaryDoc = dailySnap.exists
@@ -130,7 +130,7 @@ export async function recordOutflowSummary(outflow: OutflowDoc): Promise<void> {
     const dailySnap = await tx.get(dailyRef);
     const monthlySnap = await tx.get(monthlyRef);
     const orgSnap = await tx.get(db.collection("organizations").doc(orgId));
-    const currency = requireCurrency((outflow as any).currency || (orgSnap.data() as OrganizationDoc | undefined)?.currency, `outflow "${(outflow as any).id || outflow.outflowNumber || ""}" in organization "${orgId}"`);
+    const currency = requireCurrency((orgSnap.data() as OrganizationDoc | undefined)?.currency, `outflow "${outflow.outflowNumber || ""}" in organization "${orgId}"`);
 
     // 2. Prepare daily summary
     const existingDaily: DailySummaryDoc = dailySnap.exists

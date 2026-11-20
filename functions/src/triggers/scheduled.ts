@@ -1,7 +1,7 @@
 /**
  * Scheduled Functions
  *
- * subscriptionAndUsageSweep (daily 02:00 Asia/Kolkata):
+ * subscriptionAndUsageSweep (daily 02:00 UTC):
  *   1. Subscription expiry reminders 7 / 3 / 1 day(s) before expiry → organization Owner(s)
  *   2. Status flip to "expired" once past expiry + grace (gate already denies by time; the
  *      flip keeps stored status truthful for reports and Super Admin lists)
@@ -17,7 +17,8 @@ import { Timestamp } from "firebase-admin/firestore";
 import { db } from "../services/firebase.js";
 import { OrganizationDoc, MembershipDoc, SubscriptionPlanDoc } from "../types/models.js";
 import { EntityStatus, SubscriptionStatus } from "../constants/enums.js";
-import { evaluateSubscription, DEFAULT_ORG_TIMEZONE, localDateInTimezone } from "../services/subscription.js";
+import { evaluateSubscription, localDateInTimezone } from "../services/subscription.js";
+import { requireTimezone } from "../services/money.js";
 import { getServerUsageSnapshot, evaluateUsageLimits, mergeUsageLimits } from "../services/usageMetering.js";
 import { reserveIdempotency } from "../services/idempotency.js";
 import { createAndDispatchNotification } from "../services/notificationService.js";
@@ -84,7 +85,7 @@ export async function runSubscriptionAndUsageSweep(nowMs: number = Date.now()): 
     const org = orgSnap.data() as OrganizationDoc;
     const orgId = orgSnap.id;
     forTargetOrg(orgId); // platform work for this organization (D-21)
-    const tz = org.timezone || DEFAULT_ORG_TIMEZONE;
+    const tz = requireTimezone(org.timezone, `organization "${orgId}"`);
     result.organizationsScanned++;
 
     // 1–2. Subscription lifecycle
@@ -144,7 +145,7 @@ export async function runSubscriptionAndUsageSweep(nowMs: number = Date.now()): 
 }
 
 export const subscriptionAndUsageSweep = onSchedule(
-  { schedule: "0 2 * * *", timeZone: "Asia/Kolkata", region: "asia-south1" },
+  { schedule: "0 2 * * *", timeZone: "UTC", region: "asia-south1" },
   withScheduledContext("subscriptionAndUsageSweep", async () => {
     const result = await runSubscriptionAndUsageSweep();
     console.log("[sweep] subscription & usage sweep complete", result);

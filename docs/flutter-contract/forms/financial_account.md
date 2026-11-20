@@ -18,7 +18,7 @@
 | `bankDetails.bankBranchName` | `string` | No | Yes | `text` | {"maxLength":100} | `Sample bankBranchName` |
 | `bankDetails.upiId` | `string` | No | Yes | `text` | {"maxLength":100} | `bankDetails_upi_001` |
 | `feeRule.feePercent` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
-| `feeRule.feeFixed` | `number` | No | Yes | `money_paise` | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
+| `feeRule.feeFixed` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true} | `2500` |
 | `feeRule.feeTaxPercent` | `number` | No | Yes | `money_paise` | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
 | `feeRule.settlementDays` | `number` | No | Yes | `money_paise` | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
 | `openingBalance` | `number` | No | No | `money_paise` | — | `2500` |

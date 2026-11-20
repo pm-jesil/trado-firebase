@@ -424,7 +424,7 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
             doc: () => ({
               get: async () => ({
                 exists: true,
-                data: () => ({ currency: "BHD", timezone: "Asia/Bahrain" }),
+                data: () => ({ currency: "BHD", timezone: "Asia/Bahrain", financialYearStartMonth: 1 }),
               }),
             }),
           };

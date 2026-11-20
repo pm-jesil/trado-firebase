@@ -25,7 +25,7 @@ Back to [Master Index](./INDEX.md).
 | `bankDetails.bankBranchName` | `string` | No | {"maxLength":100} | `Sample bankBranchName` |
 | `bankDetails.upiId` | `string` | No | {"maxLength":100} | `bankDetails_upi_001` |
 | `feeRule.feePercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
-| `feeRule.feeFixed` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
+| `feeRule.feeFixed` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
 | `feeRule.feeTaxPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
 | `feeRule.settlementDays` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
 | `openingBalance` | `number` | No | — | `2500` |
@@ -33,7 +33,7 @@ Back to [Master Index](./INDEX.md).
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
 | `idempotencyKey` | `string` | No | {"minLength":8,"maxLength":128} | `idem_20261118_0001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "account", "financialAccountId", "message" (32 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "account", "financialAccountId", "message" (30 typed leaf paths).
 **Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -55,7 +55,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `financialAccountsUpdate`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/financialAccounts.ts:152`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/financialAccounts.ts:155`
 - **Permission(s):** `accounts:manage` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `financial_account.update` (`mutation`) · **State Machine:** —
 
@@ -74,7 +74,7 @@ Back to [Master Index](./INDEX.md).
 | `bankDetails.bankBranchName` | `string` | No | {"maxLength":100} | `Sample bankBranchName` |
 | `bankDetails.upiId` | `string` | No | {"maxLength":100} | `bankDetails_upi_001` |
 | `feeRule.feePercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
-| `feeRule.feeFixed` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
+| `feeRule.feeFixed` | `number` | No | {"min":0,"minInclusive":true} | `2500` |
 | `feeRule.feeTaxPercent` | `number` | No | {"min":0,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
 | `feeRule.settlementDays` | `number` | No | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
 | `isDefault` | `boolean` | No | — | `true` |
@@ -100,7 +100,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `financialAccountsList`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/financialAccounts.ts:200`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/financialAccounts.ts:203`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `financial_account.list` (`none`) · **State Machine:** —
 
@@ -115,7 +115,7 @@ Back to [Master Index](./INDEX.md).
 | `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":100,"maxInclusive":true} | `2500` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (34 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "totalCount" (32 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -137,7 +137,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `financialAccountsGet`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/financialAccounts.ts:254`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/financialAccounts.ts:257`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `financial_account.get` (`none`) · **State Machine:** —
 
@@ -149,7 +149,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `financialAccountId` | `string` | **Yes** | {"minLength":2} | `financialAccount_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "financialAccount" (30 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "financialAccount" (28 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -166,7 +166,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `financialAccountsGetLedger`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/financialAccounts.ts:288`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/financialAccounts.ts:291`
 - **Permission(s):** `ledger:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `financial_account.get_ledger` (`none`) · **State Machine:** —
 
@@ -207,7 +207,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountTransfersCreate`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/financialAccounts.ts:362`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/financialAccounts.ts:365`
 - **Permission(s):** `accounts:transfer` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account_transfer.create` (`mutation`) · **State Machine:** —
 
@@ -250,7 +250,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountTransfersList`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/financialAccounts.ts:542`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/financialAccounts.ts:547`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `account_transfer.list` (`none`) · **State Machine:** —
 
@@ -289,7 +289,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountTransfersGet`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/financialAccounts.ts:596`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/financialAccounts.ts:601`
 - **Permission(s):** `accounts:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `account_transfer.get` (`none`) · **State Machine:** —
 
@@ -318,7 +318,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `capitalTransactionsCreate`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/financialAccounts.ts:630`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/financialAccounts.ts:635`
 - **Permission(s):** `capital:manage` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `capital_transaction.create` (`mutation`) · **State Machine:** —
 
@@ -330,7 +330,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `type` | `enum` | **Yes** | Enum: `owner_contribution`, `partner_contribution`, `additional_capital`, `drawings` | `owner_contribution` |
 | `financialAccountId` | `string` | **Yes** | {"minLength":2} | `financialAccount_001` |
-| `amount` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
 | `currency` | `string` | No | {"maxLength":3,"minLength":3} | `INR` |
 | `sourceReference` | `string` | No | {"maxLength":100} | `Sample sourceReference` |
 | `description` | `string` | No | {"maxLength":500} | `2026-11-18` |
@@ -365,7 +365,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `capitalTransactionsList`
-- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/financialAccounts.ts:747`
+- **Domain:** `financialAccounts` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/financialAccounts.ts:754`
 - **Permission(s):** `capital:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `capital_transaction.list` (`none`) · **State Machine:** —
 

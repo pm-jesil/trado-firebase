@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `documentsDecide`
-- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/approvals.ts:240`
+- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/approvals.ts:266`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `document.decide` (`mutation`) · **State Machine:** [approval-decision](../state-machines.md)
 
@@ -48,7 +48,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `approvalsList`
-- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/approvals.ts:257`
+- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/approvals.ts:283`
 - **Permission(s):** `approvals:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `approval.list` (`none`) · **State Machine:** [approval-decision](../state-machines.md)
 
@@ -83,7 +83,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `approvalsCounts`
-- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/approvals.ts:431`
+- **Domain:** `approvals` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/approvals.ts:457`
 - **Permission(s):** `approvals:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `approval.counts` (`mutation`) · **State Machine:** [approval-decision](../state-machines.md)
 

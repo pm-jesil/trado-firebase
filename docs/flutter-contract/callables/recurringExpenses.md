@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `recurringExpensesCreate`
-- **Domain:** `recurringExpenses` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/recurringExpenses.ts:47`
+- **Domain:** `recurringExpenses` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/recurringExpenses.ts:48`
 - **Permission(s):** `expense:create` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `recurring_expense.create` (`mutation`) · **State Machine:** —
 
@@ -64,7 +64,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `recurringExpensesUpdate`
-- **Domain:** `recurringExpenses` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/recurringExpenses.ts:91`
+- **Domain:** `recurringExpenses` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/recurringExpenses.ts:92`
 - **Permission(s):** `expense:create` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `recurring_expense.update` (`mutation`) · **State Machine:** —
 
@@ -112,7 +112,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `recurringExpensesList`
-- **Domain:** `recurringExpenses` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/recurringExpenses.ts:104`
+- **Domain:** `recurringExpenses` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/recurringExpenses.ts:105`
 - **Permission(s):** `expense:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `recurring_expense.list` (`none`) · **State Machine:** —
 

@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `organizationsCreate`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `create` · **Source:** `functions/src/callables/organizations.ts:192`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `create` · **Source:** `functions/src/callables/organizations.ts:199`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `organization.create` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -21,10 +21,6 @@ Back to [Master Index](./INDEX.md).
 | `businessCategory` | `enum` | **Yes** | Enum: `bicycle`, `motorcycle`, `car_automobile`, `auto_spare_parts`, `mobile_electronics`, `grocery_fmcg` | `bicycle` |
 | `country` | `string` | **Yes** | {"maxLength":2,"minLength":2} | `IN` |
 | `currency` | `string` | **Yes** | {"maxLength":3,"minLength":3} | `INR` |
-| `currencyDecimals` | `number` | No | {"format":"safeint","min":0,"minInclusive":true,"max":4,"maxInclusive":true} | `1` |
-| `minorUnitName` | `string` | No | {"maxLength":30} | `Sample minorUnitName` |
-| `minorUnitNamePlural` | `string` | No | {"maxLength":30} | `Sample minorUnitNamePlural` |
-| `currencySymbol` | `string` | No | {"maxLength":10} | `Sample currencySymbol` |
 | `taxRegimeCode` | `string` | **Yes** | {"minLength":2,"maxLength":32} | `Sample taxRegimeCode` |
 | `planId` | `string` | **Yes** | {"minLength":2,"maxLength":64} | `plan_001` |
 | `createOwner` | `boolean` | No | — | `true` |
@@ -47,7 +43,11 @@ Back to [Master Index](./INDEX.md).
 | `addresses[].postalCode` | `string` | **Yes** | {"minLength":2,"maxLength":20} | `Sample postalCode` |
 | `addresses[].country` | `string` | No | {"maxLength":2,"minLength":2} | `IN` |
 | `addresses[].geoPoint.latitude` | `number` | No | {"min":-90,"minInclusive":true,"max":90,"maxInclusive":true} | `1` |
-| *...* | *+52 nested fields* | | | *See `callables.json`* |
+| `addresses[].geoPoint.longitude` | `number` | No | {"min":-180,"minInclusive":true,"max":180,"maxInclusive":true} | `1` |
+| `addresses[].contactName` | `string` | No | {"maxLength":100} | `Sample contactName` |
+| `addresses[].phone` | `string` | No | — | `+919876543210` |
+| `addresses[].isDefaultBilling` | `boolean` | No | — | `true` |
+| *...* | *+48 nested fields* | | | *See `callables.json`* |
 
 **Response:** Envelope `ACTION` · Top-level keys: "message", "organizationId", "ownerMembershipId", "ownerStatus", "ownerUserId", "status", "temporaryPassword", "userCreated" (8 typed leaf paths).
 **Declared Errors:** `IDEMPOTENCY_CONFLICT`, `INVALID_ARGUMENT`, `ORGANIZATION_DUPLICATE`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
@@ -78,7 +78,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsUpdate`
-- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:482`
+- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:486`
 - **Permission(s):** `org:manage_approval_policy`, `org:manage_bank_details`, `org:manage_legal_profile`, `org:update` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.update` (`mutation`) · **State Machine:** [organization](../state-machines.md)
 
@@ -146,7 +146,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsDeactivate`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `delete` · **Source:** `functions/src/callables/organizations.ts:583`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `delete` · **Source:** `functions/src/callables/organizations.ts:587`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.deactivate` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -176,7 +176,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsReactivate`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:654`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:658`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.reactivate` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -205,7 +205,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsList`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `list` · **Source:** `functions/src/callables/organizations.ts:606`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `list` · **Source:** `functions/src/callables/organizations.ts:610`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.list` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -220,7 +220,7 @@ Back to [Master Index](./INDEX.md).
 | `status` | `enum` | No | Enum: `active`, `inactive`, `suspended` | `active` |
 | `planId` | `string` | No | — | `plan_001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "organizations", "totalCount" (268 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "hasMore", "items", "nextCursor", "organizations", "totalCount" (260 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -242,7 +242,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsSetSubscription`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:760`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:764`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.set_subscription` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -291,7 +291,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsGet`
-- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:848`
+- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:852`
 - **Permission(s):** `org:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.get` (`none`) · **State Machine:** [organization](../state-machines.md)
 
@@ -301,7 +301,7 @@ Back to [Master Index](./INDEX.md).
 |---|---|---|---|---|
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "evaluation", "organization" (139 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "evaluation", "organization" (148 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -317,7 +317,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsPreviewDeactivationImpact`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:671`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:675`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.preview_deactivation_impact` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -349,7 +349,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsGetSubscriptionHistory`
-- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:716`
+- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/organizations.ts:720`
 - **Permission(s):** `org:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.get_subscription_history` (`none`) · **State Machine:** [organization](../state-machines.md)
 
@@ -378,7 +378,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsProvisionUser`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:948`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:949`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.provision_user` (`admin`) · **State Machine:** [organization](../state-machines.md)
 
@@ -427,7 +427,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsTransferOwnership`
-- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:1011`
+- **Domain:** `organizations` · **Gate:** `platform` · **Kind:** `update` · **Source:** `functions/src/callables/organizations.ts:1012`
 - **Permission(s):** None (authenticated / role-checked) · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.transfer_ownership` (`mutation`) · **State Machine:** [organization](../state-machines.md)
 
@@ -465,7 +465,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `organizationsRevealBankAccount`
-- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/organizations.ts:1111`
+- **Domain:** `organizations` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/organizations.ts:1112`
 - **Permission(s):** `org:manage_bank_details` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `organization.reveal_bank_account` (`mutation`) · **State Machine:** [organization](../state-machines.md)
 

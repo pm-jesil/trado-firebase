@@ -17,15 +17,93 @@ export { getExponent, getCurrencyInfo };
  */
 export function requireCurrency(value: string | null | undefined, contextDescription: string): string {
   if (!value || typeof value !== "string" || value.trim() === "") {
-    const err = new HttpsError(
-      "failed-precondition",
-      `[CURRENCY_MISSING] Currency is missing for ${contextDescription}. Documents and accounts must have a valid currency.`,
+    const err = Object.assign(
+      new HttpsError(
+        "failed-precondition",
+        `[CURRENCY_MISSING] Currency is missing for ${contextDescription}. Documents and accounts must have a valid currency.`,
+        { reason: "CURRENCY_MISSING" }
+      ),
       { reason: "CURRENCY_MISSING" }
     );
-    (err as any).reason = "CURRENCY_MISSING";
     throw err;
   }
   return value.trim().toUpperCase();
+}
+
+/**
+ * Validates that a country code is present and non-empty.
+ * Throws HttpsError with status failed-precondition and reason COUNTRY_MISSING if missing.
+ */
+export function requireCountry(value: string | null | undefined, contextDescription: string): string {
+  if (!value || typeof value !== "string" || value.trim() === "") {
+    const err = Object.assign(
+      new HttpsError(
+        "failed-precondition",
+        `[COUNTRY_MISSING] Country is missing for ${contextDescription}. Organizations must have a valid country.`,
+        { reason: "COUNTRY_MISSING" }
+      ),
+      { reason: "COUNTRY_MISSING" }
+    );
+    throw err;
+  }
+  return value.trim().toUpperCase();
+}
+
+/**
+ * Validates that a timezone is present and non-empty.
+ * Throws HttpsError with status failed-precondition and reason TIMEZONE_MISSING if missing.
+ */
+export function requireTimezone(value: string | null | undefined, contextDescription: string): string {
+  if (!value || typeof value !== "string" || value.trim() === "") {
+    const err = Object.assign(
+      new HttpsError(
+        "failed-precondition",
+        `[TIMEZONE_MISSING] Timezone is missing for ${contextDescription}. Organizations must have a valid timezone.`,
+        { reason: "TIMEZONE_MISSING" }
+      ),
+      { reason: "TIMEZONE_MISSING" }
+    );
+    throw err;
+  }
+  return value.trim();
+}
+
+/**
+ * Validates that a tax regime code is present and non-empty.
+ * Throws HttpsError with status failed-precondition and reason TAX_REGIME_MISSING if missing.
+ */
+export function requireTaxRegime(value: string | null | undefined, contextDescription: string): string {
+  if (!value || typeof value !== "string" || value.trim() === "") {
+    const err = Object.assign(
+      new HttpsError(
+        "failed-precondition",
+        `[TAX_REGIME_MISSING] Tax regime code is missing for ${contextDescription}. Organizations must have a valid taxRegimeCode.`,
+        { reason: "TAX_REGIME_MISSING" }
+      ),
+      { reason: "TAX_REGIME_MISSING" }
+    );
+    throw err;
+  }
+  return value.trim();
+}
+
+/**
+ * Validates that a financial year start month is present and valid (1-12).
+ * Throws HttpsError with status failed-precondition and reason FINANCIAL_YEAR_START_MONTH_MISSING if missing/invalid.
+ */
+export function requireFinancialYearStartMonth(value: number | null | undefined, contextDescription: string): number {
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > 12) {
+    const err = Object.assign(
+      new HttpsError(
+        "failed-precondition",
+        `[FINANCIAL_YEAR_START_MONTH_MISSING] Financial year start month is missing or invalid for ${contextDescription}. Organizations must specify an integer month between 1 and 12.`,
+        { reason: "FINANCIAL_YEAR_START_MONTH_MISSING" }
+      ),
+      { reason: "FINANCIAL_YEAR_START_MONTH_MISSING" }
+    );
+    throw err;
+  }
+  return value;
 }
 
 /**

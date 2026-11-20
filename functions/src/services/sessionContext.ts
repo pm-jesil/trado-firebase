@@ -9,7 +9,7 @@
 import { HttpsError } from "firebase-functions/v2/https";
 import { db, auth } from "./firebase.js";
 import { effectiveBusinessConfig } from "../constants/businessDefaults.js";
-import { requireCurrency } from "./money.js";
+import { requireCurrency, requireCountry, requireTimezone, requireTaxRegime } from "./money.js";
 import { getExponent } from "../constants/currencies.js";
 import {
   UserDoc,
@@ -272,9 +272,9 @@ export async function buildAuthSessionContext(
       name: primaryOrgData.name,
       currency: requireCurrency(primaryOrgData.currency, `organization "${primaryMembership.organizationId}"`),
       currencyDecimals: getExponent(primaryOrgData.currency),
-      timezone: primaryOrgData.timezone || "Asia/Kolkata",
-      country: primaryOrgData.country || "IN",
-      taxRegimeCode: primaryOrgData.taxRegimeCode || "IN_GST",
+      timezone: requireTimezone(primaryOrgData.timezone, `organization "${primaryMembership.organizationId}"`),
+      country: requireCountry(primaryOrgData.country, `organization "${primaryMembership.organizationId}"`),
+      taxRegimeCode: requireTaxRegime(primaryOrgData.taxRegimeCode, `organization "${primaryMembership.organizationId}"`),
       businessType: primaryOrgData.businessType,
       businessCategory: primaryOrgData.businessCategory,
     }

@@ -160,7 +160,7 @@ export interface OrganizationDoc {
   subscriptionStartsAt?: string;
   subscriptionExpiresAt?: string; // End of expiry date in `timezone`
   graceDays?: number;
-  timezone?: string; // IANA zone, default "Asia/Kolkata"
+  timezone?: string; // IANA zone from country defaults
   salesChannels?: SalesChannel[]; // One business can be e.g. wholesale + retail
   activeEmployeeCount?: number; // Transactional seat counter (excludes Owner)
   // Owner-editable profile (see ORGANIZATION_FIELD_POLICY)

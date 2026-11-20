@@ -37,7 +37,7 @@ import {
   getModuleForPermission,
   type PermissionResolutionContext,
 } from "./permissionResolver.js";
-import { evaluateSubscription, DEFAULT_ORG_TIMEZONE, type SubscriptionEvaluation } from "./subscription.js";
+import { evaluateSubscription, type SubscriptionEvaluation } from "./subscription.js";
 import {
   incrementServerUsage,
   getServerUsageSnapshot,
@@ -46,7 +46,7 @@ import {
   type MeteredMetric,
   PLATFORM_COST_CURRENCY,
 } from "./usageMetering.js";
-import { requireCurrency } from "./money.js";
+import { requireCurrency, requireTimezone } from "./money.js";
 import { withCategory, currentContext } from "./requestContext.js";
 import { AppPermissions } from "../constants/permissions.js";
 
@@ -155,7 +155,9 @@ const PLATFORM_ORG: OrganizationDoc = {
   businessCategory: "general" as OrganizationDoc["businessCategory"],
   country: "IN",
   currency: PLATFORM_COST_CURRENCY,
-  taxRegimeCode: "IN_GST",
+  taxRegimeCode: "NONE",
+  timezone: "UTC",
+  financialYearStartMonth: 1,
   status: EntityStatus.ACTIVE,
   planId: "plan_enterprise",
   moduleToggles: {},
@@ -193,7 +195,7 @@ export async function resolveRequestContext(
     if (exec) {
       exec.organizationId = gate.isSuperAdmin ? "platform" : gate.organizationId;
       exec.targetOrgId = gate.isSuperAdmin ? gate.organizationId : null;
-      exec.timeZone = gate.organization.timezone || DEFAULT_ORG_TIMEZONE;
+      exec.timeZone = requireTimezone(gate.organization.timezone, `organization "${gate.organizationId}"`);
       exec.actor = {
         uid: gate.callerUid,
         kind: gate.isSuperAdmin ? "superAdminOnBehalf" : "user",
@@ -341,7 +343,7 @@ async function resolveGate(
 
   // 5b. Server-side metering: one sharded write, issued in parallel with read #2 (no extra round trip)
   const isMutation = options.operation ? options.operation === "write" : required.length > 0 && !required.every(isReadOnlyPermission);
-  const timeZone = orgData.timezone || DEFAULT_ORG_TIMEZONE;
+  const timeZone = requireTimezone(orgData.timezone, `organization "${targetOrgId}"`);
   const meterMetrics: Partial<Record<MeteredMetric, number>> = {
     functionsInvocations: 1,
     [isMutation ? "firestoreWrites" : "firestoreReads"]: 1,

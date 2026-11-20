@@ -2,7 +2,7 @@
  * Tax Calculation Service (G7: Dynamic DB-Backed Worldwide Tax Engine)
  * 
  * Provides deterministic tax calculation and tax snapshots for:
- * - IN_GST (India GST: standard rates e.g. 0%, 5%, 12%, 18%, 28% with CGST/SGST/IGST split)
+ * - Indian GST (standard rates e.g. 0%, 5%, 12%, 18%, 28% with CGST/SGST/IGST split)
  * - AE_VAT (UAE VAT: standard 5%, zero-rated 0%)
  * - OM_VAT (Oman VAT: standard 5%)
  * - BH_VAT (Bahrain VAT: standard 10%, 0% zero-rated)
@@ -193,7 +193,7 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
 
     const taxSnapshot: TaxSnapshot = {
       regime: regimeCode,
-      country: params.country || regimeDoc.country || "IN",
+      country: params.country || regimeDoc.country,
       taxRatePercent: effectiveRate,
       taxAmount: totalTaxAmount,
       taxType,
@@ -256,7 +256,7 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
 
   const taxSnapshot: TaxSnapshot = {
     regime: regimeCode,
-    country: params.country || regimeDoc.country || "IN",
+    country: params.country || regimeDoc.country,
     taxRatePercent: effectiveRate,
     taxAmount,
     taxType,

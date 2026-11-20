@@ -35,7 +35,7 @@ import {
   EntityStatus,
   UnitGroup,
 } from "../constants/enums.js";
-import { requireCurrency } from "../services/money.js";
+import { requireCurrency, requireCountry } from "../services/money.js";
 import { buildSubscriptionFields } from "../services/subscription.js";
 import { nameKey, uniqueKeyId, phoneKey, taxIdKey } from "../services/naturalKeys.js";
 import { getCountryDefaults } from "../constants/countryDefaults.js";
@@ -188,14 +188,15 @@ export async function seedOrganizationFromSpec(db: Firestore, auth: Auth, spec: 
   }
 
   // Organization (counters derived from the spec)
-  const countryDef = getCountryDefaults(spec.country || "IN");
+  const country = requireCountry(spec.country, `spec "${spec.name}"`);
+  const countryDef = getCountryDefaults(country);
   const org: OrganizationDoc = {
     name: spec.name,
     legalName: spec.name,
     legalNameKey: nameKey(spec.name),
     businessType: spec.businessType,
     businessCategory: spec.businessCategory,
-    country: spec.country || "IN",
+    country,
     currency: spec.currency || countryDef.currencyCode,
     timezone: spec.timezone || countryDef.timezone,
     taxRegimeCode: spec.taxRegimeCode || countryDef.taxRegimeCode,

@@ -333,8 +333,9 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
     planCounts[planId] = (planCounts[planId] || 0) + 1;
     const st = data.status || "active";
     statusCounts[st] = (statusCounts[st] || 0) + 1;
-    const c = data.country || "IN";
-    countryCounts[c] = (countryCounts[c] || 0) + 1;
+    if (data.country) {
+      countryCounts[data.country] = (countryCounts[data.country] || 0) + 1;
+    }
     if (data.currency) orgCurrencyMap.set(doc.id, data.currency);
 
     if (data.status === "active") {

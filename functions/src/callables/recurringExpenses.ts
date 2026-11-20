@@ -20,7 +20,8 @@ import { CreateRecurringExpenseSchema, UpdateRecurringExpenseSchema, ListRecurri
 import { resolveRequestContext } from "../services/contextResolver.js";
 import { AppPermissions } from "../constants/permissions.js";
 import { fetchPage } from "../services/pagination.js";
-import { DEFAULT_ORG_TIMEZONE, localDateInTimezone, addDaysYmd } from "../services/subscription.js";
+import { localDateInTimezone, addDaysYmd } from "../services/subscription.js";
+import { requireTimezone } from "../services/money.js";
 import { reserveIdempotency, finalizeIdempotencySuccess, finalizeIdempotencyFailure } from "../services/idempotency.js";
 import { OrganizationDoc, RecurringExpenseDoc } from "../types/models.js";
 
@@ -125,7 +126,7 @@ export async function generateDueRecurringExpenses(nowMs: number = Date.now()): 
     const t = tSnap.data() as RecurringExpenseDoc;
     const org = (await db.collection("organizations").doc(t.organizationId).get()).data() as OrganizationDoc | undefined;
     if (!org) continue;
-    const today = localDateInTimezone(nowMs, org.timezone || DEFAULT_ORG_TIMEZONE);
+    const today = localDateInTimezone(nowMs, requireTimezone(org.timezone, `organization "${t.organizationId}"`));
     let runOn = t.nextRunOn;
     while (runOn <= today && (!t.endOn || runOn <= t.endOn)) {
       const period = periodKey(t, runOn);

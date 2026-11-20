@@ -4,7 +4,7 @@
 Back to [Master Index](./INDEX.md).
 
 ## `accountEntriesList`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/accountEntries.ts:49`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `list` · **Source:** `functions/src/callables/accountEntries.ts:50`
 - **Permission(s):** `accounts:view`, `ledger:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `account.entries_list` (`none`) · **State Machine:** —
 
@@ -25,7 +25,7 @@ Back to [Master Index](./INDEX.md).
 | `limit` | `number` | No | {"format":"safeint","min":1,"minInclusive":true,"max":200,"maxInclusive":true} | `2500` |
 | `startAfterId` | `string` | No | — | `startAfter_001` |
 
-**Response:** Envelope `LIST` · Top-level keys: "count", "entries", "items", "nextCursor", "totalCount" (103 typed leaf paths).
+**Response:** Envelope `LIST` · Top-level keys: "count", "entries", "items", "nextCursor", "totalCount" (99 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -49,7 +49,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesGet`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/accountEntries.ts:116`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/accountEntries.ts:117`
 - **Permission(s):** `accounts:view`, `ledger:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `account.entries_get` (`none`) · **State Machine:** —
 
@@ -61,7 +61,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `entryId` | `string` | **Yes** | {"minLength":2} | `entry_001` |
 
-**Response:** Envelope `ACTION` · Top-level keys: "entry", "reversalEntry", "reversedEntry", "subEntries" (101 typed leaf paths).
+**Response:** Envelope `ACTION` · Top-level keys: "entry", "reversalEntry", "reversedEntry", "subEntries" (97 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -81,7 +81,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesCounts`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:173`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:174`
 - **Permission(s):** `accounts:view`, `ledger:view` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `account.entries_counts` (`mutation`) · **State Machine:** —
 
@@ -113,7 +113,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesVerify`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:226`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:227`
 - **Permission(s):** `accounts:manage`, `accounts:verify`, `approvals:self_approve` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_verify` (`mutation`) · **State Machine:** —
 
@@ -148,7 +148,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesApprove`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:289`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:290`
 - **Permission(s):** `accounts:approve`, `accounts:manage`, `approvals:self_approve` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_approve` (`mutation`) · **State Machine:** —
 
@@ -183,7 +183,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesReject`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:364`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:385`
 - **Permission(s):** `accounts:approve`, `accounts:manage`, `approvals:self_approve` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_reject` (`mutation`) · **State Machine:** —
 
@@ -218,7 +218,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesReverse`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:447`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `action` · **Source:** `functions/src/callables/accountEntries.ts:468`
 - **Permission(s):** `accounts:manage`, `accounts:reverse` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_reverse` (`mutation`) · **State Machine:** —
 
@@ -254,7 +254,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesUpdateNote`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:524`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:545`
 - **Permission(s):** `accounts:manage` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `account.entries_update_note` (`mutation`) · **State Machine:** —
 
@@ -289,7 +289,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountEntriesCreateSubEntry`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/accountEntries.ts:556`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `create` · **Source:** `functions/src/callables/accountEntries.ts:577`
 - **Permission(s):** `accounts:entry_create`, `accounts:manage` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** Yes (`idempotencyKey`) · **Audit:** `account.entries_create_sub_entry` (`mutation`) · **State Machine:** —
 
@@ -301,7 +301,7 @@ Back to [Master Index](./INDEX.md).
 | `branchId` | `string` | No | — | `branch_001` |
 | `parentEntryId` | `string` | **Yes** | {"minLength":2} | `parentEntry_001` |
 | `subEntryType` | `enum` | **Yes** | Enum: `transaction_charge`, `gateway_fee`, `bank_charge`, `adjustment`, `rounding`, `tip` | `transaction_charge` |
-| `amount` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `amount` | `number` | **Yes** | {"min":0,"minInclusive":false} | `2500` |
 | `financialAccountId` | `string` | No | — | `financialAccount_001` |
 | `direction` | `enum` | No | Enum: `in`, `out` | `in` |
 | `notes` | `string` | No | {"maxLength":500} | `Sample notes` |
@@ -335,7 +335,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountingPolicyGet`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/accountEntries.ts:658`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `read` · **Source:** `functions/src/callables/accountEntries.ts:682`
 - **Permission(s):** `accounts:view`, `org:manage_approval_policy` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `accounting.policy_get` (`none`) · **State Machine:** —
 
@@ -362,7 +362,7 @@ Back to [Master Index](./INDEX.md).
 ```
 
 ## `accountingPolicyUpdate`
-- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:681`
+- **Domain:** `accountEntries` · **Gate:** `tenant` · **Kind:** `update` · **Source:** `functions/src/callables/accountEntries.ts:703`
 - **Permission(s):** `org:manage_approval_policy` · **Module:** — · **Feature Flag:** —
 - **Idempotency:** No · **Audit:** `accounting.policy_update` (`mutation`) · **State Machine:** —
 
@@ -372,9 +372,10 @@ Back to [Master Index](./INDEX.md).
 |---|---|---|---|---|
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
-| `minorUnitsThresholds.*` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":true} | `1` |
+| `moneyConvention` | `literal` | No | Enum: `major` | `2026-11-18` |
 | `selfApprovalPolicy` | `enum` | No | Enum: `off`, `up_to_limit`, `on` | `off` |
-| `selfApprovalLimits.*` | `number` | **Yes** | {"format":"safeint","min":0,"minInclusive":true} | `2500` |
+| `selfApprovalLimits.*` | `number` | **Yes** | {"min":0,"minInclusive":true} | `2500` |
+| `cashCountVarianceThreshold` | `number` | No | {"min":0,"minInclusive":true} | `1` |
 | `roundingMode` | `enum` | No | Enum: `half_up`, `half_even` | `half_up` |
 | `roundToNearestRupee` | `boolean` | No | — | `true` |
 | `cashRoundingFils` | `boolean` | No | — | `true` |
@@ -387,10 +388,11 @@ Back to [Master Index](./INDEX.md).
   "request": {
     "organizationId": "organization_001",
     "branchId": "branch_001",
+    "moneyConvention": "2026-11-18",
     "selfApprovalPolicy": "off",
+    "cashCountVarianceThreshold": 1,
     "roundingMode": "half_up",
-    "roundToNearestRupee": true,
-    "cashRoundingFils": true
+    "roundToNearestRupee": true
   },
   "response": {
     "policy": "..."

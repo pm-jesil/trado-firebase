@@ -9,7 +9,7 @@
 | `branchId` | `string` | No | No | `text` | — | `branch_001` |
 | `type` | `enum` | **Yes** | No | `dropdown` | Enum: `owner_contribution`, `partner_contribution`, `additional_capital`, `drawings` | `owner_contribution` |
 | `financialAccountId` | `string` | **Yes** | No | `text` | {"minLength":2} | `financialAccount_001` |
-| `amount` | `number` | **Yes** | No | `money_paise` | {"format":"safeint","min":0,"minInclusive":false} | `2500` |
+| `amount` | `number` | **Yes** | No | `money_paise` | {"min":0,"minInclusive":false} | `2500` |
 | `currency` | `string` | No | No | `text` | {"maxLength":3,"minLength":3} | `INR` |
 | `sourceReference` | `string` | No | No | `text` | {"maxLength":100} | `Sample sourceReference` |
 | `description` | `string` | No | No | `textarea` | {"maxLength":500} | `2026-11-18` |
