@@ -2,8 +2,8 @@
 
 - **Date:** 2026-11-20
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1, S2, S3a, S3b)
-- **Current State:** **STEPS S1, S2, S3a, S3b COMPLETED. `round2` completely deleted from codebase (0 occurrences in functions/src). Strict Money.amount(x, currency) and Money.sum(x, currency) deployed across tax calculation, costing engine, summary service, operational reports, financial reports, analytics reports, and stock transfers. 408/408 unit tests pass.**
+- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1, S2, S3a, S3b, S3c+S4b)
+- **Current State:** **STEPS S1, S2, S3a, S3b, S3c+S4b COMPLETED. reportsGetPlatformOverview separated into per-currency buckets (totalsByCurrency); PLATFORM_COST_CURRENCY constant in usageMetering; deleted round2/round4 aliases; assertAmountMatchesCurrency float noise tests passing; converted minor-unit callers across seed, scenarios, scripts, and tests to decimal major units. 421/421 unit tests pass across 115 suites.**
 
 ## Summary of Prompt 77 & 77C Deliverables
 

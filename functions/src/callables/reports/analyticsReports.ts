@@ -324,6 +324,7 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
   const countryCounts: Record<string, number> = {};
   const subscriptionsExpiring: Array<{ organizationId: string; name: string; expiresAt: string; daysLeft: number }> = [];
   const activeOrgIds: string[] = [];
+  const orgCurrencyMap = new Map<string, string>();
   const nowMs = Date.now();
 
   orgsSnap.docs.forEach((doc) => {
@@ -334,6 +335,7 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
     statusCounts[st] = (statusCounts[st] || 0) + 1;
     const c = data.country || "IN";
     countryCounts[c] = (countryCounts[c] || 0) + 1;
+    orgCurrencyMap.set(doc.id, data.currency || "INR");
 
     if (data.status === "active") {
       activeOrgIds.push(doc.id);
@@ -353,13 +355,19 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
     }
   });
 
-  let totalPlatformRevenue = 0;
   let billsCount = 0;
-  let totalPlatformOutflows = 0;
   let outflowsCount = 0;
-  const orgUsageMap: Array<{ organizationId: string; billsCount: number; revenue: number }> = [];
+  const orgUsageMap: Array<{ organizationId: string; currency: string; billsCount: number; revenue: number }> = [];
+  const totalsByCurrency: Record<string, {
+    revenue: number;
+    outflows: number;
+    netCashFlow: number;
+    billsCount: number;
+    outflowsCount: number;
+  }> = {};
 
   const orgQueries = activeOrgIds.map(async (orgId) => {
+    const orgCurrency = orgCurrencyMap.get(orgId) || "INR";
     const [bSnap, oSnap] = await Promise.all([
       db.collection("bills").where("organizationId", "==", orgId).where("status", "in", ["active", "partial", "paid"]).get(),
       db.collection("outflows").where("organizationId", "==", orgId).where("status", "in", ["active", "partial", "paid"]).get(),
@@ -372,21 +380,46 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
       if (input.from && createdAt < input.from) return;
       if (input.to && createdAt > `${input.to}T23:59:59.999Z`) return;
       const amt = Number(data.totalAmount) || 0;
-      totalPlatformRevenue += amt;
       orgRev += amt;
       billsCount++;
     });
 
+    let orgOut = 0;
     oSnap.docs.forEach((doc) => {
       const data = doc.data();
       const createdAt = data.createdAt;
       if (input.from && createdAt < input.from) return;
       if (input.to && createdAt > `${input.to}T23:59:59.999Z`) return;
-      totalPlatformOutflows += Number(data.totalAmount) || 0;
+      const amt = Number(data.totalAmount) || 0;
+      orgOut += amt;
       outflowsCount++;
     });
 
-    orgUsageMap.push({ organizationId: orgId, billsCount: bSnap.size, revenue: Money.amount(orgRev, "INR") });
+    const roundedOrgRev = Money.amount(orgRev, orgCurrency);
+    const roundedOrgOut = Money.amount(orgOut, orgCurrency);
+
+    orgUsageMap.push({
+      organizationId: orgId,
+      currency: orgCurrency,
+      billsCount: bSnap.size,
+      revenue: roundedOrgRev,
+    });
+
+    if (!totalsByCurrency[orgCurrency]) {
+      totalsByCurrency[orgCurrency] = {
+        revenue: 0,
+        outflows: 0,
+        netCashFlow: 0,
+        billsCount: 0,
+        outflowsCount: 0,
+      };
+    }
+    const bucket = totalsByCurrency[orgCurrency];
+    bucket.billsCount += bSnap.size;
+    bucket.outflowsCount += oSnap.size;
+    bucket.revenue = Money.sum([bucket.revenue, roundedOrgRev], orgCurrency);
+    bucket.outflows = Money.sum([bucket.outflows, roundedOrgOut], orgCurrency);
+    bucket.netCashFlow = Money.amount(bucket.revenue - bucket.outflows, orgCurrency);
   });
 
   await Promise.all(orgQueries);
@@ -406,13 +439,9 @@ export const reportsGetPlatformOverview = onCall({ region: "asia-south1" }, asyn
     subscriptionsExpiring,
     atRiskOrganizations: [],
     topOrganizationsByUsage,
-    totalPlatformRevenue: Money.amount(totalPlatformRevenue, "INR"),
-    totalPlatformOutflows: Money.amount(totalPlatformOutflows, "INR"),
-    netPlatformCashFlow: Money.amount(totalPlatformRevenue - totalPlatformOutflows, "INR"),
+    totalsByCurrency,
     platformFinancials: {
-      totalRevenue: Money.amount(totalPlatformRevenue, "INR"),
-      totalOutflows: Money.amount(totalPlatformOutflows, "INR"),
-      netPlatformCashFlow: Money.amount(totalPlatformRevenue - totalPlatformOutflows, "INR"),
+      totalsByCurrency,
       billsCount,
       outflowsCount,
     },

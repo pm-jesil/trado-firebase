@@ -284,10 +284,10 @@ async function run() {
   assert.ok(platformOverviewRes.totalOrganizations >= 1);
   assert.ok(platformOverviewRes.activeOrganizations >= 1);
   assert.ok(platformOverviewRes.availablePlansCount >= 1);
-  assert.ok(typeof platformOverviewRes.totalPlatformRevenue === "number", "totalPlatformRevenue must be number");
-  assert.ok(typeof platformOverviewRes.totalPlatformOutflows === "number", "totalPlatformOutflows must be number");
+  assert.ok(platformOverviewRes.totalsByCurrency !== undefined, "totalsByCurrency must be present");
+  assert.ok(typeof platformOverviewRes.totalsByCurrency === "object", "totalsByCurrency must be object");
   assert.ok(platformOverviewRes.platformFinancials !== undefined, "platformFinancials must be present");
-  console.log(`✓ reportsGetPlatformOverview verified: ${platformOverviewRes.totalOrganizations} total orgs, ${platformOverviewRes.activeOrganizations} active, platform revenue ₹${platformOverviewRes.totalPlatformRevenue}`);
+  console.log(`✓ reportsGetPlatformOverview verified: ${platformOverviewRes.totalOrganizations} total orgs, ${platformOverviewRes.activeOrganizations} active, totalsByCurrency:`, platformOverviewRes.totalsByCurrency);
 
   // 7. CSV Export
   const csvRes = await callFunction("reportsExportCsv", {

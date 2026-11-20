@@ -29,7 +29,7 @@ import {
   CapitalTransactionDoc,
   OrganizationDoc,
 } from "../types/models.js";
-import { Money } from "../services/money.js";
+import { Money, assertAmountMatchesCurrency } from "../services/money.js";
 import { reserveIdempotency } from "../services/idempotency.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
@@ -60,6 +60,10 @@ export const financialAccountsCreate = onCall({ region: "asia-south1" }, async (
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
   const now = new Date().toISOString();
+  if (typeof input.openingBalance === "number" && input.openingBalance > 0) {
+    const accCurrency = input.currency || ctx.organization.currency || "INR";
+    assertAmountMatchesCurrency(input.openingBalance, accCurrency);
+  }
 
   const idempotency = await reserveIdempotency({
     scope: orgId,
@@ -376,6 +380,7 @@ export const accountTransfersCreate = onCall({ region: "asia-south1" }, async (r
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
   const now = new Date().toISOString();
+  assertAmountMatchesCurrency(input.amount, ctx.organization.currency || "INR");
 
   if (input.sourceAccountId === input.destinationAccountId) {
     throw new HttpsError("invalid-argument", "Source and destination financial accounts must be different.");
@@ -644,6 +649,8 @@ export const capitalTransactionsCreate = onCall({ region: "asia-south1" }, async
   const orgId = ctx.organizationId;
   const callerUid = ctx.callerUid;
   const now = new Date().toISOString();
+  const currency = input.currency || ctx.organization.currency || "INR";
+  assertAmountMatchesCurrency(input.amount, currency);
 
   const idempotency = await reserveIdempotency({
     scope: orgId,

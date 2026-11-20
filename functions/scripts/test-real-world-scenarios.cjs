@@ -195,22 +195,22 @@ async function runRealWorldScenarios() {
   const precisionProd = await callFunction("productsCreate", buildProductPayload(orgId, {
     name: `Precision Item ${runTag}`,
     initialStock: 10,
-    sellingPrice: 199, // Rs 1.99
-    costPrice: 100,
+    sellingPrice: 1.99, // Rs 1.99
+    costPrice: 1.00,
   }), ownerToken);
   assert.ok(precisionProd.productId, "Precision product created");
 
-  // Bill 3 items at 199 paise = 597 paise
+  // Bill 3 items at 1.99 = 5.97
   const precisionBill = await callFunction("billsCreate", {
     organizationId: orgId,
     customerId: custId,
     salesMode: "pos",
     items: [{ productId: precisionProd.productId, quantity: 3 }],
-    paidAmount: 597,
+    paidAmount: 5.97,
     paymentMethod: "cash",
   }, ownerToken);
   assert.ok(precisionBill.billId, "Precision bill created");
-  pass("Monetary calculations stored in exact integer minor units (paise)");
+  pass("Monetary calculations stored in decimal major units");
 
   // Attempt refund greater than paid amount -> Must be rejected
   await assertCallableError(
@@ -221,7 +221,7 @@ async function runRealWorldScenarios() {
       items: [{
         productId: precisionProd.productId,
         quantity: 3,
-        refundAmount: 999999, // Excessive refund attempt > 597 paise
+        refundAmount: 9999.99, // Excessive refund attempt > 5.97
         reason: "Excessive refund claim",
       }],
       refundMethod: "cash",

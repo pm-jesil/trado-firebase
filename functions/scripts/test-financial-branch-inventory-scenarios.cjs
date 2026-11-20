@@ -95,11 +95,11 @@ async function run() {
     code: `CASH-${uniq()}`,
     accountType: "cash",
     currency: "INR",
-    openingBalance: 500000, // ₹5,000.00
+    openingBalance: 5000.00, // ₹5,000.00
     isDefault: true,
   });
   assert.ok(cashAccRes.financialAccountId, "Must return financialAccountId");
-  assert.equal(cashAccRes.account.currentBalance, 500000, "Current balance must match opening balance");
+  assert.equal(cashAccRes.account.currentBalance, 5000.00, "Current balance must match opening balance");
   ok("[financialAccountsCreate#ok] Financial account created with initial opening balance ₹5,000.00");
 
   const cashAccId = cashAccRes.financialAccountId;
@@ -136,8 +136,8 @@ async function run() {
   assert.equal(cashLedger.items.length, 1, "Must have exactly 1 ledger transaction");
   assert.equal(cashLedger.items[0].type, "opening_balance");
   assert.equal(cashLedger.items[0].direction, "in");
-  assert.equal(cashLedger.items[0].amount, 500000);
-  assert.equal(cashLedger.items[0].balanceAfter, 500000);
+  assert.equal(cashLedger.items[0].amount, 5000.00);
+  assert.equal(cashLedger.items[0].balanceAfter, 5000.00);
   const accountTxnSnap = await db.collection("accountTransactions")
     .where("financialAccountId", "==", cashAccId)
     .get();
@@ -160,7 +160,7 @@ async function run() {
     partyId: customerId,
     partyType: "customer",
     direction: "in",
-    amount: 150000, // ₹1,500.00
+    amount: 1500.00, // ₹1,500.00
     method: "cash",
     financialAccountId: cashAccId,
   });
@@ -175,8 +175,8 @@ async function run() {
     financialAccountId: cashAccId,
   });
   assert.equal(updatedCashLedger.items.length, 2, "Must have 2 ledger transactions");
-  assert.equal(updatedCashLedger.account.currentBalance, 650000, "Balance must increase by payment amount (500,000 + 150,000 = 650,000)");
-  assert.equal(updatedCashLedger.items[0].balanceAfter, 650000, "Latest transaction balanceAfter must be 650,000 paise");
+  assert.equal(updatedCashLedger.account.currentBalance, 6500.00, "Balance must increase by payment amount (5,000 + 1,500 = 6,500)");
+  assert.equal(updatedCashLedger.items[0].balanceAfter, 6500.00, "Latest transaction balanceAfter must be 6,500.00");
   ok("Two-phase atomic ledger update verified with zero drift (D-47)");
 
   console.log("\n--- SCENARIO 3: Multi-Bill Payment Allocation & Settlement ---");
@@ -196,9 +196,9 @@ async function run() {
     branchId: branchMainId,
     billNumber: `INV-${uniq()}-1`,
     customerId: customerId3,
-    totalAmount: 100000, // ₹1,000
+    totalAmount: 1000.00, // ₹1,000
     paidAmount: 0,
-    balanceAmount: 100000,
+    balanceAmount: 1000.00,
     status: "active",
     createdAt: new Date().toISOString(),
   });
@@ -209,17 +209,17 @@ async function run() {
     branchId: branchMainId,
     billNumber: `INV-${uniq()}-2`,
     customerId: customerId3,
-    totalAmount: 200000, // ₹2,000
+    totalAmount: 2000.00, // ₹2,000
     paidAmount: 0,
-    balanceAmount: 200000,
+    balanceAmount: 2000.00,
     status: "active",
     createdAt: new Date().toISOString(),
   });
 
   // Update customer outstanding and total spend to ₹3,000
   await db.collection("customers").doc(customerId3).update({
-    outstandingBalance: 300000,
-    totalSpend: 300000,
+    outstandingBalance: 3000.00,
+    totalSpend: 3000.00,
   });
 
   // Make an allocated payment of ₹2,500: ₹1,000 fully settles Bill 1, ₹1,500 partially settles Bill 2
@@ -228,12 +228,12 @@ async function run() {
     partyId: customerId3,
     partyType: "customer",
     direction: "in",
-    amount: 250000,
+    amount: 2500.00,
     method: "cash",
     financialAccountId: cashAccId,
     allocations: [
-      { documentId: bill1Ref.id, documentType: "bill", amount: 100000 },
-      { documentId: bill2Ref.id, documentType: "bill", amount: 150000 },
+      { documentId: bill1Ref.id, documentType: "bill", amount: 1000.00 },
+      { documentId: bill2Ref.id, documentType: "bill", amount: 1500.00 },
     ],
   });
 
@@ -244,13 +244,13 @@ async function run() {
 
   // Verify Bill 2 state
   const b2Snap = await bill2Ref.get();
-  assert.equal(b2Snap.data().balanceAmount, 50000, "Bill 2 must have ₹500 balance remaining");
-  assert.equal(b2Snap.data().paidAmount, 150000, "Bill 2 must show ₹1,500 paid");
+  assert.equal(b2Snap.data().balanceAmount, 500.00, "Bill 2 must have ₹500 balance remaining");
+  assert.equal(b2Snap.data().paidAmount, 1500.00, "Bill 2 must show ₹1,500 paid");
   assert.equal(b2Snap.data().paymentStatus, "partial", "Bill 2 must have paymentStatus partial");
 
   // Verify customer outstanding
   const custSnap = await db.collection("customers").doc(customerId3).get();
-  assert.equal(custSnap.data().outstandingBalance, 50000, "Customer outstanding must be exactly ₹500 remaining");
+  assert.equal(custSnap.data().outstandingBalance, 500.00, "Customer outstanding must be exactly ₹500 remaining");
   ok("Multi-invoice payment allocations executed atomically across documents and party balance");
 
   console.log("\n--- SCENARIO 4: Account-to-Account Transfers (FB-5) ---");
@@ -260,7 +260,7 @@ async function run() {
     name: "HDFC Operating Bank",
     code: `HDFC-${uniq()}`,
     accountType: "bank",
-    openingBalance: 1000000, // ₹10,000.00
+    openingBalance: 10000.00, // ₹10,000.00
   });
   const bankAccId = bankAccRes.financialAccountId;
 
@@ -269,7 +269,7 @@ async function run() {
     organizationId: orgId,
     sourceAccountId: bankAccId,
     destinationAccountId: cashAccId,
-    amount: 200000, // ₹2,000
+    amount: 2000.00, // ₹2,000
     notes: "Petty cash replenishment",
   });
   assert.equal(transferRes.transfer?.status || transferRes.status, "completed", "Immediate transfer should complete");
@@ -295,7 +295,7 @@ async function run() {
     organizationId: orgId,
     financialAccountId: bankAccId,
   });
-  assert.equal(bankLedger.account.currentBalance, 800000, "Bank account must be decremented to ₹8,000");
+  assert.equal(bankLedger.account.currentBalance, 8000.00, "Bank account must be decremented to ₹8,000");
 
   // Insufficient funds rejection
   await assertCallableError(
@@ -698,12 +698,12 @@ async function run() {
   ok("[paymentsReverseFee#ok] Payment fee reversed, clearing account credited back, and expense voided");
 
   console.log("\n--- SCENARIO 11: Capital Introduction & Drawings Flow (D-52, GAP-CAP-01) ---");
-  // 1. Capital infusion by owner (₹50,000.00 = 5,000,000 paise) into cash account
+  // 1. Capital infusion by owner (₹50,000.00) into cash account
   const capInRes = await callFunction(owner, "capitalTransactionsCreate", {
     organizationId: orgId,
     type: "owner_contribution",
     financialAccountId: cashAccId,
-    amount: 5000000,
+    amount: 50000.00,
     sourceReference: "PROMOTER-CAP-01",
     description: "Initial owner equity injection",
   });
@@ -711,12 +711,12 @@ async function run() {
   assert.ok(capInRes.transactionNumber.startsWith("CAP-"), "Capital txn number must start with CAP- prefix");
   ok("[capitalTransactionsCreate#ok] Owner capital contribution recorded with CAP- prefix (D-52)");
 
-  // 2. Capital drawings (₹10,000.00 = 1,000,000 paise) by owner from cash account
+  // 2. Capital drawings (₹10,000.00) by owner from cash account
   const capOutRes = await callFunction(owner, "capitalTransactionsCreate", {
     organizationId: orgId,
     type: "drawings",
     financialAccountId: cashAccId,
-    amount: 1000000,
+    amount: 10000.00,
     description: "Owner personal drawings",
   });
   assert.ok(capOutRes.capitalTransactionId);
@@ -744,7 +744,7 @@ async function run() {
     branchId: branchMainId,
     name: "Split Pay Test Item",
     baseUnit: "piece",
-    sellingPrice: 10000, // ₹100.00
+    sellingPrice: 100.00, // ₹100.00
     initialStock: 20,
     storageLocationId: locId,
   });
@@ -754,11 +754,11 @@ async function run() {
     organizationId: orgId,
     branchId: branchMainId,
     items: [
-      { productId: splitProdId, quantity: 1, unitPriceOverride: 10000 },
+      { productId: splitProdId, quantity: 1, unitPriceOverride: 100.00 },
     ],
     splitPayments: [
-      { method: "cash", amount: 6000, financialAccountId: cashAccId },
-      { method: "card", amount: 4000, financialAccountId: clearingAccId },
+      { method: "cash", amount: 60.00, financialAccountId: cashAccId },
+      { method: "card", amount: 40.00, financialAccountId: clearingAccId },
     ],
   });
   assert.ok(splitBillRes.billId, "Must return billId");
@@ -774,18 +774,18 @@ async function run() {
     financialAccountId: cashAccId,
   });
   const hasCashSplitTxn = splitCashLedger.items.some(
-    (t) => t.sourceDocumentId === splitBillRes.billId && t.amount === 6000
+    (t) => t.sourceDocumentId === splitBillRes.billId && t.amount === 60.00
   );
-  assert.ok(hasCashSplitTxn, "Must have posted 6000 paise ledger transaction to cash account");
+  assert.ok(hasCashSplitTxn, "Must have posted 60.00 ledger transaction to cash account");
 
   const clearingLedger = await callFunction(owner, "financialAccountsGetLedger", {
     organizationId: orgId,
     financialAccountId: clearingAccId,
   });
   const hasClearingSplitTxn = clearingLedger.items.some(
-    (t) => t.sourceDocumentId === splitBillRes.billId && t.amount === 4000
+    (t) => t.sourceDocumentId === splitBillRes.billId && t.amount === 40.00
   );
-  assert.ok(hasClearingSplitTxn, "Must have posted 4000 paise ledger transaction to clearing account");
+  assert.ok(hasClearingSplitTxn, "Must have posted 40.00 ledger transaction to clearing account");
 
   ok("[billsCreate#ok] Bill created with multi-account split payments (₹60 cash + ₹40 card) and atomically posted to ledgers");
 
@@ -924,8 +924,8 @@ async function run() {
   const policyUpd = await callFunction(owner, "accountingPolicyUpdate", {
     organizationId: orgId,
     selfApprovalPolicy: "up_to_limit",
-    selfApprovalLimits: { INR: 5000000 },
-    minorUnitsThresholds: { INR: 1000000 },
+    selfApprovalLimits: { INR: 50000.00 },
+    minorUnitsThresholds: { INR: 10000.00 },
     roundingMode: "half_up",
   });
   assert.equal(policyUpd.policy.selfApprovalPolicy, "up_to_limit");

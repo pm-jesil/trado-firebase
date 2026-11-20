@@ -81,7 +81,7 @@ async function runAudit() {
     code: `BANK-${uniq()}`,
     accountType: "bank",
     currency: "INR",
-    openingBalance: 1000000, // ₹10,000
+    openingBalance: 10000, // ₹10,000
     isDefault: false,
   });
 

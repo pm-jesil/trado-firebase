@@ -41,7 +41,7 @@ import {
   DocumentType,
 } from "../../constants/enums.js";
 import { AppPermissions } from "../../constants/permissions.js";
-import { Money } from "../../services/money.js";
+import { Money, assertAmountMatchesCurrency } from "../../services/money.js";
 import { reserveIdempotency, finalizeIdempotencyFailure } from "../../services/idempotency.js";
 import {
   readNextDocumentNumberInTxn,
@@ -123,6 +123,14 @@ export const billsCreate = onCall({ region: "asia-south1" }, async (request) => 
   try {
     const orgData = ctx.organization;
     const currency = orgData.currency || "INR";
+    if (input.splitPayments) {
+      for (const split of input.splitPayments) {
+        assertAmountMatchesCurrency(split.amount, currency);
+      }
+    }
+    if (typeof input.paidAmount === "number" && input.paidAmount > 0) {
+      assertAmountMatchesCurrency(input.paidAmount, currency);
+    }
     const billRef = db.collection("bills").doc();
     const billId = billRef.id;
     const now = new Date().toISOString();
