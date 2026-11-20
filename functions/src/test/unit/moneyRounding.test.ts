@@ -13,6 +13,7 @@ import {
   CreateCapitalTransactionSchema,
   CreateSubEntrySchema,
   FeeRuleInputSchema,
+  UpdateAccountingPolicySchema,
 } from "../../validation/schemas.js";
 import { PaymentMethod } from "../../constants/enums.js";
 
@@ -684,6 +685,234 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
 
         const expectedFee = Money.amount(baseFee + feeTax, currency);
         assert.equal(expectedFee, 440);
+      });
+    });
+  });
+
+  describe("Prompt 77D S5 — Single Money Convention & Duplicate Removal (Unit)", () => {
+    describe("Self-approval limit enforcement in decimal major units (BHD)", () => {
+      const evaluateSelfApproval = (amount: number, currency: string, policy: any) => {
+        const selfPolicy = policy?.selfApprovalPolicy || "off";
+        if (selfPolicy === "on") return true;
+        if (selfPolicy === "up_to_limit") {
+          const limit = policy?.selfApprovalLimits?.[currency] ?? 0;
+          if (amount > limit) {
+            const err = new Error(`Entry amount (${amount} ${currency}) exceeds self-approval limit (${limit} ${currency}).`);
+            (err as any).reason = "SELF_REVIEW_FORBIDDEN";
+            throw err;
+          }
+          return true;
+        }
+        const err = new Error("Makers cannot approve their own entries.");
+        (err as any).reason = "SELF_REVIEW_FORBIDDEN";
+        throw err;
+      };
+
+      const bhdPolicy = {
+        selfApprovalPolicy: "up_to_limit",
+        selfApprovalLimits: { BHD: 50.000, AED: 500.00, INR: 10000.00 },
+      };
+
+      it("approves 49.999 BHD when self-approval limit is 50.000 BHD", () => {
+        assert.doesNotThrow(() => evaluateSelfApproval(49.999, "BHD", bhdPolicy));
+      });
+
+      it("approves exact limit 50.000 BHD when self-approval limit is 50.000 BHD", () => {
+        assert.doesNotThrow(() => evaluateSelfApproval(50.000, "BHD", bhdPolicy));
+      });
+
+      it("rejects 50.001 BHD with SELF_REVIEW_FORBIDDEN when limit is 50.000 BHD", () => {
+        assert.throws(
+          () => evaluateSelfApproval(50.001, "BHD", bhdPolicy),
+          (err: any) => err.reason === "SELF_REVIEW_FORBIDDEN"
+        );
+      });
+    });
+
+    describe("Double-entry debit === credit balancing in decimal major units", () => {
+      it("balances 3-decimal currency (BHD) journal entries", () => {
+        const currency = "BHD";
+        const debits = [12.345, 87.655];
+        const credits = [50.000, 50.000];
+
+        const totalDebit = Money.sum(debits, currency);
+        const totalCredit = Money.sum(credits, currency);
+
+        assert.equal(totalDebit, 100.000);
+        assert.equal(totalCredit, 100.000);
+        assert.ok(Money.equal(totalDebit, totalCredit, currency));
+      });
+
+      it("balances 2-decimal currency (AED) journal entries", () => {
+        const currency = "AED";
+        const debits = [14.25, 35.75, 50.00];
+        const credits = [100.00];
+
+        const totalDebit = Money.sum(debits, currency);
+        const totalCredit = Money.sum(credits, currency);
+
+        assert.equal(totalDebit, 100.00);
+        assert.equal(totalCredit, 100.00);
+        assert.ok(Money.equal(totalDebit, totalCredit, currency));
+      });
+
+      it("balances 0-decimal currency (JPY) journal entries", () => {
+        const currency = "JPY";
+        const debits = [1500, 3500];
+        const credits = [5000];
+
+        const totalDebit = Money.sum(debits, currency);
+        const totalCredit = Money.sum(credits, currency);
+
+        assert.equal(totalDebit, 5000);
+        assert.equal(totalCredit, 5000);
+        assert.ok(Money.equal(totalDebit, totalCredit, currency));
+      });
+
+      it("detects unbalanced journal entry", () => {
+        const currency = "BHD";
+        const debits = [12.346, 87.655]; // sum = 100.001
+        const credits = [100.000];
+
+        const totalDebit = Money.sum(debits, currency);
+        const totalCredit = Money.sum(credits, currency);
+
+        assert.strictEqual(Money.equal(totalDebit, totalCredit, currency), false);
+      });
+    });
+
+    describe("UpdateAccountingPolicySchema validation with decimal values", () => {
+      it("accepts decimal minorUnitsThresholds and selfApprovalLimits and cashCountVarianceThreshold", () => {
+        const parsed = UpdateAccountingPolicySchema.parse({
+          minorUnitsThresholds: { BHD: 200.5, AED: 2000.75 },
+          selfApprovalLimits: { BHD: 50.25, AED: 500.5 },
+          cashCountVarianceThreshold: 1000.5,
+          selfApprovalPolicy: "up_to_limit",
+        });
+        assert.equal(parsed.minorUnitsThresholds?.BHD, 200.5);
+        assert.equal(parsed.selfApprovalLimits?.BHD, 50.25);
+        assert.equal(parsed.cashCountVarianceThreshold, 1000.5);
+      });
+    });
+
+    describe("Migration script (migrate-money-single-convention.cjs) transforms", () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const migration = require("../../../scripts/migrate-money-single-convention.cjs");
+
+      it("migrates financialAccounts from minor to decimal major units and is idempotent", () => {
+        const legacyDoc = {
+          currency: "BHD",
+          openingBalanceMinor: 1500000,
+          currentBalanceMinor: 1500000,
+        };
+        const res = migration.transformFinancialAccountDoc(legacyDoc);
+        assert.strictEqual(res.isChanged, true);
+        assert.equal(res.updates.openingBalance, 1500.000);
+        assert.equal(res.updates.currentBalance, 1500.000);
+        assert.ok(res.updates.openingBalanceMinor !== undefined);
+        assert.ok(res.updates.currentBalanceMinor !== undefined);
+
+        const cleanDoc = {
+          currency: "BHD",
+          openingBalance: 1500.000,
+          currentBalance: 1500.000,
+        };
+        const cleanRes = migration.transformFinancialAccountDoc(cleanDoc);
+        assert.strictEqual(cleanRes.isChanged, false);
+      });
+
+      it("migrates accountTransactions from minor to decimal major units and is idempotent", () => {
+        const legacyDoc = {
+          currency: "AED",
+          amountMinor: 250000,
+          balanceAfterMinor: 750000,
+        };
+        const res = migration.transformAccountTransactionDoc(legacyDoc);
+        assert.strictEqual(res.isChanged, true);
+        assert.equal(res.updates.amount, 2500.00);
+        assert.equal(res.updates.balanceAfter, 7500.00);
+        assert.ok(res.updates.amountMinor !== undefined);
+        assert.ok(res.updates.balanceAfterMinor !== undefined);
+
+        const cleanDoc = {
+          currency: "AED",
+          amount: 2500.00,
+          balanceAfter: 7500.00,
+        };
+        const cleanRes = migration.transformAccountTransactionDoc(cleanDoc);
+        assert.strictEqual(cleanRes.isChanged, false);
+      });
+
+      it("migrates journalEntries from minor to decimal major units and is idempotent", () => {
+        const legacyDoc = {
+          currency: "INR",
+          totalDebitMinor: 5000000,
+          totalCreditMinor: 5000000,
+          lines: [
+            { accountCode: "1001", debitMinor: 5000000, credit: 0 },
+            { accountCode: "2001", debit: 0, creditMinor: 5000000 },
+          ],
+        };
+        const res = migration.transformJournalEntryDoc(legacyDoc);
+        assert.strictEqual(res.isChanged, true);
+        assert.equal(res.updates.totalDebit, 50000.00);
+        assert.equal(res.updates.totalCredit, 50000.00);
+        assert.equal(res.updates.lines[0].debit, 50000.00);
+        assert.equal(res.updates.lines[0].debitMinor, undefined);
+        assert.equal(res.updates.lines[1].credit, 50000.00);
+        assert.equal(res.updates.lines[1].creditMinor, undefined);
+
+        const cleanDoc = {
+          currency: "INR",
+          totalDebit: 50000.00,
+          totalCredit: 50000.00,
+          lines: [
+            { accountCode: "1001", debit: 50000.00, credit: 0 },
+            { accountCode: "2001", debit: 0, credit: 50000.00 },
+          ],
+        };
+        const cleanRes = migration.transformJournalEntryDoc(cleanDoc);
+        assert.strictEqual(cleanRes.isChanged, false);
+      });
+
+      it("migrates organizations accounting policy thresholds and limits and is idempotent", () => {
+        const legacyDoc = {
+          currency: "INR",
+          settings: {
+            accountingPolicy: {
+              cashCountVarianceThresholdMinor: 1000000,
+              minorUnitsThresholds: { INR: 5000000, BHD: 200000 },
+              selfApprovalLimits: { INR: 1000000, BHD: 50000 },
+            },
+          },
+        };
+        const res = migration.transformOrganizationDoc(legacyDoc);
+        assert.strictEqual(res.isChanged, true);
+        assert.equal(res.updates["settings.accountingPolicy.cashCountVarianceThreshold"], 10000.00);
+        assert.ok(res.updates["settings.accountingPolicy.cashCountVarianceThresholdMinor"] !== undefined);
+        assert.equal(res.updates["settings.accountingPolicy.moneyConvention"], "major");
+        assert.deepEqual(res.updates["settings.accountingPolicy.minorUnitsThresholds"], {
+          INR: 50000.00,
+          BHD: 200.000,
+        });
+        assert.deepEqual(res.updates["settings.accountingPolicy.selfApprovalLimits"], {
+          INR: 10000.00,
+          BHD: 50.000,
+        });
+
+        const cleanDoc = {
+          currency: "INR",
+          settings: {
+            accountingPolicy: {
+              moneyConvention: "major",
+              cashCountVarianceThreshold: 10000.00,
+              minorUnitsThresholds: { INR: 50000.00, BHD: 200.000 },
+              selfApprovalLimits: { INR: 10000.00, BHD: 50.000 },
+            },
+          },
+        };
+        const cleanRes = migration.transformOrganizationDoc(cleanDoc);
+        assert.strictEqual(cleanRes.isChanged, false);
       });
     });
   });

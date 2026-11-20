@@ -2,8 +2,8 @@
 
 - **Date:** 2026-11-20
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1, S2, S3a, S3b, S3c, S4)
-- **Current State:** **STEPS S1, S2, S3a, S3b, S3c, S4 COMPLETED. Removed `.int()` and 'paise' messages from validation schemas; enforced `assertAmountMatchesCurrency` across payments, bills, outflows, fees, capital, sub-entries, transfers, and cash counts; fixed cash count denomination math and fee math in `cashFlows.ts` using `Money.amount`. 420/420 unit tests pass across 115 suites.**
+- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1, S2, S3a, S3b, S3c, S4, S4b, S5)
+- **Current State:** **STEPS S1, S2, S3a, S3b, S3c, S4, S4b, S5 COMPLETED. Removed 8 duplicate integer-minor fields from models.ts and readers/writers (postingService, postingRules, seed-business-data); renamed cashCountVarianceThresholdMinor to decimal cashCountVarianceThreshold in AccountingPolicy; converted minorUnitsThresholds and selfApprovalLimits to decimal major units; enforced self-approval policy and limits in accountEntries and approvals; authored idempotent migration script functions/scripts/migrate-money-single-convention.cjs with dry-run/apply modes. 433/433 unit tests pass across 120 suites.**
 
 ## Summary of Prompt 77 & 77C Deliverables
 

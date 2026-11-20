@@ -71,8 +71,6 @@ export interface SeedFinancialAccount {
   type?: FinancialAccountType;
   currency?: string;
   openingBalance?: number;
-  openingBalanceMinor?: number;
-  currentBalanceMinor?: number;
   bankDetails?: {
     bankName?: string;
     accountNumberMasked?: string;
@@ -344,8 +342,6 @@ export async function seedBusinessData(db: Firestore, spec: SeedOrgSpec, uids: R
       bankDetails: fa.bankDetails,
       openingBalance: fa.openingBalance || 0,
       currentBalance: fa.openingBalance || 0,
-      openingBalanceMinor: Math.round((fa.openingBalance || 0) * Math.pow(10, spec.currencyDecimals ?? 2)),
-      currentBalanceMinor: Math.round((fa.openingBalance || 0) * Math.pow(10, spec.currencyDecimals ?? 2)),
       isDefault: fa.isDefault ?? false,
       isActive: true,
       createdAt: now,
@@ -592,8 +588,6 @@ export const BAHRAIN_BICYCLE_SPEC: SeedOrgSpec = {
       type: "cash",
       currency: "BHD",
       openingBalance: 1500,
-      openingBalanceMinor: 1500000,
-      currentBalanceMinor: 1500000,
       isDefault: true,
     },
     {
@@ -604,8 +598,6 @@ export const BAHRAIN_BICYCLE_SPEC: SeedOrgSpec = {
       type: "bank",
       currency: "BHD",
       openingBalance: 10000,
-      openingBalanceMinor: 10000000,
-      currentBalanceMinor: 10000000,
       isDefault: false,
       bankDetails: {
         bankName: "National Bank of Bahrain",
@@ -841,8 +833,6 @@ export const UAE_KITCHENWARE_SPEC: SeedOrgSpec = {
       type: "cash",
       currency: "AED",
       openingBalance: 2500,
-      openingBalanceMinor: 250000,
-      currentBalanceMinor: 250000,
       isDefault: true,
     },
     {
@@ -853,8 +843,6 @@ export const UAE_KITCHENWARE_SPEC: SeedOrgSpec = {
       type: "bank",
       currency: "AED",
       openingBalance: 50000,
-      openingBalanceMinor: 5000000,
-      currentBalanceMinor: 5000000,
       isDefault: false,
       bankDetails: {
         bankName: "Emirates NBD",

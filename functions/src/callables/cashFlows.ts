@@ -277,7 +277,7 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
       const countNumber = reservation.formattedNumber;
 
       const policy = orgData?.settings?.accountingPolicy as (Record<string, any>) | undefined;
-      const thresholdMajor = policy?.cashCountVarianceThreshold ?? ((policy?.cashCountVarianceThresholdMinor ?? 100000) / (10 ** getExponent(currency)));
+      const thresholdMajor = policy?.cashCountVarianceThreshold ?? (policy?.cashCountVarianceThresholdMinor !== undefined ? policy.cashCountVarianceThresholdMinor / (10 ** getExponent(currency)) : 1000);
       const reviewThresholdMajor = thresholdMajor / 2;
 
       let varianceTransactionId: string | null = null;

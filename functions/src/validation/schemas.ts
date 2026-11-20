@@ -2515,9 +2515,11 @@ export const GetAccountingPolicySchema = z.strictObject({
 
 export const UpdateAccountingPolicySchema = z.strictObject({
   ...ContextFields,
-  minorUnitsThresholds: z.record(z.string(), z.number().int().min(0)).optional(),
+  moneyConvention: z.literal("major").optional(),
+  minorUnitsThresholds: z.record(z.string(), z.number().min(0)).optional(),
   selfApprovalPolicy: z.enum(["off", "up_to_limit", "on"]).optional(),
-  selfApprovalLimits: z.record(z.string(), z.number().int().min(0)).optional(),
+  selfApprovalLimits: z.record(z.string(), z.number().min(0)).optional(),
+  cashCountVarianceThreshold: z.number().min(0).optional(),
   roundingMode: z.enum(["half_up", "half_even"]).optional(),
   roundToNearestRupee: z.boolean().optional(),
   cashRoundingFils: z.boolean().optional(),

@@ -227,7 +227,7 @@ export interface AppliedPostingResult {
   transactionIds: string[];
   journalEntryId?: string;
   journalEntryNumber?: string;
-  accountBalances: Array<{ financialAccountId: string; balanceAfter: number; balanceAfterMinor: number }>;
+  accountBalances: Array<{ financialAccountId: string; balanceAfter: number }>;
 }
 
 /**
@@ -259,7 +259,6 @@ export function applyPostingInTxn(
   const accountBalances = postResult.results.map((r) => ({
     financialAccountId: r.financialAccountId,
     balanceAfter: r.balanceAfter,
-    balanceAfterMinor: Money.toMinor(r.balanceAfter, prepared.currency),
   }));
 
   // 2. Process Balanced Double-Entry Journal Entry
@@ -270,10 +269,8 @@ export function applyPostingInTxn(
     commitDocumentNumberInTxn(txn, prepared.journalReservation);
     journalEntryNumber = prepared.journalReservation.formattedNumber;
 
-    const totalDebit = prepared.journalLines.reduce((acc, l) => acc + (l.debit || 0), 0);
-    const totalCredit = prepared.journalLines.reduce((acc, l) => acc + (l.credit || 0), 0);
-    const totalDebitMinor = Money.toMinor(totalDebit, prepared.currency);
-    const totalCreditMinor = Money.toMinor(totalCredit, prepared.currency);
+    const totalDebit = Money.sum(prepared.journalLines.map((l) => l.debit || 0), prepared.currency);
+    const totalCredit = Money.sum(prepared.journalLines.map((l) => l.credit || 0), prepared.currency);
 
     const jrnRef = db.collection("journalEntries").doc();
     journalEntryId = jrnRef.id;
@@ -291,14 +288,11 @@ export function applyPostingInTxn(
         accountName: l.accountName,
         debit: l.debit,
         credit: l.credit,
-        debitMinor: Money.toMinor(l.debit, prepared.currency),
-        creditMinor: Money.toMinor(l.credit, prepared.currency),
         description: l.description,
       })),
-      totalDebit: Money.amount(totalDebit, prepared.currency),
-      totalCredit: Money.amount(totalCredit, prepared.currency),
-      totalDebitMinor,
-      totalCreditMinor,
+      totalDebit,
+      totalCredit,
+      currency: prepared.currency,
       actorUid: prepared.actorUid,
       createdAt: prepared.now,
     };
