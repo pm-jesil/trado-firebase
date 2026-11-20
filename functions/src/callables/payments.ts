@@ -79,6 +79,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
     const paymentId = paymentRef.id;
     const now = new Date().toISOString();
     const callerUid = ctx.callerUid;
+    const orgCurr = ctx.organization.currency;
 
     const finalResult = await db.runTransaction(async (txn) => {
       // === STEP 1: ALL TRANSACTIONAL READS FIRST ===
@@ -112,7 +113,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
       if (input.allocations && input.allocations.length > 0) {
         let totalAllocated = 0;
         for (const alloc of input.allocations) {
-          totalAllocated = Money.amount(totalAllocated + alloc.amount);
+          totalAllocated = Money.amount(totalAllocated + alloc.amount, orgCurr);
           const docRef = db.collection(alloc.documentType === "bill" ? "bills" : "outflows").doc(alloc.documentId);
           const docSnap = await txn.get(docRef);
           assertSameOrg(docSnap, orgId, alloc.documentType);
@@ -121,7 +122,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
           if (!openStatus) {
             throw new HttpsError("failed-precondition", `Cannot allocate payment against ${alloc.documentType} in status "${docData.status}".`);
           }
-          if (alloc.amount > Money.amount(docData.balanceAmount || 0) + 0.005) {
+          if (alloc.amount > Money.amount(docData.balanceAmount || 0, (docData as any).currency || orgCurr) + 0.005) {
             throw new HttpsError("invalid-argument", `Allocation ${alloc.amount} exceeds open balance ${docData.balanceAmount} on ${alloc.documentType} ${alloc.documentId}.`);
           }
           allocatedDocSnaps.push({ ref: docRef, snap: docSnap, type: alloc.documentType, amount: alloc.amount });
@@ -183,7 +184,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
         if (!openStatus) {
           throw new HttpsError("failed-precondition", `Cannot record a payment against a document in status "${settled.status}".`);
         }
-        if (input.amount > Money.amount(settled.balanceAmount || 0) + 0.005) {
+        if (input.amount > Money.amount(settled.balanceAmount || 0, (settled as any).currency || orgCurr) + 0.005) {
           throw new HttpsError("invalid-argument", `Payment ${input.amount} exceeds the open balance ${settled.balanceAmount}.`);
         }
       }
@@ -237,8 +238,9 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
       for (const item of allocatedDocSnaps) {
         if (item.type === "bill") {
           const bData = item.snap.data() as BillDoc;
-          const newPaid = Money.amount((bData.paidAmount || 0) + item.amount);
-          const newBal = Money.amount(Math.max(0, bData.totalAmount - newPaid));
+          const docCurr = (bData as any).currency || orgCurr;
+          const newPaid = Money.amount((bData.paidAmount || 0) + item.amount, docCurr);
+          const newBal = Money.amount(Math.max(0, bData.totalAmount - newPaid), docCurr);
           const newStatus = newBal <= 0 ? "paid" : "partial";
           txn.update(item.ref, {
             paidAmount: newPaid,
@@ -248,8 +250,9 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
           });
         } else {
           const oData = item.snap.data() as OutflowDoc;
-          const newPaid = Money.amount((oData.paidAmount || 0) + item.amount);
-          const newBal = Money.amount(Math.max(0, oData.totalAmount - newPaid));
+          const docCurr = (oData as any).currency || orgCurr;
+          const newPaid = Money.amount((oData.paidAmount || 0) + item.amount, docCurr);
+          const newBal = Money.amount(Math.max(0, oData.totalAmount - newPaid), docCurr);
           const newStatus = newBal <= 0 ? "paid" : "partial";
           txn.update(item.ref, {
             paidAmount: newPaid,
@@ -263,8 +266,9 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
       // Settle linked Bill if applicable
       if (billRef && billSnap && billSnap.exists) {
         const bData = billSnap.data() as BillDoc;
-        const newPaid = Money.amount((bData.paidAmount || 0) + input.amount);
-        const newBal = Money.amount(Math.max(0, bData.totalAmount - newPaid));
+        const docCurr = (bData as any).currency || orgCurr;
+        const newPaid = Money.amount((bData.paidAmount || 0) + input.amount, docCurr);
+        const newBal = Money.amount(Math.max(0, bData.totalAmount - newPaid), docCurr);
         const newStatus = newBal <= 0 ? "paid" : "partial";
         txn.update(billRef, {
           paidAmount: newPaid,
@@ -277,8 +281,9 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
       // Settle linked Outflow if applicable
       if (outflowRef && outflowSnap && outflowSnap.exists) {
         const oData = outflowSnap.data() as OutflowDoc;
-        const newPaid = Money.amount((oData.paidAmount || 0) + input.amount);
-        const newBal = Money.amount(Math.max(0, oData.totalAmount - newPaid));
+        const docCurr = (oData as any).currency || orgCurr;
+        const newPaid = Money.amount((oData.paidAmount || 0) + input.amount, docCurr);
+        const newBal = Money.amount(Math.max(0, oData.totalAmount - newPaid), docCurr);
         const newStatus = newBal <= 0 ? "paid" : "partial";
         txn.update(outflowRef, {
           paidAmount: newPaid,
@@ -292,7 +297,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
       if (custRef && custSnap && custSnap.exists) {
         const cData = custSnap.data() as CustomerDoc;
         const currentBal = cData.outstandingBalance || 0;
-        const newBal = Money.amount(Math.max(0, currentBal - input.amount));
+        const newBal = Money.amount(Math.max(0, currentBal - input.amount), orgCurr);
         txn.update(custRef, {
           outstandingBalance: newBal,
           updatedAt: now,
@@ -303,7 +308,7 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
       if (vendRef && vendSnap && vendSnap.exists) {
         const vData = vendSnap.data() as VendorDoc;
         const currentPayable = vData.outstandingPayable || 0;
-        const newPayable = Money.amount(Math.max(0, currentPayable - input.amount));
+        const newPayable = Money.amount(Math.max(0, currentPayable - input.amount), orgCurr);
         txn.update(vendRef, {
           outstandingPayable: newPayable,
           updatedAt: now,
@@ -459,8 +464,9 @@ export const paymentsVoid = onCall({ region: "asia-south1" }, async (request) =>
           ? docStatus === "active"
           : docStatus === "confirmed";
         if (isActive) {
-          const newPaid = Money.amount(Math.max(0, (docData.paidAmount || 0) - payment.amount));
-          const newBal = Money.amount(docData.totalAmount - newPaid);
+          const docCurr = (docData as any).currency || (payment as any).currency || ctx.organization.currency;
+          const newPaid = Money.amount(Math.max(0, (docData.paidAmount || 0) - payment.amount), docCurr);
+          const newBal = Money.amount(docData.totalAmount - newPaid, docCurr);
           const newPaymentStatus = newPaid <= 0 ? "pending" : (newBal <= 0 ? "paid" : "partial");
           txn.update(docRef, {
             paidAmount: newPaid,
@@ -474,18 +480,19 @@ export const paymentsVoid = onCall({ region: "asia-south1" }, async (request) =>
 
       // 3. Reverse party balance
       if (partyRef && partySnap?.exists) {
+        const payCurr = (payment as any).currency || ctx.organization.currency;
         if (payment.partyType === "customer") {
           const cust = partySnap.data() as CustomerDoc;
           // Voiding an inbound collection restores the customer's outstanding balance
           txn.update(partyRef, {
-            outstandingBalance: Money.amount((cust.outstandingBalance || 0) + payment.amount),
+            outstandingBalance: Money.amount((cust.outstandingBalance || 0) + payment.amount, payCurr),
             updatedAt: now,
           });
         } else if (payment.partyType === "vendor") {
           const vend = partySnap.data() as VendorDoc;
           // Voiding an outbound payment restores the vendor's outstanding payable
           txn.update(partyRef, {
-            outstandingPayable: Money.amount((vend.outstandingPayable || 0) + payment.amount),
+            outstandingPayable: Money.amount((vend.outstandingPayable || 0) + payment.amount, payCurr),
             updatedAt: now,
           });
         }

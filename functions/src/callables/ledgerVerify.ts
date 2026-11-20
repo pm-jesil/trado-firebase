@@ -259,7 +259,7 @@ export const ledgerVerify = onCall({ region: "asia-south1" }, async (request) =>
     const expectedBalance = openBillSum;
     const recordedBalance = customer.outstandingBalance || 0;
 
-    if (!Money.equal(expectedBalance, recordedBalance)) {
+    if (!Money.equal(expectedBalance, recordedBalance, ctx.organization.currency)) {
       discrepancies.push({
         entity: "customer",
         id: custId,
@@ -295,7 +295,7 @@ export const ledgerVerify = onCall({ region: "asia-south1" }, async (request) =>
     const expectedPayable = openOutflowSum;
     const recordedPayable = vendor.outstandingPayable || 0;
 
-    if (!Money.equal(expectedPayable, recordedPayable)) {
+    if (!Money.equal(expectedPayable, recordedPayable, ctx.organization.currency)) {
       discrepancies.push({
         entity: "vendor",
         id: vendId,

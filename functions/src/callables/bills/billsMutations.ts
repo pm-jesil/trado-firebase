@@ -442,8 +442,8 @@ export async function finalizeBillInternal(
       : null;
 
     const paidAmount = Math.min(billData.totalAmount, Math.max(0, (collect?.paidAmount || 0) + (billData.paidAmount || 0)));
-    const newlyPaid = Money.subtract(paidAmount, billData.paidAmount || 0);
-    const balanceAmount = Money.subtract(billData.totalAmount, paidAmount);
+    const newlyPaid = Money.subtract(paidAmount, billData.paidAmount || 0, (billData as any).currency || ctx.organization.currency);
+    const balanceAmount = Money.subtract(billData.totalAmount, paidAmount, (billData as any).currency || ctx.organization.currency);
 
     const commitEffects = await prepareSaleEffects(txn, {
       ctx,
@@ -539,7 +539,7 @@ export async function decideBill(ctx: RequestContext, input: DocumentDecisionInp
     }
 
     const paidAmount = bill.requestedPaidAmount || 0;
-    const balanceAmount = Money.subtract(bill.totalAmount, paidAmount);
+    const balanceAmount = Money.subtract(bill.totalAmount, paidAmount, (bill as any).currency || ctx.organization.currency);
     const commitEffects = await prepareSaleEffects(txn, {
       ctx,
       billId: snap.id,
@@ -721,13 +721,14 @@ export const billsVoid = onCall({ region: "asia-south1" }, async (request) => {
       if (custRef && custSnap?.exists) {
         const cust = custSnap.data() as CustomerDoc;
         const totalPaid = bill.paidAmount || 0;
+        const billCurr = (bill as any).currency || ctx.organization.currency;
         const custUpdates: Partial<CustomerDoc> = {
-          totalSpend: Money.amount((cust.totalSpend || 0) - bill.totalAmount),
-          outstandingBalance: Money.amount((cust.outstandingBalance || 0) - bill.balanceAmount),
+          totalSpend: Money.amount((cust.totalSpend || 0) - bill.totalAmount, billCurr),
+          outstandingBalance: Money.amount((cust.outstandingBalance || 0) - bill.balanceAmount, billCurr),
           updatedAt: now,
         };
         if (paymentDisposition === "keep_as_customer_credit" && totalPaid > 0) {
-          custUpdates.advanceBalance = Money.amount((cust.advanceBalance || 0) + totalPaid);
+          custUpdates.advanceBalance = Money.amount((cust.advanceBalance || 0) + totalPaid, billCurr);
         }
         txn.update(custRef, custUpdates);
       }

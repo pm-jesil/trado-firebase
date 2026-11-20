@@ -244,9 +244,10 @@ async function prepareOutflowEffects(txn: Transaction, p: OutflowEffectsParams) 
     if (preparedStock) commitStockChangesInTxn(txn, preparedStock);
     if (vendorRef && vendorSnap?.exists) {
       const vend = vendorSnap.data() as VendorDoc;
+      const curr = (p.doc as any).currency || p.ctx.organization.currency;
       txn.update(vendorRef, {
-        totalPurchase: Money.amount((vend.totalPurchase || 0) + p.doc.totalAmount),
-        outstandingPayable: Money.amount((vend.outstandingPayable || 0) + p.balanceAmount),
+        totalPurchase: Money.amount((vend.totalPurchase || 0) + p.doc.totalAmount, curr),
+        outstandingPayable: Money.amount((vend.outstandingPayable || 0) + p.balanceAmount, curr),
         updatedAt: now,
       });
     }
@@ -424,7 +425,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
     const preDiscountTotal = Money.amount(netTaxable + taxTotal, currency);
     const billDiscount = Money.amount(Math.min(preDiscountTotal,
       (input.billDiscountAmount || 0) + (input.billDiscountPercent ? Money.percent(preDiscountTotal, input.billDiscountPercent, currency) : 0)), currency);
-    const totalAmount = Money.roundCurrency(preDiscountTotal - billDiscount, currency);
+    const totalAmount = Money.amount(preDiscountTotal - billDiscount, currency);
     const requestedPaid = Math.min(totalAmount, Math.max(0, input.paidAmount || 0));
 
     const approval = await evaluateApproval(ctx, isPurchase ? "purchase" : "expense", totalAmount);
@@ -663,7 +664,7 @@ export async function decideOutflow(ctx: RequestContext, input: DocumentDecision
     }
 
     const paidAmount = doc.requestedPaidAmount || 0;
-    const balanceAmount = Money.subtract(doc.totalAmount, paidAmount);
+    const balanceAmount = Money.subtract(doc.totalAmount, paidAmount, (doc as any).currency || ctx.organization.currency);
     const commitEffects = await prepareOutflowEffects(txn, {
       ctx,
       outflowId: snap.id,
@@ -855,9 +856,10 @@ export const outflowsVoid = onCall({ region: "asia-south1" }, async (request) =>
       if (unreceive) unreceive();
       if (vendRef && vendSnap?.exists) {
         const vend = vendSnap.data() as VendorDoc;
+        const curr = (doc as any).currency || ctx.organization.currency;
         txn.update(vendRef, {
-          totalPurchase: Money.amount((vend.totalPurchase || 0) - doc.totalAmount),
-          outstandingPayable: Money.amount((vend.outstandingPayable || 0) - doc.balanceAmount),
+          totalPurchase: Money.amount((vend.totalPurchase || 0) - doc.totalAmount, curr),
+          outstandingPayable: Money.amount((vend.outstandingPayable || 0) - doc.balanceAmount, curr),
           updatedAt: now,
         });
       }

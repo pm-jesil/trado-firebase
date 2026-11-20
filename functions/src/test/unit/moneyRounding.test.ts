@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { roundTo, round2, roundCurrency } from "../../services/money.js";
+import { roundTo, round2, Money, assertAmountMatchesCurrency, getCurrencyDecimals } from "../../services/money.js";
+import { CURRENCIES, getCurrencyInfo, getExponent } from "../../constants/currencies.js";
 import { calculateTax } from "../../services/taxCalculation.js";
 
 describe("Commercial Money Rounding (Half Away From Zero)", () => {
@@ -105,13 +106,154 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
     }
   });
 
-  it("currency helper roundCurrency respects ISO 4217 minor unit exponents", () => {
-    assert.equal(roundCurrency(10.005, "INR"), 10.01);
-    assert.equal(roundCurrency(10.005, "USD"), 10.01);
-    assert.equal(roundCurrency(10.005, "AED"), 10.01);
-    assert.equal(roundCurrency(10.0005, "OMR"), 10.001);
-    assert.equal(roundCurrency(10.0005, "BHD"), 10.001);
-    assert.equal(roundCurrency(100.5, "JPY"), 101);
+  it("canonical Money.amount respects ISO 4217 minor unit exponents and rounding", () => {
+    assert.equal(Money.amount(10.005, "INR"), 10.01);
+    assert.equal(Money.amount(10.005, "USD"), 10.01);
+    assert.equal(Money.amount(10.005, "AED"), 10.01);
+    assert.equal(Money.amount(10.0005, "OMR"), 10.001);
+    assert.equal(Money.amount(10.0005, "BHD"), 10.001);
+    assert.equal(Money.amount(100.5, "JPY"), 101);
+
+    // Prompt 77D S2 specific assertions:
+    // 0.125 BHD (3 decimals) -> 0.125
+    assert.equal(Money.amount(0.125, "BHD"), 0.125);
+    // 0.125 AED (2 decimals, half away from zero) -> 0.13
+    assert.equal(Money.amount(0.125, "AED"), 0.13);
+    // Negative values half away from zero
+    assert.equal(Money.amount(-0.125, "AED"), -0.13);
+    assert.equal(Money.amount(-0.125, "BHD"), -0.125);
+    assert.equal(Money.amount(-2.5, "JPY"), -3);
+
+    // Float trap tests (exact ties across exponents)
+    assert.equal(Money.amount(1.005, "AED"), 1.01);
+    assert.equal(Money.amount(2.675, "AED"), 2.68);
+    assert.equal(Money.amount(1.0005, "BHD"), 1.001);
+    assert.equal(Money.amount(-1.005, "AED"), -1.01);
+    assert.equal(Money.amount(0.5, "JPY"), 1);
+  });
+
+  describe("assertAmountMatchesCurrency validation", () => {
+    it("accepts valid decimal precision matching currency exponent", () => {
+      assert.doesNotThrow(() => assertAmountMatchesCurrency(100, "JPY"));
+      assert.doesNotThrow(() => assertAmountMatchesCurrency(0, "JPY"));
+      assert.doesNotThrow(() => assertAmountMatchesCurrency(12.5, "AED"));
+      assert.doesNotThrow(() => assertAmountMatchesCurrency(12.55, "AED"));
+      assert.doesNotThrow(() => assertAmountMatchesCurrency(0.125, "BHD"));
+      assert.doesNotThrow(() => assertAmountMatchesCurrency(1.234, "OMR"));
+    });
+
+    it("rejects amounts exceeding currency exponent with AMOUNT_PRECISION_INVALID", () => {
+      assert.throws(
+        () => assertAmountMatchesCurrency(100.5, "JPY"),
+        /AMOUNT_PRECISION_INVALID/
+      );
+      assert.throws(
+        () => assertAmountMatchesCurrency(12.555, "AED"),
+        /AMOUNT_PRECISION_INVALID/
+      );
+      assert.throws(
+        () => assertAmountMatchesCurrency(0.1234, "BHD"),
+        /AMOUNT_PRECISION_INVALID/
+      );
+    });
+
+    it("rejects unknown or invalid currencies and non-finite amounts", () => {
+      assert.throws(
+        () => assertAmountMatchesCurrency(NaN, "AED"),
+        /AMOUNT_INVALID/
+      );
+      assert.throws(
+        () => assertAmountMatchesCurrency(Infinity, "AED"),
+        /AMOUNT_INVALID/
+      );
+      assert.throws(
+        () => assertAmountMatchesCurrency(10, "UNKNOWN_CURRENCY"),
+        /CURRENCY_UNKNOWN/
+      );
+    });
+  });
+
+  describe("Prompt 77D S1 — Currency Table (Unit)", () => {
+    it("includes all required currencies with valid definitions", () => {
+      const requiredCodes = [
+        "INR", "AED", "BHD", "OMR", "KWD", "QAR", "SAR", "JOD", "USD", "EUR",
+        "GBP", "SGD", "CAD", "AUD", "JPY", "CNY", "PKR", "BDT", "LKR", "NPR",
+        "MYR", "THB", "IDR", "ZAR", "EGP", "TRY", "CHF", "KRW", "VND", "TND", "IQD", "LYD",
+      ];
+
+      for (const code of requiredCodes) {
+        const info = CURRENCIES[code];
+        assert.ok(info, `Currency ${code} must exist in CURRENCIES`);
+        assert.equal(info.code, code);
+        assert.ok([0, 2, 3, 4].includes(info.exponent), `${code} exponent must be 0, 2, 3, or 4`);
+        assert.ok(info.symbol && typeof info.symbol === "string", `${code} must have a symbol string`);
+        assert.ok(
+          info.symbolPosition === "before" || info.symbolPosition === "after",
+          `${code} symbolPosition must be 'before' or 'after'`
+        );
+        assert.ok(info.major && info.major.name && info.major.plural, `${code} must have major name and plural`);
+
+        if (info.minor) {
+          assert.ok(info.minor.name && info.minor.plural, `${code} must have minor name and plural`);
+          const expectedPerMajor = Math.pow(10, info.exponent);
+          assert.equal(
+            info.minor.perMajor,
+            expectedPerMajor,
+            `${code} minor.perMajor must equal 10^exponent (${expectedPerMajor})`
+          );
+        }
+      }
+    });
+
+    it("verifies specific ISO 4217 exponents", () => {
+      assert.equal(getExponent("BHD"), 3);
+      assert.equal(getExponent("OMR"), 3);
+      assert.equal(getExponent("KWD"), 3);
+      assert.equal(getExponent("JOD"), 3);
+      assert.equal(getExponent("JPY"), 0);
+      assert.equal(getExponent("INR"), 2);
+      assert.equal(getExponent("AED"), 2);
+      assert.equal(getExponent("USD"), 2);
+    });
+
+    it("verifies minor unit names and perMajor", () => {
+      const bhd = getCurrencyInfo("BHD");
+      assert.equal(bhd.minor?.name, "Fils");
+      assert.equal(bhd.minor?.perMajor, 1000);
+
+      const aed = getCurrencyInfo("AED");
+      assert.equal(aed.minor?.name, "Fils");
+      assert.equal(aed.minor?.perMajor, 100);
+
+      const inr = getCurrencyInfo("INR");
+      assert.equal(inr.minor?.name, "Paisa");
+      assert.equal(inr.minor?.plural, "Paise");
+      assert.equal(inr.minor?.perMajor, 100);
+
+      const jpy = getCurrencyInfo("JPY");
+      assert.equal(jpy.minor, undefined, "JPY has exponent 0 and no minor unit in circulation");
+    });
+
+    it("throws CURRENCY_REQUIRED when currency code is missing or empty", () => {
+      assert.throws(() => getCurrencyInfo(""), /CURRENCY_REQUIRED/);
+      assert.throws(() => getCurrencyInfo(null as any), /CURRENCY_REQUIRED/);
+      assert.throws(() => getCurrencyInfo(undefined as any), /CURRENCY_REQUIRED/);
+      assert.throws(() => getExponent("   "), /CURRENCY_REQUIRED/);
+    });
+
+    it("throws CURRENCY_UNKNOWN for unrecognized currency codes", () => {
+      assert.throws(() => getCurrencyInfo("XYZ"), /CURRENCY_UNKNOWN/);
+      assert.throws(() => getCurrencyInfo("INVALID"), /CURRENCY_UNKNOWN/);
+      assert.throws(() => getExponent("FOO"), /CURRENCY_UNKNOWN/);
+    });
+
+    it("delegates getCurrencyDecimals in money.ts to getExponent", () => {
+      assert.equal(getCurrencyDecimals("BHD"), 3);
+      assert.equal(getCurrencyDecimals("OMR"), 3);
+      assert.equal(getCurrencyDecimals("KWD"), 3);
+      assert.equal(getCurrencyDecimals("JOD"), 3);
+      assert.equal(getCurrencyDecimals("JPY"), 0);
+    });
   });
 });
 

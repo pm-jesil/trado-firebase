@@ -176,7 +176,7 @@ export function billTotals(
     throw new HttpsError("permission-denied", "[PERMISSION_DENIED] Bill-level discounts require bill:discount.", { reason: "PERMISSION_DENIED" });
   }
   const rawTotal = Money.subtract(priced.subTotal, discountTotal, currency) + priced.taxTotal;
-  const totalAmount = Money.roundCurrency(rawTotal, currency);
+  const totalAmount = Money.amount(rawTotal, currency);
 
   const taxLines = priced.items.map((item) => ({
     taxableAmount: item.subtotal - item.discountValue,
@@ -195,7 +195,7 @@ export function billTotals(
     isInterState,
   });
 
-  return { discountTotal, totalAmount, roundOff: Money.roundCurrency(totalAmount - rawTotal, currency), taxSnapshot: taxResult.taxSnapshot };
+  return { discountTotal, totalAmount, roundOff: Money.amount(totalAmount - rawTotal, currency), taxSnapshot: taxResult.taxSnapshot };
 }
 
 export function stockOutItems(billId: string, items: BillItem[], reason: string, storageLocationId?: string): StockChangeItem[] {
@@ -325,9 +325,10 @@ export async function prepareSaleEffects(txn: Transaction, p: SaleEffectsParams)
     if (preparedStock) commitStockChangesInTxn(txn, preparedStock);
     if (customerRef && customerSnap?.exists) {
       const cust = customerSnap.data() as CustomerDoc;
+      const currency = p.ctx.organization.currency;
       txn.update(customerRef, {
-        totalSpend: Money.amount((cust.totalSpend || 0) + p.totalAmount),
-        outstandingBalance: Money.amount((cust.outstandingBalance || 0) + p.balanceAmount),
+        totalSpend: Money.amount((cust.totalSpend || 0) + p.totalAmount, currency),
+        outstandingBalance: Money.amount((cust.outstandingBalance || 0) + p.balanceAmount, currency),
         updatedAt: now,
       });
     }

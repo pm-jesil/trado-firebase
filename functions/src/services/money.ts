@@ -1,16 +1,14 @@
 /**
  * Canonical Money and Precision Utility for Trado
- * 
- * Ported directly from the legacy Trado architecture (common/money/money.util.ts)
- * 
- * Rounding policy:
- * - Amounts (totals, payments, discounts): 2 decimal places (or currency exponent)
- * - Unit rates / cost prices: 4 decimal places
- * - Quantities: validated against precision (0-4 decimal places)
- * - ISO 4217 Currency exponents: 3 decimals (BHD, KWD, OMR, etc.), 0 decimals (JPY, KRW), 2 decimals default
- * 
- * Uses standard commercial rounding (round half away from zero) with Number.EPSILON to prevent float drift.
+ *
+ * ONE Source of Truth for rounding and precision across Trado backend.
+ * All operations require an explicit ISO 4217 currency code.
+ * Exponents derive from constants/currencies.ts.
  */
+
+import { getExponent, getCurrencyInfo } from "../constants/currencies.js";
+
+export { getExponent, getCurrencyInfo };
 
 /**
  * Round a number to N decimal places using standard commercial rounding (round half away from zero).
@@ -48,6 +46,7 @@ export function roundTo(value: number, decimals: number): number {
 
 /**
  * Round to 2 decimal places (amounts, totals, payments default).
+ * Kept during S2 for non-money ratios/percents, to be renamed in S3.
  */
 export function round2(value: number): number {
   return roundTo(value, 2);
@@ -72,39 +71,51 @@ export function roundQty(value: number, precision: number = 4): number {
 
 /**
  * ISO 4217 Currency minor unit exponents (decimals).
+ * Delegates to canonical CURRENCIES table in constants/currencies.ts.
  */
-export function getCurrencyDecimals(currency: string = "INR"): number {
-  if (!currency) return 2;
-  const c = currency.toUpperCase().trim();
-  const threeDecimals = ["BHD", "KWD", "OMR", "JOD", "TND", "IQD", "LYD"];
-  const zeroDecimals = ["JPY", "KRW", "VND", "CLP", "PYG", "RWF", "UGX"];
-  if (threeDecimals.includes(c)) return 3;
-  if (zeroDecimals.includes(c)) return 0;
-  return 2;
+export function getCurrencyDecimals(currency: string): number {
+  return getExponent(currency);
 }
 
 /**
- * Round an amount to the proper minor unit exponent of the currency.
+ * Assert that an amount matches the decimal precision allowed by the currency.
+ * Throws AMOUNT_PRECISION_INVALID if the amount has more decimals than the currency exponent.
  */
-export function roundCurrency(value: number, currency: string = "INR"): number {
-  return roundTo(value, getCurrencyDecimals(currency));
+export function assertAmountMatchesCurrency(amount: number, currency: string): void {
+  if (typeof amount !== "number" || !Number.isFinite(amount)) {
+    throw new Error("AMOUNT_INVALID: amount must be a finite number");
+  }
+  const exponent = getExponent(currency);
+  const rounded = roundTo(amount, exponent);
+  if (Math.abs(amount - rounded) > 1e-7) {
+    throw new Error(`AMOUNT_PRECISION_INVALID: amount ${amount} has more decimals than allowed for ${currency} (${exponent} decimals)`);
+  }
 }
 
 export const Money = {
-  round2,
   round4,
-  amount(value: number, currency: string = "INR"): number {
-    return roundTo(value, getCurrencyDecimals(currency));
-  },
-  rate: round4,
   qty: roundQty,
   getDecimals: getCurrencyDecimals,
 
   /**
+   * Primary canonical rounding entry point: rounds amount to currency exponent.
+   */
+  amount(value: number, currency: string): number {
+    return roundTo(value, getExponent(currency));
+  },
+
+  /**
+   * Rate rounding helper: rounds unit rates / cost prices to 4 decimal places.
+   */
+  rate(value: number): number {
+    return round4(value);
+  },
+
+  /**
    * Check if two money amounts are equal within currency rounding tolerance.
    */
-  equal(a: number, b: number, currency: string = "INR"): boolean {
-    const decimals = getCurrencyDecimals(currency);
+  equal(a: number, b: number, currency: string): boolean {
+    const decimals = getExponent(currency);
     const tolerance = 0.5 * Math.pow(10, -decimals);
     return Math.abs(roundTo(a, decimals) - roundTo(b, decimals)) < tolerance;
   },
@@ -112,8 +123,8 @@ export const Money = {
   /**
    * Check if an amount is effectively zero within currency tolerance.
    */
-  isZero(value: number, currency: string = "INR"): boolean {
-    const decimals = getCurrencyDecimals(currency);
+  isZero(value: number, currency: string): boolean {
+    const decimals = getExponent(currency);
     const tolerance = 0.5 * Math.pow(10, -decimals);
     return Math.abs(roundTo(value, decimals)) < tolerance;
   },
@@ -121,15 +132,15 @@ export const Money = {
   /**
    * Safely subtract b from a, floored at 0, rounded to currency decimals.
    */
-  subtract(a: number, b: number, currency: string = "INR"): number {
-    return roundTo(Math.max(0, a - b), getCurrencyDecimals(currency));
+  subtract(a: number, b: number, currency: string): number {
+    return roundTo(Math.max(0, a - b), getExponent(currency));
   },
 
   /**
    * Sum an array of numbers, rounded to currency decimal places.
    */
-  sum(values: number[], currency: string = "INR"): number {
-    const decimals = getCurrencyDecimals(currency);
+  sum(values: number[], currency: string): number {
+    const decimals = getExponent(currency);
     return roundTo(
       values.reduce((acc, v) => acc + (v || 0), 0),
       decimals
@@ -139,8 +150,8 @@ export const Money = {
   /**
    * Calculate percentage of a base amount.
    */
-  percent(base: number, percentage: number, currency: string = "INR"): number {
-    return roundTo((base * percentage) / 100, getCurrencyDecimals(currency));
+  percent(base: number, percentage: number, currency: string): number {
+    return roundTo((base * percentage) / 100, getExponent(currency));
   },
 
   /**
@@ -150,9 +161,9 @@ export const Money = {
   extractTax(
     inclusiveAmount: number,
     taxRate: number,
-    currency: string = "INR"
+    currency: string
   ): { net: number; tax: number } {
-    const decimals = getCurrencyDecimals(currency);
+    const decimals = getExponent(currency);
     if (taxRate <= 0) {
       return { net: roundTo(inclusiveAmount, decimals), tax: 0 };
     }
@@ -168,9 +179,9 @@ export const Money = {
   addTax(
     netAmount: number,
     taxRate: number,
-    currency: string = "INR"
+    currency: string
   ): { gross: number; tax: number } {
-    const decimals = getCurrencyDecimals(currency);
+    const decimals = getExponent(currency);
     const tax = roundTo((netAmount * taxRate) / 100, decimals);
     return { gross: roundTo(netAmount + tax, decimals), tax };
   },
@@ -178,8 +189,8 @@ export const Money = {
   /**
    * Convert a major decimal amount into integer minor units (cents, paise, fils).
    */
-  fromDecimal(amount: number, currency: string = "INR"): number {
-    const decimals = getCurrencyDecimals(currency);
+  fromDecimal(amount: number, currency: string): number {
+    const decimals = getExponent(currency);
     const factor = Math.pow(10, decimals);
     return Math.round((amount + Number.EPSILON) * factor);
   },
@@ -187,23 +198,23 @@ export const Money = {
   /**
    * Convert integer minor units back into a major decimal amount.
    */
-  toDecimal(minorUnits: number, currency: string = "INR"): number {
-    const decimals = getCurrencyDecimals(currency);
+  toDecimal(minorUnits: number, currency: string): number {
+    const decimals = getExponent(currency);
     const factor = Math.pow(10, decimals);
     return roundTo(minorUnits / factor, decimals);
   },
 
   /**
-   * Alias: Convert major decimal into exact integer minor units.
+   * Convert major decimal into exact integer minor units.
    */
-  toMinor(amount: number, currency: string = "INR"): number {
+  toMinor(amount: number, currency: string): number {
     return this.fromDecimal(amount, currency);
   },
 
   /**
-   * Alias: Convert exact integer minor units to major decimal.
+   * Convert exact integer minor units to major decimal.
    */
-  fromMinor(minorUnits: number, currency: string = "INR"): number {
+  fromMinor(minorUnits: number, currency: string): number {
     return this.toDecimal(minorUnits, currency);
   },
 
@@ -239,23 +250,24 @@ export const Money = {
     }
 
     // Distribute remaining cents/paise one by one to parts with highest remainder
-    for (let i = 0; i < remainder; i++) {
-      results[i % results.length]++;
+    if (remainder > 0) {
+      const remaindersWithIndex = ratios.map((r, idx) => ({
+        idx,
+        rem: (intTotal * r) / totalRatio - results[idx],
+      }));
+      remaindersWithIndex.sort((a, b) => b.rem - a.rem);
+
+      for (let i = 0; i < remainder; i++) {
+        results[remaindersWithIndex[i].idx]++;
+      }
     }
 
     return results;
   },
-
-  /**
-   * Round amount to the currency's standard decimal places.
-   */
-  roundCurrency(amount: number, currency: string = "INR"): number {
-    return roundTo(amount, getCurrencyDecimals(currency));
-  },
-} as const;
+};
 
 export const toMinor = Money.toMinor.bind(Money);
-export const fromMinor = Money.toDecimal.bind(Money);
-export const addMinor = Money.addMinor;
-export const subtractMinor = Money.subtractMinor;
-export const allocateMinor = Money.allocateMinor;
+export const fromMinor = Money.fromMinor.bind(Money);
+export const addMinor = Money.addMinor.bind(Money);
+export const subtractMinor = Money.subtractMinor.bind(Money);
+export const allocateMinor = Money.allocateMinor.bind(Money);

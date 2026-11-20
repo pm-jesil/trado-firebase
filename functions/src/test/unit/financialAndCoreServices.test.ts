@@ -156,9 +156,9 @@ describe("Business Core Services - Decimal-Safe Money & Precision Utility", () =
     assert.equal(Money.getDecimals("USD"), 2);
     assert.equal(Money.getDecimals("AED"), 2);
 
-    assert.equal(Money.roundCurrency(10.555, "INR"), 10.56);
-    assert.equal(Money.roundCurrency(10.554, "INR"), 10.55);
-    assert.equal(Money.amount(19.999), 20.00);
+    assert.equal(Money.amount(10.555, "INR"), 10.56);
+    assert.equal(Money.amount(10.554, "INR"), 10.55);
+    assert.equal(Money.amount(19.999, "INR"), 20.00);
   });
 
   it("handles 3-decimal currencies (BHD, KWD, OMR) accurately without truncating the 3rd decimal", () => {
@@ -168,11 +168,11 @@ describe("Business Core Services - Decimal-Safe Money & Precision Utility", () =
 
     const priceBhd = 1.250;
     const qtyBhd = 3;
-    const totalBhd = Money.roundCurrency(priceBhd * qtyBhd, "BHD");
+    const totalBhd = Money.amount(priceBhd * qtyBhd, "BHD");
     assert.equal(totalBhd, 3.750);
 
     const subTotal = 15.1234;
-    assert.equal(Money.roundCurrency(subTotal, "KWD"), 15.123);
+    assert.equal(Money.amount(subTotal, "KWD"), 15.123);
 
     // Minor unit conversion (1 KWD = 1000 fils)
     const fils = Money.fromDecimal(1.250, "KWD");
@@ -184,7 +184,7 @@ describe("Business Core Services - Decimal-Safe Money & Precision Utility", () =
     assert.equal(Money.getDecimals("JPY"), 0);
     assert.equal(Money.getDecimals("KRW"), 0);
 
-    const totalJpy = Money.roundCurrency(1542.89, "JPY");
+    const totalJpy = Money.amount(1542.89, "JPY");
     assert.equal(totalJpy, 1543);
   });
 
@@ -207,7 +207,7 @@ describe("Business Core Services - Decimal-Safe Money & Precision Utility", () =
     const { net, tax } = Money.extractTax(100, 18, "INR");
     assert.equal(net, 84.75);
     assert.equal(tax, 15.25);
-    assert.equal(Money.amount(net + tax), 100.00);
+    assert.equal(Money.amount(net + tax, "INR"), 100.00);
 
     // Add tax
     const added = Money.addTax(84.75, 18, "INR");

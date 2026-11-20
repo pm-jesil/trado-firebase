@@ -160,6 +160,8 @@ export async function reconcilePartyBalances(
   partyId?: string
 ): Promise<PartyReconciliationReport> {
   const now = new Date().toISOString();
+  const orgSnap = await db.collection("organizations").doc(organizationId).get();
+  const currency = (orgSnap.data() as OrganizationDoc | undefined)?.currency || "INR";
   const collectionName = partyType === "customer" ? "customers" : "vendors";
   let partyDocs: FirebaseFirestore.QueryDocumentSnapshot[] = [];
 
@@ -230,13 +232,13 @@ export async function reconcilePartyBalances(
         }
       }
 
-      const calculatedBalance = Money.amount(Math.max(0, totalBilled - totalBillPaid - totalCreditNotes));
-      const recordedBalance = Money.amount(cust.outstandingBalance || 0);
-      const balanceDifference = Money.amount(recordedBalance - calculatedBalance);
-      const recordedVolume = Money.amount(cust.totalSpend || 0);
-      const calculatedVolume = Money.amount(totalBilled);
-      const volumeDifference = Money.amount(recordedVolume - calculatedVolume);
-      const paymentLedgerDifference = Money.amount(totalPaymentsIn - totalBillPaid);
+      const calculatedBalance = Money.amount(Math.max(0, totalBilled - totalBillPaid - totalCreditNotes), currency);
+      const recordedBalance = Money.amount(cust.outstandingBalance || 0, currency);
+      const balanceDifference = Money.amount(recordedBalance - calculatedBalance, currency);
+      const recordedVolume = Money.amount(cust.totalSpend || 0, currency);
+      const calculatedVolume = Money.amount(totalBilled, currency);
+      const volumeDifference = Money.amount(recordedVolume - calculatedVolume, currency);
+      const paymentLedgerDifference = Money.amount(totalPaymentsIn - totalBillPaid, currency);
 
       const isDiscrepancy = Math.abs(balanceDifference) > 0.01 || Math.abs(paymentLedgerDifference) > 0.01;
       if (isDiscrepancy) discrepancyCount++;
@@ -301,13 +303,13 @@ export async function reconcilePartyBalances(
         totalDebitNotes += (rData.totalRefundAmount || 0);
       }
 
-      const calculatedBalance = Money.amount(Math.max(0, totalPurchased - totalOutflowPaid - totalDebitNotes));
-      const recordedBalance = Money.amount(vend.outstandingPayable || 0);
-      const balanceDifference = Money.amount(recordedBalance - calculatedBalance);
-      const recordedVolume = Money.amount(vend.totalPurchase || 0);
-      const calculatedVolume = Money.amount(totalPurchased);
-      const volumeDifference = Money.amount(recordedVolume - calculatedVolume);
-      const disbursementLedgerDifference = Money.amount(totalPaymentsOut - totalOutflowPaid);
+      const calculatedBalance = Money.amount(Math.max(0, totalPurchased - totalOutflowPaid - totalDebitNotes), currency);
+      const recordedBalance = Money.amount(vend.outstandingPayable || 0, currency);
+      const balanceDifference = Money.amount(recordedBalance - calculatedBalance, currency);
+      const recordedVolume = Money.amount(vend.totalPurchase || 0, currency);
+      const calculatedVolume = Money.amount(totalPurchased, currency);
+      const volumeDifference = Money.amount(recordedVolume - calculatedVolume, currency);
+      const disbursementLedgerDifference = Money.amount(totalPaymentsOut - totalOutflowPaid, currency);
 
       const isDiscrepancy = Math.abs(balanceDifference) > 0.01 || Math.abs(disbursementLedgerDifference) > 0.01;
       if (isDiscrepancy) discrepancyCount++;
