@@ -17,7 +17,7 @@ import {
 } from "../validation/schemas.js";
 import { parseInput } from "../validation/parseInput.js";
 import { PaymentDoc, BillDoc, OutflowDoc, CustomerDoc, VendorDoc } from "../types/models.js";
-import { Money } from "../services/money.js";
+import { Money, assertAmountMatchesCurrency } from "../services/money.js";
 import { reserveIdempotency, finalizeIdempotencyFailure, finalizeIdempotencySuccess } from "../services/idempotency.js";
 import {
   readNextDocumentNumberInTxn,
@@ -80,6 +80,17 @@ export const paymentsCreate = onCall({ region: "asia-south1" }, async (request) 
     const now = new Date().toISOString();
     const callerUid = ctx.callerUid;
     const orgCurr = ctx.organization.currency;
+
+    try {
+      assertAmountMatchesCurrency(input.amount, orgCurr);
+      if (input.allocations) {
+        for (const alloc of input.allocations) {
+          assertAmountMatchesCurrency(alloc.amount, orgCurr);
+        }
+      }
+    } catch (err) {
+      throw new HttpsError("invalid-argument", (err as Error).message);
+    }
 
     const finalResult = await db.runTransaction(async (txn) => {
       // === STEP 1: ALL TRANSACTIONAL READS FIRST ===

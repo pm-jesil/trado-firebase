@@ -41,6 +41,8 @@ import {
   applyEntriesInTxn,
   updateEntryWorkflowInTxn,
 } from "../services/postingService.js";
+import { Money, assertAmountMatchesCurrency } from "../services/money.js";
+import { getExponent } from "../constants/currencies.js";
 
 // ============================================================================
 // 1. accountTransfersConfirm
@@ -248,18 +250,25 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
         throw new HttpsError("invalid-argument", "Cash counts can only be performed on cash accounts.");
       }
 
+      const orgData = (orgSnap.exists ? orgSnap.data() : null) as OrganizationDoc | null;
+      const currency = account.currency || orgData?.currency || "INR";
+
       // Calculate total counted amount from denominations
-      let countedPaise = 0;
+      const lineTotals: number[] = [];
       for (const [denomStr, count] of Object.entries(input.denominations)) {
         const denom = Number(denomStr);
-        if (denom > 0 && count > 0) {
-          // Multiply denom by 100 to get paise (e.g. 500 note = 50000 paise)
-          countedPaise += denom * 100 * count;
+        if (isNaN(denom) || denom <= 0) {
+          throw new HttpsError("invalid-argument", `Invalid denomination "${denomStr}".`);
+        }
+        assertAmountMatchesCurrency(denom, currency);
+        if (count > 0) {
+          lineTotals.push(Money.amount(denom * count, currency));
         }
       }
 
-      const systemBalance = account.currentBalance || 0;
-      const varianceAmount = countedPaise - systemBalance;
+      const counted = Money.sum(lineTotals, currency);
+      const systemBalance = Money.amount(account.currentBalance || 0, currency);
+      const varianceAmount = Money.amount(counted - systemBalance, currency);
 
       const reservation = await readNextDocumentNumberInTxn(txn, {
         organizationId: orgId,
@@ -267,9 +276,9 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
       });
       const countNumber = reservation.formattedNumber;
 
-      const orgData = (orgSnap.exists ? orgSnap.data() : null) as OrganizationDoc | null;
-      const thresholdMinor = orgData?.settings?.accountingPolicy?.cashCountVarianceThresholdMinor || 100000;
-      const reviewThresholdMinor = Math.floor(thresholdMinor / 2);
+      const policy = orgData?.settings?.accountingPolicy as (Record<string, any>) | undefined;
+      const thresholdMajor = policy?.cashCountVarianceThreshold ?? ((policy?.cashCountVarianceThresholdMinor ?? 100000) / (10 ** getExponent(currency)));
+      const reviewThresholdMajor = thresholdMajor / 2;
 
       let varianceTransactionId: string | null = null;
       if (varianceAmount !== 0) {
@@ -288,11 +297,11 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
               type: "adjustment",
               direction,
               amount: Math.abs(varianceAmount),
-              currency: account.currency || "INR",
+              currency,
               description: `Cash count ${countNumber} variance adjustment (${varianceAmount > 0 ? "overage" : "shortage"})`,
               status: "added",
-              needsReview: Math.abs(varianceAmount) > reviewThresholdMinor,
-              reviewReasons: Math.abs(varianceAmount) > reviewThresholdMinor ? ["fee_variance"] : [],
+              needsReview: Math.abs(varianceAmount) > reviewThresholdMajor,
+              reviewReasons: Math.abs(varianceAmount) > reviewThresholdMajor ? ["fee_variance"] : [],
             },
           ],
         });
@@ -308,12 +317,12 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
         branchId: account.branchId || null,
         countNumber,
         financialAccountId: input.financialAccountId,
-        countedAmount: countedPaise,
+        countedAmount: counted,
         systemBalance,
         varianceAmount,
         denominations: input.denominations,
         varianceTransactionId,
-        needsApproval: Math.abs(varianceAmount) > thresholdMinor,
+        needsApproval: Math.abs(varianceAmount) > thresholdMajor,
         notes: input.notes,
         createdAt: now,
         createdBy: ctx.callerUid,
@@ -324,7 +333,7 @@ export const cashCountsCreate = onCall({ region: "asia-south1" }, async (request
       return {
         countId: countRef.id,
         countNumber,
-        countedAmount: countedPaise,
+        countedAmount: counted,
         systemBalance,
         varianceAmount,
         varianceTransactionId,
@@ -439,18 +448,24 @@ export const accountEntriesRecordFee = onCall({ region: "asia-south1" }, async (
       const accSnap = await txn.get(accRef);
       const account = accSnap.exists ? (accSnap.data() as FinancialAccountDoc) : null;
 
+      const currency = parent.currency || account?.currency || "INR";
+      assertAmountMatchesCurrency(input.feeAmount, currency);
+      if (input.feeTaxAmount) {
+        assertAmountMatchesCurrency(input.feeTaxAmount, currency);
+      }
+
       let hasVariance = false;
       let reviewReasons: string[] | undefined = undefined;
-      const totalFee = input.feeAmount + (input.feeTaxAmount || 0);
+      const totalFee = Money.amount(input.feeAmount + (input.feeTaxAmount || 0), currency);
 
       if (account?.feeRule) {
         const fixed = account.feeRule.feeFixed ?? 0;
         const pct = account.feeRule.feePercent ?? 0;
         const taxPct = account.feeRule.feeTaxPercent ?? 0;
         const gross = parent.amount;
-        const baseFee = fixed + Math.round((gross * pct) / 100);
-        const feeTax = Math.round((baseFee * taxPct) / 100);
-        const expectedFee = baseFee + feeTax;
+        const baseFee = Money.amount(fixed + (gross * pct) / 100, currency);
+        const feeTax = Money.amount((baseFee * taxPct) / 100, currency);
+        const expectedFee = Money.amount(baseFee + feeTax, currency);
         if (totalFee !== expectedFee) {
           hasVariance = true;
           reviewReasons = ["fee_variance"];

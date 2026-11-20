@@ -889,7 +889,7 @@ export const OutflowLineSchema = z.strictObject({
 
 export const SplitPaymentEntrySchema = z.strictObject({
   method: z.nativeEnum(PaymentMethod),
-  amount: z.number().int().positive("Payment amount must be positive paise"),
+  amount: z.number().positive("Payment amount must be positive"),
   financialAccountId: z.string().trim().min(2, "Valid financial account required"),
   notes: z.string().trim().max(300).optional(),
 });
@@ -1747,7 +1747,7 @@ export const ModuleRequestDetailsSchema = z.strictObject({
 export const BillingQueryDetailsSchema = z.strictObject({
   subject: z.enum(["invoice", "payment", "charge", "other"]),
   reference: z.string().trim().max(100).optional(),
-  amount: z.number().int().nonnegative().optional(), // minor paise
+  amount: z.number().nonnegative().optional(),
   description: z.string().trim().min(5).max(5000),
 });
 
@@ -2078,7 +2078,7 @@ export const BankDetailsInputSchema = z.strictObject({
 
 export const FeeRuleInputSchema = z.strictObject({
   feePercent: z.number().min(0).max(100).optional(),
-  feeFixed: z.number().int().min(0).optional(),
+  feeFixed: z.number().min(0).optional(),
   feeTaxPercent: z.number().min(0).max(100).optional(),
   settlementDays: z.number().int().min(0).optional(),
 });
@@ -2342,8 +2342,8 @@ export const RecordPaymentFeeSchema = z.strictObject({
   paymentId: z.string().trim().optional(),
   financialAccountId: z.string().trim().min(2),
   paymentMethod: z.nativeEnum(PaymentMethod),
-  feeAmount: z.number().int().positive("Fee must be positive paise"),
-  feeTaxAmount: z.number().int().min(0).default(0).optional(),
+  feeAmount: z.number().positive("Fee must be positive"),
+  feeTaxAmount: z.number().min(0).default(0).optional(),
   settlementTiming: z.enum(["immediate_deduction", "billed_later"]).default("immediate_deduction"),
   settlementReference: z.string().trim().max(100).optional(),
   feeExpenseCategoryId: z.string().trim().optional(),
@@ -2403,7 +2403,7 @@ export const CreateCapitalTransactionSchema = z.strictObject({
   ...ContextFields,
   type: z.enum(["owner_contribution", "partner_contribution", "additional_capital", "drawings"]),
   financialAccountId: z.string().trim().min(2),
-  amount: z.number().int().positive("Capital amount must be positive paise"),
+  amount: z.number().positive("Capital amount must be positive"),
   currency: z.string().trim().length(3).default("INR").optional(),
   sourceReference: z.string().trim().max(100).optional(),
   description: z.string().trim().max(500).optional(),
@@ -2492,7 +2492,7 @@ export const CreateSubEntrySchema = z.strictObject({
   ...ContextFields,
   parentEntryId: z.string().trim().min(2),
   subEntryType: z.enum(["transaction_charge", "gateway_fee", "bank_charge", "adjustment", "rounding", "tip", "other"]),
-  amount: z.number().int().positive("Sub-entry amount must be positive paise"),
+  amount: z.number().positive("Sub-entry amount must be positive"),
   financialAccountId: z.string().trim().optional(),
   direction: z.enum(["in", "out"]).optional(),
   notes: z.string().trim().max(500).optional(),
@@ -2503,8 +2503,8 @@ export const CreateSubEntrySchema = z.strictObject({
 export const RecordEntryFeeSchema = z.strictObject({
   ...ContextFields,
   entryId: z.string().trim().min(2),
-  feeAmount: z.number().int().positive("Fee must be positive paise"),
-  feeTaxAmount: z.number().int().min(0).default(0).optional(),
+  feeAmount: z.number().positive("Fee must be positive"),
+  feeTaxAmount: z.number().min(0).default(0).optional(),
   notes: z.string().trim().max(500).optional(),
   idempotencyKey: z.string().min(8).max(128).optional(),
 });

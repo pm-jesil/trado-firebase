@@ -6,6 +6,15 @@ import { calculateTax } from "../../services/taxCalculation.js";
 import { computeProfitLoss } from "../../callables/reports/financialReports.js";
 import { reportsGetPlatformOverview } from "../../callables/reports/analyticsReports.js";
 import { db } from "../../services/firebase.js";
+import {
+  SplitPaymentEntrySchema,
+  RecordPaymentFeeSchema,
+  RecordEntryFeeSchema,
+  CreateCapitalTransactionSchema,
+  CreateSubEntrySchema,
+  FeeRuleInputSchema,
+} from "../../validation/schemas.js";
+import { PaymentMethod } from "../../constants/enums.js";
 
 describe("Commercial Money Rounding (Half Away From Zero)", () => {
   it("rounds exact ties and floating-point boundary cases correctly (2 decimals)", () => {
@@ -464,6 +473,210 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
       } finally {
         (db as any).collection = origCollection;
       }
+    });
+  });
+
+  describe("Prompt 77D S4 — One Money Convention in Schemas and Cash Flows", () => {
+    describe("Cash count denomination summation and variance", () => {
+      it("counts INR denominations (500x3 = 1,500.00 INR) with exact variance", () => {
+        const currency = "INR";
+        const denominations: Record<string, number> = { "500": 3 };
+        const lineTotals: number[] = [];
+
+        for (const [denomStr, count] of Object.entries(denominations)) {
+          const denom = Number(denomStr);
+          assertAmountMatchesCurrency(denom, currency);
+          lineTotals.push(Money.amount(denom * count, currency));
+        }
+
+        const counted = Money.sum(lineTotals, currency);
+        assert.equal(counted, 1500.00);
+
+        // System balance matches counted amount -> zero variance
+        const systemBalanceExact = 1500.00;
+        const varianceExact = Money.amount(counted - systemBalanceExact, currency);
+        assert.equal(varianceExact, 0.00);
+
+        // System balance short by 100 -> positive variance (overage)
+        const systemBalanceShort = 1400.00;
+        const varianceOverage = Money.amount(counted - systemBalanceShort, currency);
+        assert.equal(varianceOverage, 100.00);
+
+        // System balance over by 100 -> negative variance (shortage)
+        const systemBalanceOver = 1600.00;
+        const varianceShortage = Money.amount(counted - systemBalanceOver, currency);
+        assert.equal(varianceShortage, -100.00);
+      });
+
+      it("counts BHD denominations (0.500x10 + 0.100x5 = 5.500 BHD) preserving 3 decimals", () => {
+        const currency = "BHD";
+        const denominations: Record<string, number> = {
+          "0.5": 10,
+          "0.100": 5,
+        };
+        const lineTotals: number[] = [];
+
+        for (const [denomStr, count] of Object.entries(denominations)) {
+          const denom = Number(denomStr);
+          assertAmountMatchesCurrency(denom, currency);
+          lineTotals.push(Money.amount(denom * count, currency));
+        }
+
+        const counted = Money.sum(lineTotals, currency);
+        assert.equal(counted, 5.500);
+
+        // System balance has 3 decimals (5.500 BHD) -> zero variance
+        const systemBalanceExact = 5.500;
+        const varianceExact = Money.amount(counted - systemBalanceExact, currency);
+        assert.equal(varianceExact, 0.000);
+
+        // System balance 5.000 BHD -> overage of 0.500 BHD
+        const systemBalanceShort = 5.000;
+        const varianceOverage = Money.amount(counted - systemBalanceShort, currency);
+        assert.equal(varianceOverage, 0.500);
+
+        // System balance 5.625 BHD -> shortage of -0.125 BHD
+        const systemBalanceOver = 5.625;
+        const varianceShortage = Money.amount(counted - systemBalanceOver, currency);
+        assert.equal(varianceShortage, -0.125);
+      });
+
+      it("counts JPY denominations (1000x5 = 5,000 JPY) preserving 0 decimals", () => {
+        const currency = "JPY";
+        const denominations: Record<string, number> = { "1000": 5 };
+        const lineTotals: number[] = [];
+
+        for (const [denomStr, count] of Object.entries(denominations)) {
+          const denom = Number(denomStr);
+          assertAmountMatchesCurrency(denom, currency);
+          lineTotals.push(Money.amount(denom * count, currency));
+        }
+
+        const counted = Money.sum(lineTotals, currency);
+        assert.equal(counted, 5000);
+
+        const systemBalanceExact = 5000;
+        const varianceExact = Money.amount(counted - systemBalanceExact, currency);
+        assert.equal(varianceExact, 0);
+
+        const systemBalanceShort = 4000;
+        const varianceOverage = Money.amount(counted - systemBalanceShort, currency);
+        assert.equal(varianceOverage, 1000);
+      });
+    });
+
+    describe("Schema validation allows non-integer amounts in major units", () => {
+      it("validates SplitPaymentEntrySchema with decimal amounts", () => {
+        const aedSplit = SplitPaymentEntrySchema.parse({
+          method: PaymentMethod.CASH,
+          amount: 12.50,
+          financialAccountId: "acc_aed_cash",
+        });
+        assert.equal(aedSplit.amount, 12.50);
+
+        const bhdSplit = SplitPaymentEntrySchema.parse({
+          method: PaymentMethod.CARD,
+          amount: 1.250,
+          financialAccountId: "acc_bhd_card",
+        });
+        assert.equal(bhdSplit.amount, 1.250);
+      });
+
+      it("validates RecordPaymentFeeSchema and RecordEntryFeeSchema with decimal amounts", () => {
+        const feeParsed = RecordPaymentFeeSchema.parse({
+          organizationId: "org_test",
+          sourceDocumentType: "bill",
+          sourceDocumentId: "bill_1",
+          financialAccountId: "acc_1",
+          paymentMethod: PaymentMethod.CARD,
+          feeAmount: 0.250,
+          feeTaxAmount: 0.025,
+        });
+        assert.equal(feeParsed.feeAmount, 0.250);
+        assert.equal(feeParsed.feeTaxAmount, 0.025);
+
+        const entryFeeParsed = RecordEntryFeeSchema.parse({
+          organizationId: "org_test",
+          entryId: "entry_1",
+          feeAmount: 2.50,
+          feeTaxAmount: 0.25,
+        });
+        assert.equal(entryFeeParsed.feeAmount, 2.50);
+        assert.equal(entryFeeParsed.feeTaxAmount, 0.25);
+      });
+
+      it("validates CreateCapitalTransactionSchema and CreateSubEntrySchema with decimal amounts", () => {
+        const capParsed = CreateCapitalTransactionSchema.parse({
+          organizationId: "org_test",
+          type: "owner_contribution",
+          financialAccountId: "acc_cap",
+          amount: 1234.56,
+          currency: "USD",
+        });
+        assert.equal(capParsed.amount, 1234.56);
+
+        const subParsed = CreateSubEntrySchema.parse({
+          organizationId: "org_test",
+          parentEntryId: "parent_1",
+          subEntryType: "gateway_fee",
+          amount: 1.500,
+        });
+        assert.equal(subParsed.amount, 1.500);
+      });
+
+      it("validates FeeRuleInputSchema with decimal fixed fees", () => {
+        const feeRule = FeeRuleInputSchema.parse({
+          feeFixed: 0.250,
+          feePercent: 2.5,
+          feeTaxPercent: 5.0,
+        });
+        assert.equal(feeRule.feeFixed, 0.250);
+        assert.equal(feeRule.feePercent, 2.5);
+      });
+    });
+
+    describe("Fee calculation with Money.amount preserves currency exponent without Math.round", () => {
+      it("computes fee variance in AED (2 decimals)", () => {
+        const currency = "AED";
+        const feeRule = { feeFixed: 1.00, feePercent: 2.5, feeTaxPercent: 5.0 };
+        const gross = 100.00;
+        const baseFee = Money.amount(feeRule.feeFixed + (gross * feeRule.feePercent) / 100, currency);
+        assert.equal(baseFee, 3.50);
+
+        const feeTax = Money.amount((baseFee * feeRule.feeTaxPercent) / 100, currency);
+        assert.equal(feeTax, 0.18); // 3.50 * 0.05 = 0.175 -> half away from zero = 0.18
+
+        const expectedFee = Money.amount(baseFee + feeTax, currency);
+        assert.equal(expectedFee, 3.68);
+      });
+
+      it("computes fee variance in BHD (3 decimals)", () => {
+        const currency = "BHD";
+        const feeRule = { feeFixed: 0.100, feePercent: 2.0, feeTaxPercent: 10.0 };
+        const gross = 10.000;
+        const baseFee = Money.amount(feeRule.feeFixed + (gross * feeRule.feePercent) / 100, currency);
+        assert.equal(baseFee, 0.300);
+
+        const feeTax = Money.amount((baseFee * feeRule.feeTaxPercent) / 100, currency);
+        assert.equal(feeTax, 0.030);
+
+        const expectedFee = Money.amount(baseFee + feeTax, currency);
+        assert.equal(expectedFee, 0.330);
+      });
+
+      it("computes fee variance in JPY (0 decimals)", () => {
+        const currency = "JPY";
+        const feeRule = { feeFixed: 100, feePercent: 3.0, feeTaxPercent: 10.0 };
+        const gross = 10000;
+        const baseFee = Money.amount(feeRule.feeFixed + (gross * feeRule.feePercent) / 100, currency);
+        assert.equal(baseFee, 400);
+
+        const feeTax = Money.amount((baseFee * feeRule.feeTaxPercent) / 100, currency);
+        assert.equal(feeTax, 40);
+
+        const expectedFee = Money.amount(baseFee + feeTax, currency);
+        assert.equal(expectedFee, 440);
+      });
     });
   });
 });

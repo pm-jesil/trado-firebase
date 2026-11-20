@@ -31,7 +31,7 @@ import {
   OutflowDoc,
 } from "../types/models.js";
 import { OutflowKind, OutflowStatus, PaymentStatus } from "../constants/enums.js";
-import { Money } from "../services/money.js";
+import { Money, assertAmountMatchesCurrency } from "../services/money.js";
 import { reserveIdempotency } from "../services/idempotency.js";
 import { fetchPage } from "../services/pagination.js";
 import { resolveRequestContext } from "../services/contextResolver.js";
@@ -124,6 +124,10 @@ export const paymentsRecordFee = onCall({ region: "asia-south1" }, async (reques
     }
 
     const currency = account.currency || "INR";
+    assertAmountMatchesCurrency(input.feeAmount, currency);
+    if (input.feeTaxAmount) {
+      assertAmountMatchesCurrency(input.feeTaxAmount, currency);
+    }
     const feeAmount = Money.amount(input.feeAmount, currency);
     const feeTaxAmount = input.feeTaxAmount ? Money.amount(input.feeTaxAmount, currency) : 0;
     const totalFeeDeduction = feeAmount + feeTaxAmount;
@@ -143,8 +147,8 @@ export const paymentsRecordFee = onCall({ region: "asia-south1" }, async (reques
       const fixed = account.feeRule.feeFixed ?? 0;
       const pct = account.feeRule.feePercent ?? 0;
       const taxPct = account.feeRule.feeTaxPercent ?? 0;
-      const baseFee = fixed + Math.round((grossAmount * pct) / 100);
-      const feeTax = Math.round((baseFee * taxPct) / 100);
+      const baseFee = Money.amount(fixed + (grossAmount * pct) / 100, currency);
+      const feeTax = Money.amount((baseFee * taxPct) / 100, currency);
       expectedFeeAmount = Money.amount(baseFee + feeTax, currency);
     }
 

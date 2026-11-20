@@ -42,6 +42,7 @@ import {
   applyEntriesInTxn,
   updateEntryWorkflowInTxn,
 } from "../services/postingService.js";
+import { assertAmountMatchesCurrency } from "../services/money.js";
 
 // ============================================================================
 // 1. accountEntriesList
@@ -583,6 +584,9 @@ export const accountEntriesCreateSubEntry = onCall({ region: "asia-south1" }, as
       if (!snap.exists) throw new HttpsError("not-found", `Parent entry "${input.parentEntryId}" not found.`);
       const parent = snap.data() as AccountTransactionDoc;
       if (parent.organizationId !== orgId) throw new HttpsError("permission-denied", "Cross-tenant access rejected.");
+
+      const currency = parent.currency || "INR";
+      assertAmountMatchesCurrency(input.amount, currency);
 
       // Strict Depth Limit: Depth 1 only! (Q-F22)
       if (parent.parentEntryId) {
