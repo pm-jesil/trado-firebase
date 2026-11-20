@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { roundTo, round2, Money, assertAmountMatchesCurrency, getCurrencyDecimals } from "../../services/money.js";
+import { roundTo, Money, assertAmountMatchesCurrency, getCurrencyDecimals } from "../../services/money.js";
 import { CURRENCIES, getCurrencyInfo, getExponent } from "../../constants/currencies.js";
 import { calculateTax } from "../../services/taxCalculation.js";
 
@@ -48,6 +48,7 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
   it("guarantees tax-split parity (CGST + SGST === total tax exactly)", () => {
     // 18% GST on Rs 100.05
     const res = calculateTax({
+      currency: "INR",
       subTotal: 100.05,
       taxRegimeCode: "IN_GST",
       country: "IN",
@@ -56,7 +57,7 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
     });
     const cgst = res.breakdown.find((b) => b.name.startsWith("CGST"))?.amount || 0;
     const sgst = res.breakdown.find((b) => b.name.startsWith("SGST"))?.amount || 0;
-    assert.equal(round2(cgst + sgst), res.taxAmount);
+    assert.equal(Money.amount(cgst + sgst, "INR"), res.taxAmount);
     assert.equal(res.taxAmount, 18.01);
     assert.equal(cgst, 9.01);
     assert.equal(sgst, 9.0);

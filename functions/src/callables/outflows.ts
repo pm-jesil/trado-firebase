@@ -436,6 +436,7 @@ export const outflowsCreate = onCall({ region: "asia-south1" }, async (request) 
     const paymentMethod = (input.paymentMethod as PaymentMethod) || PaymentMethod.CASH;
 
     const taxResult = calculateTax({
+      currency,
       taxRegimeCode: orgData.taxRegimeCode,
       country: orgData.country,
       subTotal: subTotal - discountTotal,

@@ -158,6 +158,7 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
       ];
 
       const result = calculateTax({
+        currency: "INR",
         taxRegimeCode: "IN_GST",
         country: "IN",
         subTotal: 8000,
@@ -194,6 +195,7 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
       ];
 
       const result = calculateTax({
+        currency: "INR",
         taxRegimeCode: "IN_GST",
         country: "IN",
         subTotal: 1000,
@@ -207,6 +209,7 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
   describe("5. Intra-State vs Inter-State India GST Split (Gap G7)", () => {
     it("splits intra-state GST into equal CGST and SGST", () => {
       const result = calculateTax({
+        currency: "INR",
         taxRegimeCode: "IN_GST",
         country: "IN",
         subTotal: 10000,
@@ -226,6 +229,7 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
 
     it("applies single IGST for inter-state transactions", () => {
       const result = calculateTax({
+        currency: "INR",
         taxRegimeCode: "IN_GST",
         country: "IN",
         subTotal: 10000,
@@ -245,8 +249,9 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
   });
 
   describe("6. Worldwide Tax Regimes (Gap G7)", () => {
-    it("calculates Bahrain 10% VAT with standard labels", () => {
+    it("calculates Bahrain 10% VAT with standard labels and 3-decimal precision", () => {
       const result = calculateTax({
+        currency: "BHD",
         taxRegimeCode: "BH_VAT",
         country: "BH",
         subTotal: 100, // 100.000 BHD
@@ -258,10 +263,21 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
       assert.equal(result.taxSnapshot.labels?.taxName, "VAT");
       assert.equal(result.taxSnapshot.labels?.registrationLabel, "TRN");
       assert.equal(result.taxSnapshot.labels?.invoiceTitle, "Tax Invoice");
+
+      // Verify 3-decimal precision on 1.255 BHD (10% = 0.1255 -> rounds to 0.126 BHD)
+      const fractionalResult = calculateTax({
+        currency: "BHD",
+        taxRegimeCode: "BH_VAT",
+        country: "BH",
+        subTotal: 1.255,
+      });
+      assert.equal(fractionalResult.taxAmount, 0.126);
+      assert.equal(fractionalResult.totalWithTax, 1.381);
     });
 
     it("calculates UAE 5% VAT", () => {
       const result = calculateTax({
+        currency: "AED",
         taxRegimeCode: "AE_VAT",
         country: "AE",
         subTotal: 500,
@@ -274,6 +290,7 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
 
     it("calculates Saudi Arabia 15% VAT", () => {
       const result = calculateTax({
+        currency: "SAR",
         taxRegimeCode: "SA_VAT",
         country: "SA",
         subTotal: 1000,
@@ -286,6 +303,7 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
 
     it("calculates UK 20% VAT with VAT Invoice title", () => {
       const result = calculateTax({
+        currency: "GBP",
         taxRegimeCode: "GB_VAT",
         country: "GB",
         subTotal: 200,
@@ -298,6 +316,7 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
 
     it("handles tax-exempt (NONE) operations returning 0 tax and Bill of Supply", () => {
       const result = calculateTax({
+        currency: "USD",
         taxRegimeCode: "NONE",
         country: "GLOBAL",
         subTotal: 1500,

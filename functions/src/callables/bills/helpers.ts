@@ -34,7 +34,7 @@ import {
   PaymentMethod,
 } from "../../constants/enums.js";
 import { AppPermissions } from "../../constants/permissions.js";
-import { Money, round2 } from "../../services/money.js";
+import { Money, roundTo } from "../../services/money.js";
 import {
   readNextDocumentNumberInTxn,
   commitDocumentNumberInTxn,
@@ -181,13 +181,14 @@ export function billTotals(
   const taxLines = priced.items.map((item) => ({
     taxableAmount: item.subtotal - item.discountValue,
     taxRatePercent: item.taxAmount > 0 && (item.subtotal - item.discountValue) > 0
-      ? round2((item.taxAmount / (item.subtotal - item.discountValue)) * 100)
+      ? roundTo((item.taxAmount / (item.subtotal - item.discountValue)) * 100, 2)
       : 0,
     taxCode: item.taxCodeSnapshot,
     isTaxable: item.taxAmount > 0,
   }));
 
   const taxResult = calculateTax({
+    currency,
     taxRegimeCode: ctx.organization.taxRegimeCode,
     country: ctx.organization.country,
     subTotal: priced.subTotal - discountTotal,

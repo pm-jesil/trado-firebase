@@ -17,6 +17,7 @@ import { redact } from "../../services/auditRecorder.js";
 describe("Business Core Services - Tax Calculation", () => {
   it("calculates standard India GST (18%) split into CGST (9%) and SGST (9%) for intra-state sales", () => {
     const result = calculateTax({
+      currency: "INR",
       taxRegimeCode: "IN_GST",
       country: "IN",
       subTotal: 1000,
@@ -46,6 +47,7 @@ describe("Business Core Services - Tax Calculation", () => {
 
   it("calculates India GST (18%) as single IGST line for inter-state sales", () => {
     const result = calculateTax({
+      currency: "INR",
       taxRegimeCode: "IN_GST",
       country: "IN",
       subTotal: 2500,
@@ -62,6 +64,7 @@ describe("Business Core Services - Tax Calculation", () => {
 
   it("calculates UAE VAT (5%) correctly", () => {
     const result = calculateTax({
+      currency: "AED",
       taxRegimeCode: "AE_VAT",
       country: "AE",
       subTotal: 500,
@@ -79,6 +82,7 @@ describe("Business Core Services - Tax Calculation", () => {
 
   it("calculates US State Sales Tax (7%) correctly", () => {
     const result = calculateTax({
+      currency: "USD",
       taxRegimeCode: "US_SALES_TAX",
       country: "US",
       subTotal: 100,
@@ -94,6 +98,7 @@ describe("Business Core Services - Tax Calculation", () => {
 
   it("handles NONE / exempt regime with zero tax and 'Bill of Supply' label", () => {
     const result = calculateTax({
+      currency: "INR",
       taxRegimeCode: "NONE",
       country: "GLOBAL",
       subTotal: 1500,

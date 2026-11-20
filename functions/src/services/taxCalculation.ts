@@ -22,7 +22,7 @@
 
 import { TaxSnapshot, TaxRegimeDoc, TaxBreakdownItem } from "../types/models.js";
 import { DEFAULT_TAX_REGIMES, TaxRegimeDefinition } from "../constants/catalogs.js";
-import { round2 } from "./money.js";
+import { Money, roundTo } from "./money.js";
 import { db } from "./firebase.js";
 
 export interface TaxLineInput {
@@ -33,6 +33,7 @@ export interface TaxLineInput {
 }
 
 export interface CalculateTaxParams {
+  currency: string;
   taxRegimeCode: string;
   country: string;
   isRegistered?: boolean;
@@ -96,6 +97,10 @@ export async function getTaxRegime(code: string): Promise<TaxRegimeDoc | null> {
  * Calculates tax and produces an immutable TaxSnapshot for bills and outflows.
  */
 export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
+  const currency = params.currency;
+  if (!currency || typeof currency !== "string" || !currency.trim()) {
+    throw new Error("CURRENCY_REQUIRED: calculateTax requires an explicit currency parameter.");
+  }
   const regimeCode = (params.taxRegimeCode || "NONE").toUpperCase().trim();
   const subTotal = Math.max(0, params.subTotal || 0);
 
@@ -132,13 +137,13 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
       const taxable = Math.max(0, line.taxableAmount || 0);
       const isTaxable = line.isTaxable !== false;
       const rate = isTaxable ? (line.taxRatePercent !== undefined ? line.taxRatePercent : defaultRate) : 0;
-      const lineTax = isTaxable && rate > 0 ? round2(taxable * (rate / 100)) : 0;
+      const lineTax = isTaxable && rate > 0 ? Money.amount(taxable * (rate / 100), currency) : 0;
 
-      totalTaxAmount = round2(totalTaxAmount + lineTax);
+      totalTaxAmount = Money.amount(totalTaxAmount + lineTax, currency);
       const current = rateMap.get(rate) || { taxable: 0, tax: 0 };
       rateMap.set(rate, {
-        taxable: round2(current.taxable + taxable),
-        tax: round2(current.tax + lineTax),
+        taxable: Money.amount(current.taxable + taxable, currency),
+        tax: Money.amount(current.tax + lineTax, currency),
       });
     }
 
@@ -159,7 +164,7 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
           });
         } else {
           const halfRate = rate / 2;
-          const halfAmount = round2(val.tax / 2);
+          const halfAmount = Money.amount(val.tax / 2, currency);
           breakdown.push({
             name: `CGST (${halfRate}%)`,
             rate: halfRate,
@@ -169,7 +174,7 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
           breakdown.push({
             name: `SGST (${halfRate}%)`,
             rate: halfRate,
-            amount: round2(val.tax - halfAmount),
+            amount: Money.amount(val.tax - halfAmount, currency),
             taxableAmount: val.taxable,
           });
         }
@@ -183,8 +188,8 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
       }
     }
 
-    const effectiveRate = subTotal > 0 ? round2((totalTaxAmount / subTotal) * 100) : 0;
-    const totalWithTax = round2(subTotal + totalTaxAmount);
+    const effectiveRate = subTotal > 0 ? roundTo((totalTaxAmount / subTotal) * 100, 2) : 0;
+    const totalWithTax = Money.amount(subTotal + totalTaxAmount, currency);
 
     const taxSnapshot: TaxSnapshot = {
       regime: regimeCode,
@@ -210,8 +215,8 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
 
   // Case 2: Document-level subtotal calculation (single rate fallback)
   const effectiveRate = params.taxRatePercent !== undefined ? params.taxRatePercent : defaultRate;
-  const taxAmount = effectiveRate > 0 ? round2(subTotal * (effectiveRate / 100)) : 0;
-  const totalWithTax = round2(subTotal + taxAmount);
+  const taxAmount = effectiveRate > 0 ? Money.amount(subTotal * (effectiveRate / 100), currency) : 0;
+  const totalWithTax = Money.amount(subTotal + taxAmount, currency);
   const breakdown: TaxBreakdownItem[] = [];
 
   if (effectiveRate > 0) {
@@ -225,7 +230,7 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
         });
       } else {
         const halfRate = effectiveRate / 2;
-        const halfAmount = round2(taxAmount / 2);
+        const halfAmount = Money.amount(taxAmount / 2, currency);
         breakdown.push({
           name: `CGST (${halfRate}%)`,
           rate: halfRate,
@@ -235,7 +240,7 @@ export function calculateTax(params: CalculateTaxParams): TaxCalculationResult {
         breakdown.push({
           name: `SGST (${halfRate}%)`,
           rate: halfRate,
-          amount: round2(taxAmount - halfAmount),
+          amount: Money.amount(taxAmount - halfAmount, currency),
           taxableAmount: subTotal,
         });
       }
