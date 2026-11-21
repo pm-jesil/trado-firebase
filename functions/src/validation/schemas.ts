@@ -2505,7 +2505,6 @@ export const GetAccountingPolicySchema = z.strictObject({
 
 export const UpdateAccountingPolicySchema = z.strictObject({
   ...ContextFields,
-  moneyConvention: z.literal("major").optional(),
   selfApprovalPolicy: z.enum(["off", "up_to_limit", "on"]).optional(),
   selfApprovalLimits: z.record(z.string(), z.number().min(0)).optional(),
   cashCountVarianceThreshold: z.number().min(0).optional(),

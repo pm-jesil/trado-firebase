@@ -211,7 +211,6 @@ export interface OrganizationContact {
 
 
 export interface AccountingPolicy {
-  moneyConvention?: "major";
   selfApprovalPolicy?: "off" | "up_to_limit" | "on";
   selfApprovalLimits?: Record<string, number>;
   roundingMode?: "half_up" | "half_even";

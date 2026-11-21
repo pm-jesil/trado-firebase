@@ -3958,7 +3958,7 @@
           "organizations",
           "totalCount"
         ],
-        "leafCount": 260,
+        "leafCount": 262,
         "sampleLeaves": [
           {
             "path": "items[].bankAccounts[].id",
@@ -4489,7 +4489,7 @@
           "evaluation",
           "organization"
         ],
-        "leafCount": 148,
+        "leafCount": 149,
         "sampleLeaves": [
           {
             "path": "organization.bankAccounts[].id",
@@ -29559,13 +29559,8 @@
           "policy"
         ],
         "requiredTopKeys": [],
-        "leafCount": 7,
+        "leafCount": 8,
         "sampleLeaves": [
-          {
-            "path": "policy.moneyConvention",
-            "type": "\"major\" | undefined",
-            "optional": true
-          },
           {
             "path": "policy.selfApprovalPolicy",
             "type": "\"off\" | \"up_to_limit\" | \"on\" | undefined",
@@ -29594,6 +29589,16 @@
           {
             "path": "policy.cashCountVarianceThreshold",
             "type": "number | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.updatedAt",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.updatedBy",
+            "type": "string | undefined",
             "optional": true
           }
         ]
@@ -29649,18 +29654,6 @@
           "enumValues": [],
           "uiHint": "text",
           "example": "branch_001"
-        },
-        {
-          "path": "moneyConvention",
-          "type": "literal",
-          "required": false,
-          "nullable": false,
-          "bounds": {},
-          "enumValues": [
-            "major"
-          ],
-          "uiHint": "text",
-          "example": "2026-11-18"
         },
         {
           "path": "selfApprovalPolicy",
@@ -29738,43 +29731,16 @@
       ],
       "response": {
         "envelope": "ENTITY",
-        "tsType": "{ policy: { updatedAt: string; updatedBy: string; cashRoundingFils?: boolean | undefined; roundToNearestRupee?: boolean | undefined; roundingMode?: \"half_up\" | \"half_even\" | undefined; cashCountVarianceThreshold?: number | undefined; selfAp",
+        "tsType": "{ policy: AccountingPolicy; }",
         "topLevelKeys": [
           "policy"
         ],
-        "requiredTopKeys": [
-          "policy"
-        ],
-        "leafCount": 9,
+        "requiredTopKeys": [],
+        "leafCount": 8,
         "sampleLeaves": [
           {
-            "path": "policy.updatedAt",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "policy.updatedBy",
-            "type": "string",
-            "optional": false
-          },
-          {
-            "path": "policy.cashRoundingFils",
-            "type": "boolean | undefined",
-            "optional": true
-          },
-          {
-            "path": "policy.roundToNearestRupee",
-            "type": "boolean | undefined",
-            "optional": true
-          },
-          {
-            "path": "policy.roundingMode",
-            "type": "\"half_up\" | \"half_even\" | undefined",
-            "optional": true
-          },
-          {
-            "path": "policy.cashCountVarianceThreshold",
-            "type": "number | undefined",
+            "path": "policy.selfApprovalPolicy",
+            "type": "\"off\" | \"up_to_limit\" | \"on\" | undefined",
             "optional": true
           },
           {
@@ -29783,13 +29749,33 @@
             "optional": true
           },
           {
-            "path": "policy.selfApprovalPolicy",
-            "type": "\"off\" | \"up_to_limit\" | \"on\" | undefined",
+            "path": "policy.roundingMode",
+            "type": "\"half_up\" | \"half_even\" | undefined",
             "optional": true
           },
           {
-            "path": "policy.moneyConvention",
-            "type": "\"major\" | undefined",
+            "path": "policy.roundToNearestRupee",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.cashRoundingFils",
+            "type": "boolean | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.cashCountVarianceThreshold",
+            "type": "number | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.updatedAt",
+            "type": "string | undefined",
+            "optional": true
+          },
+          {
+            "path": "policy.updatedBy",
+            "type": "string | undefined",
             "optional": true
           }
         ]
@@ -45623,7 +45609,7 @@
           },
           {
             "path": "request.severity",
-            "type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
+            "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
             "optional": true
           },
           {
@@ -46512,7 +46498,7 @@
           },
           {
             "path": "request.severity",
-            "type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
+            "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
             "optional": true
           },
           {
@@ -46788,7 +46774,7 @@
           },
           {
             "path": "request.severity",
-            "type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
+            "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
             "optional": true
           },
           {
@@ -47771,7 +47757,7 @@
           },
           {
             "path": "items[].severity",
-            "type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
+            "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
             "optional": true
           },
           {
@@ -48703,7 +48689,7 @@
           },
           {
             "path": "request.severity",
-            "type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined | \"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined",
+            "type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined | RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined",
             "optional": true
           },
           {

@@ -958,7 +958,6 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
         assert.strictEqual(res.isChanged, true);
         assert.equal(res.updates["settings.accountingPolicy.cashCountVarianceThreshold"], 10000.00);
         assert.ok(res.updates["settings.accountingPolicy.cashCountVarianceThresholdMinor"] !== undefined);
-        assert.equal(res.updates["settings.accountingPolicy.moneyConvention"], "major");
         // currency metadata copies are deleted
         assert.ok(res.updates.currencyDecimals !== undefined);
         assert.ok(res.updates.minorUnitName !== undefined);
@@ -973,7 +972,6 @@ describe("Commercial Money Rounding (Half Away From Zero)", () => {
           currency: "INR",
           settings: {
             accountingPolicy: {
-              moneyConvention: "major",
               cashCountVarianceThreshold: 10000.00,
               selfApprovalLimits: { INR: 10000.00, BHD: 50.000 },
             },

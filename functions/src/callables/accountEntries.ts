@@ -691,7 +691,6 @@ export const accountingPolicyGet = onCall({ region: "asia-south1" }, async (requ
 
   const orgDoc = (await db.collection("organizations").doc(orgId).get()).data() as OrganizationDoc | undefined;
   const policy: AccountingPolicy = orgDoc?.settings?.accountingPolicy || {
-    moneyConvention: "major",
     selfApprovalPolicy: "off",
     roundingMode: "half_up",
     roundToNearestRupee: false,
@@ -718,7 +717,6 @@ export const accountingPolicyUpdate = onCall({ region: "asia-south1" }, async (r
 
   const orgData = orgSnap.data() as OrganizationDoc | undefined;
   const currentPolicy: AccountingPolicy = orgData?.settings?.accountingPolicy || {
-    moneyConvention: "major",
     selfApprovalPolicy: "off",
     roundingMode: "half_up",
     roundToNearestRupee: false,
@@ -727,7 +725,6 @@ export const accountingPolicyUpdate = onCall({ region: "asia-south1" }, async (r
 
   const updatedPolicy: AccountingPolicy = {
     ...currentPolicy,
-    moneyConvention: "major",
     ...(input.selfApprovalPolicy !== undefined ? { selfApprovalPolicy: input.selfApprovalPolicy } : {}),
     ...(input.selfApprovalLimits !== undefined ? { selfApprovalLimits: input.selfApprovalLimits } : {}),
     ...(input.cashCountVarianceThreshold !== undefined ? { cashCountVarianceThreshold: input.cashCountVarianceThreshold } : {}),

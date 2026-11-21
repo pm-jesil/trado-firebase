@@ -346,7 +346,7 @@ Back to [Master Index](./INDEX.md).
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "policy" (7 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "policy" (8 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -372,7 +372,6 @@ Back to [Master Index](./INDEX.md).
 |---|---|---|---|---|
 | `organizationId` | `string` | No | {"minLength":2} | `organization_001` |
 | `branchId` | `string` | No | — | `branch_001` |
-| `moneyConvention` | `literal` | No | Enum: `major` | `2026-11-18` |
 | `selfApprovalPolicy` | `enum` | No | Enum: `off`, `up_to_limit`, `on` | `off` |
 | `selfApprovalLimits.*` | `number` | **Yes** | {"min":0,"minInclusive":true} | `1` |
 | `cashCountVarianceThreshold` | `number` | No | {"min":0,"minInclusive":true} | `1` |
@@ -380,7 +379,7 @@ Back to [Master Index](./INDEX.md).
 | `roundToNearestRupee` | `boolean` | No | — | `true` |
 | `cashRoundingFils` | `boolean` | No | — | `true` |
 
-**Response:** Envelope `ENTITY` · Top-level keys: "policy" (9 typed leaf paths).
+**Response:** Envelope `ENTITY` · Top-level keys: "policy" (8 typed leaf paths).
 **Declared Errors:** `INVALID_ARGUMENT`, `PERMISSION_DENIED`, `UNAUTHENTICATED`, `UNKNOWN_FIELD` (see [errors.md](../errors.md)).
 
 ```json
@@ -388,11 +387,11 @@ Back to [Master Index](./INDEX.md).
   "request": {
     "organizationId": "organization_001",
     "branchId": "branch_001",
-    "moneyConvention": "2026-11-18",
     "selfApprovalPolicy": "off",
     "cashCountVarianceThreshold": 1,
     "roundingMode": "half_up",
-    "roundToNearestRupee": true
+    "roundToNearestRupee": true,
+    "cashRoundingFils": true
   },
   "response": {
     "policy": "..."

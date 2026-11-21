@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
-  "totalDocuments": 237,
+  "totalDocuments": 236,
   "countsByClassification": {
     "KEEP+UPDATE": 79,
     "REWRITE": 2,
-    "ARCHIVE": 22,
+    "ARCHIVE": 21,
     "GENERATED": 134
   },
   "documents": [
@@ -181,12 +181,6 @@
       "title": "Metering, audit and request-context inventory (prompt 66, Part 1)",
       "classification": "GENERATED",
       "lineCount": null
-    },
-    {
-      "path": "docs/audit/money-field-inventory.md",
-      "title": "Money and Currency Field Mechanical Inventory (Prompt 77D S0)",
-      "classification": "ARCHIVE",
-      "lineCount": 305
     },
     {
       "path": "docs/audit/numeric-audit.md",

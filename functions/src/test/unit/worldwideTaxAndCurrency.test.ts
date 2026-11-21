@@ -16,8 +16,6 @@ import { getCountryDefaults, COUNTRY_DEFAULTS } from "../../constants/countryDef
 import { DEFAULT_TAX_REGIMES } from "../../constants/catalogs.js";
 import { calculateTax, getTaxRegime } from "../../services/taxCalculation.js";
 import {
-  toMinor,
-  fromMinor,
   getCurrencyDecimals,
   Money,
   requireCountry,
@@ -151,21 +149,15 @@ describe("Phase 3 — Worldwide Tax, Regions & Currency (Unit)", () => {
       assert.equal(getCurrencyDecimals("OMR"), 3);
       assert.equal(getCurrencyDecimals("KWD"), 3);
 
-      // Bahrain: 1.500 BHD = 1500 fils
-      assert.equal(toMinor(1.5, "BHD"), 1500);
-      assert.equal(fromMinor(1500, "BHD"), 1.5);
+      // Bahrain: 1.500 BHD (3 decimals)
+      assert.equal(Money.amount(1.5, "BHD"), 1.5);
+      assert.equal(Money.amount(0.005, "BHD"), 0.005);
 
-      // Bahrain: 0.005 BHD = 5 fils
-      assert.equal(toMinor(0.005, "BHD"), 5);
-      assert.equal(fromMinor(5, "BHD"), 0.005);
+      // Oman: 12.750 OMR (3 decimals)
+      assert.equal(Money.amount(12.75, "OMR"), 12.75);
 
-      // Oman: 12.750 OMR = 12750 baisa
-      assert.equal(toMinor(12.75, "OMR"), 12750);
-      assert.equal(fromMinor(12750, "OMR"), 12.75);
-
-      // Kuwait: 100.250 KWD = 100250 fils
-      assert.equal(toMinor(100.25, "KWD"), 100250);
-      assert.equal(fromMinor(100250, "KWD"), 100.25);
+      // Kuwait: 100.250 KWD (3 decimals)
+      assert.equal(Money.amount(100.25, "KWD"), 100.25);
     });
 
     it("rounds currency amounts using correct exponent", () => {

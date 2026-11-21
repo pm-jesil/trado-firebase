@@ -8,33 +8,18 @@ import { Money } from "../../services/money.js";
 import { STANDARD_ACCOUNTS, PostingEventCode } from "../../services/postingRules.js";
 
 describe("Posting Rules & Financial Engine Unit Tests (Phase 1)", () => {
-  describe("1. Minor Units Integer Arithmetic", () => {
-    it("converts major to minor without precision drift", () => {
-      assert.strictEqual(Money.toMinor(12.34, "INR"), 1234);
-      assert.strictEqual(Money.toMinor(12.345, "BHD"), 12345);
-      assert.strictEqual(Money.toMinor(100, "JPY"), 100);
-      assert.strictEqual(Money.toMinor(0.01, "USD"), 1);
+  describe("1. Money Major Units & Decimal Arithmetic", () => {
+    it("rounds major units correctly per currency exponent", () => {
+      assert.strictEqual(Money.amount(12.34, "INR"), 12.34);
+      assert.strictEqual(Money.amount(12.345, "BHD"), 12.345);
+      assert.strictEqual(Money.amount(100.4, "JPY"), 100);
+      assert.strictEqual(Money.amount(0.01, "USD"), 0.01);
     });
 
-    it("converts minor to major correctly", () => {
-      assert.strictEqual(Money.fromMinor(1234, "INR"), 12.34);
-      assert.strictEqual(Money.fromMinor(12345, "BHD"), 12.345);
-      assert.strictEqual(Money.fromMinor(100, "JPY"), 100);
-    });
-
-    it("adds and subtracts minor units safely", () => {
-      const a = Money.toMinor(10.50, "INR");
-      const b = Money.toMinor(5.25, "INR");
-      assert.strictEqual(Money.addMinor(a, b), 1575);
-      assert.strictEqual(Money.subtractMinor(a, b), 525);
-    });
-
-    it("allocates minor units with zero remainder drift", () => {
-      // Divide 100.00 (10000 minor units) across 3 ratios (1:1:1)
-      const allocated = Money.allocateMinor(10000, [1, 1, 1]);
-      assert.strictEqual(allocated.length, 3);
-      assert.strictEqual(allocated.reduce((s, x) => s + x, 0), 10000);
-      assert.deepStrictEqual(allocated, [3334, 3333, 3333]);
+    it("sums amounts with Money.sum safely without precision drift", () => {
+      assert.strictEqual(Money.sum([12.34, 5.25], "INR"), 17.59);
+      assert.strictEqual(Money.sum([10.50, 5.25], "INR"), 15.75);
+      assert.strictEqual(Money.sum([12.345, 0.005], "BHD"), 12.35);
     });
   });
 

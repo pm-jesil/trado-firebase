@@ -188,40 +188,39 @@ function transformOrganizationDoc(data) {
 
   const policy = data.settings?.accountingPolicy;
   if (policy) {
-    if (policy.moneyConvention !== "major") {
-      // Rename cashCountVarianceThresholdMinor -> cashCountVarianceThreshold
-      if (policy.cashCountVarianceThresholdMinor !== undefined) {
-        if (!data.currency) {
-          return { updates: {}, isChanged: false, noCurrency: true };
+    // Rename cashCountVarianceThresholdMinor -> cashCountVarianceThreshold
+    if (policy.cashCountVarianceThresholdMinor !== undefined) {
+      if (!data.currency) {
+        return { updates: {}, isChanged: false, noCurrency: true };
+      }
+      const exp = getExponent(data.currency);
+      if (policy.cashCountVarianceThreshold === undefined) {
+        updates["settings.accountingPolicy.cashCountVarianceThreshold"] =
+          Number((policy.cashCountVarianceThresholdMinor / (10 ** exp)).toFixed(exp));
+      }
+      updates["settings.accountingPolicy.cashCountVarianceThresholdMinor"] = FieldValue.delete();
+      changed = true;
+    }
+
+    // 4. Convert selfApprovalLimits values from minor to major if doc was unmigrated
+    if (
+      (policy.cashCountVarianceThresholdMinor !== undefined || data.currencyDecimals !== undefined) &&
+      policy.selfApprovalLimits &&
+      typeof policy.selfApprovalLimits === "object"
+    ) {
+      const converted = { ...policy.selfApprovalLimits };
+      let limitsChanged = false;
+      for (const [currKey, val] of Object.entries(converted)) {
+        if (typeof val === "number" && val >= 10000) {
+          const cExp = getExponent(currKey);
+          converted[currKey] = Number((val / (10 ** cExp)).toFixed(cExp));
+          limitsChanged = true;
         }
-        const exp = getExponent(data.currency);
-        if (policy.cashCountVarianceThreshold === undefined) {
-          updates["settings.accountingPolicy.cashCountVarianceThreshold"] =
-            Number((policy.cashCountVarianceThresholdMinor / (10 ** exp)).toFixed(exp));
-        }
-        updates["settings.accountingPolicy.cashCountVarianceThresholdMinor"] = FieldValue.delete();
+      }
+      if (limitsChanged) {
+        updates["settings.accountingPolicy.selfApprovalLimits"] = converted;
         changed = true;
       }
-
-      // 4. Convert selfApprovalLimits values from minor to major
-      if (policy.selfApprovalLimits && typeof policy.selfApprovalLimits === "object") {
-        const converted = { ...policy.selfApprovalLimits };
-        let limitsChanged = false;
-        for (const [currKey, val] of Object.entries(converted)) {
-          if (typeof val === "number" && val >= 10000) {
-            const cExp = getExponent(currKey);
-            converted[currKey] = Number((val / (10 ** cExp)).toFixed(cExp));
-            limitsChanged = true;
-          }
-        }
-        if (limitsChanged) {
-          updates["settings.accountingPolicy.selfApprovalLimits"] = converted;
-          changed = true;
-        }
-      }
-
-      updates["settings.accountingPolicy.moneyConvention"] = "major";
-      changed = true;
     }
   }
 

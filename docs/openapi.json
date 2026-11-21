@@ -3,7 +3,7 @@
   "info": {
     "title": "Trado Firebase Backend — Local Emulator API",
     "version": "1.0.0",
-    "description": "Authoritative OpenAPI 3.0.3 contract for the Trado Firebase backend.\n\n**207 HTTPS Callable functions** across 40 domains.\n**8 Firestore Triggers** (internal event-driven background automation).\n\n⚠️ **LOCAL EMULATOR ONLY** — Targets loopback Firebase Emulator Suite (`127.0.0.1:5001`).\nDo NOT use this contract against production cloud endpoints.\n\nGenerated from canonical source exports and validation schemas (215 total exports).\nInput schemas derived from 232 Zod schemas via z.toJSONSchema()."
+    "description": "Authoritative OpenAPI 3.0.3 contract for the Trado Firebase backend.\n\n**207 HTTPS Callable functions** across 40 domains.\n**8 Firestore Triggers** (internal event-driven background automation).\n\n⚠️ **LOCAL EMULATOR ONLY** — Targets loopback Firebase Emulator Suite (`127.0.0.1:5001`).\nDo NOT use this contract against production cloud endpoints.\n\nGenerated from canonical source exports and validation schemas (215 total exports).\nInput schemas derived from 230 Zod schemas via z.toJSONSchema()."
   },
   "servers": [
     {
@@ -18010,7 +18010,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "default": "bank_ounqxdd",
+            "default": "bank_5278sji",
             "type": "string",
             "minLength": 1
           },
@@ -18094,7 +18094,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "default": "bank_dv1lrlk",
+              "default": "bank_ynf59lb",
               "type": "string",
               "minLength": 1
             },
@@ -22951,22 +22951,6 @@
         },
         "additionalProperties": false
       },
-      "GetBranchSchema": {
-        "type": "object",
-        "properties": {
-          "organizationId": {
-            "type": "string"
-          },
-          "branchId": {
-            "type": "string",
-            "minLength": 2
-          }
-        },
-        "required": [
-          "branchId"
-        ],
-        "additionalProperties": false
-      },
       "SwitchBranchContextSchema": {
         "type": "object",
         "properties": {
@@ -24815,30 +24799,6 @@
         "additionalProperties": false
       },
       "ListRecurringExpensesSchema": {
-        "type": "object",
-        "properties": {
-          "organizationId": {
-            "type": "string",
-            "minLength": 2
-          },
-          "branchId": {
-            "type": "string"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "limit": {
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 100
-          },
-          "startAfterId": {
-            "type": "string"
-          }
-        },
-        "additionalProperties": false
-      },
-      "PaginationQuerySchema": {
         "type": "object",
         "properties": {
           "organizationId": {
@@ -28878,10 +28838,6 @@
           },
           "branchId": {
             "type": "string"
-          },
-          "moneyConvention": {
-            "type": "string",
-            "const": "major"
           },
           "selfApprovalPolicy": {
             "type": "string",
@@ -32924,14 +32880,6 @@
                         "accountingPolicy": {
                           "type": "object",
                           "properties": {
-                            "moneyConvention": {
-                              "type": "string",
-                              "enum": [
-                                "major"
-                              ],
-                              "nullable": true,
-                              "x-ts-type": "\"major\" | undefined"
-                            },
                             "selfApprovalPolicy": {
                               "type": "string",
                               "enum": [
@@ -33810,14 +33758,6 @@
                         "accountingPolicy": {
                           "type": "object",
                           "properties": {
-                            "moneyConvention": {
-                              "type": "string",
-                              "enum": [
-                                "major"
-                              ],
-                              "nullable": true,
-                              "x-ts-type": "\"major\" | undefined"
-                            },
                             "selfApprovalPolicy": {
                               "type": "string",
                               "enum": [
@@ -47918,15 +47858,6 @@
                       "accountingPolicy": {
                         "type": "object",
                         "properties": {
-                          "moneyConvention": {
-                            "type": "string",
-                            "enum": [
-                              "major",
-                              "major"
-                            ],
-                            "nullable": true,
-                            "x-ts-type": "\"major\" | undefined | \"major\" | undefined"
-                          },
                           "selfApprovalPolicy": {
                             "type": "string",
                             "enum": [
@@ -53963,7 +53894,7 @@
                   },
                   "severity": {
                     "nullable": true,
-                    "x-ts-type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined"
+                    "x-ts-type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined"
                   },
                   "status": {
                     "description": "Lifecycle status of the record (values: the field's enum).",
@@ -54301,7 +54232,7 @@
                   },
                   "severity": {
                     "nullable": true,
-                    "x-ts-type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined"
+                    "x-ts-type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined"
                   },
                   "status": {
                     "description": "Lifecycle status of the record (values: the field's enum).",
@@ -54810,7 +54741,7 @@
                   },
                   "severity": {
                     "nullable": true,
-                    "x-ts-type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined"
+                    "x-ts-type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined"
                   },
                   "status": {
                     "description": "Lifecycle status of the record (values: the field's enum).",
@@ -55098,7 +55029,7 @@
                     },
                     "severity": {
                       "nullable": true,
-                      "x-ts-type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined"
+                      "x-ts-type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined"
                     },
                     "status": {
                       "description": "Lifecycle status of the record (values: the field's enum).",
@@ -55545,7 +55476,7 @@
                   },
                   "severity": {
                     "nullable": true,
-                    "x-ts-type": "\"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined | \"major\" | RequestSeverity | \"minor\" | \"critical\" | undefined"
+                    "x-ts-type": "RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined | RequestSeverity | \"minor\" | \"major\" | \"critical\" | undefined"
                   },
                   "status": {
                     "description": "Lifecycle status of the record (values: the field's enum).",
@@ -59199,14 +59130,6 @@
               "policy": {
                 "type": "object",
                 "properties": {
-                  "moneyConvention": {
-                    "type": "string",
-                    "enum": [
-                      "major"
-                    ],
-                    "nullable": true,
-                    "x-ts-type": "\"major\" | undefined"
-                  },
                   "selfApprovalPolicy": {
                     "type": "string",
                     "enum": [
@@ -59280,14 +59203,6 @@
               "policy": {
                 "type": "object",
                 "properties": {
-                  "moneyConvention": {
-                    "type": "string",
-                    "enum": [
-                      "major"
-                    ],
-                    "nullable": true,
-                    "x-ts-type": "\"major\" | undefined"
-                  },
                   "selfApprovalPolicy": {
                     "type": "string",
                     "enum": [
@@ -60226,7 +60141,7 @@
     "triggerCount": 8,
     "totalExports": 215,
     "zodSchemasResolved": true,
-    "resolvedSchemaCount": 232,
+    "resolvedSchemaCount": 230,
     "operationsWithExamples": 121
   }
 }

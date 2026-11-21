@@ -6,10 +6,9 @@
  * Exponents derive from constants/currencies.ts.
  */
 
-import { getExponent, getCurrencyInfo } from "../constants/currencies.js";
+import { getExponent } from "../constants/currencies.js";
 import { HttpsError } from "firebase-functions/v2/https";
 
-export { getExponent, getCurrencyInfo };
 
 /**
  * Validates that a currency code is present and non-empty.
@@ -291,71 +290,5 @@ export const Money = {
     const factor = Math.pow(10, decimals);
     return roundTo(minorUnits / factor, decimals);
   },
-
-  /**
-   * Convert major decimal into exact integer minor units.
-   */
-  toMinor(amount: number, currency: string): number {
-    return this.fromDecimal(amount, currency);
-  },
-
-  /**
-   * Convert exact integer minor units to major decimal.
-   */
-  fromMinor(minorUnits: number, currency: string): number {
-    return this.toDecimal(minorUnits, currency);
-  },
-
-  /**
-   * Add integer minor units with exact integer arithmetic.
-   */
-  addMinor(a: number, b: number): number {
-    return Math.round(a) + Math.round(b);
-  },
-
-  /**
-   * Subtract integer minor units with exact integer arithmetic.
-   */
-  subtractMinor(a: number, b: number): number {
-    return Math.round(a) - Math.round(b);
-  },
-
-  /**
-   * Allocate integer minor units across proportions without fractional remainder loss.
-   */
-  allocateMinor(totalMinor: number, ratios: number[]): number[] {
-    const totalRatio = ratios.reduce((sum, r) => sum + r, 0);
-    if (totalRatio <= 0) return ratios.map(() => 0);
-
-    const intTotal = Math.round(totalMinor);
-    let remainder = intTotal;
-    const results: number[] = [];
-
-    for (let i = 0; i < ratios.length; i++) {
-      const share = Math.floor((intTotal * ratios[i]) / totalRatio);
-      results.push(share);
-      remainder -= share;
-    }
-
-    // Distribute remaining minor units one by one to parts with highest remainder
-    if (remainder > 0) {
-      const remaindersWithIndex = ratios.map((r, idx) => ({
-        idx,
-        rem: (intTotal * r) / totalRatio - results[idx],
-      }));
-      remaindersWithIndex.sort((a, b) => b.rem - a.rem);
-
-      for (let i = 0; i < remainder; i++) {
-        results[remaindersWithIndex[i].idx]++;
-      }
-    }
-
-    return results;
-  },
 };
 
-export const toMinor = Money.toMinor.bind(Money);
-export const fromMinor = Money.fromMinor.bind(Money);
-export const addMinor = Money.addMinor.bind(Money);
-export const subtractMinor = Money.subtractMinor.bind(Money);
-export const allocateMinor = Money.allocateMinor.bind(Money);
