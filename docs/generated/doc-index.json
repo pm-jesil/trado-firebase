@@ -228,7 +228,7 @@
       "path": "docs/audit/run-ledger.md",
       "title": "Trado Engineering Run Ledger (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 53
+      "lineCount": 54
     },
     {
       "path": "docs/audit/test-coverage-matrix.md",

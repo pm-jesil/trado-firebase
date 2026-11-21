@@ -1,9 +1,9 @@
 # Trado Engineering Handoff (Appendix E)
 
-- **Date:** 2026-11-20
+- **Date:** 2026-11-21
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
-- **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1-S8)
-- **Current State:** **STEP S9 FINISHED. Verification suite passed across 114 units (0 failing, 0 stale, 0 untraced, 0 unmapped). Established new trusted baseline `base-8c4086d4` (trusted: true). Verified 12 live emulator gate steps (failed=0/12). Detected 27/27 seeded defects (undetected: none). Migration dry-run on fresh seed shows 0 would-change. End-to-end BHD scenario verified with 10% VAT, payment, and posting (3 decimals, balanced ledger, green invariants INV-1..INV-19). Local release tag created.**
+- **Prompt:** Prompt 77E — Remove Unused Code, Duplicates and Junk (RUN 1: E3-A, E3-M, E3-B1)
+- **Current State:** **RUN 1 FINISHED (commits `f1e4238`, `dcc4ebc`, `1a4d586`). Verification passed: `build` clean, `test:unit` 444 tests across 125 suites (0 failures), `test:static` clean (0 drift, 0 unbacked fields, 0 link issues), `verify:status` clean (untraced 0, unmapped 0). Ready for owner approval of RUN 2 (E3-B2, E3-B3, E3-F).**
 
 ## Summary of Prompt 77 & 77C Deliverables
 
