@@ -246,4 +246,4 @@ Latency was not benchmarked against production; on the local emulator all suites
 
 ### Phase reports
 
-The point-in-time phase reports (Phases C–F, prompts 58–64) are archived in [phase-reports-archive.md](phase-reports-archive.md). Current figures: [coverage.md](coverage.md).
+The point-in-time phase reports (Phases C–F, prompts 58–64) are preserved in git history at tag 77d-complete. Current figures: [coverage.md](coverage.md).

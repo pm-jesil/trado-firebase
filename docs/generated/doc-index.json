@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
-  "totalDocuments": 234,
+  "totalDocuments": 222,
   "countsByClassification": {
-    "KEEP+UPDATE": 79,
+    "KEEP+UPDATE": 78,
     "REWRITE": 2,
-    "ARCHIVE": 20,
+    "ARCHIVE": 9,
     "GENERATED": 133
   },
   "documents": [
@@ -33,18 +33,6 @@
       "lineCount": 171
     },
     {
-      "path": "docs/audit/2026-11-16-master-financial-branch-inventory-audit.md",
-      "title": "Master Forensic Audit & Architecture Blueprint: Financial Accounting, Multi-Branch Operations, Warehouses, Stock Transfers & Approvals",
-      "classification": "ARCHIVE",
-      "lineCount": 237
-    },
-    {
-      "path": "docs/audit/2026-11-17-backend-baseline.md",
-      "title": "Trado Firebase Backend — Baseline Audit & Gap Verification (Phase 0)",
-      "classification": "ARCHIVE",
-      "lineCount": 129
-    },
-    {
       "path": "docs/audit/api-logic-ledger.md",
       "title": "Trado Architecture — API Logic Audit (Prompt 68 Z3 / B.4 & D-34)",
       "classification": "GENERATED",
@@ -69,52 +57,16 @@
       "lineCount": 157
     },
     {
-      "path": "docs/audit/changes/run-74.md",
-      "title": "Run 74 Change Record — Requests and Support Desk Module (Prompt 74)",
-      "classification": "ARCHIVE",
-      "lineCount": 121
-    },
-    {
-      "path": "docs/audit/changes/run-75.md",
-      "title": "Run 75 Change Record — Master Financial Accounting, Branch Operations, Inventory, Stock Transfers & Permissions (Prompt 75)",
-      "classification": "ARCHIVE",
-      "lineCount": 90
-    },
-    {
-      "path": "docs/audit/changes/run-76.md",
-      "title": "Run 76 Change Record — Comprehensive Backend Hardening, Accounting Integrity & Verification Gate (Prompt 76)",
-      "classification": "ARCHIVE",
-      "lineCount": 85
-    },
-    {
       "path": "docs/audit/coverage.md",
       "title": "Computed coverage",
       "classification": "GENERATED",
       "lineCount": null
     },
     {
-      "path": "docs/audit/current-repository-baseline.md",
-      "title": "Trado Firebase Backend — Current Repository Baseline Census",
-      "classification": "ARCHIVE",
-      "lineCount": 197
-    },
-    {
       "path": "docs/audit/document-ledger.md",
       "title": "Trado Platform Document Verification Ledger (Y-14 / D-20)",
       "classification": "ARCHIVE",
       "lineCount": 168
-    },
-    {
-      "path": "docs/audit/documentation-inventory-and-deduplication.md",
-      "title": "Trado Documentation Inventory & Deduplication Report",
-      "classification": "ARCHIVE",
-      "lineCount": 83
-    },
-    {
-      "path": "docs/audit/documentation-verification-report.md",
-      "title": "Trado Firebase Backend — Documentation & Codebase Verification Report",
-      "classification": "ARCHIVE",
-      "lineCount": 249
     },
     {
       "path": "docs/audit/documents-audit.md",
@@ -195,12 +147,6 @@
       "lineCount": 131
     },
     {
-      "path": "docs/audit/phase-reports-archive.md",
-      "title": "Phase reports (prompts 58–64)",
-      "classification": "ARCHIVE",
-      "lineCount": 221
-    },
-    {
       "path": "docs/audit/roundtrip-results.md",
       "title": "Maximal round-trip proof",
       "classification": "GENERATED",
@@ -219,28 +165,10 @@
       "lineCount": 54
     },
     {
-      "path": "docs/audit/test-coverage-matrix.md",
-      "title": "Trado Backend: Comprehensive Test Coverage Matrix",
-      "classification": "KEEP+UPDATE",
-      "lineCount": 166
-    },
-    {
-      "path": "docs/audit/test-file-refactor.md",
-      "title": "Trado Backend: Test File Inventory & Refactor Documentation",
-      "classification": "ARCHIVE",
-      "lineCount": 75
-    },
-    {
       "path": "docs/audit/test-quality-audit.md",
       "title": "Trado Architecture — Test Quality Guard Audit (Prompt 68 Z3 / B.8 & D-34)",
       "classification": "GENERATED",
       "lineCount": null
-    },
-    {
-      "path": "docs/audit/test-refactor-verification-report.md",
-      "title": "Trado Firebase Backend: Test Architecture, Feature Coverage, Repository Hygiene & Verification Audit Report",
-      "classification": "ARCHIVE",
-      "lineCount": 266
     },
     {
       "path": "docs/audit/triggers-audit.md",
