@@ -3,7 +3,7 @@
 - **Date:** 2026-11-20
 - **Last Active Agent:** antigravity (Gemini 3.8 Flash)
 - **Prompt:** Prompt 77D — Money and Currency: ONE Source of Truth, Correct Rounding for 0/2/3-Decimal Currencies, Major/Minor/Sub-minor Unit Names (Steps S1-S8)
-- **Current State:** **STEP S8b COMPLETED. Generated `docs/generated/currencies.json` via `scripts/generate-policy-artifacts.js` with `--check` wired to `test:static`; replaced hand-written table in `payments-and-party-ledgers.md` with link to canonical JSON; updated `authMe` / `sessionContext.ts` to return derived `currencyInfo` (dropped `currencyDecimals`); registered decision `D-71` and marked `D-19`/`A-41` superseded across decision register, generators, and audit registers; removed `money_paise` `uiHint` alias completely (retained `money` with `currencyExponentFrom`), updated seeded defect `BM-2` to `money uiHint on a string field`; 452/452 unit tests pass across 126 suites; `test:static` passes cleanly across 35+ checks (0 violations). Ready for S9.**
+- **Current State:** **STEP S9 FINISHED. Verification suite passed across 114 units (0 failing, 0 stale, 0 untraced, 0 unmapped). Established new trusted baseline `base-8c4086d4` (trusted: true). Verified 12 live emulator gate steps (failed=0/12). Detected 27/27 seeded defects (undetected: none). Migration dry-run on fresh seed shows 0 would-change. End-to-end BHD scenario verified with 10% VAT, payment, and posting (3 decimals, balanced ledger, green invariants INV-1..INV-19). Local release tag created.**
 
 ## Summary of Prompt 77 & 77C Deliverables
 

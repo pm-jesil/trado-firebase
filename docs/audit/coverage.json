@@ -1,6 +1,6 @@
 {
-  "runId": "cov-127abe6a",
-  "timestamp": "2026-11-20T18:45:16.604Z",
+  "runId": "cov-21231b84",
+  "timestamp": "2026-11-21T01:43:58.256Z",
   "allPassed": false,
   "sources": {
     "exports": 215,
@@ -18,8 +18,8 @@
     "requestSchemas": 248,
     "documentTypes": 63,
     "collections": 63,
-    "traceFiles": 35,
-    "traces": 2285
+    "traceFiles": 28,
+    "traces": 1938
   },
   "registryFindings": [
     "collection \"requests/activity\" has no document interface in types/models.ts",
@@ -64,33 +64,31 @@
     "C-1": {
       "id": "C-1",
       "name": "Catalog: stored leaf paths (types ∪ census) catalogued, system-managed or deferred",
-      "numerator": 1495,
-      "denominator": 1569,
-      "ratio": "1495/1569",
-      "coveredByEvidence": 1495,
+      "numerator": 1497,
+      "denominator": 1559,
+      "ratio": "1497/1559",
+      "coveredByEvidence": 1497,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [
-        "accountTransactions:amountMinor (stored in emulator data but in no document type)",
-        "accountTransactions:balanceAfterMinor (stored in emulator data but in no document type)",
         "accountTransactions:updatedAt (stored in emulator data but in no document type)",
-        "accountTransactions:notes (stored in emulator data but in no document type)",
         "accountTransactions:updatedBy (stored in emulator data but in no document type)",
+        "accountTransactions:notes (stored in emulator data but in no document type)",
+        "requests/activity:activityId (stored in emulator data but in no document type)",
         "requests/activity:requestId (stored in emulator data but in no document type)",
         "requests/activity:type (stored in emulator data but in no document type)",
         "requests/activity:visibility (stored in emulator data but in no document type)",
         "requests/activity:author.uid (stored in emulator data but in no document type)",
         "requests/activity:author.name (stored in emulator data but in no document type)",
+        "requests/activity:author.role (stored in emulator data but in no document type)",
+        "requests/activity:author.isPlatformHandler (stored in emulator data but in no document type)",
+        "requests/activity:content (stored in emulator data but in no document type)",
+        "requests/activity:createdAt (stored in emulator data but in no document type)",
         "requests/activity:author.roleLabel (stored in emulator data but in no document type)",
         "requests/activity:author.isPlatform (stored in emulator data but in no document type)",
-        "requests/activity:content (stored in emulator data but in no document type)",
         "requests/activity:details.previousStatus (stored in emulator data but in no document type)",
         "requests/activity:details.nextStatus (stored in emulator data but in no document type)",
         "requests/activity:details.action (stored in emulator data but in no document type)",
-        "requests/activity:createdAt (stored in emulator data but in no document type)",
-        "requests/activity:activityId (stored in emulator data but in no document type)",
-        "requests/activity:author.role (stored in emulator data but in no document type)",
-        "requests/activity:author.isPlatformHandler (stored in emulator data but in no document type)",
         "auditLogs:logId (stored in emulator data but in no document type)",
         "auditLogs:scope (stored in emulator data but in no document type)",
         "auditLogs:actorRole (stored in emulator data but in no document type)",
@@ -116,23 +114,13 @@
         "counters:year (stored in emulator data but in no document type)",
         "counters:currentSequence (stored in emulator data but in no document type)",
         "counters:updatedAt (stored in emulator data but in no document type)",
-        "financialAccounts:openingBalanceMinor (stored in emulator data but in no document type)",
-        "financialAccounts:currentBalanceMinor (stored in emulator data but in no document type)",
         "organizationUsageDaily:clientReported.storageOperations (stored in emulator data but in no document type)",
         "organizationUsageDaily:clientReported.locationPings (stored in emulator data but in no document type)",
         "organizationUsageMonthly:clientReported.storageOperations (stored in emulator data but in no document type)",
         "organizationUsageMonthly:clientReported.locationPings (stored in emulator data but in no document type)",
-        "organizations:currencyDecimals (stored in emulator data but in no document type)",
-        "organizations:minorUnitName (stored in emulator data but in no document type)",
-        "organizations:minorUnitNamePlural (stored in emulator data but in no document type)",
-        "organizations:currencySymbol (stored in emulator data but in no document type)",
         "organizations:settings.approvals.allowSelfApproval (stored in emulator data but in no document type)",
         "organizations:settings.approvals.thresholds.k1 (stored in emulator data but in no document type)",
         "organizations:settings.numbering.k1 (stored in emulator data but in no document type)",
-        "organizations:settings.accountingPolicy.minorUnitsThresholds.k1 (stored in emulator data but in no document type)",
-        "organizations:settings.accountingPolicy.updatedAt (stored in emulator data but in no document type)",
-        "organizations:settings.accountingPolicy.updatedBy (stored in emulator data but in no document type)",
-        "organizations:settings.accountingPolicy.minorUnitsThresholds.INR (stored in emulator data but in no document type)",
         "platformSettings:requestsEnabled (stored in emulator data but in no document type)",
         "platformSettings:reopenWindowDays (stored in emulator data but in no document type)",
         "platformSettings:autoCloseDays (stored in emulator data but in no document type)",
@@ -151,14 +139,14 @@
         {
           "collection": "accountTransactions",
           "docType": "AccountTransactionDoc",
-          "storedLeafPaths": 50,
+          "storedLeafPaths": 48,
           "typed": 45,
-          "censusOnly": 5,
+          "censusOnly": 3,
           "inCatalog": 45,
           "systemManaged": 0,
           "deferred": 0,
-          "missing": 5,
-          "censusDocs": 96
+          "missing": 3,
+          "censusDocs": 83
         },
         {
           "collection": "accountTransfers",
@@ -194,7 +182,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 5,
-          "censusDocs": 1966
+          "censusDocs": 1789
         },
         {
           "collection": "bills",
@@ -206,7 +194,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 1,
-          "censusDocs": 46
+          "censusDocs": 30
         },
         {
           "collection": "branchProductStock",
@@ -254,7 +242,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 1,
-          "censusDocs": 84
+          "censusDocs": 71
         },
         {
           "collection": "capitalTransactions",
@@ -326,7 +314,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 33
+          "censusDocs": 32
         },
         {
           "collection": "dailySummaries",
@@ -338,7 +326,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 33
+          "censusDocs": 21
         },
         {
           "collection": "deliveries",
@@ -350,7 +338,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 9
+          "censusDocs": 6
         },
         {
           "collection": "departments",
@@ -386,19 +374,19 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 137
+          "censusDocs": 104
         },
         {
           "collection": "financialAccounts",
           "docType": "FinancialAccountDoc",
-          "storedLeafPaths": 29,
+          "storedLeafPaths": 27,
           "typed": 27,
-          "censusOnly": 2,
+          "censusOnly": 0,
           "inCatalog": 27,
           "systemManaged": 0,
           "deferred": 0,
-          "missing": 2,
-          "censusDocs": 195
+          "missing": 0,
+          "censusDocs": 159
         },
         {
           "collection": "idempotencyRecords",
@@ -410,7 +398,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 241
+          "censusDocs": 233
         },
         {
           "collection": "imageUploadSessions",
@@ -482,7 +470,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 168
+          "censusDocs": 143
         },
         {
           "collection": "memberships",
@@ -494,7 +482,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 142
+          "censusDocs": 118
         },
         {
           "collection": "modules",
@@ -518,7 +506,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 32
+          "censusDocs": 21
         },
         {
           "collection": "notificationOutbox",
@@ -530,7 +518,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 115
+          "censusDocs": 91
         },
         {
           "collection": "notifications",
@@ -542,7 +530,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 189
+          "censusDocs": 143
         },
         {
           "collection": "organizationUsageDaily",
@@ -554,7 +542,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 2,
-          "censusDocs": 86
+          "censusDocs": 50
         },
         {
           "collection": "organizationUsageMonthly",
@@ -571,14 +559,14 @@
         {
           "collection": "organizations",
           "docType": "OrganizationDoc",
-          "storedLeafPaths": 136,
-          "typed": 125,
-          "censusOnly": 11,
-          "inCatalog": 125,
+          "storedLeafPaths": 130,
+          "typed": 127,
+          "censusOnly": 3,
+          "inCatalog": 127,
           "systemManaged": 0,
           "deferred": 0,
-          "missing": 11,
-          "censusDocs": 66
+          "missing": 3,
+          "censusDocs": 54
         },
         {
           "collection": "outflows",
@@ -590,7 +578,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 42
+          "censusDocs": 26
         },
         {
           "collection": "paymentProcessingFees",
@@ -614,7 +602,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 60
+          "censusDocs": 49
         },
         {
           "collection": "permissionCatalog",
@@ -662,7 +650,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 70
+          "censusDocs": 50
         },
         {
           "collection": "recurringExpenses",
@@ -674,7 +662,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 3
+          "censusDocs": 2
         },
         {
           "collection": "requests",
@@ -698,7 +686,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 10
+          "censusDocs": 7
         },
         {
           "collection": "roles",
@@ -722,7 +710,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 35
+          "censusDocs": 28
         },
         {
           "collection": "stockAdjustmentRequests",
@@ -734,7 +722,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 2
+          "censusDocs": 0
         },
         {
           "collection": "stockBalances",
@@ -746,7 +734,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 63
+          "censusDocs": 48
         },
         {
           "collection": "stockMovements",
@@ -758,7 +746,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 159
+          "censusDocs": 117
         },
         {
           "collection": "stockTransfers",
@@ -830,7 +818,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 6
+          "censusDocs": 4
         },
         {
           "collection": "uniqueKeys",
@@ -842,7 +830,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 207
+          "censusDocs": 186
         },
         {
           "collection": "units",
@@ -866,7 +854,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 329
+          "censusDocs": 264
         },
         {
           "collection": "usageRateCards",
@@ -890,7 +878,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 150
+          "censusDocs": 126
         },
         {
           "collection": "vendors",
@@ -902,7 +890,7 @@
           "systemManaged": 0,
           "deferred": 0,
           "missing": 0,
-          "censusDocs": 17
+          "censusDocs": 15
         }
       ],
       "collectionsWithoutDocumentType": [
@@ -913,8 +901,8 @@
         "platformCostReconciliation",
         "platformSettings"
       ],
-      "descriptions": "1089/1495",
-      "censusRun": "census-mwo3ig14"
+      "descriptions": "1091/1497",
+      "censusRun": "census-mwpkj32b"
     },
     "C-2": {
       "id": "C-2",
@@ -2434,52 +2422,61 @@
           "unproven": 9
         }
       ],
-      "roundtripRun": "roundtrip-mwo2pzdd"
+      "roundtripRun": "roundtrip-mwpp2ghx"
     },
     "C-3": {
       "id": "C-3",
       "name": "Unknown keys: every request object is strict and rejected an unknown key at runtime (plus removed names)",
-      "numerator": 356,
+      "numerator": 343,
       "denominator": 361,
-      "ratio": "356/361",
-      "coveredByEvidence": 356,
+      "ratio": "343/361",
+      "coveredByEvidence": 343,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [
+        "accountEntriesList:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "accountTransfersDispute:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "paymentsDisputeFee:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
         "paymentsReverseFee:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
         "paymentsListFees:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
-        "stockTransfersReceive:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "paymentsGetFee:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "ledgerVerify:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "reportsGetBranchSummary:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "requestsMeta:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
         "plansCatalogList:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
-        "requestsList:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)"
+        "requestsTransition:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "requestsGet:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "requestsList:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "requestsActivityList:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "requestsCounts:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "requestsInboxList:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "requestsInboxCounts:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)",
+        "requestsSettingsGet:(top level) (no runtime test sent an unknown key here and got UNKNOWN_FIELD)"
       ],
       "passed": false
     },
     "C-4": {
       "id": "C-4",
       "name": "Bounds and enums: max / max+1 / min / min−1 per bounded leaf, every enum value and one invalid value",
-      "numerator": 4416,
+      "numerator": 4420,
       "denominator": 4421,
-      "ratio": "4416/4421",
-      "coveredByEvidence": 4416,
+      "ratio": "4420/4421",
+      "coveredByEvidence": 4420,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [
-        "productsList:ids[length]:max",
-        "accountingPolicyUpdate:moneyConvention:enum=major",
-        "accountingPolicyUpdate:moneyConvention:enum-invalid",
-        "accountingPolicyUpdate:cashCountVarianceThreshold:min",
-        "accountingPolicyUpdate:cashCountVarianceThreshold:min-1"
+        "productsList:ids[length]:max"
       ],
       "passed": false,
-      "sweepRun": "sweep-mwo2u3os"
+      "sweepRun": "sweep-mwpp3jlm"
     },
     "C-5": {
       "id": "C-5",
       "name": "Responses: documented response leaf paths with a description and an executed example",
-      "numerator": 2270,
-      "denominator": 4388,
-      "ratio": "2270/4388",
-      "coveredByEvidence": 2270,
+      "numerator": 2238,
+      "denominator": 4412,
+      "ratio": "2238/4412",
+      "coveredByEvidence": 2238,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [
@@ -2490,6 +2487,16 @@
         "authLogin:result.context.jobRoles[].code (never present in a response of an executed test)",
         "authLogin:result.context.permissions[] (no description)",
         "authLogin:result.context.platformPermissions[] (no description)",
+        "authLogin:result.context.primaryOrganization.currencyInfo.numeric (no description)",
+        "authLogin:result.context.primaryOrganization.currencyInfo.symbol (no description)",
+        "authLogin:result.context.primaryOrganization.currencyInfo.symbolPosition (no description)",
+        "authLogin:result.context.primaryOrganization.currencyInfo.exponent (no description)",
+        "authLogin:result.context.primaryOrganization.currencyInfo.major.plural (no description)",
+        "authLogin:result.context.primaryOrganization.currencyInfo.minor.perMajor (no description)",
+        "authLogin:result.context.primaryOrganization.currencyInfo.minor.plural (no description)",
+        "authLogin:result.context.primaryOrganization.currencyInfo.subMinor.perMinor (no description)",
+        "authLogin:result.context.primaryOrganization.currencyInfo.subMinor.name (never present in a response of an executed test)",
+        "authLogin:result.context.primaryOrganization.currencyInfo.subMinor.plural (no description)",
         "authLogin:result.context.device.recognized (no description)",
         "authLogin:result.context.contextStatus (no description)",
         "authMe:result.context.businessConfig.modules.* (never present in a response of an executed test)",
@@ -2499,6 +2506,16 @@
         "authMe:result.context.jobRoles[].code (never present in a response of an executed test)",
         "authMe:result.context.permissions[] (no description)",
         "authMe:result.context.platformPermissions[] (no description)",
+        "authMe:result.context.primaryOrganization.currencyInfo.numeric (no description)",
+        "authMe:result.context.primaryOrganization.currencyInfo.symbol (no description)",
+        "authMe:result.context.primaryOrganization.currencyInfo.symbolPosition (no description)",
+        "authMe:result.context.primaryOrganization.currencyInfo.exponent (no description)",
+        "authMe:result.context.primaryOrganization.currencyInfo.major.plural (no description)",
+        "authMe:result.context.primaryOrganization.currencyInfo.minor.perMajor (no description)",
+        "authMe:result.context.primaryOrganization.currencyInfo.minor.plural (no description)",
+        "authMe:result.context.primaryOrganization.currencyInfo.subMinor.perMinor (no description)",
+        "authMe:result.context.primaryOrganization.currencyInfo.subMinor.name (never present in a response of an executed test)",
+        "authMe:result.context.primaryOrganization.currencyInfo.subMinor.plural (no description)",
         "authMe:result.context.device.recognized (no description)",
         "authMe:result.context.contextStatus (no description)",
         "authMe:result.credentials (no description)",
@@ -2514,13 +2531,24 @@
         "usersUpdateMe:result.user.primaryOrganizationId (never present in a response of an executed test)",
         "usersUpdateMe:result.user.updatedBy (never present in a response of an executed test)",
         "imagesAttach:result.image.thumbnailPath (never present in a response of an executed test)",
+        "organizationsList:result.items[].bankAccounts[].label (never present in a response of an executed test)",
+        "organizationsList:result.items[].bankAccounts[].upiId (never present in a response of an executed test)",
+        "organizationsList:result.items[].bankAccounts[].currency (never present in a response of an executed test)",
         "organizationsList:result.items[].bankAccounts[].printOnInvoice (no description)",
         "organizationsList:result.items[].code (never present in a response of an executed test)",
         "organizationsList:result.items[].image.thumbnailPath (never present in a response of an executed test)",
         "organizationsList:result.items[].usageLimitOverrides (never present in a response of an executed test)",
         "organizationsList:result.items[].showCostToTenant (never present in a response of an executed test)",
         "organizationsList:result.items[].supportAccessExpiresAt (never present in a response of an executed test)",
+        "organizationsList:result.items[].displayName (never present in a response of an executed test)",
+        "organizationsList:result.items[].contact.altPhone (never present in a response of an executed test)",
+        "organizationsList:result.items[].contacts[].designation (never present in a response of an executed test)",
         "organizationsList:result.items[].contacts[].type (no description)",
+        "organizationsList:result.items[].contacts[].notifyBy (never present in a response of an executed test)",
+        "organizationsList:result.items[].contacts[].createdAt (never present in a response of an executed test)",
+        "organizationsList:result.items[].contacts[].updatedAt (never present in a response of an executed test)",
+        "organizationsList:result.items[].contacts[].createdBy (never present in a response of an executed test)",
+        "organizationsList:result.items[].contacts[].updatedBy (never present in a response of an executed test)",
         "organizationsList:result.items[].address.id (never present in a response of an executed test)",
         "organizationsList:result.items[].address.line1 (never present in a response of an executed test)",
         "organizationsList:result.items[].address.city (never present in a response of an executed test)",
@@ -2536,7 +2564,14 @@
         "organizationsList:result.items[].address.phone (never present in a response of an executed test)",
         "organizationsList:result.items[].address.isDefaultBilling (never present in a response of an executed test)",
         "organizationsList:result.items[].address.isDefaultShipping (never present in a response of an executed test)",
+        "organizationsList:result.items[].addresses[].line2 (never present in a response of an executed test)",
+        "organizationsList:result.items[].addresses[].area (never present in a response of an executed test)",
+        "organizationsList:result.items[].addresses[].geoPoint.latitude (never present in a response of an executed test)",
+        "organizationsList:result.items[].addresses[].geoPoint.longitude (never present in a response of an executed test)",
+        "organizationsList:result.items[].addresses[].contactName (never present in a response of an executed test)",
+        "organizationsList:result.items[].addresses[].phone (never present in a response of an executed test)",
         "organizationsList:result.items[].settings.approvals.modules (never present in a response of an executed test)",
+        "organizationsList:result.items[].settings.approvals.amountThreshold (never present in a response of an executed test)",
         "organizationsList:result.items[].settings.accountingPolicy.moneyConvention (no description)",
         "organizationsList:result.items[].settings.accountingPolicy.selfApprovalPolicy (no description)",
         "organizationsList:result.items[].settings.accountingPolicy.selfApprovalLimits.* (no description)",
@@ -2544,14 +2579,27 @@
         "organizationsList:result.items[].settings.accountingPolicy.roundToNearestRupee (no description)",
         "organizationsList:result.items[].settings.accountingPolicy.cashRoundingFils (no description)",
         "organizationsList:result.items[].settings.accountingPolicy.cashCountVarianceThreshold (no description)",
+        "organizationsList:result.items[].settings.businessConfig.defaultUnits[] (never present in a response of an executed test)",
         "organizationsList:result.items[].settings.businessConfig.productFields (never present in a response of an executed test)",
+        "organizationsList:result.items[].settings.businessConfig.salesMode (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].bankAccounts[].label (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].bankAccounts[].upiId (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].bankAccounts[].currency (never present in a response of an executed test)",
         "organizationsList:result.organizations[].bankAccounts[].printOnInvoice (no description)",
         "organizationsList:result.organizations[].code (never present in a response of an executed test)",
         "organizationsList:result.organizations[].image.thumbnailPath (never present in a response of an executed test)",
         "organizationsList:result.organizations[].usageLimitOverrides (never present in a response of an executed test)",
         "organizationsList:result.organizations[].showCostToTenant (never present in a response of an executed test)",
         "organizationsList:result.organizations[].supportAccessExpiresAt (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].displayName (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].contact.altPhone (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].contacts[].designation (never present in a response of an executed test)",
         "organizationsList:result.organizations[].contacts[].type (no description)",
+        "organizationsList:result.organizations[].contacts[].notifyBy (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].contacts[].createdAt (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].contacts[].updatedAt (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].contacts[].createdBy (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].contacts[].updatedBy (never present in a response of an executed test)",
         "organizationsList:result.organizations[].address.id (never present in a response of an executed test)",
         "organizationsList:result.organizations[].address.line1 (never present in a response of an executed test)",
         "organizationsList:result.organizations[].address.city (never present in a response of an executed test)",
@@ -2567,7 +2615,14 @@
         "organizationsList:result.organizations[].address.phone (never present in a response of an executed test)",
         "organizationsList:result.organizations[].address.isDefaultBilling (never present in a response of an executed test)",
         "organizationsList:result.organizations[].address.isDefaultShipping (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].addresses[].line2 (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].addresses[].area (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].addresses[].geoPoint.latitude (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].addresses[].geoPoint.longitude (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].addresses[].contactName (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].addresses[].phone (never present in a response of an executed test)",
         "organizationsList:result.organizations[].settings.approvals.modules (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].settings.approvals.amountThreshold (never present in a response of an executed test)",
         "organizationsList:result.organizations[].settings.accountingPolicy.moneyConvention (no description)",
         "organizationsList:result.organizations[].settings.accountingPolicy.selfApprovalPolicy (no description)",
         "organizationsList:result.organizations[].settings.accountingPolicy.selfApprovalLimits.* (no description)",
@@ -2575,7 +2630,9 @@
         "organizationsList:result.organizations[].settings.accountingPolicy.roundToNearestRupee (no description)",
         "organizationsList:result.organizations[].settings.accountingPolicy.cashRoundingFils (no description)",
         "organizationsList:result.organizations[].settings.accountingPolicy.cashCountVarianceThreshold (no description)",
+        "organizationsList:result.organizations[].settings.businessConfig.defaultUnits[] (never present in a response of an executed test)",
         "organizationsList:result.organizations[].settings.businessConfig.productFields (never present in a response of an executed test)",
+        "organizationsList:result.organizations[].settings.businessConfig.salesMode (never present in a response of an executed test)",
         "organizationsSetSubscription:result.evaluation.allowed (no description)",
         "organizationsSetSubscription:result.evaluation.state (no description)",
         "organizationsSetSubscription:result.overLimit[] (no description)",
@@ -2633,15 +2690,12 @@
         "organizationsGet:result.organization.settings.businessConfig.productFields (never present in a response of an executed test)",
         "organizationsGet:result.organization.settings.businessConfig.salesMode (never present in a response of an executed test)",
         "organizationsGet:result.organization.updatedBy (never present in a response of an executed test)",
-        "organizationsGet:result.organization.currencyInfo.code (never present in a response of an executed test)",
         "organizationsGet:result.organization.currencyInfo.numeric (no description)",
         "organizationsGet:result.organization.currencyInfo.symbol (no description)",
         "organizationsGet:result.organization.currencyInfo.symbolPosition (no description)",
         "organizationsGet:result.organization.currencyInfo.exponent (no description)",
-        "organizationsGet:result.organization.currencyInfo.major.name (never present in a response of an executed test)",
         "organizationsGet:result.organization.currencyInfo.major.plural (no description)",
         "organizationsGet:result.organization.currencyInfo.minor.perMajor (no description)",
-        "organizationsGet:result.organization.currencyInfo.minor.name (never present in a response of an executed test)",
         "organizationsGet:result.organization.currencyInfo.minor.plural (no description)",
         "organizationsGet:result.organization.currencyInfo.subMinor.perMinor (no description)",
         "organizationsGet:result.organization.currencyInfo.subMinor.name (never present in a response of an executed test)",
@@ -4013,7 +4067,6 @@
         "reportsGetPlatformOverview:result.totalUsers (no description)",
         "reportsGetPlatformOverview:result.subscriptionsExpiring[].daysLeft (no description)",
         "reportsGetPlatformOverview:result.atRiskOrganizations[] (no description)",
-        "reportsGetPlatformOverview:result.topOrganizationsByUsage[].currency (never present in a response of an executed test)",
         "reportsGetPlatformOverview:result.topOrganizationsByUsage[].billsCount (no description)",
         "reportsGetPlatformOverview:result.topOrganizationsByUsage[].revenue (no description)",
         "reportsGetPlatformOverview:result.totalsByCurrency.* (no description)",
@@ -4603,64 +4656,66 @@
         "usageGetLimits:result.currentMonth (no description)"
       ],
       "passed": false,
-      "returnedButUndocumented": 847,
+      "returnedButUndocumented": 761,
       "returnedButUndocumentedSample": [
-        "organizationsList:items[].currencyDecimals",
-        "organizationsList:items[].currencySymbol",
-        "organizationsList:items[].minorUnitName",
-        "organizationsList:items[].minorUnitNamePlural",
-        "organizationsList:items[].settings.accountingPolicy.minorUnitsThresholds.k1",
-        "organizationsList:items[].settings.accountingPolicy.updatedAt",
-        "organizationsList:items[].settings.accountingPolicy.updatedBy",
-        "organizationsList:items[].settings.approvals.allowSelfApproval",
-        "organizationsList:items[].settings.approvals.modules.account_transfer",
         "organizationsList:items[].settings.approvals.modules.expense",
         "organizationsList:items[].settings.approvals.modules.purchase",
-        "organizationsList:items[].settings.approvals.modules.return",
         "organizationsList:items[].settings.approvals.modules.sale",
-        "organizationsList:items[].settings.approvals.modules.stock_adjustment",
-        "organizationsList:items[].settings.approvals.modules.stock_transfer",
-        "organizationsList:items[].settings.approvals.thresholds.k1",
-        "organizationsList:items[].settings.businessConfig.productFields.alternateUnits",
-        "organizationsList:items[].settings.businessConfig.productFields.batch",
-        "organizationsList:items[].settings.businessConfig.productFields.expiry",
-        "organizationsList:items[].settings.businessConfig.productFields.jewellery",
-        "organizationsList:items[].settings.businessConfig.productFields.serial",
-        "organizationsList:items[].settings.businessConfig.productFields.variants",
-        "organizationsList:items[].settings.numbering.k1",
-        "organizationsList:items[].usageLimitOverrides.k1.dailyLimit",
-        "organizationsList:items[].usageLimitOverrides.k1.enabled",
-        "organizationsList:items[].usageLimitOverrides.k1.enforcementMode",
-        "organizationsList:items[].usageLimitOverrides.k1.hardThresholdPercent",
-        "organizationsList:items[].usageLimitOverrides.k1.monthlyLimit",
-        "organizationsList:items[].usageLimitOverrides.k1.warningThresholdPercent",
-        "organizationsList:items[].usageLimitOverrides.k1.weeklyLimit",
-        "organizationsList:organizations[].currencyDecimals",
-        "organizationsList:organizations[].currencySymbol",
-        "organizationsList:organizations[].minorUnitName",
-        "organizationsList:organizations[].minorUnitNamePlural",
-        "organizationsList:organizations[].settings.accountingPolicy.minorUnitsThresholds.k1",
-        "organizationsList:organizations[].settings.accountingPolicy.updatedAt",
-        "organizationsList:organizations[].settings.accountingPolicy.updatedBy",
-        "organizationsList:organizations[].settings.approvals.allowSelfApproval",
-        "organizationsList:organizations[].settings.approvals.modules.account_transfer",
-        "organizationsList:organizations[].settings.approvals.modules.expense"
+        "organizationsList:organizations[].settings.approvals.modules.expense",
+        "organizationsList:organizations[].settings.approvals.modules.purchase",
+        "organizationsList:organizations[].settings.approvals.modules.sale",
+        "organizationsPreviewDeactivationImpact:branches[].code",
+        "organizationsPreviewDeactivationImpact:branches[].createdAt",
+        "organizationsPreviewDeactivationImpact:branches[].createdBy",
+        "organizationsPreviewDeactivationImpact:branches[].isActive",
+        "organizationsPreviewDeactivationImpact:branches[].isDefault",
+        "organizationsPreviewDeactivationImpact:branches[].name",
+        "organizationsPreviewDeactivationImpact:branches[].organizationId",
+        "organizationsPreviewDeactivationImpact:branches[].updatedAt",
+        "organizationsPreviewDeactivationImpact:employees[].createdAt",
+        "organizationsPreviewDeactivationImpact:employees[].createdBy",
+        "organizationsPreviewDeactivationImpact:employees[].departmentId",
+        "organizationsPreviewDeactivationImpact:employees[].isPrimary",
+        "organizationsPreviewDeactivationImpact:employees[].jobRoleIds[]",
+        "organizationsPreviewDeactivationImpact:employees[].organizationId",
+        "organizationsPreviewDeactivationImpact:employees[].permissions",
+        "organizationsPreviewDeactivationImpact:employees[].primaryBranchId",
+        "organizationsPreviewDeactivationImpact:employees[].reportingToIds[]",
+        "organizationsPreviewDeactivationImpact:employees[].roleId",
+        "organizationsPreviewDeactivationImpact:employees[].status",
+        "organizationsPreviewDeactivationImpact:employees[].teamId",
+        "organizationsPreviewDeactivationImpact:employees[].updatedAt",
+        "organizationsPreviewDeactivationImpact:employees[].updatedBy",
+        "organizationsPreviewDeactivationImpact:employees[].userId",
+        "categoriesList:items[].categoryId",
+        "categoriesList:items[].createdAt",
+        "categoriesList:items[].createdBy",
+        "categoriesList:items[].isActive",
+        "categoriesList:items[].name",
+        "categoriesList:items[].nameKey",
+        "categoriesList:items[].nature",
+        "categoriesList:items[].organizationId",
+        "categoriesList:items[].parentId",
+        "categoriesList:items[].updatedAt",
+        "unitsList:items[].baseUnit"
       ]
     },
     "C-6": {
       "id": "C-6",
       "name": "Exports: runtime-traced success, validation failure, role / plan denial, tenant isolation, idempotent replay; triggers executed",
-      "numerator": 718,
+      "numerator": 694,
       "denominator": 931,
-      "ratio": "718/931",
-      "coveredByEvidence": 718,
+      "ratio": "694/931",
+      "coveredByEvidence": 694,
       "coveredByRegister": 0,
       "registerEntries": [],
       "uncovered": [
         "organizationsUpdate:denied-plan",
         "organizationsUpdate:tenant-isolation",
+        "organizationsRevealBankAccount:denied-role",
         "organizationsRevealBankAccount:denied-plan",
         "organizationsRevealBankAccount:tenant-isolation",
+        "onStorageObjectFinalized:executed (no trigger test recorded an observed effect)",
         "approvalsList:denied-role",
         "approvalsList:denied-plan",
         "approvalsList:tenant-isolation",
@@ -4700,6 +4755,7 @@
         "capitalTransactionsList:denied-role",
         "capitalTransactionsList:denied-plan",
         "capitalTransactionsList:tenant-isolation",
+        "accountEntriesList:validation-failure",
         "accountEntriesList:denied-role",
         "accountEntriesList:denied-plan",
         "accountEntriesList:tenant-isolation",
@@ -4737,6 +4793,7 @@
         "accountTransfersConfirm:denied-role",
         "accountTransfersConfirm:denied-plan",
         "accountTransfersConfirm:tenant-isolation",
+        "accountTransfersDispute:validation-failure",
         "accountTransfersDispute:denied-role",
         "accountTransfersDispute:denied-plan",
         "accountTransfersDispute:tenant-isolation",
@@ -4759,6 +4816,7 @@
         "paymentsVerifyFee:success",
         "paymentsVerifyFee:denied-plan",
         "paymentsVerifyFee:tenant-isolation",
+        "paymentsDisputeFee:validation-failure",
         "paymentsDisputeFee:denied-role",
         "paymentsDisputeFee:denied-plan",
         "paymentsDisputeFee:tenant-isolation",
@@ -4770,9 +4828,11 @@
         "paymentsListFees:denied-role",
         "paymentsListFees:denied-plan",
         "paymentsListFees:tenant-isolation",
+        "paymentsGetFee:validation-failure",
         "paymentsGetFee:denied-role",
         "paymentsGetFee:denied-plan",
         "paymentsGetFee:tenant-isolation",
+        "ledgerVerify:validation-failure",
         "ledgerVerify:denied-role",
         "ledgerVerify:denied-plan",
         "ledgerVerify:tenant-isolation",
@@ -4829,9 +4889,13 @@
         "reportsGetCashBankSummary:denied-role",
         "reportsGetCashBankSummary:denied-plan",
         "reportsGetCashBankSummary:tenant-isolation",
+        "reportsGetBranchSummary:validation-failure",
         "reportsGetBranchSummary:denied-role",
         "reportsGetBranchSummary:denied-plan",
         "reportsGetBranchSummary:tenant-isolation",
+        "auditGetEntityHistory:denied-role",
+        "auditLogsList:denied-role",
+        "requestsMeta:validation-failure",
         "requestsMeta:denied-plan",
         "requestsMeta:tenant-isolation",
         "plansCatalogList:validation-failure",
@@ -4842,19 +4906,26 @@
         "requestsUpdate:tenant-isolation",
         "requestsAddComment:denied-plan",
         "requestsAddComment:tenant-isolation",
+        "requestsTransition:validation-failure",
         "requestsTransition:denied-plan",
         "requestsTransition:tenant-isolation",
+        "requestsGet:validation-failure",
         "requestsGet:denied-plan",
         "requestsGet:tenant-isolation",
         "requestsList:validation-failure",
         "requestsList:denied-plan",
+        "requestsList:tenant-isolation",
+        "requestsActivityList:validation-failure",
         "requestsActivityList:denied-plan",
         "requestsActivityList:tenant-isolation",
+        "requestsCounts:validation-failure",
         "requestsCounts:denied-plan",
         "requestsCounts:tenant-isolation",
+        "requestsInboxList:validation-failure",
         "requestsInboxList:denied-role",
         "requestsInboxList:denied-plan",
         "requestsInboxList:tenant-isolation",
+        "requestsInboxCounts:validation-failure",
         "requestsInboxCounts:denied-role",
         "requestsInboxCounts:denied-plan",
         "requestsInboxCounts:tenant-isolation",
@@ -4866,13 +4937,19 @@
         "requestsAddInternalNote:tenant-isolation",
         "requestsApply:denied-plan",
         "requestsApply:tenant-isolation",
+        "requestsSettingsGet:validation-failure",
         "usageGetDetail:denied-role",
         "usageGetDetail:denied-plan",
         "usageGetDetail:tenant-isolation",
+        "onBillWritten:executed (no trigger test recorded an observed effect)",
+        "onOutflowWritten:executed (no trigger test recorded an observed effect)",
+        "onPaymentWritten:executed (no trigger test recorded an observed effect)",
+        "onDeliveryWritten:executed (no trigger test recorded an observed effect)",
+        "onRequestActivityWritten:executed (no trigger test recorded an observed effect)",
         "requestsSlaAndLifecycleSweep:executed (no trigger test recorded an observed effect)"
       ],
       "passed": false,
-      "exportsWithAtLeastOneTrace": "214/215",
+      "exportsWithAtLeastOneTrace": "208/215",
       "notMeasured": [
         "membership-override denial per callable (the denial reason is PERMISSION_DENIED, indistinguishable from a role denial in a trace)",
         "org-toggle applicability per callable (measured once at layer level only)"
@@ -4903,7 +4980,7 @@
           "scanned": 63,
           "excluded": 0,
           "exclusions": [],
-          "scopeRun": "check-data-duplication-mwp0vwox"
+          "scopeRun": "check-data-duplication-mwpo4a39"
         },
         {
           "guard": "functions/scripts/check-no-any-writes.js",
@@ -4916,7 +4993,7 @@
           "scanned": 63,
           "excluded": 0,
           "exclusions": [],
-          "scopeRun": "check-raw-field-census-mwo3ig1b"
+          "scopeRun": "check-raw-field-census-mwpkj32h"
         },
         {
           "guard": "functions/scripts/check-same-doc-duplicates.cjs",
@@ -4924,7 +5001,7 @@
           "scanned": 63,
           "excluded": 0,
           "exclusions": [],
-          "scopeRun": "check-same-doc-duplicates-mwo3j0kz"
+          "scopeRun": "check-same-doc-duplicates-mwpkjde5"
         },
         {
           "guard": "functions/scripts/check-stored-url-fields.js",
@@ -5086,7 +5163,7 @@
         "firestore": 14,
         "storage": 3
       },
-      "rulesCoverageRun": "rules-mwo21lah"
+      "rulesCoverageRun": "rules-mwpo54cw"
     },
     "C-10": {
       "id": "C-10",

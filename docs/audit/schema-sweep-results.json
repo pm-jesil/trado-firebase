@@ -1,6 +1,6 @@
 {
- "runId": "sweep-mwo2u3os",
- "generatedAt": "2026-11-19T21:43:16.780Z",
+ "runId": "sweep-mwpp3jlm",
+ "generatedAt": "2026-11-21T00:54:15.034Z",
  "items": [
   {
    "id": "healthCheck:organizationId:min",
@@ -640,46 +640,6 @@
   },
   {
    "id": "organizationsCreate:currency:min-1",
-   "pass": true
-  },
-  {
-   "id": "organizationsCreate:currencyDecimals:max",
-   "pass": true
-  },
-  {
-   "id": "organizationsCreate:currencyDecimals:max+1",
-   "pass": true
-  },
-  {
-   "id": "organizationsCreate:currencyDecimals:min",
-   "pass": true
-  },
-  {
-   "id": "organizationsCreate:currencyDecimals:min-1",
-   "pass": true
-  },
-  {
-   "id": "organizationsCreate:minorUnitName:max",
-   "pass": true
-  },
-  {
-   "id": "organizationsCreate:minorUnitName:max+1",
-   "pass": true
-  },
-  {
-   "id": "organizationsCreate:minorUnitNamePlural:max",
-   "pass": true
-  },
-  {
-   "id": "organizationsCreate:minorUnitNamePlural:max+1",
-   "pass": true
-  },
-  {
-   "id": "organizationsCreate:currencySymbol:max",
-   "pass": true
-  },
-  {
-   "id": "organizationsCreate:currencySymbol:max+1",
    "pass": true
   },
   {
@@ -11711,11 +11671,11 @@
    "pass": true
   },
   {
-   "id": "accountingPolicyUpdate:minorUnitsThresholds.*:min",
+   "id": "accountingPolicyUpdate:moneyConvention:enum=major",
    "pass": true
   },
   {
-   "id": "accountingPolicyUpdate:minorUnitsThresholds.*:min-1",
+   "id": "accountingPolicyUpdate:moneyConvention:enum-invalid",
    "pass": true
   },
   {
@@ -11740,6 +11700,14 @@
   },
   {
    "id": "accountingPolicyUpdate:selfApprovalLimits.*:min-1",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:cashCountVarianceThreshold:min",
+   "pass": true
+  },
+  {
+   "id": "accountingPolicyUpdate:cashCountVarianceThreshold:min-1",
    "pass": true
   },
   {

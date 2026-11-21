@@ -1,6 +1,6 @@
 {
-  "runId": "rules-mwo21lah",
-  "generatedAt": "2026-11-19T21:21:06.569Z",
+  "runId": "rules-mwpo54cw",
+  "generatedAt": "2026-11-21T00:27:28.976Z",
   "firestore": {
     "38:read": {
       "allowed": 4,
@@ -76,7 +76,7 @@
     }
   },
   "firestoreMeta": {
-    "projectId": "trado-x-rules-mwo213fo",
+    "projectId": "trado-x-rules-mwpo4f1b",
     "recordedOutcomes": 12
   },
   "storage": {

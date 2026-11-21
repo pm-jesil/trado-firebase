@@ -125,6 +125,7 @@ export function applyAccountTransactionInTxn(
     type: params.type,
     direction: params.direction,
     amount: normalizedAmount,
+    currency,
     balanceAfter,
     sourceDocumentType: params.sourceDocumentType,
     sourceDocumentId: params.sourceDocumentId,

@@ -316,6 +316,7 @@ export async function seedDemoOrganization(
     businessCategory: BusinessCategory.GENERAL,
     country: "IN",
     currency: "INR",
+    timezone: "Asia/Kolkata",
     taxRegimeCode: "IN_GST",
     status: EntityStatus.ACTIVE,
     planId: isMultiBranch ? "plan_growth" : "plan_starter",
@@ -597,6 +598,7 @@ export async function seedDemoOrganization(
       businessCategory: BusinessCategory.GENERAL,
       country: "IN",
       currency: "INR",
+      timezone: "Asia/Kolkata",
       taxRegimeCode: "IN_GST",
       status: "deactivated", // Inactive organization
       planId: "plan_starter",
@@ -651,6 +653,7 @@ export async function seedDemoOrganization(
       businessCategory: BusinessCategory.GENERAL,
       country: "IN",
       currency: "INR",
+      timezone: "Asia/Kolkata",
       taxRegimeCode: "IN_GST",
       status: EntityStatus.ACTIVE,
       planId: "plan_growth",

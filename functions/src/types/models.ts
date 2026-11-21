@@ -218,6 +218,8 @@ export interface AccountingPolicy {
   roundToNearestRupee?: boolean;
   cashRoundingFils?: boolean;
   cashCountVarianceThreshold?: number;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export interface OrganizationSettings {

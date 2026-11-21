@@ -628,7 +628,7 @@ async function run() {
     code: `CARD-CLEAR-${uniq()}`,
     accountType: "clearing",
     currency: "INR",
-    openingBalance: 100000, // ₹1,000.00
+    openingBalance: 1000.00, // ₹1,000.00
   });
   const clearingAccId = cardClearingAcc.financialAccountId;
 
@@ -639,7 +639,7 @@ async function run() {
     sourceDocumentId: bill1Ref.id,
     financialAccountId: clearingAccId,
     paymentMethod: "card",
-    feeAmount: 2000, // ₹20.00
+    feeAmount: 20.00, // ₹20.00
     feeTaxAmount: 0,
     settlementTiming: "immediate_deduction",
     settlementReference: "GATEWAY-REF-88899",
@@ -647,7 +647,7 @@ async function run() {
   });
   assert.ok(feeRes.feeId, "Must return feeId");
   assert.ok(feeRes.feeNumber.startsWith("FEE-"), "Fee document number must start with FEE- prefix");
-  assert.equal(feeRes.balanceAfter, 98000, "Clearing account must be debited by feeAmount (₹1000 - ₹20 = ₹980)");
+  assert.equal(feeRes.balanceAfter, 980.00, "Clearing account must be debited by feeAmount (₹1000 - ₹20 = ₹980)");
   const feeDocSnap = await db.collection("paymentProcessingFees").doc(feeRes.feeId).get();
   assert.equal(feeDocSnap.exists, true, "paymentProcessingFees collection must contain fee doc");
   ok("[paymentsRecordFee#ok] Payment fee recorded atomically and debited from financial account (D-51)");
@@ -694,7 +694,7 @@ async function run() {
     reason: "Transaction was voided by gateway",
   });
   assert.equal(reverseRes.status, "reversed");
-  assert.equal(reverseRes.balanceAfter, 100000, "Fee deduction reversed back to clearing account (98000 + 2000 = 100000)");
+  assert.equal(reverseRes.balanceAfter, 1000.00, "Fee deduction reversed back to clearing account (980 + 20 = 1000)");
   ok("[paymentsReverseFee#ok] Payment fee reversed, clearing account credited back, and expense voided");
 
   console.log("\n--- SCENARIO 11: Capital Introduction & Drawings Flow (D-52, GAP-CAP-01) ---");
@@ -805,7 +805,7 @@ async function run() {
       {
         productId: splitProdId,
         quantity: 1,
-        refundAmount: 10000,
+        refundAmount: 100.00,
         reason: "Customer change of mind",
         disposition: "restocked_to_inventory",
       },
@@ -824,7 +824,7 @@ async function run() {
   const afterAcc = cashAfterReturn.financialAccount || cashAfterReturn.account;
   assert.equal(
     afterAcc.currentBalance,
-    beforeAcc.currentBalance - 10000,
+    beforeAcc.currentBalance - 100.00,
     "Cash account balance must decrease by exact refund amount"
   );
   ok("[returnsCreate#ok] Sales return executed with automatic financial account deduction and ledger entry (G1)");
@@ -893,9 +893,20 @@ async function run() {
   assert.ok(bhProd.productId);
   ok("Product created with 10% Bahrain VAT");
 
+  // Create customer in Bahrain org
+  const bhCust = await callFunction(bhOwner, "customersCreate", {
+    organizationId: bhOrgId,
+    name: "Bahrain Cyclist Club",
+    partyType: "person",
+    phone: `+973${Math.floor(30000000 + Math.random() * 9000000)}`,
+  });
+  const bhCustId = bhCust.customerId || bhCust.customer?.customerId;
+  assert.ok(bhCustId, "Customer created in Bahrain org");
+
   // Create a sale in Bahrain org with 10% VAT
   const bhBill = await callFunction(bhOwner, "billsCreate", {
     organizationId: bhOrgId,
+    customerId: bhCustId,
     items: [
       {
         productId: bhProd.productId,
@@ -912,6 +923,59 @@ async function run() {
   assert.equal(bhBillData.taxSnapshot.taxAmount, 30, "Tax amount must be 30.000 BHD");
   assert.equal(bhBillData.taxSnapshot.labels.taxName, "VAT", "Tax label must be VAT");
   ok("Bahrain sale billed with 10% VAT, 3-decimal rounding, and immutable tax snapshot (G7)");
+
+  // Find Bahrain default cash account
+  const bhAccounts = await callFunction(bhOwner, "financialAccountsList", {
+    organizationId: bhOrgId,
+  });
+  const bhCashAcc = (bhAccounts.items || []).find((a) => a.accountType === "cash" || a.type === "cash");
+  assert.ok(bhCashAcc, "Bahrain cash account must exist");
+  assert.equal(bhCashAcc.currency, "BHD", "Bahrain cash account currency must be BHD");
+  const bhCashAccId = bhCashAcc.financialAccountId || bhCashAcc.id;
+
+  // Full settlement payment in BHD (330.000 BHD)
+  const bhPay = await callFunction(bhOwner, "paymentsCreate", {
+    organizationId: bhOrgId,
+    partyId: bhCustId,
+    partyType: "customer",
+    direction: "in",
+    amount: 330.000,
+    method: "cash",
+    financialAccountId: bhCashAccId,
+    allocations: [
+      { documentId: bhBill.billId, documentType: "bill", amount: 330.000 },
+    ],
+  });
+  assert.ok(bhPay.paymentId, "Bahrain payment created");
+  ok("Bahrain payment created for 330.000 BHD");
+
+  // Verify bill balance is settled
+  const bhBillSettled = await callFunction(bhOwner, "billsGet", {
+    organizationId: bhOrgId,
+    billId: bhBill.billId,
+  });
+  const settledData = bhBillSettled.bill || bhBillSettled;
+  assert.equal(settledData.paidAmount, 330, "Paid amount must be 330.000 BHD");
+  assert.equal(settledData.balanceAmount, 0, "Balance amount must be 0.000 BHD");
+  assert.equal(settledData.paymentStatus, "paid", "Payment status must be paid");
+  ok("Bahrain bill fully settled with 0 balance (G8)");
+
+  // Verify Bahrain cash ledger updated with 3-decimal balance
+  const bhCashLedger = await callFunction(bhOwner, "financialAccountsGetLedger", {
+    organizationId: bhOrgId,
+    financialAccountId: bhCashAccId,
+  });
+  assert.equal(bhCashLedger.items.length, 1, "Must have 1 payment transaction in Bahrain ledger");
+  assert.equal(bhCashLedger.account.currentBalance, 330.000, "Current balance must be 330.000 BHD");
+  assert.equal(bhCashLedger.items[0].balanceAfter, 330.000, "balanceAfter must be 330.000 BHD");
+  assert.equal(bhCashLedger.items[0].amount, 330.000, "Transaction amount must be 330.000 BHD");
+  ok("Bahrain ledger posted with 330.000 BHD running balance (G8)");
+
+  // Verify invariants for Bahrain org
+  const { assertLedgerInvariants: assertBhInvariants } = require("../lib/services/invariantsOracle.js");
+  const bhInv = await assertBhInvariants(bhOrgId);
+  assert.equal(bhInv.violations.length, 0, `Bahrain ledger invariants must have 0 violations: ${JSON.stringify(bhInv.violations)}`);
+  ok("Bahrain ledger invariants verified with zero violations (INV-1..INV-19)");
 
   console.log("\n--- SCENARIO 14: Account Entry Lifecycle & Accounting Policy (Prompt 77, U-2, U-3) ---");
   // 1. accountingPolicyGet & accountingPolicyUpdate
@@ -941,7 +1005,7 @@ async function run() {
   const subRes = await callFunction(owner, "accountEntriesCreateSubEntry", {
     organizationId: orgId,
     parentEntryId: rootTxnId,
-    amount: 2500,
+    amount: 25.00,
     description: "Bank passbook statement print fee",
     subEntryType: "bank_charge",
   });
@@ -1004,7 +1068,7 @@ async function run() {
   const rejSubRes = await callFunction(owner, "accountEntriesCreateSubEntry", {
     organizationId: orgId,
     parentEntryId: rootTxnId,
-    amount: 1500,
+    amount: 15.00,
     description: "Erroneous charge to reject",
     subEntryType: "bank_charge",
   });
@@ -1032,7 +1096,7 @@ async function run() {
     organizationId: orgId,
     sourceAccountId: cashAccId,
     destinationAccountId: bankAccId,
-    amount: 100000,
+    amount: 1000.00,
     transferType: "cashier_handover",
     mode: "in_transit",
     notes: "Shift handover to branch vault",
@@ -1053,7 +1117,7 @@ async function run() {
     organizationId: orgId,
     sourceAccountId: cashAccId,
     destinationAccountId: bankAccId,
-    amount: 50000,
+    amount: 500.00,
     transferType: "cashier_handover",
     mode: "in_transit",
     notes: "Second handover batch",
@@ -1103,8 +1167,8 @@ async function run() {
   const feeSubRes = await callFunction(owner, "accountEntriesRecordFee", {
     organizationId: orgId,
     entryId: rootTxnId,
-    feeAmount: 1800,
-    feeTaxAmount: 324,
+    feeAmount: 18.00,
+    feeTaxAmount: 3.24,
     notes: "Card processing gateway interchange fee",
   });
   assert.ok(feeSubRes.subEntryId);
@@ -1117,7 +1181,7 @@ async function run() {
   await db.collection("carrierClaims").doc(claimId).set({
     organizationId: orgId,
     transferId: "trf_demo",
-    amount: 15000,
+    amount: 150.00,
     status: "pending",
     createdAt: new Date().toISOString(),
   });
