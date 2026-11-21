@@ -1,10 +1,10 @@
 {
   "version": "1.0.0",
-  "totalDocuments": 236,
+  "totalDocuments": 237,
   "countsByClassification": {
     "KEEP+UPDATE": 79,
     "REWRITE": 2,
-    "ARCHIVE": 21,
+    "ARCHIVE": 22,
     "GENERATED": 134
   },
   "documents": [
@@ -234,7 +234,7 @@
       "path": "docs/audit/run-ledger.md",
       "title": "Trado Engineering Run Ledger (Appendix E)",
       "classification": "ARCHIVE",
-      "lineCount": 52
+      "lineCount": 53
     },
     {
       "path": "docs/audit/test-coverage-matrix.md",
@@ -265,6 +265,12 @@
       "title": "Trado Architecture — Triggers & Background Logic Audit (Prompt 68 Z3 / B.5 & D-34)",
       "classification": "GENERATED",
       "lineCount": null
+    },
+    {
+      "path": "docs/audit/unused-code-report.md",
+      "title": "Trado Backend — Unused Code, Duplicates and Junk Audit (Prompt 77E)",
+      "classification": "ARCHIVE",
+      "lineCount": 250
     },
     {
       "path": "docs/audit/update-logic-ledger.md",
