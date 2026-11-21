@@ -43,12 +43,13 @@ const DECISIONS = [
   { id: "D-26", title: "Untrusted Client Metadata", prompt: "66", status: "active", enforcedBy: "functions/src/services/requestContext.ts", desc: "Token and server clock authoritative; client _meta feeds diagnostic analytics only." },
   { id: "D-27", title: "Privacy by Default", prompt: "66", status: "active", enforcedBy: "scripts/check-sensitive.js", desc: "IP addresses truncated (/24 and /48); secrets dropped; 24-month retention enforced by TTL." },
   { id: "D-28", title: "Evidence Ladder", prompt: "67", status: "active", enforcedBy: "scripts/audit/extract-obligations.js", desc: "Status assigned by evidence levels L0-L4 only; documentation text never counts as evidence." },
-  { id: "D-29", title: "Frozen As-Found Baseline", prompt: "67", status: "active", enforcedBy: "docs/audit/as-found/", desc: "Phase A as-found snapshot is permanently frozen; ongoing progress tracked as delta." },
+  { id: "D-29", title: "Frozen As-Found Baseline", prompt: "67", status: "superseded", enforcedBy: "docs/audit/as-found/", desc: "Phase A as-found snapshot is permanently frozen; ongoing progress tracked as delta. (SUPERSEDED by D-72: Pre-77D state preserved in git history at tag 77d-complete)" },
   { id: "D-30", title: "Change Coupling Enforcement", prompt: "67", status: "active", enforcedBy: "scripts/verify-coupling.js", desc: "Source changes require coupled updates to tests, docs, OpenAPI, and manifests before completion." },
   { id: "D-31", title: "Generated Contract Suites & Hand-Written Scenarios", prompt: "67", status: "active", enforcedBy: "docs/process/testing-standard.md", desc: "Contract tests generated from schemas and registry; complex domain scenarios hand-written." },
   { id: "D-32", title: "Ask, Don't Guess Protocol", prompt: "67", status: "active", enforcedBy: "docs/process/ask-protocol.md", desc: "Unclear business semantics asked interactively; answers recorded in register and never re-asked." },
   { id: "D-33", title: "Single Canonical Rule File", prompt: "67", status: "active", enforcedBy: "scripts/check-rules-sync.js", desc: "AGENTS.md is the single authoritative rule file; CLAUDE.md is a thin adapter referencing it." },
   { id: "D-71", title: "Decimal Money in Major Units & Single Currency Table", prompt: "77D", status: "active", enforcedBy: "functions/src/services/money.ts", desc: "Money is a decimal number in major units; one rounding entry Money.amount; one currency table (constants/currencies.ts); zero integer minor/paise duplicate fields; no silent currency fallbacks. Supersedes D-19 / A-41 minor-unit rule." },
+  { id: "D-72", title: "Pre-77D State Preserved in Git History", prompt: "77E", status: "active", enforcedBy: "git history", desc: "Supersedes D-29. Pre-77D baseline and audit snapshots preserved permanently in git history at tag 77d-complete rather than kept in working tree files." },
 ];
 
 function main() {

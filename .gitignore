@@ -78,6 +78,7 @@ firebase-export-*/
 
 # Scratch files
 scratch/
+functions/scripts/helpers/runtime-callable-traces.jsonl
 
 # Local emulator credentials and developer overrides
 .local/

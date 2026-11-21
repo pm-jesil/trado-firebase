@@ -33,7 +33,7 @@ Total decisions: **71** (All Active)
 | **D-26** | **Untrusted Client Metadata** | 66 | `active` | `functions/src/services/requestContext.ts` | Token and server clock authoritative; client _meta feeds diagnostic analytics only. |
 | **D-27** | **Privacy by Default** | 66 | `active` | `scripts/check-sensitive.js` | IP addresses truncated (/24 and /48); secrets dropped; 24-month retention enforced by TTL. |
 | **D-28** | **Evidence Ladder** | 67 | `active` | `scripts/audit/extract-obligations.js` | Status assigned by evidence levels L0-L4 only; documentation text never counts as evidence. |
-| **D-29** | **Frozen As-Found Baseline** | 67 | `active` | `docs/audit/as-found/` | Phase A as-found snapshot is permanently frozen; ongoing progress tracked as delta. |
+| **D-29** | **Frozen As-Found Baseline** | 67 | `superseded` | `docs/audit/as-found/` | Phase A as-found snapshot is permanently frozen; ongoing progress tracked as delta. (SUPERSEDED by D-72: Pre-77D state preserved in git history at tag 77d-complete) |
 | **D-30** | **Change Coupling Enforcement** | 67 | `active` | `scripts/verify-coupling.js` | Source changes require coupled updates to tests, docs, OpenAPI, and manifests before completion. |
 | **D-31** | **Generated Contract Suites & Hand-Written Scenarios** | 67 | `active` | `docs/process/testing-standard.md` | Contract tests generated from schemas and registry; complex domain scenarios hand-written. |
 | **D-32** | **Ask, Don't Guess Protocol** | 67 | `active` | `docs/process/ask-protocol.md` | Unclear business semantics asked interactively; answers recorded in register and never re-asked. |
@@ -76,6 +76,7 @@ Total decisions: **71** (All Active)
 | **D-69** | **Intra-Branch Location Moves & Cancel-After-Dispatch (Q-F11, D-F8)** | Hybrid-77 | `active` | `functions/src/callables/stockTransfers.ts` | Transfers between distinct storage locations within the same branch are marked `internal: true`. Transfers cancelled after dispatch re-credit source branch physical stock and decrement in-transit stock atomically. |
 | **D-70** | **Scope Convention & Cross-Branch Comparative Reporting (U-5, Q-F12, D-F9)** | Hybrid-77 | `active` | `functions/src/callables/reports/financialReports.ts` | Reports support `branchId`, `branchIds[]`, or `scope: 'organization'`. Non-org-scoped callers querying outside their assigned branch fail with `BRANCH_ACCESS_DENIED`. `reportsGetBranchSummary` aggregates cross-branch comparative metrics. |
 | **D-71** | **Decimal Money in Major Units & Single Currency Table** | 77D | `active` | `functions/src/services/money.ts` | Money is a decimal number in major units; one rounding entry Money.amount; one currency table (constants/currencies.ts); zero integer minor/paise duplicate fields; no silent currency fallbacks. Supersedes D-19 / A-41 minor-unit rule. |
+| **D-72** | **Pre-77D State Preserved in Git History** | 77E | `active` | `git history` | Supersedes D-29. Pre-77D baseline and audit snapshots preserved permanently in git history at tag `77d-complete` rather than kept in working tree files. |
 
 ## Answered Business Decisions (A-n)
 

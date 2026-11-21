@@ -1,11 +1,11 @@
 {
   "version": "1.0.0",
-  "totalDocuments": 236,
+  "totalDocuments": 234,
   "countsByClassification": {
     "KEEP+UPDATE": 79,
     "REWRITE": 2,
-    "ARCHIVE": 21,
-    "GENERATED": 134
+    "ARCHIVE": 20,
+    "GENERATED": 133
   },
   "documents": [
     {
@@ -47,18 +47,6 @@
     {
       "path": "docs/audit/api-logic-ledger.md",
       "title": "Trado Architecture — API Logic Audit (Prompt 68 Z3 / B.4 & D-34)",
-      "classification": "GENERATED",
-      "lineCount": null
-    },
-    {
-      "path": "docs/audit/as-found/2026-11-14-antigravity.md",
-      "title": "Frozen As-Found Baseline: Truth Audit of Prompts 62–66",
-      "classification": "ARCHIVE",
-      "lineCount": 138
-    },
-    {
-      "path": "docs/audit/as-found/2026-11-14-as-found-after-S1-S3.md",
-      "title": "Permanent As-Found Snapshot: as-found-after-S1-S3 (D-29)",
       "classification": "GENERATED",
       "lineCount": null
     },
@@ -294,7 +282,7 @@
       "path": "docs/decisions/decision-register.md",
       "title": "Trado Architectural Decision Register (D-1 .. D-71)",
       "classification": "KEEP+UPDATE",
-      "lineCount": 126
+      "lineCount": 127
     },
     {
       "path": "docs/decisions-log.md",
