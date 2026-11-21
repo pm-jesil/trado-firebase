@@ -57,8 +57,6 @@ export const ContactPersonSchema = z.strictObject({
   { message: "At least one contact method (phone or email) is required for a contact person.", path: ["phone"] }
 );
 
-export type ContactPersonInput = z.infer<typeof ContactPersonSchema>;
-
 export const ContactPersonArraySchema = z.array(ContactPersonSchema).max(20);
 
 // 3. Bank Account Schema (Sensitive accountNumber)
@@ -86,8 +84,6 @@ export const BankAccountSchema = z.strictObject({
   { message: "Invalid routing code format for specified routing type", path: ["routingCode"] }
 );
 
-export type BankAccountInput = z.infer<typeof BankAccountSchema>;
-
 export const BankAccountArraySchema = z.array(BankAccountSchema).max(10);
 
 // 4. Tax Identity Schema
@@ -107,15 +103,11 @@ export const TaxIdentitySchema = z.strictObject({
   { message: "Invalid PAN format (expected 5 uppercase letters, 4 digits, 1 uppercase letter)", path: ["pan"] }
 );
 
-export type TaxIdentityInput = z.infer<typeof TaxIdentitySchema>;
-
 // 5. Canonical Notes Schema
 export const NotesSchema = z.strictObject({
   notes: z.string().trim().max(2000).optional(),
   customerNotes: z.string().trim().max(2000).optional(),
 });
-
-export type NotesInput = z.infer<typeof NotesSchema>;
 
 // 6. Party Core Schema (Shared Customer & Vendor base)
 export const PartyCoreSchema = z.strictObject({
@@ -138,4 +130,3 @@ export const PartyCoreSchema = z.strictObject({
   { message: "At least one contact method (phone or email) is required.", path: ["phone"] }
 );
 
-export type PartyCoreInput = z.infer<typeof PartyCoreSchema>;

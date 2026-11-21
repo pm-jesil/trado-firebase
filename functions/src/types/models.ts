@@ -10,7 +10,6 @@ import type { Timestamp } from "firebase-admin/firestore";
 import type { z } from "zod";
 import type { AddressSchema, BankAccountSchema, ContactPersonSchema } from "../validation/sharedSchemas.js";
 import type { BranchSettingsSchema, CreateRecurringExpenseSchema } from "../validation/schemas.js";
-import type { MeteredMetric } from "../services/usageMetering.js";
 import {
   BusinessType,
   BusinessCategory,
@@ -1356,36 +1355,11 @@ export interface OrganizationUsageDailyDoc extends UsageRollupQuantities {
   updatedAt?: string;
 }
 
-/** userUsageDaily/{organizationId}_{uid}_{utcDate}: organization × user × day cost rollup. */
-export interface UserUsageDailyDoc extends UsageRollupQuantities {
-  organizationId: string;
-  uid: string;
-  date: string; // YYYY-MM-DD (UTC)
-  devices?: Record<string, { calls: number }>; // _meta.deviceId → calls (bounded, overflow "other")
-}
-
-/** organizationUsageMonthly/{organizationId}_{YYYY-MM}: client-reported numbers (usageRecordClientMetric) only. */
-export interface OrganizationUsageMonthlyDoc {
-  organizationId: string;
-  month: string; // YYYY-MM
-  clientReported?: Partial<ServiceUsageCounts>; // untrusted client estimates
-  updatedAt?: string;
-}
-
 /** branchUsageDaily/{organizationId}_{branchId}_{date}: client-reported numbers (usageRecordClientMetric) only. */
 export interface BranchUsageDailyDoc {
   organizationId: string;
   branchId: string;
   date: string; // YYYY-MM-DD
-  clientReported?: Partial<ServiceUsageCounts>; // untrusted client estimates
-  updatedAt?: string;
-}
-
-/** branchUsageMonthly/{organizationId}_{branchId}_{YYYY-MM}: client-reported numbers (usageRecordClientMetric) only. */
-export interface BranchUsageMonthlyDoc {
-  organizationId: string;
-  branchId: string;
-  month: string; // YYYY-MM
   clientReported?: Partial<ServiceUsageCounts>; // untrusted client estimates
   updatedAt?: string;
 }
@@ -1493,16 +1467,6 @@ export interface RecurringExpenseDoc extends Omit<z.output<typeof CreateRecurrin
   createdAt: string;
   updatedAt: string;
   updatedBy?: string;
-}
-
-/** usageCounterShards/{organizationId}_{month}_{shard}: sharded server usage counters (incrementServerUsage). */
-export interface UsageCounterShardDoc {
-  organizationId: string;
-  month: string; // YYYY-MM (organization timezone)
-  shard: number;
-  updatedAt: string;
-  days: Record<string, Partial<Record<MeteredMetric, number>>>; // day (YYYY-MM-DD) → metric → count
-  branches?: Record<string, Record<string, Partial<Record<MeteredMetric, number>>>>; // branchId → day → metric → count
 }
 
 /** imageUploadSessions/{uploadId}: one client upload slot (imagesCreateUploadSession); consumed once by imagesAttach. */
@@ -1844,29 +1808,6 @@ export interface CashCountDoc {
 }
 
 
-/**
- * 31. accountReconciliations/{id}
- * Bank statement reconciliation audit record.
- */
-export interface AccountReconciliationDoc {
-  organizationId: string;
-  financialAccountId: string;
-  periodStart: string;
-  periodEnd: string;
-  statementOpeningBalance: number;
-  statementClosingBalance: number;
-  ledgerClosingBalance: number;
-  discrepancyAmount: number;
-  reconciledTransactionIds: string[];
-  status: "draft" | "reconciled" | "discrepancy";
-  notes?: string;
-  createdAt: string;
-  createdBy: string;
-  updatedAt?: string;
-  updatedBy?: string;
-}
-
-
 export type StorageLocationType = "warehouse" | "stockyard" | "counter" | "backroom" | "quarantine" | "transit";
 
 /**
@@ -2020,28 +1961,6 @@ export interface CapitalTransactionDoc {
   accountTransactionId: string;
   createdAt: string;
   createdBy: string;
-}
-
-export type AccountClassification = "asset" | "liability" | "equity" | "revenue" | "expense";
-export type NormalBalance = "debit" | "credit";
-
-/**
- * 36. chartOfAccounts/{id}
- * Standard Chart of Accounts for double-entry trial-balancing.
- */
-export interface ChartOfAccountDoc {
-  organizationId: string;
-  accountCode: string;
-  name: string;
-  classification: AccountClassification;
-  normalBalance: NormalBalance;
-  isSystem: boolean;
-  isActive: boolean;
-  description?: string;
-  createdAt: string;
-  createdBy: string;
-  updatedAt?: string;
-  updatedBy?: string;
 }
 
 export interface JournalLineItem {

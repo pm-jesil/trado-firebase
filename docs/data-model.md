@@ -851,7 +851,6 @@ The zero-duplication rule: a value lives in exactly one place and everything els
 
 | ID | Kind | Collection | Field | Reason | Single writer | Reconcile / cap |
 |---|---|---|---|---|---|---|
-| DUP-085 | BOUNDED_ARRAY | `accountReconciliations` | `reconciledTransactionIds` | Array of reconciled ledger transaction IDs bounded per statement period. | — | cap 500 |
 | DUP-083 | R4 | `accountTransactions` | `balanceAfter` | Running account balance snapshot at the exact time of the transaction for point-in-time statements and audit. | — | — |
 | DUP-101 | BOUNDED_ARRAY | `accountTransactions` | `reviewReasons` | Flagged review reasons array on ledger transactions bounded by prepareEntriesInTxn. | `prepareEntriesInTxn` | cap 10 |
 | DUP-104 | BOUNDED_ARRAY | `accountTransactions` | `workflow.approvedBy` | Audit list of approval actors and timestamps for multi-level approval, bounded to at most 10 approvers. | `updateEntryWorkflowInTxn` | cap 10 |

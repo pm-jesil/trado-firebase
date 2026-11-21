@@ -54,19 +54,6 @@ export enum SalesMode {
   BOTH = "both",
 }
 
-export enum UserRole {
-  SUPER_ADMIN = "super_admin",
-  ORG_OWNER = "org_owner",
-  ADMIN = "admin",
-  EMPLOYEE = "employee",
-}
-
-export enum EmployeeType {
-  FULL_TIME = "full_time",
-  PART_TIME = "part_time",
-  CONTRACT = "contract",
-}
-
 export enum EntityStatus {
   ACTIVE = "active",
   INACTIVE = "inactive",

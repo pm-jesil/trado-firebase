@@ -288,7 +288,7 @@
       "path": "docs/data-model.md",
       "title": "Trado Data Model & Schema Specification",
       "classification": "KEEP+UPDATE",
-      "lineCount": 950
+      "lineCount": 949
     },
     {
       "path": "docs/decisions/decision-register.md",

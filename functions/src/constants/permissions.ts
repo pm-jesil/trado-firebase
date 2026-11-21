@@ -213,5 +213,3 @@ export const AppPermissions = {
   STOCK_TRANSFER_DISPATCH: "stock:transfer_dispatch",
   STOCK_TRANSFER_RECEIVE: "stock:transfer_receive",
 } as const;
-
-export type PermissionCode = typeof AppPermissions[keyof typeof AppPermissions] | string;

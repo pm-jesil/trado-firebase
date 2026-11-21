@@ -98,12 +98,10 @@ export const AuthLoginSchema = z.strictObject({
   password: z.string().min(1, "Password is required").max(512),
   deviceId: z.string().trim().min(4).max(128).optional(),
 });
-export type AuthLoginInput = z.infer<typeof AuthLoginSchema>;
 
 export const AuthMeSchema = z.strictObject({
   deviceId: z.string().trim().min(4).max(128).optional(),
 });
-export type AuthMeInput = z.infer<typeof AuthMeSchema>;
 
 export const ImageRefSchema = z.strictObject({
   path: z.string().trim().min(5).max(500),
@@ -140,7 +138,6 @@ export const OrganizationContactSchema = z.strictObject({
   createdBy: z.string().trim().optional(),
   updatedBy: z.string().trim().optional(),
 });
-export type OrganizationContactInput = z.infer<typeof OrganizationContactSchema>;
 
 export const CreateOrganizationSchema = z.strictObject({
   organizationId: ContextFields.organizationId,

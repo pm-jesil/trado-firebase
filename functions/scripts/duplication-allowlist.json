@@ -690,16 +690,6 @@
       "reason": "Inter-branch stock transfer line items array capped at 200 in CreateStockTransferSchema."
     },
     {
-      "id": "DUP-085",
-      "kind": "BOUNDED_ARRAY",
-      "collection": "accountReconciliations",
-      "field": "reconciledTransactionIds",
-      "owner": "financialAccounts",
-      "serverWritten": true,
-      "cap": 500,
-      "reason": "Array of reconciled ledger transaction IDs bounded per statement period."
-    },
-    {
       "id": "DUP-088",
       "kind": "BOUNDED_ARRAY",
       "collection": "payments",
