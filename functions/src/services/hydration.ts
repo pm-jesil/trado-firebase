@@ -119,7 +119,3 @@ export function hydrate(ctx: Pick<RequestContext, "organizationId" | "can">, doc
   return new ReferenceCollector().collect(docs).resolve(ctx);
 }
 
-/** Converts a membership id to the user's uid within an organization (`${uid}_${orgId}`). */
-export function membershipIdFor(uid: string, organizationId: string): string {
-  return `${uid}_${organizationId}`;
-}

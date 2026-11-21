@@ -124,11 +124,3 @@ export async function getNextDocumentNumberInTxn(
   return reservation.formattedNumber;
 }
 
-/**
- * Standalone wrapper for allocating document number when no external transaction is in progress.
- */
-export async function allocateNextDocumentNumber(params: NextNumberParams): Promise<string> {
-  return await db.runTransaction(async (txn) => {
-    return await getNextDocumentNumberInTxn(txn, params);
-  });
-}

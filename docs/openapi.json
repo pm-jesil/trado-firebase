@@ -10199,7 +10199,7 @@
       "post": {
         "operationId": "recurringExpensesList",
         "summary": "[READ] Recurring Expenses List",
-        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `recurringExpenses.list`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `expense:view`, `outflow:view`\n\n**Input schema:** `PaginationQuerySchema`\n\n**Reads:** recurringExpenses\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
+        "description": "**Risk Classification:** `READ`\n\n**Recommended Persona:** `Retail Owner / Cashier / Staff`\n\n**Safe to Repeat:** `Yes`\n\n**Logical name:** `recurringExpenses.list`\n\n**Authentication:** Required (Firebase ID Token)\n\n**Permissions:** `expense:view`, `outflow:view`\n\n**Input schema:** `ListRecurringExpensesSchema`\n\n**Reads:** recurringExpenses\n\n\n**Expected Errors:**\n- `UNAUTHENTICATED`: Missing or expired Firebase ID token\n- `PERMISSION_DENIED`: Caller lacks required capability\n- `INVALID_ARGUMENT`: Payload failed schema validation",
         "tags": [
           "procurement"
         ],
@@ -10219,7 +10219,7 @@
                 ],
                 "properties": {
                   "data": {
-                    "$ref": "#/components/schemas/PaginationQuerySchema"
+                    "$ref": "#/components/schemas/ListRecurringExpensesSchema"
                   }
                 }
               },
@@ -18010,7 +18010,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "default": "bank_1yrrf6x",
+            "default": "bank_ounqxdd",
             "type": "string",
             "minLength": 1
           },
@@ -18094,7 +18094,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "default": "bank_cwvwwr1",
+              "default": "bank_dv1lrlk",
               "type": "string",
               "minLength": 1
             },
@@ -32973,6 +32973,18 @@
                               "type": "number",
                               "nullable": true,
                               "x-ts-type": "number | undefined"
+                            },
+                            "updatedAt": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Time the record was last changed (ISO-8601).",
+                              "x-ts-type": "string | undefined"
+                            },
+                            "updatedBy": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Firebase Auth uid of the user who last changed the record.",
+                              "x-ts-type": "string | undefined"
                             }
                           }
                         },
@@ -33847,6 +33859,18 @@
                               "type": "number",
                               "nullable": true,
                               "x-ts-type": "number | undefined"
+                            },
+                            "updatedAt": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Time the record was last changed (ISO-8601).",
+                              "x-ts-type": "string | undefined"
+                            },
+                            "updatedBy": {
+                              "type": "string",
+                              "nullable": true,
+                              "description": "Firebase Auth uid of the user who last changed the record.",
+                              "x-ts-type": "string | undefined"
                             }
                           }
                         },
@@ -47949,6 +47973,18 @@
                             "type": "number",
                             "nullable": true,
                             "x-ts-type": "number | undefined | number | undefined"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Time the record was last changed (ISO-8601).",
+                            "x-ts-type": "string | undefined | string | undefined"
+                          },
+                          "updatedBy": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "Firebase Auth uid of the user who last changed the record.",
+                            "x-ts-type": "string | undefined | string | undefined"
                           }
                         }
                       },
@@ -59212,6 +59248,18 @@
                     "type": "number",
                     "nullable": true,
                     "x-ts-type": "number | undefined"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Time the record was last changed (ISO-8601).",
+                    "x-ts-type": "string | undefined"
+                  },
+                  "updatedBy": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Firebase Auth uid of the user who last changed the record.",
+                    "x-ts-type": "string | undefined"
                   }
                 }
               }
@@ -59232,47 +59280,13 @@
               "policy": {
                 "type": "object",
                 "properties": {
-                  "updatedAt": {
-                    "type": "string",
-                    "description": "Time the record was last changed (ISO-8601).",
-                    "x-ts-type": "string"
-                  },
-                  "updatedBy": {
-                    "type": "string",
-                    "description": "Firebase Auth uid of the user who last changed the record.",
-                    "x-ts-type": "string"
-                  },
-                  "cashRoundingFils": {
-                    "type": "boolean",
-                    "nullable": true,
-                    "x-ts-type": "boolean | undefined"
-                  },
-                  "roundToNearestRupee": {
-                    "type": "boolean",
-                    "nullable": true,
-                    "x-ts-type": "boolean | undefined"
-                  },
-                  "roundingMode": {
+                  "moneyConvention": {
                     "type": "string",
                     "enum": [
-                      "half_up",
-                      "half_even"
+                      "major"
                     ],
                     "nullable": true,
-                    "x-ts-type": "\"half_up\" | \"half_even\" | undefined"
-                  },
-                  "cashCountVarianceThreshold": {
-                    "type": "number",
-                    "nullable": true,
-                    "x-ts-type": "number | undefined"
-                  },
-                  "selfApprovalLimits": {
-                    "type": "object",
-                    "additionalProperties": {
-                      "type": "number",
-                      "x-ts-type": "number"
-                    },
-                    "x-ts-type": "Record<string, number>"
+                    "x-ts-type": "\"major\" | undefined"
                   },
                   "selfApprovalPolicy": {
                     "type": "string",
@@ -59284,20 +59298,56 @@
                     "nullable": true,
                     "x-ts-type": "\"off\" | \"up_to_limit\" | \"on\" | undefined"
                   },
-                  "moneyConvention": {
+                  "selfApprovalLimits": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "number",
+                      "x-ts-type": "number"
+                    },
+                    "x-ts-type": "Record<string, number>"
+                  },
+                  "roundingMode": {
                     "type": "string",
                     "enum": [
-                      "major"
+                      "half_up",
+                      "half_even"
                     ],
                     "nullable": true,
-                    "x-ts-type": "\"major\" | undefined"
+                    "x-ts-type": "\"half_up\" | \"half_even\" | undefined"
+                  },
+                  "roundToNearestRupee": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "cashRoundingFils": {
+                    "type": "boolean",
+                    "nullable": true,
+                    "x-ts-type": "boolean | undefined"
+                  },
+                  "cashCountVarianceThreshold": {
+                    "type": "number",
+                    "nullable": true,
+                    "x-ts-type": "number | undefined"
+                  },
+                  "updatedAt": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Time the record was last changed (ISO-8601).",
+                    "x-ts-type": "string | undefined"
+                  },
+                  "updatedBy": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "Firebase Auth uid of the user who last changed the record.",
+                    "x-ts-type": "string | undefined"
                   }
                 }
               }
             }
           }
         },
-        "x-ts-type": "{ policy: { updatedAt: string; updatedBy: string; cashRoundingFils?: boolean | undefined; roundToNearestRupee?: boolean | undefined; roundingMode?: \"half_up\" | \"half_even\" | undefined; cashCountVarianceThreshold?: number | undefined; selfApprovalLimits?: Record<...> | undefined; selfApprovalPolicy?: \"off\" | ... 2 mo..."
+        "x-ts-type": "{ policy: AccountingPolicy; }"
       },
       "AccountTransfersConfirmResponse": {
         "type": "object",

@@ -30,7 +30,6 @@ import { db } from "./firebase.js";
 import { lockSegment } from "./naturalKeys.js";
 
 export type SerialStatus = "pending_receipt" | "in_stock" | "reserved" | "sold" | "returned" | "damaged" | "vendor_returned" | "in_transit";
-export const IN_HAND: ReadonlySet<SerialStatus> = new Set(["in_stock", "returned", "reserved", "in_transit"]);
 const AVAILABLE: ReadonlySet<SerialStatus> = new Set(["in_stock", "returned"]);
 
 export interface SerialLine {

@@ -189,5 +189,3 @@ function logRequest(ctx: RequestContext, info: FinishInfo, durationMs: number): 
   }
 }
 
-/** For tests and the overhead measurement. */
-export const meterMode = (): string => MODE;

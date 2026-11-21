@@ -3691,7 +3691,7 @@
         "expense:view",
         "outflow:view"
       ],
-      "inputSchema": "PaginationQuerySchema",
+      "inputSchema": "ListRecurringExpensesSchema",
       "firestoreCollectionsRead": [
         "recurringExpenses"
       ],

@@ -53,10 +53,6 @@ export class MockNotificationSender implements NotificationSender {
 // Active singleton sender (defaulting to MockNotificationSender for local tests)
 let activeSender: NotificationSender = new MockNotificationSender();
 
-export function setNotificationSender(sender: NotificationSender): void {
-  activeSender = sender;
-}
-
 export function getNotificationSender(): NotificationSender {
   return activeSender;
 }

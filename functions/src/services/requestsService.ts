@@ -28,14 +28,6 @@ import {
   SubscriptionPlanDoc,
 } from "../types/models.js";
 
-export interface Clock {
-  now(): Date;
-}
-
-export const systemClock: Clock = {
-  now: () => new Date(),
-};
-
 /**
  * Maps each of the 15 categories to approval or work kind.
  */

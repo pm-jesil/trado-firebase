@@ -154,13 +154,6 @@ export function validateBarcode(barcode: string): boolean {
   return calculatedCheck === checkDigit;
 }
 
-// 11. HSN / SAC (4, 6, or 8 digits)
-export function validateHSN(hsn: string): boolean {
-  if (!hsn) return false;
-  const clean = hsn.trim();
-  return /^\d{4}$|^\d{6}$|^\d{8}$/.test(clean);
-}
-
 // 12. Postal Code per Country
 export function validatePostalCode(postalCode: string, countryCode: string): boolean {
   if (!postalCode || !countryCode) return false;

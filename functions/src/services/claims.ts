@@ -53,10 +53,4 @@ export async function setPrimaryBranchClaim(uid: string, branchId: string): Prom
   await setCustomClaims(uid, { primaryBranchId: branchId }, true);
 }
 
-/**
- * Sets the isSuperAdmin claim for a platform administrator.
- */
-export async function setSuperAdminClaim(uid: string, isSuperAdmin: boolean): Promise<void> {
-  await setCustomClaims(uid, { isSuperAdmin }, true);
-}
 

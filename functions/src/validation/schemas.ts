@@ -1244,11 +1244,6 @@ export const ListBranchesSchema = z.strictObject({
   status: z.nativeEnum(EntityStatus).optional(),
 });
 
-export const GetBranchSchema = z.strictObject({
-  organizationId: z.string().trim().optional(),
-  branchId: z.string().trim().min(2),
-});
-
 export const SwitchBranchContextSchema = z.strictObject({
   organizationId: ContextFields.organizationId,
   branchId: ContextFields.branchId,
@@ -1632,7 +1627,6 @@ export const ListRecurringExpensesSchema = z.strictObject({
   limit: z.number().int().min(1).max(100).optional(),
   startAfterId: z.string().trim().optional(),
 });
-export const PaginationQuerySchema = ListRecurringExpensesSchema;
 
 // ── Image Pipeline Schemas (N-06 / N-07) ─────────────────────────
 export const CreateImageUploadSessionSchema = z.strictObject({

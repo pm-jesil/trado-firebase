@@ -63,10 +63,3 @@ export function normalizeOptionalPhone(phone?: string | null, defaultCountry: st
   return normalizePhone(phone, defaultCountry);
 }
 
-/**
- * Normalizes an optional email address. Returns undefined if omitted.
- */
-export function normalizeOptionalEmail(email?: string | null): string | undefined {
-  if (!email || !email.trim()) return undefined;
-  return normalizeEmail(email);
-}
